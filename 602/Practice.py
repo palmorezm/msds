@@ -1,0 +1,801 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 21 15:46:26 2021
+
+@author: Zachary Palmore
+"""
+
+# Datacamp Intro to Python Practice 
+
+import numpy as np
+np.array([6, 2, 4]) + np.array([5, 1, 3])
+
+# results in:
+# array([11,  3,  7])
+
+import numpy as np
+np.array([6, 2, 4]) * np.array([5, 1, 3])
+# results in:
+# array([11,  3,  7])
+
+import numpy as np
+np.array([6, 2, 4]) - np.array([5, 1, 3])
+
+# results in:
+# array([1,  1,  1])
+
+import numpy as np
+np.array([6, 2, 4]) / np.array([5, 1, 3])
+# results in:
+# array([1.2       , 2.        , 1.33333333])
+
+# What operator in the following equation 
+# print("6" ? (2 ** 2))
+#would produce the vector; 6666
+
+print("6" * (2 ** 2))
+# Results in 6666
+
+# Complete the code 
+# import numpy as np
+# numbers = [[50, 3],[21, 15],[32, 80]]
+# np_array = np.array(numbers)
+# print(np_array. ? )
+# to return the output; 
+# (3, 2)
+
+import numpy as np
+numbers = [[50, 3],[21, 15],[32, 80]]
+np_array = np.array(numbers)
+print(np_array.size)
+
+# AttributeError: 'numpy.ndarray' object has no attribute 'dim'
+# AttributeError: 'numpy.ndarray' object has no attribute 'len'
+# Attribute size = 6 (there are 6 values)
+
+# What is the output of this code? 
+
+p = "23"
+print(type(p))
+
+# What is the output of the following code? 
+
+x = [11, 12, 13, 14]
+y = x
+y[2:4] = [15, 16]
+print(x)
+
+# Which code invokes the method x() of the object p? 
+
+# p.x() is correct if object x was corrected
+p.x()
+# Results
+# AttributeError: 'str' object has no attribute 'x'
+
+x().p
+# Results 
+# TypeError: 'list' object is not callable
+
+p$x()
+# Results 
+# SyntaxError: invalid syntax
+
+x(p)
+# Results
+# TypeError: 'list' object is not callable
+
+# You have the following data frame: 
+#  Month  Count
+# 0   Jan     52
+# 1   Apr     29
+# 2   Mar     46
+# 3   Feb      3
+
+# Select the code to return the output: 
+#  Month  Count
+# 0   Jan     52
+
+print(df.loc[df['Month'] == 'Jan'])
+
+# Complete the code to return the output: 
+# get the standard devation of 'Count'
+# print(df['Count'] ? )
+
+print(df['Count'].std())
+
+# Complete the code to return the output:
+#           Country  Total
+# 0   United States   1118
+# 1    Soviet Union    473
+# 2  United Kingdom    273
+    
+import pandas as pd
+list_keys = ['Country', 'Total']
+list_values = [['United States', 'Soviet Union', 'United Kingdom'], [1118, 473, 273]]
+
+zipped = list(zip(list_keys, list_values))
+data = dict(zipped)
+df = pd.DataFrame(data)
+print(df.head())
+
+# returns;
+#           Country  Total
+# 0   United States   1118
+# 1    Soviet Union    473
+# 2  United Kingdom    273
+
+zipped = zip(dict(list_keys, list_values))
+data = list(zipped)
+df = pd.DataFrame(data)
+print(df.head())
+
+# returns;
+# TypeError: dict expected at most 1 argument, got 2
+
+zipped = zip(list(list_keys, list_values))
+data = dict(zipped)
+df = pd.DataFrame(data)
+print(df.head())
+
+# returns;
+# TypeError: list expected at most 1 argument, got 2
+
+zipped = list(dict(list_keys, list_values))
+data = zip(zipped)
+df = pd.DataFrame(data)
+print(df.head())
+
+# returns; 
+# TypeError: dict expected at most 1 argument, got 2
+
+zipped = dict(list(list_keys, list_values))
+data = zip(zipped)
+df = pd.DataFrame(data)
+print(df.head())
+
+# returns;
+# TypeError: list expected at most 1 argument, got 2
+
+# Which of the following methods will generate summary statistics exlcuding NaN values? 
+# .summary()
+# .describe()
+# .info()
+# .stats() 
+
+# results without NaN for summary stats
+.describe()
+
+
+# Complete the code to return the output
+# DatetimeIndex(['2013-01-01 09:12:34', '2013-01-01 09:12:34'], dtype='datetime64[ns]', freq=None)
+
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.to_datetime(l)))
+
+# results;
+# TypeError: an integer is required (got type list)
+
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.datetime(l)))
+
+# results;
+# DatetimeIndex(['2013-01-01 09:12:34', '2013-01-01 09:12:34'], dtype='datetime64[ns]', freq=None)
+
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.date(l)))
+
+# results; 
+# AttributeError: module 'pandas' has no attribute 'date'
+
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.time(l)))
+
+# results; 
+# AttributeError: module 'pandas' has no attribute 'time'
+
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.todatetime(l)))
+
+# results; 
+# AttributeError: module 'pandas' has no attribute 'todatetime'
+
+# Return the functions found within the pandas package
+import pandas as pd
+dir(pd)
+
+# Which of these will return an error?
+True + "r"
+# returns error;
+# TypeError: unsupported operand type(s) for +: 'bool' and 'str'
+
+bool(5) + 7
+# returns 8
+
+"python" + "data"
+# returns "pythondata"
+
+6 + 6.5 
+# returns 12.5
+
+# Select the code to return the output
+# [3, 13, 11]
+
+x = [18, 8, 3, 13, 11, 9, 7]
+print(x[2:5])
+# returns;
+# [3, 13, 11]
+
+x = [18, 8, 3, 13, 11, 9, 7]
+print(x[0:5])
+# returns;
+# [18, 8, 3, 13, 11]
+
+x = [18, 8, 3, 13, 11, 9, 7]
+print(x[0:6])
+# returns;
+# [18, 8, 3, 13, 11, 9]
+
+# Complete the code to return the output 
+# 1.55
+# import numpy as np
+# np_heights = np.array([[1.60,1.75],[1.56,1.70],[1.49,1.68]])
+# print(np. ? (np_heights[:,0]))
+
+import numpy as np
+np_heights = np.array([[1.60,1.75],[1.56,1.70],[1.49,1.68]]) 
+print(np.mean(np_heights[:,0]))
+# returns; 
+# 1.55
+
+# Complete the code to return the output
+# Jan
+# Jun
+# Dec
+# Mar
+# x = ['Jan', 'Jun', 'Dec', 'Mar']
+# for month in ?: 
+#    print(month)
+
+x = ['Jan', 'Jun', 'Dec', 'Mar']
+for month in x:
+    print(month)
+# returns;
+# Jan
+# Jun
+# Dec
+# Mar
+
+# Complete the code to return the output
+# {'course': 'sql', 'level': 'intermediate', 'lesson': {'dictionaries': 'python', 'lists': 'r'}}
+# datacamp[ ? ] = 'sql'
+# print(datacamp)
+
+# Here is the datacamp dictionary
+# datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+
+datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+datacamp['course'] = 'sql'
+print(datacamp)
+# returns;
+# {'course': 'sql', 'level': 'intermediate', 'lesson': {'dictionaries': 'python', 'lists': 'r'}}
+
+datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+datacamp['lists'] = 'sql'
+print(datacamp)
+# return; 
+# {'course': 'python', 'level': 'intermediate', 'lesson': {'dictionaries': 'python', 'lists': 'r'}, 'lists': 'sql'}
+
+datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+datacamp['lesson'] = 'sql'
+print(datacamp)
+# return; 
+# {'course': 'python', 'level': 'intermediate', 'lesson': 'sql'}
+
+datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+datacamp['dictionaries'] = 'sql'
+print(datacamp)
+# returns; 
+# {'course': 'python', 'level': 'intermediate', 'lesson': {'dictionaries': 'python', 'lists': 'r'}, 'dictionaries': 'sql'}
+
+# Complete the code to return the output
+# 1 
+# 2
+# 3
+# 4
+# array([[1, 2],
+#        [3, 4]])
+# for val in np. ? (np_array):
+#  print(val)
+
+import numpy as np
+np_array = np.array([[1, 2],
+                     [3, 4]])
+
+
+for val in np.nditer (np_array):
+    print(val)
+# returns; 
+# 1 
+# 2
+# 3
+# 4
+
+for val in np.enumerate (np_array):
+    print(val)
+# returns; 
+# AttributeError: module 'numpy' has no attribute 'enumerate'
+
+for val in np.items (np_array):
+    print(val)
+# returns; 
+# AttributeError: module 'numpy' has no attribute 'items'
+
+
+for val in np.diter (np_array):
+    print(val)
+# returns; 
+# AttributeError: module 'numpy' has no attribute 'diter'
+
+# Complete the code to return the output
+# python practice has 100 items
+# r practice has 30 items
+# sql practice has 10 items
+# practice = {'python': 100, "r": 30, "sql": 10}
+# for course, number in practice.items():
+#   print( ? + " practice has " + str( ? ) + " items")
+
+practice = {'python': 100, "r": 30, "sql": 10}
+for course, number in practice.items():
+   print(course + " practice has " + str(number) + " items")
+# returns; 
+# python practice has 100 items
+# r practice has 30 items
+# sql practice has 10 items
+
+# Complete the code to return the output
+# DatetimeIndex(['2013-01-01 09:12:34', '2013-01-01 09:12:34'], dtype='datetime64[ns]', freq=None)
+# l = ['2013-01-01 091234','2013-01-01 091234']
+# print((pd.?(l)))
+
+import pandas as pd
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.to_datetime(l)))
+# returns; 
+# DatetimeIndex(['2013-01-01 09:12:34', '2013-01-01 09:12:34'], dtype='datetime64[ns]', freq=None)
+
+# Create a data frame of two columns and four rows using np.array and pd.Dataframe
+# print the results
+import pandas as pd
+import numpy as np  
+df = pd.DataFrame(np.array([["Jan", 52], ["Feb", 24], ["Mar", 3], ["Apr", 35]]),
+                   columns=['Month', 'Count'])
+print(df)
+
+# Select the code to return the output
+#   Month  Count
+# 0   Jan     52
+# For the data frame df 
+#   Month  Count
+# 0   Jan     52
+# 1   Feb     24
+# 2   Mar     3 
+# 3   Apr     35
+import pandas as pd
+import numpy as np  
+df = pd.DataFrame(np.array([["Jan", 52], ["Feb", 24], ["Mar", 3], ["Apr", 35]]),
+                   columns=['Month', 'Count'])
+# 'loc' locks in on the part of the df that you want to view
+# specify what you want to look in on with df[ colname ] and boolean 
+print(df.loc[df['Month'] == 'Jan'])
+# returns; 
+#   Month  Count
+# 0   Jan     52
+
+# Select the code to return the output
+#       Month  Count
+# three   Feb     24
+# For the data frame df 
+#   Month  Count
+# 0   Jan     52
+# 1   Feb     24
+# 2   Mar     3 
+# 3   Apr     35
+import pandas as pd
+import numpy as np  
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+
+df = del(df[0])
+# returns;
+# SyntaxError: invalid syntax
+
+df = df.drop(df[0])
+# returns; 
+# KeyError: 0
+
+# drop the first row
+df = df.drop(0)
+print(df)
+# returns; 
+#         Month Count
+# 1    one   Feb    24
+# 2    two   Mar     3
+# 3  three   Apr    35
+
+# 'loc' locks in on the part of the df that you want to view
+# specify that you want to see the entire row of the data frame with ':'
+print(df.loc['three':])
+# returns; 
+#         Month  Count
+# 0 three   Apr     35
+
+# Drop the first row of the data frame df
+import pandas as pd
+import numpy as np  
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+
+df = del(df[0])
+# returns;
+# SyntaxError: invalid syntax
+
+df = df.drop(df[0])
+# returns; 
+# KeyError: 0
+
+# drop the first row
+df = df.drop(0)
+print(df)
+# returns; 
+#         Month Count
+# 1    one   Feb    24
+# 2    two   Mar     3
+# 3  three   Apr    35
+
+# What argument would you use to get a data frame as numpy array? 
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+df.values
+# returns; 
+# array([['zero', 'Jan', '52'],
+#      ['one', 'Feb', '24'],
+#      ['two', 'Mar', '3'],
+#      ['three', 'Apr', '35']], dtype=object)
+
+# What argument would you use to peek at the top of a data frame? 
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+df.head()
+# returns; 
+# first 5 rows of data
+# In this case that looks like;  
+#       ID Month Count
+# 0   zero   Jan    52
+# 1    one   Feb    24
+# 2    two   Mar     3
+# 3  three   Apr    35
+# Since there are fewer than 5, it shows all the rows available
+
+import matplotlib.pyplot as plt 
+plt.scatter([1,2,3,4], [5,6,7,8])
+
+# What will this return? 
+# np.array([True, 1, 2]) + np.array([3, 4, False])
+
+import numpy as np
+np.array([True, 1, 2]) + np.array([3, 4, False])
+# returns; 
+# array([4, 5, 2])
+
+# Complete the code to return the output
+# 0 
+# print( ? * bool(3.2))
+
+print(False * bool(3.2))
+# returns; 
+# 0
+
+# Complete the code to return the output 
+# <class 'bool'>
+# p = ?
+# print(type(p))
+
+p = True
+print(type(p))
+# or
+p = False
+print(type(p))
+# returns; 
+# <class 'bool'>
+
+# Complete the code to return the output
+# 10
+# x = 5
+# y = x
+# print(x ? y)
+
+x = 5
+y = x
+print(x + y)
+
+# Reverse the order of the elements
+# y = [12, 18, 1, 2]
+
+y = [12, 18, 1, 2]
+y.reverse()
+print(y)
+# returns;
+# [2, 1, 18, 12]
+
+
+# Write code to display the 2nd and 3rd rows of a data frame df 
+import pandas as pd
+import numpy as np
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+print(df.iloc[1:3])
+
+
+# Write code that prints the row of the data frame df where the count is 3
+import pandas as pd
+import numpy as np
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+print(df.loc[df['Count'] == 3])
+
+# What is the output of this code? 
+# practice = ["Introduction","Python","DataCamp", "R", "SQL", "Data Science"]
+# x = -6
+# y = -3
+# print(practice[x:y])
+
+practice = ["Introduction","Python","DataCamp", "R", "SQL", "Data Science"]
+x = -6
+y = -3
+print(practice[x:y])
+# returns; 
+# ['Introduction', 'Python', 'DataCamp']
+
+# Complete the code to return the output; 
+# (2, 4)
+# import numpy as np
+# x = np.array([14, 21, 24, 24])
+# y = np.array([12, 6, 23, 29])
+# z = np.array([x, y])
+# print(z.?)
+
+import numpy as np
+x = np.array([14, 21, 24, 24])
+y = np.array([12, 6, 23, 29])
+z = np.array([x, y])
+print(z.shape)
+# returns; 
+# (2, 4) 
+# which corresponds to 2 rows and 4 columns as shown in the data frame z 
+print(z)
+
+# Write code to return the output
+# [1, 0, 2]
+x = 1
+y = 0
+z = 2
+print([x,y,z])
+# returns; 
+# [1, 0, 2]
+
+# Write code to print the help available for the function len()
+print(help(len))
+
+
+# Write code to print the name and surname of an individual using variables name = "Bob" and surname = "Smith"
+name = "Bob"
+surname = " Smith"
+print(name + surname)
+
+# Write code to print the second through the fourth entries of the variable x
+x = [1,2,3,4,5]
+print(x[1:4])
+
+# What is the output of this code? 
+import numpy as np
+z = np.array([[5, 9, 8], 
+              [9, 0, 6]])
+print(z[0:, 1:])
+# returns; 
+# [[9 8]
+#  [0 6]]
+
+# Complete the code to return the output
+# 100
+# 4 * 5 ** ? 
+print(4 * 5 ** 2)
+# returns; 
+# 100
+
+# What would be the result of running this code on the data frame iris_sample? 
+# print(iris_sample.iloc[[0], [1]])
+# returns the second column of the first row in iris_sample
+
+# Complete the code to return the output
+# array([[ 4, 11],
+#       [ 5, 12],
+#       [ 6, 13]])
+# import numpy as np
+# y = np.array([[4, 5, 6],
+#              [11, 12, 13]])
+# ? (y)
+import numpy as np
+y = np.array([[4, 5, 6],
+             [11, 12, 13]])
+np.transpose(y)
+# returns; 
+# array([[ 4, 11],
+#       [ 5, 12],
+#       [ 6, 13]])
+
+np.flip(y)
+# returns; 
+# array([[13, 12, 11],
+#       [ 6,  5,  4]])
+
+np.rotate(y)
+# returns; 
+# AttributeError: module 'numpy' has no attribute 'rotate'
+
+np.reverse(y)
+# returns; 
+# AttributeError: module 'numpy' has no attribute 'reverse'
+
+# Write code that returns the following based on the two nunmpy arrays named numpy1 and numpy2
+# array([ True, False, False, False], dtype=bool)
+numpy1 = np.array([17.2, 20.0, 8.25, 9.50])
+numpy2 = np.array([13.0, 24.0, 8.25, 9.0])
+np.logical_and(numpy1 > 10, numpy2 < 20)
+# returns; 
+# array([ True, False, False, False])
+
+np.or(numpy1 > 10, numpy2 < 20)
+# returns;
+# SyntaxError: invalid syntax
+
+np.logical_or(numpy1 > 10, numpy2 < 20)
+# returns; 
+# array([ True,  True,  True,  True])
+
+np.logical_or(numpy1 > 10, numpy2 < 20)
+# returns; 
+# array([ True,  True,  True,  True])
+
+np.and(numpy1 > 10, numpy2 < 20)
+# returns; 
+# SyntaxError: invalid syntax
+
+# Write code to interate through and print the elements of numpy arrays numpy1 and numpy2
+import numpy as np 
+np_array1 = np.array([1,2,3])
+np_array2 = np.array([4,5,6])
+np_array = np.array([np_array1, np_array2])
+
+for val in np.nditer(np_array):
+    print(val)
+
+# What does this code do?  
+# df.iloc[[1]]
+# selects the second row of values 
+
+### #### ### ### Section Break ### ### ### 
+# For reference about the material: see midterm materials folder
+# 
+
+x = int(input(2))
+y = int(input(4))
+print(x+y)
+
+
+def concatA(a,b):
+     return a + b
+
+print(concatA([9, 2, 1], [4, 8, 7]))
+
+def extendList(a):
+    return 2*a
+print(extendList([7,1,1]))
+
+
+		
+def addList(a):
+
+
+def addList(a):
+    return sum(a)
+print(addList([7,1,1]))
+
+x = 6
+elif  x % 2 == 0:
+    print("x is even")
+
+x = 6
+else  x % 2 == 0:
+    print("x is even")
+
+x = 6
+if  x % 2 == 0:
+    print("x is even")
+
+x = 6
+for  x % 2 == 0:
+    print("x is even")
+
+
+input()
+
+
+
+class A:
+      X = 0
+      def __init__(self, v=0):
+            self.Y=v
+            A.X += v
+
+
+a = A()
+b = A(1)
+c = A(2)
+print(c.X)
+
+
+
+x = 2
+y = 4
+x= x / y
+y = y / x
+print(y)
+
+
+[1, 0, 1] + [2, 4, 6]
+
+
+
+
+x = input(3)
+y = int(input(6))
+print(x * y)
+
+3*6
+
+practice = {'python':100, "r":30, "SQL": 10}
+for key, value in practice :
+       print(key+ " practice has " + str(value) + " items")
+
+
+
+Which statement is illegal in Python?
+Given the Python statement:
+
+
+
+value = (42, "universe", "everything")
+
+
+value.append(35)	
+value.extend([5,7])
+value.insert(1, "hitchhiker")
+
+
+not(39 < 63)
+Required Output:
+False
+
+
+x = 7
+def is_odd (x) : return x % 2 == 1 # True
+
+x = 9
+def is_odd (x) : return x / 2 == 1 # False
+
+x = 11
+def is_odd (x) : if x % 2 == 1: return True else: return False # False
+
+is_odd(x) 
+
+( 1 < 15 ) and (15 <  25)
