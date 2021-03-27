@@ -1,0 +1,1541 @@
+---
+title: "Project 3"
+author: "Team DAREZ"
+date: "10/17/2020"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+    toc_collapsed: yes
+    toc_depth: 3
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Introduction
+
+As recent as March of 2019 we are still hearing repeatedly that the demand of data scientists is not being met. The University of Pennsylvania states "Data analytics is becoming mission-critical to more and more businesses." They quote LinkedIn co-found Allen Blue saying, "There are very few data scientists out here passing out their resumes. Data scientists are almost all already employed, because they're so much in demand." (https://knowledge.wharton.upenn.edu/article/whats-driving-demand-data-scientist/) 
+
+Data scientists come in many different flavors and from many different backgrounds as well, so often it comes down to having the right set of skills for the job. So what are those specific skills, other than it saying "data scientist" on your business card, that are in demand?
+
+We set out to use our growing data science skills to begin looking at the data on what skills are in demand for data science. We chose to use 3 datasets, each looking at a slightly different angle of the question, "Which are the most valued data science skills?"
+
+First, we looked at the 2019 Kaggle Survey on Data Science and Machine Learning. This massive, world-wide survey asks some pertinent questions of what specific tools and skills current practitioners are using. Next, we accessed a scrape of Glassdoor job postings that bring in the perspective of what hiring companies are asking for. Finally, a scrape of Indeed job postings was used to look at trends such as job locations and salaries. In a sense, these tell us what the job market expects of data scientists on a larger scale in terms of where we are willing to live and what salary is acceptable.
+
+
+## Setup 
+
+Packages needed for this project include:
+
+```{r message = FALSE}
+#some packages repeated, but nice to know which sections they were used in
+
+# For Web-scrap of Indeed
+library(rvest)
+library(readr)
+library(tidyverse)
+library(DT)
+library(xml2)
+
+# For graphing and nice tables
+library(ggplot2)
+library(rcartocolor)
+library(kableExtra)
+
+# SQL database connection
+library(odbc) 
+library(DBI)  
+
+#packages for glassdoor
+library(tidyverse)
+library(openintro) 
+library (readr)
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(wordcloud)
+library(tidytext)
+library(igraph)
+library(ggraph)
+
+#package for Kaggle Survey
+library (tidyverse)
+library (stringr)
+
+```
+
+
+### Database Connection: Azure
+
+We wanted to store our data in an Azure online database. We created an account and initialized the database. We set up permissions and granted each user access to the database based on their IP addresses.
+
+We created tables for each of the data sources and imported the data to each table, saving the import packages as SSIS (.dtsx) files. The initial tables included one table for the survey information from both Indeed and Glassdoor, and three tables to store the Kaggle survey data. We also created a "read only" user account that was shared with each of the team members so that they could read the data. The "read only" connection is in the code below:
+
+
+```{r Azure_connection}
+library(odbc) # create connection to SQL database
+library(DBI)  # query SQL database tables
+
+# connect to the server
+my_connection <- dbConnect(drv = odbc::odbc(),
+         Driver = "SQL Server",
+         server = "data607.database.windows.net",
+         database = "Project3",
+         uid = "Professor607",
+         pwd = "TeamDAREZ#1")
+```
+
+
+What follows is our step-by-step method of importing the data from the database into R. The flow began by reading the data from our Indeed web-scrape into its dataframe. This process is repeated until each source is extracted from the database and in their own dataframes. It was completed using the DBI package's `dbGetQuery` function. Snippets of information containing the number of observations and the number of variables were written above the block of code that was used to read the data. Small examples of the imported data are also shown beneath the chunks. 
+
+#### Importing Indeed
+Reading the Indeed web-scrape data into a dataframe. It contains 1524 observations of 7 variables. 
+
+
+
+``` {r read_indeed}
+# read indeed data into a data frame named "df_indeed"
+df_indeed <- dbGetQuery(my_connection,'
+  SELECT "SurveyID", "source", "title", "company", "location", "summary", "link"
+  FROM "indeed_scrape_1"
+  WHERE "source" = \'indeed\'
+')
+
+head(df_indeed)
+```
+
+#### Importing Glassdoor
+Reading the Glassdoor text data into a dataframe. It contains 1710 observations of 7 variables.
+
+
+``` {r read_Glassdoor}
+# read Glassdoor data into a data frame named "df_Glassdoor"
+df_Glassdoor <- dbGetQuery(my_connection,'
+  SELECT "SurveyID", "source", "title", "company", "location", "summary", "link"
+  FROM "indeed_scrape_1"
+  WHERE "source" = \'Glassdoor\'
+')
+
+head(df_Glassdoor)
+```
+
+
+#### Importing Kaggle Survey Schema
+Reading the Kaggle industry survey schema into a dataframe. It contains 10 observations of 35 variables. 
+
+
+``` {r read_survey_schema}
+# read survey schema data into a data frame named "df_survey_schema"
+df_survey_schema <- dbGetQuery(my_connection,'
+  SELECT "2019 Kaggle Machine Learning and Data Science Survey", "Q1", "Q2", "Q3", "Q4"
+  , "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17"
+  , "Q18", "Q19", "Q20", "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27", "Q28", "Q29"
+  , "Q30", "Q31", "Q32", "Q33", "Q34"
+  FROM "survey_schema"
+')
+
+head(df_survey_schema)
+```
+
+
+#### Importing Kaggle Survey’s MC Responses
+Reading the Kaggle industry survey multiple choice responses into a dataframe. It contains 19,718 observations of 246 variables. 
+
+
+``` {r read_survey_multi_choice}
+# read survey multiple choice data into a data frame named "df_survey_multi_choice"
+
+df_survey_multi_choice <- dbGetQuery(my_connection,'
+  SELECT "Time from Start to Finish (seconds)"
+  , "Q1", "Q2", "Q2_OTHER_TEXT", "Q3", "Q4", "Q5", "Q5_OTHER_TEXT"
+  , "Q6", "Q7", "Q8", "Q9_Part_1", "Q9_Part_2", "Q9_Part_3", "Q9_Part_4"
+  , "Q9_Part_5", "Q9_Part_6", "Q9_Part_7", "Q9_Part_8", "Q9_OTHER_TEXT"
+  , "Q10", "Q11", "Q12_Part_1", "Q12_Part_2", "Q12_Part_3", "Q12_Part_4", "Q12_Part_5"
+  , "Q12_Part_6", "Q12_Part_7", "Q12_Part_8", "Q12_Part_9", "Q12_Part_10", "Q12_Part_11"
+  , "Q12_Part_12", "Q12_OTHER_TEXT", "Q13_Part_1", "Q13_Part_2", "Q13_Part_3", "Q13_Part_4"
+  , "Q13_Part_5", "Q13_Part_6", "Q13_Part_7", "Q13_Part_8", "Q13_Part_9", "Q13_Part_10"
+  , "Q13_Part_11", "Q13_Part_12", "Q13_OTHER_TEXT", "Q14", "Q14_Part_1_TEXT", "Q14_Part_2_TEXT"
+  , "Q14_Part_3_TEXT", "Q14_Part_4_TEXT", "Q14_Part_5_TEXT", "Q14_OTHER_TEXT", "Q15"
+  , "Q16_Part_1", "Q16_Part_2", "Q16_Part_3", "Q16_Part_4", "Q16_Part_5", "Q16_Part_6"
+  , "Q16_Part_7", "Q16_Part_8", "Q16_Part_9", "Q16_Part_10", "Q16_Part_11", "Q16_Part_12", "Q16_OTHER_TEXT"
+  , "Q17_Part_1", "Q17_Part_2", "Q17_Part_3", "Q17_Part_4", "Q17_Part_5", "Q17_Part_6", "Q17_Part_7", "Q17_Part_8"
+  , "Q17_Part_9", "Q17_Part_10", "Q17_Part_11", "Q17_Part_12", "Q17_OTHER_TEXT", "Q18_Part_1", "Q18_Part_2"
+  , "Q18_Part_3", "Q18_Part_4", "Q18_Part_5", "Q18_Part_6", "Q18_Part_7", "Q18_Part_8", "Q18_Part_9", "Q18_Part_10"
+  , "Q18_Part_11", "Q18_Part_12", "Q18_OTHER_TEXT", "Q19", "Q19_OTHER_TEXT", "Q20_Part_1", "Q20_Part_2"
+  , "Q20_Part_3", "Q20_Part_4", "Q20_Part_5", "Q20_Part_6", "Q20_Part_7"
+  , "Q20_Part_8", "Q20_Part_9", "Q20_Part_10", "Q20_Part_11", "Q20_Part_12", "Q20_OTHER_TEXT", "Q21_Part_1"
+  , "Q21_Part_2", "Q21_Part_3", "Q21_Part_4", "Q21_Part_5", "Q21_OTHER_TEXT", "Q22", "Q23", "Q24_Part_1"
+  , "Q24_Part_2", "Q24_Part_3", "Q24_Part_4", "Q24_Part_5", "Q24_Part_6", "Q24_Part_7", "Q24_Part_8"
+  , "Q24_Part_9", "Q24_Part_10", "Q24_Part_11", "Q24_Part_12", "Q24_OTHER_TEXT", "Q25_Part_1", "Q25_Part_2"
+  , "Q25_Part_3", "Q25_Part_4", "Q25_Part_5", "Q25_Part_6", "Q25_Part_7", "Q25_Part_8", "Q25_OTHER_TEXT"
+  , "Q26_Part_1", "Q26_Part_2", "Q26_Part_3", "Q26_Part_4", "Q26_Part_5", "Q26_Part_6", "Q26_Part_7"
+  , "Q26_OTHER_TEXT", "Q27_Part_1", "Q27_Part_2", "Q27_Part_3", "Q27_Part_4", "Q27_Part_5", "Q27_Part_6"
+  , "Q27_OTHER_TEXT", "Q28_Part_1", "Q28_Part_2", "Q28_Part_3", "Q28_Part_4", "Q28_Part_5", "Q28_Part_6"
+  , "Q28_Part_7", "Q28_Part_8", "Q28_Part_9", "Q28_Part_10", "Q28_Part_11", "Q28_Part_12", "Q28_OTHER_TEXT"
+  , "Q29_Part_1", "Q29_Part_2", "Q29_Part_3", "Q29_Part_4", "Q29_Part_5", "Q29_Part_6", "Q29_Part_7", "Q29_Part_8"
+  , "Q29_Part_9", "Q29_Part_10", "Q29_Part_11", "Q29_Part_12", "Q29_OTHER_TEXT"
+  , "Q30_Part_1", "Q30_Part_2", "Q30_Part_3", "Q30_Part_4", "Q30_Part_5", "Q30_Part_6", "Q30_Part_7"
+  , "Q30_Part_8", "Q30_Part_9", "Q30_Part_10", "Q30_Part_11", "Q30_Part_12", "Q30_OTHER_TEXT"
+  , "Q31_Part_1", "Q31_Part_2", "Q31_Part_3", "Q31_Part_4", "Q31_Part_5", "Q31_Part_6", "Q31_Part_7"
+  , "Q31_Part_8", "Q31_Part_9", "Q31_Part_10", "Q31_Part_11", "Q31_Part_12", "Q31_OTHER_TEXT"
+  , "Q32_Part_1", "Q32_Part_2", "Q32_Part_3", "Q32_Part_4", "Q32_Part_5", "Q32_Part_6", "Q32_Part_7"
+  , "Q32_Part_8", "Q32_Part_9", "Q32_Part_10", "Q32_Part_11", "Q32_Part_12", "Q32_OTHER_TEXT"
+  , "Q33_Part_1", "Q33_Part_2", "Q33_Part_3", "Q33_Part_4", "Q33_Part_5", "Q33_Part_6"
+  , "Q33_Part_7", "Q33_Part_8", "Q33_Part_9", "Q33_Part_10", "Q33_Part_11", "Q33_Part_12", "Q33_OTHER_TEXT"
+  , "Q34_Part_1", "Q34_Part_2", "Q34_Part_3", "Q34_Part_4", "Q34_Part_5", "Q34_Part_6"
+  , "Q34_Part_7", "Q34_Part_8", "Q34_Part_9", "Q34_Part_10", "Q34_Part_11", "Q34_Part_12", "Q34_OTHER_TEXT"
+  FROM "multiple_choice_responses"
+')
+
+head(df_survey_multi_choice)
+```
+
+#### Importing Other Kaggle Responses
+Reading the Kaggle industry survey responses listed as “other” into a dataframe. It contains 19,718 observations of 28 variables.  
+
+
+
+``` {r read_survey_other_text}
+# read survey other text response (free form) data into a data frame named "df_survey_other_text"
+
+df_survey_other_text <- dbGetQuery(my_connection,'
+  SELECT "Q12_OTHER_TEXT", "Q13_OTHER_TEXT", "Q14_OTHER_TEXT", "Q14_Part_1_TEXT", "Q14_Part_2_TEXT"
+  , "Q14_Part_3_TEXT", "Q14_Part_4_TEXT", "Q14_Part_5_TEXT", "Q16_OTHER_TEXT", "Q17_OTHER_TEXT", "Q18_OTHER_TEXT"
+  , "Q19_OTHER_TEXT", "Q20_OTHER_TEXT", "Q21_OTHER_TEXT"
+  , "Q24_OTHER_TEXT", "Q25_OTHER_TEXT", "Q26_OTHER_TEXT", "Q27_OTHER_TEXT", "Q28_OTHER_TEXT", "Q29_OTHER_TEXT"
+  , "Q2_OTHER_TEXT", "Q30_OTHER_TEXT", "Q31_OTHER_TEXT", "Q32_OTHER_TEXT", "Q33_OTHER_TEXT", "Q34_OTHER_TEXT"
+  , "Q5_OTHER_TEXT", "Q9_OTHER_TEXT"
+  FROM "other_text_responses"
+')
+
+head(df_survey_other_text)
+```
+
+
+
+# Analysis
+
+
+First, we look at the 2019 Kaggle Survey on Data Science and Machine Learning. This massive, world-wide survey asks some pertinent questions of what specific tools and skills current practitioners are using.
+
+Next, we access a scrape of Glassdoor job postings that bring in the perspective of what hiring companies are asking for. 
+
+Finally, a scrape of Indeed job postings is used to look at trends such as job locations and salaries as in a sense, these tell us what the job market expects of data scientists on a larger scale in terms of where we are willing to live and what salary is acceptable
+
+
+
+## Kaggle 2019 Survey Data
+
+For three weeks from October 8 to October 28 of 2019 Kaggle conducted an industry-wide survey with 19,717 responses from individuals in the data science and machine learning fields. Responses were aggregated into a file with data from 171 countries and any country that had less than 50 responses was placed in an "other" category to preserve anonymity of the respondents. The data collected gives a comprehensive look at the state of the industry by asking questions about their education, workplace habits, tools in use and more. It was formatted as a multiple-choice survey wherein responses could be categorized into one of several options for each question. 
+
+We selected this data set to give us the most comprehensive look at the skills and general expectations of the data science and machine learning job market. We decided to select questions that were most relevant to our interests. Here are a few examples:
+
+    * What programming languages do you use on a regular basis?
+    * What programming language would you recommend an aspiring data scientist to learn first?
+    * Which of the following relational database products do you use on a regular basis?
+ 
+These were used in the analysis but prior to performing any computations, the data required cleaning. Due to the way the survey was shuffled to preserve anonymity, the responses needed to be organized into a format that was usable to analyze. With the multiple-choice responses uploaded to our database and GitHub repository as a spreadsheet (.csv) we began to organize and clean the data. 
+
+### Tidying and Munging the Kaggle Data
+
+The 2019 Kaggle survey contains thirty-four questions and the corresponding recorded responses. We decided to make a dataframe for each question and response. The code to accomplish this task is below for each dataframe. It is formatted for ease of viewing to see how each question was cleaned and summarized.
+
+    Q1 - What is your age (# years)?
+
+```{r message = FALSE}
+# create dataframe just for question 1
+
+q_01 <- dbGetQuery(my_connection,'
+  SELECT "Q1"
+    FROM "multiple_choice_responses"
+    wHERE "Q1" != \'\'
+      AND "Q1" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_01 <- data.frame(q_01) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_01
+```
+
+    Q2 - What is your gender?
+
+```{r message = FALSE}
+# create dataframe just for question 2
+
+q_02 <- dbGetQuery(my_connection,'
+  SELECT "Q2"
+    FROM "multiple_choice_responses"
+    wHERE "Q2" != \'\'
+      AND "Q2" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_02 <- data.frame(q_02) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_02
+```
+
+    Q3 - In which country do you currently reside?
+
+```{r message = FALSE}
+# create dataframe just for question 3
+
+q_03 <- dbGetQuery(my_connection,'
+  SELECT "Q3"
+    FROM "multiple_choice_responses"
+    wHERE "Q3" != \'\'
+      AND "Q3" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_03 <- data.frame(q_03) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_03
+```
+
+    Q4 - What is the highest level of formal education that you have attained or
+    plan to attain within the next 2 years?
+
+```{r message = FALSE}
+# create dataframe just for question 4
+
+q_04 <- dbGetQuery(my_connection,'
+  SELECT "Q4"
+    FROM "multiple_choice_responses"
+    wHERE "Q4" != \'\'
+      AND "Q4" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_04 <- data.frame(q_04) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_04
+```
+
+    Q5 - Select the title most similar to your current role (or most recent title if retired):
+
+```{r message = FALSE}
+# create dataframe just for question 5
+
+q_05 <- dbGetQuery(my_connection,'
+  SELECT "Q5"
+    FROM "multiple_choice_responses"
+    wHERE "Q5" != \'\'
+      AND "Q5" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_05 <- data.frame(q_05) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_05
+```
+
+    Q6 - What is the size of the company where you are employed?
+
+```{r message = FALSE}
+# create dataframe just for question 6
+
+q_06 <- dbGetQuery(my_connection,'
+  SELECT "Q6"
+    FROM "multiple_choice_responses"
+    wHERE "Q6" != \'\'
+      AND "Q6" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_06 <- data.frame(q_06) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_06
+```
+
+    Q7 - Approximately how many individuals are responsible for data science
+    workloads at your place of business?
+
+```{r message = FALSE}
+# create dataframe just for question 7
+
+q_07 <- dbGetQuery(my_connection,'
+  SELECT "Q7"
+    FROM "multiple_choice_responses"
+    wHERE "Q7" != \'\'
+      AND "Q7" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_07 <- data.frame(q_07) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_07
+```
+
+    Q8 - Does your current employer incorporate machine learning methods into their business?
+
+```{r message = FALSE}
+# create dataframe just for question 8
+
+q_08 <- dbGetQuery(my_connection,'
+  SELECT "Q8"
+    FROM "multiple_choice_responses"
+    wHERE "Q8" != \'\'
+      AND "Q8" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_08 <- data.frame(q_08) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_08
+```
+
+    Q9 - Select any activities that make up an important part of your role at work:
+    (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 9
+
+q_09 <- dbGetQuery(my_connection,'
+  SELECT "Q9_Part_1", "Q9_Part_2", "Q9_Part_3", "Q9_Part_4"
+        , "Q9_Part_5", "Q9_Part_6", "Q9_Part_7", "Q9_Part_8"
+    FROM "multiple_choice_responses"
+    wHERE "Q9_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_09 <- data.frame(q_09) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_09
+```
+
+    Q10 - What is your current yearly compensation (approximate $USD)?
+
+```{r message = FALSE}
+# create dataframe just for question 10
+
+q_10 <- dbGetQuery(my_connection,'
+  SELECT "Q10"
+    FROM "multiple_choice_responses"
+    wHERE "Q10" != \'\'
+      AND "Q10" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_10 <- data.frame(q_10) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_10
+```
+
+    Q11 - Approximately how much money have you spent on machine learning and/or
+    cloud computing products at your work in the past 5 years?
+
+```{r message = FALSE}
+# create dataframe just for question 11
+
+q_11 <- dbGetQuery(my_connection,'
+  SELECT "Q11"
+    FROM "multiple_choice_responses"
+    wHERE "Q11" != \'\'
+      AND "Q11" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_11 <- data.frame(q_11) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_11
+```
+
+    Q12 - Who/what are your favorite media sources that report on data science
+    topics? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 12
+
+q_12 <- dbGetQuery(my_connection,'
+  SELECT "Q12_Part_1", "Q12_Part_2", "Q12_Part_3", "Q12_Part_4"
+        , "Q12_Part_5", "Q12_Part_6", "Q12_Part_7", "Q12_Part_8"
+        , "Q12_Part_9", "Q12_Part_10", "Q12_Part_11"
+        , "Q12_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q12_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_12 <- data.frame(q_12) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_12 <- q_12[-1,]
+q_12
+```
+
+    Q13 - On which platforms have you begun or completed data science courses? 
+    (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 13
+
+q_13 <- dbGetQuery(my_connection,'
+  SELECT "Q13_Part_1", "Q13_Part_2", "Q13_Part_3", "Q13_Part_4", "Q13_Part_5"
+        , "Q13_Part_6", "Q13_Part_7", "Q13_Part_8", "Q13_Part_9", "Q13_Part_10"
+        , "Q13_Part_11", "Q13_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q13_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_13 <- data.frame(q_13) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_13 <- q_13[-1,]
+q_13
+```
+
+    Q14 - What is the primary tool that you use at work or school to analyze data?
+    (Include text response) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 14
+
+q_14 <- dbGetQuery(my_connection,'
+  SELECT "Q14"
+    FROM "multiple_choice_responses"
+    wHERE "Q14" != \'\'
+      AND "Q14" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_14 <- data.frame(q_14) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_14
+```
+
+    Q15 - How long have you been writing code to analyze data (at work or at school)?
+
+```{r message = FALSE}
+# create dataframe just for question 15
+
+q_15 <- dbGetQuery(my_connection,'
+  SELECT "Q15"
+    FROM "multiple_choice_responses"
+    wHERE "Q15" != \'\'
+      AND "Q15" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_15 <- data.frame(q_15) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_15
+```
+
+    Q16 - Which of the following integrated development environments (IDE's) do
+    you use on a regular basis? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 16
+
+q_16 <- dbGetQuery(my_connection,'
+  SELECT "Q16_Part_1", "Q16_Part_2", "Q16_Part_3", "Q16_Part_4", "Q16_Part_5"
+      , "Q16_Part_6", "Q16_Part_7", "Q16_Part_8", "Q16_Part_9", "Q16_Part_10"
+      , "Q16_Part_11", "Q16_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q16_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_16 <- data.frame(q_16) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_16 <- q_16[-1,]
+q_16
+```
+
+    Q17 - Which of the following hosted notebook products do you use on a regular
+    basis? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 17
+
+q_17 <- dbGetQuery(my_connection,'
+  SELECT "Q17_Part_1", "Q17_Part_2", "Q17_Part_3", "Q17_Part_4", "Q17_Part_5"
+        , "Q17_Part_6", "Q17_Part_7", "Q17_Part_8", "Q17_Part_9", "Q17_Part_10"
+        , "Q17_Part_11", "Q17_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q17_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_17 <- data.frame(q_17) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_17 <- q_17[-1,]
+q_17
+```
+
+In this review of the Kaggle survey, we were able to summarize the selected multiple-choice responses. This allows us to see what respondents in the industry expect from new data scientists and it provided evidence of what to expect in the future. 
+
+### Kaggle Analysis
+
+Aspiring data scientist and current data science professionals may be interested in knowing what the industry expectations are as they are constantly changing. As new software and analysis methods appear, we make changes to our processes and create new programs, develop new models, and improve our data systems. To understand these trends, we took a well-rounded approach. 
+
+The data we selected provides a snapshot in time of those industry skills, tools, and expectations. We have three sources to gather information from; a large, global survey called the Kaggle Survey, a web-scrape of current jobs offered on Indeed, and a textual analysis of another web-scrape compiled from Glassdoor. We begin with the Kaggle survey.
+
+
+#### Dataset:Multiple Choice Responses
+```{r}
+Data <- dbGetQuery(my_connection,"Select * FROM dbo.multiple_choice_responses")
+```
+
+Converting to a tibble
+
+```{r tibble}
+Data_Tibble <-as_tibble(Data)
+```
+Filtering out non data roles
+Since our research question is "What are the most sought after skills for data scientists?" we are only interested in looking at the information for data roles.
+```{r}
+DataScientists <- filter (Data_Tibble,Q5 == "Data Scientist" | Q5 == "Data Analyst" | Q5 == "Data Engineer")
+```
+
+#### Responses
+
+We are going to store the responses for **questions 18-34** in separate data frames (q_18,q_19,q_20 and so on till q_34).However, we have excluded questions that are not relevant for our analysis (non skills based questions) 
+
+Question 18:What programming languages do you use on a regular basis?
+```{r, message=FALSE}
+q_18 <- DataScientists %>% 
+  select(starts_with("Q18")& !"Q18_OTHER_TEXT")
+q_18 <-q_18 %>% 
+  gather(Q,Response)  %>% 
+    group_by(Response) %>%
+      summarize(count_response = n())
+```
+Question 19: What programming language would you recommend an aspiring data scientist to learn first?
+```{r, message = FALSE}
+q_19 <- DataScientists %>% 
+  select(starts_with("Q19")& !"Q19_OTHER_TEXT")
+q_19 <- q_19 %>% 
+  gather(Q,Response)  %>% 
+    group_by(Response) %>%
+      summarize(count_response = n())
+```
+Question 20: What data visualization libraries or tools do you use on a regular basis? 
+```{r, message = FALSE}
+q_20 <- DataScientists %>% 
+  select(starts_with("Q20")& !"Q20_OTHER_TEXT")
+
+q_20 <-q_20 %>% 
+  gather(Q20,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 24: Which of the following ML algorithms do you use on a regular basis? 
+```{r, message = FALSE}
+q_24 <- DataScientists %>% 
+  select(starts_with("Q24")& !"Q24_OTHER_TEXT")
+
+q_24 <-q_24 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 25: Which categories of ML tools do you use on a regular basis?
+```{r, message = FALSE}
+q_25 <- DataScientists %>% 
+  select(starts_with("Q25")& !"Q25_OTHER_TEXT")
+q_25 <-q_25 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 26: Which categories of computer vision methods do you use on a regular basis?
+```{r, message = FALSE}
+q_26 <- DataScientists %>% 
+  select(starts_with("Q26")& !"Q26_OTHER_TEXT")
+q_26 %>% 
+  gather(Q26,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+
+```
+Question 27: Which of the following natural language processing (NLP) methods do you use on a regular basis?
+```{r, message= FALSE}
+q_27 <- DataScientists %>% 
+  select(starts_with("Q27")& !"Q27_OTHER_TEXT")
+q_27 %>% 
+  gather(Q27,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 28: Which of the following machine learning frameworks do you use on a regular basis?
+```{r, message = FALSE}
+q_28 <- DataScientists %>% 
+  select(starts_with("Q28")& !"Q28_OTHER_TEXT")
+q_28 <-q_28 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 29: Which of the following cloud computing platforms do you use on a regular basis? 
+```{r, message = FALSE}
+q_29 <- DataScientists %>% 
+  select(starts_with("Q29")& !"Q29_OTHER_TEXT")
+
+q_29 <-q_29 %>% 
+  gather(Q29,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 30: Which specific cloud computing products do you use on a regular basis? 
+```{r, message = FALSE}
+q_30 <- DataScientists %>% 
+  select(starts_with("Q30")& !"Q30_OTHER_TEXT")
+q_30 <- q_30 %>% 
+  gather(Q30,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 31: Which specific big data / analytics products do you use on a regular basis?
+```{r, message = FALSE}
+q_31 <- DataScientists %>% 
+  select(starts_with("Q31")& !"Q31_OTHER_TEXT")
+
+q_31 <-
+q_31 %>% 
+  gather(Q31,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 32: Which of the following machine learning products do you use on a regular basis? 
+```{r, message = FALSE}
+q_32 <- DataScientists %>% 
+  select(starts_with("Q32")& !"Q32_OTHER_TEXT")
+q_32<- q_32 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 33: Which automated machine learning tools (or partial AutoML tools) do you use on a regular basis? 
+```{r, message = FALSE}
+q_33 <- DataScientists %>% 
+  select(starts_with("Q33")& !"Q33_OTHER_TEXT")
+q_33 <-q_33 %>% 
+  gather(Q33,response)  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+```
+Question 34: Which of the following relational database products do you use on a regular basis? 
+```{r, message = FALSE}
+q_34 <- DataScientists %>% 
+  select(starts_with("Q34")& !"Q34_OTHER_TEXT")
+q_34 <-q_34 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+
+In this review of the Kaggle survey, we were able to summarize the selected multiple-choice responses. This allows us to see what respondents in the industry expect from aspiring and existing data scientists. It also provided evidence of what to expect in the future.
+
+
+#### Most cited skills
+
+It looks like the majority of the skills-based questions can be categorized into the following areas-
+1.**Programming Languages**: Questions 18 and 19
+2.**Data Visualization**: Question 20
+3.**ML Tools and Products**: Questions 25,32 and 33
+4.**ML Framework**: Question 28
+5.**Big Data**: Question 31
+6.**Cloud Platforms**: Questions 29 and 30
+7.**Relational Databases**:Question 34 
+8.Computer Vision: Question 26
+9.NLP: Question 27
+
+We are particularly interested in understanding what the most cited tools or skills were for #1-6 above.
+
+*1.Programming Languages*
+
+We will combine the individual data frame for each question first before plotting the data.
+
+```{r, message = FALSE}
+PL <- rbind(q_18,q_19)
+PL <-PL %>% 
+    group_by(Response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(PL)
+```
+We don't need to see the blank responses
+```{r, message = FALSE}
+PL$Response[PL$Response == ""|PL$Response =="None"] <- NA
+PL <-PL %>% 
+    group_by(Response) %>%
+      summarize(sum_response= sum(sum_response))
+PL <- na.omit(PL)
+knitr::kable(PL)
+```
+
+```{r}
+PL$Response <- factor(PL$Response, levels = PL$Response[order(PL$sum_response)])
+
+ggplot(data=PL, aes(x=Response,y=sum_response, fill=Response))+
+  geom_col(fill="#53baa3") + 
+  geom_text(label=(PL$sum_response)) +
+  ggtitle("Frequency of Respondents Selecting Programming Languages") +
+  coord_flip() +  
+  xlab('Response Count') +
+  ylab('Pramming Languages') 
+
+
+```
+
+*2. Data Visualization*
+```{r}
+
+q_20$response <- factor(q_20$response, levels = q_20$response[order(q_20$count_response)])
+
+q_20graph <- q_20[-c(1), ]
+
+ggplot(data=q_20graph, aes(x=response,y=count_response, fill=response))+
+  geom_col(fill="#53baa3")+ 
+  geom_text(label=(q_20graph$count_response))+
+  ggtitle("Frequency of Respondents Selecting Data Visualization Tools") +
+  coord_flip() +  
+  xlab('Response Count') +
+  ylab('Data Visualization Tools') 
+```
+
+
+*3. ML Algorithm *
+
+```{r}
+
+q_24$response <- factor(q_24$response, levels = q_24$response[order(q_24$count_response)])
+
+q_24graph <- q_24[-c(1), ]
+
+
+ggplot(data=q_24graph, aes(x=response,y=count_response, fill=response)) +
+  geom_col(fill="#53baa3") + 
+  geom_text(label=(q_24graph$count_response)) +
+  ggtitle("Freq of Respondents Selecting ML Algorithms") +
+  coord_flip() +  
+  xlab('Response Count') +
+  ylab('ML Algorithms')
+
+```
+
+*4. ML Framework*
+```{r}
+
+q_28$response <- factor(q_28$response, levels = q_28$response[order(q_28$count_response)])
+
+q_28graph <- q_28[-c(1), ]
+
+ggplot(data=q_28graph, aes(x=response,y=count_response, fill=response)) +
+  geom_col(fill="#53baa3") + 
+  geom_text(label=(q_28graph$count_response)) +
+  ggtitle("Freq of Respondents Selecting ML Frameworks") +
+  xlab('Response Count') +
+  ylab('ML Frameworks') +
+  coord_flip()
+
+
+```
+*5. Cloud Platforms*
+
+```{r}
+CloudPlatform <- rbind(q_29,q_30)
+CloudPlatform <-CloudPlatform %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(CloudPlatform)
+```
+```{r}
+CloudPlatform$response[CloudPlatform$response == ""|CloudPlatform$response=="None"] <- NA
+```
+
+For cloud platforms, we are only interested in seeing the combined results for the service provider. Therefore, we will combine the responses from Question 30 to only reflect the provider for the tool. For instance, for AWS we are currently seeing 5 naming variations. We would like to  reconcile the naming variations under AWS to get the combined results. This applies to Azure and Google Cloud as well.
+
+```{r}
+x <- str_detect(CloudPlatform$response,"AWS")
+y <- str_detect(CloudPlatform$response,"Azure")
+z <- str_detect (CloudPlatform$response,"Google")
+```
+
+```{r}
+CloudPlatform$response <-ifelse(x,"Amazon Web Services (AWS)",CloudPlatform$response)
+CloudPlatform$response <-ifelse(y,"Microsoft Azure",CloudPlatform$response)
+CloudPlatform$response <-ifelse(z,"Google Cloud Platform",CloudPlatform$response)
+CloudPlatform <- na.omit(CloudPlatform)
+CloudPlatform <-CloudPlatform %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(sum_response))
+knitr::kable(CloudPlatform)
+```  
+
+```{r}
+
+CloudPlatform <- rbind(q_29,q_30)
+CloudPlatform <-CloudPlatform %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(CloudPlatform)
+
+CloudPlatform$response[CloudPlatform$response == ""|CloudPlatform$response=="None"] <- NA
+```
+
+```{r}
+
+CloudPlatform$response <- factor(CloudPlatform$response, levels = CloudPlatform$response[order(CloudPlatform$sum_response)])
+
+CloudPlatformgraph <- CloudPlatform[-c(1), ]
+
+
+ggplot(data=CloudPlatformgraph, aes(x=response,y=sum_response, fill=response)) + 
+  geom_col(fill="#53baa3") + 
+  geom_text(label=(CloudPlatformgraph$sum_response)) +
+  ggtitle("Freq of Selected Cloud Platforms") +
+  xlab('Response Count') +
+  ylab('Cloud Platforms') +
+  coord_flip()
+
+```
+
+
+
+
+#### Dataset 2 (Other Text responses)
+Free form responses for those who selected the other option in the main multiple choice survey.
+
+Data
+```{r}
+Data2 <- dbGetQuery(my_connection,"Select * FROM dbo.other_text_responses")
+```
+
+Filtering out non-data roles
+We are only going to look at respondents primary responsibilities presumably entail working with data on a daily basis, given their titles.
+
+```{r}
+DataRoles <- dbGetQuery(my_connection,"Select * 
+           FROM dbo.other_text_responses
+           WHERE 
+           [Q5_OTHER_TEXT] like '%Data%' OR 
+           [Q5_OTHER_TEXT] like '%Machine     Learning%' 
+OR [Q5_OTHER_TEXT] like   '%Artifical Intelligence%' OR [Q5_OTHER_TEXT] like '%Business Intelligence%'
+OR  [Q5_OTHER_TEXT] like '%Analytics%'
+OR  [Q5_OTHER_TEXT] like '%Algorithm%'
+OR  [Q5_OTHER_TEXT] like '%Analyst%'
+OR  [Q5_OTHER_TEXT] like '%Developer%'
+OR  [Q5_OTHER_TEXT] like '%AI%'
+OR  [Q5_OTHER_TEXT] like '%Programmer%'
+OR  [Q5_OTHER_TEXT] like '%Math%'")
+DataRoles
+```
+
+#### Primary Tool
+
+The survey question where a significant amount of respondents picked the other option is Question 14 (What is the primary tool that you use at work or school to analyze data? (Include text response) - Selected Choice). Therefore, we would like to see if there are any other skillsets or tools here that are worth looking into besides the ones mentioned in the main dataset.
+
+```{r}
+PrimaryTool <- DataRoles %>% 
+  select("Q14_OTHER_TEXT")
+
+PrimaryTool <-PrimaryTool %>% 
+  gather(Q14other,response)  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+PrimaryTool
+```
+Respondents were allowed to input more than one answer in this field,i.e. one respondent can list multiple tools in their response, usually separated by a comma. We will therefore split the responses into separate columns first and then convert the dataset from wide to long.
+```{r}
+PrimaryTool <- separate(PrimaryTool,response,
+         into=c("T1","T2","T3"),
+         sep=",")
+PrimaryTool %>% gather(Tool,Response,
+        T1,T2,T3)%>% group_by(Response)%>%
+  summarize(Sum_response=sum(count_reponse))
+      
+```
+Looks like Python might be the winner here.
+
+
+
+
+
+
+## Indeed Scrape
+
+We performed multiple web-scrapes of Indeed.com to collect data on real-world examples of jobs with the title "data scientist." These data were intended to give further insight into the expectations of the market such as where data scientists’ jobs are located and the salaries. Thus, we looked for those markers of job title, company, salary ranges and location of each posting. 
+
+Our initial scrape was compiled to create a sample for analysis. In this, we only wanted to create a data frame with the job title from the first page of results in the Indeed job search. A regular expression in conjunction with functions from the rvest package allowed the information to be extracted from the html of the webpage. The first scraping example is displayed below. 
+
+
+```{r}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+job_data_html <- html_nodes(webpage,'.jobtitle , #sja0 b') 
+job_data <- html_text(job_data_html)
+head(job_data)
+```
+
+In each case, the data was extracted as a text file and was rife with errors. It was not usable at this stage. Another parameter was necessary to clean the data and transform it into something functional. In this case, we decided a vector of characters would suffice. The example of the regular expression used to extract the job title of each posting on the first webpage of Indeed for this singular sample is shown.  
+
+```{r, eval = FALSE}
+str_extract(job_data, "(\\w+.+)+")
+```
+
+We found this string to be the most effective at parsing the job title of all listing on the first page into usable form. We repeated this process until we had a clear understanding of each variable of interest to us available on the webpage. 
+
+Some information presented challenges that were not transforming data types or parsing strings but rather developing a standard quantifiable value from a range of numbers in different units and categories. A good example of this is the monetary information where the employers listed the information as a range of values per year, per hour, and contractual amounts. None of which would be remotely close when performing calculations. 
+
+To solve this, we separated the information we had into categories and selected the category with the most results. Those with a salary listed as a range per year had the highest proportion of jobs with any monetary information on its posting. The process of cleaning can be seen here:
+
+```{r, eval = FALSE}
+# Performing the 1-page scrape and producing a text file from the html of indeed.com
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+sal_data_html <- html_nodes(webpage,'.salaryText') 
+sal_data <- html_text
+# Cleaning the subset begins with evaluation of the data
+head(sal_data)
+# Extracting the salary ranges provided as characters 
+salary_data <- str_extract(job_data, "(\\w+.+)+") 
+# Removing the hourly rates - a smaller group than salary range
+salary_data <- str_remove_all(salary_data, "\\d+ an hour")
+# Remove the label " a year" since all should be at this stage
+salary_data <- str_remove_all(salary_data, " a year")
+# Remove the dollar sign - they are all dollars
+salary_data <- str_remove_all(salary_data,"\\$")
+# Anticipating duplicates - testing a solution
+salary_data <- as.data.frame(salary_data)
+salary_data[2,1] <- ("70,000 - $90,000")
+salary_data %>% 
+  mutate(salary = as.factor(job_data)) %>%
+  count(salary)
+```
+
+As with all samples, there were missing values inherent to the postings on Indeed. Salary information was no exception. These missing values were included in the dataset but were not included in the analysis. To determine how well these chunks of code ran with the full data from the indeed search, we ran it in for-loops to collect pages of job information.   
+
+In total, there were at least 18 scrapes performed, two for each variable in the data frame (a sample and a full run). With the html to text data from each sample being pulled from a different section on the webpage, they often required a unique regular expression to produce functional data types. To ensure we could manipulate the data for analysis, the resultant text strings were all converted a data frame as characters. That complete progression of extraction and cleaning was run with the following code. Each variable was stored in its own column and each observation has its own row.  
+
+
+```{r message=FALSE, include=FALSE, eval = FALSE}
+     ############################
+    #      Do Not Run!         #
+   #    See Data In Repo      #
+  #     Labeled *Indeed*     #
+ #        For Results       #
+############################
+
+empties <- data.frame(title=character(),
+                    date=character(),
+                    company=character(),
+                    salary=character(),
+                    maxsal=character(),
+                    minsal=character(),
+                    location=character(),
+                    summary=character(),
+                    link=character(),
+                  # description = character(),
+                 stringsAsFactors=FALSE)
+for (i in seq(0, 800, 10)){
+  url <- paste0('https://www.indeed.com/jobs?q=data%20scientist&start=10&vjk=c03d341a13e2bb74',i)
+  var <- read_html(url)
+  # job title
+    title <-  var %>%
+        html_nodes('#resultsCol .jobtitle') %>%
+          html_text() %>%
+        str_extract("(\\w+.+)+")
+# job posting date
+    date <-  var %>%
+        html_nodes('.date') %>%
+          html_text() %>%
+        str_extract("\\d+|Just posted|Today")
+# employer name
+    company <- var %>%
+        html_nodes('#resultsCol .company') %>%
+          html_text() %>%
+        str_extract("(\\w+).+")
+# salary ranges
+    job_data <- var %>%
+        html_nodes('.salaryText') %>%
+          html_text()
+            salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\n|\\$")
+            maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+              str_remove_all("- \\$| ")
+            minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+              str_remove_all(" |\\$")
+# job location
+    location <- var %>%
+        html_nodes('#resultsCol .location') %>%
+          html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}")
+# job summary
+    summary <- var %>%
+        html_nodes('#resultsCol .summary') %>%
+          html_text() %>%
+        str_extract(".+")
+# link to the job description
+    link <- var %>%
+        html_nodes('#resultsCol .jobtitle .turnstileLink, #resultsCol a.jobtitle') %>%
+          html_attr('href')
+            link <- paste0("https://www.indeed.com",link)
+  Indeed <- rbind(empties, as.data.frame(cbind(title,
+
+                  company=character(), 
+                 salary=character(),
+                 maxsal=character(),
+                 minsal=character(),
+                 location=character(), 
+                 summary=character(), 
+                 links=character(),
+                 stringsAsFactors=FALSE) 
+for (i in seq(0, 800, 10)){
+  url_ds <- paste0('https://www.indeed.com/jobs?q=data%20scientist&l&vjk=dd25f8809ed80778',i)
+  var <- read_html(url_ds)
+  Sys.sleep(3)
+title <-  var %>% 
+      html_nodes('.jobtitle, #sja0 b') %>%
+    html_text() %>%
+      str_extract("(\\w+.+)+") 
+date <-  var %>% 
+      html_nodes('.date') %>%
+    html_text() %>%
+      str_extract("\\d+|Just posted|Today") 
+company <- var %>% 
+      html_nodes('.company') %>%
+    html_text() %>%
+      str_extract("(\\w+).+") 
+job_data <- var %>%
+    html_nodes('.salaryText') %>%
+    html_text()
+      salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\$")
+      maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+       str_remove_all("- \\$| ")
+      minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+    str_remove_all(" |\\$")
+location <- var %>%
+        html_nodes('.location') %>%
+      html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}")   
+summary <- var %>%
+        html_nodes('.summary') %>%
+      html_text() %>%
+        str_extract(".+")
+links <- var %>%
+        html_nodes('.jobtitle .turnstileLink, a.jobtitle') %>%
+      html_attr('href') 
+        link <- paste0("https://www.indeed.com",link)
+        
+Indeed <- rbind(empties, as.data.frame(cbind(title,
+                                                  date,
+                                                  company,
+                                                  salary,
+                                                  maxsal,
+                                                  minsal,
+                                                  location,
+                                                  summary,
+                                                  link)))
+                                                  links
+                                                  )))
+}
+```
+
+This creates a data frame of the publicly posted jobs with the title "data scientist" on Indeed on October 13, 2020 called *Indeed*. It contains several attributes of the posted jobs, namely, the job title, the company name or employer, location, job summary, and a link to the original posting webpage. Data is then exported as a spreadsheet (.csv) and uploaded to our GitHub repository to make it more accessible and reproducible.  
+
+### Indeed Analysis
+
+The code above results in the CSV stored in our Github repository, which we'll read into a dataframe. 
+
+```{r}
+indeed_df <- read.csv(url("https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/Indeed.csv"), stringsAsFactors=FALSE)
+indeed_df$minsal <- str_remove(indeed_df$minsal, "[,]")
+indeed_df$minsal <- as.numeric(as.character(indeed_df$minsal))
+indeed_df$maxsal <- str_remove(indeed_df$maxsal, "[,]")
+indeed_df$maxsal <- as.numeric(as.character(indeed_df$maxsal))
+glimpse(indeed_df)
+```
+
+Our Indeed scrape provides information on job posting locations, companies, and salaries. First, we can see that by far the greatest number of job posting at the time of this scrape were in Washington, DC and Lexington Park, MD (and NA) with over 100 in each location. Given the current state of global affairs, these "NA" locations could represent a higher number of remote jobs due to the COVID-19 pandemic. It may also be the case that the employers have multiple locations listed as some cases show. This presents room for further analysis. 
+
+```{r, message=FALSE}
+
+indeed_toploc <- count(indeed_df, location, sort=TRUE)
+indeed_toploc <- (top_n(indeed_toploc, 20))
+indeed_toploc <- indeed_toploc %>%
+  filter(rank(desc(n))<=50)
+
+kable(indeed_toploc, format = "markdown")
+
+indeed_toploc$location <- factor(indeed_toploc$location, levels = indeed_toploc$location[order(indeed_toploc$n)])
+
+ggplot(indeed_toploc, aes(x = n, y = location, fill = n)) +
+  geom_bar(stat="identity", fill="#53baa3") +
+  labs(title="Job Listings for Top 20 Locations") +
+  xlab('# of Listings') +
+  ylab('Locations')
+   
+
+```
+
+Taking a closer look, we see that for DC the postings primarily come from the CIA and the US Dept of the Treasury. All of the Lexington Park, MD postings are from the KBR. This is just a point-in-time snapshot of the job listings at the time of the scrape (during a strange economic time as well) - but it seems fair to conclude that in general the largest quantity of 'Data Science' jobs are available on the East Coast - one could say that proximity to a urban center is a desirable attribute for a data scientist, as that is where the work seems to be!
+
+```{r}
+indeed_dc <- subset(indeed_df, (location == "Washington, DC"))
+indeed_topdc <- count(indeed_dc, company, sort=TRUE)
+kable(top_n(indeed_topdc, 15), format = "markdown")
+
+indeed_lex <- subset(indeed_df, (location == "Lexington Park, MD"))
+indeed_toplex <- count(indeed_lex, company, sort=TRUE)
+kable(top_n(indeed_toplex, 15), format = "markdown")
+```
+
+Finally, looking at the salary ranges, where they were available, we see that the mean minimum on the salary range is $83,578 and the mean maximum is $139,151. Further, the mean range of the salary is $55,623 - which is also plotted. While there are certainly many missing values, it is interesting to see the variation in the salary range offered from this Indeed scrape.
+
+```{r}
+
+mean(indeed_df$minsal, na.rm=TRUE)
+mean(indeed_df$maxsal, na.rm=TRUE)
+
+indeed_df <- indeed_df %>%
+  mutate(indeed_df, sal_range = maxsal - minsal)
+
+mean(indeed_df$sal_range, na.rm=TRUE)
+
+ggplot(indeed_df, aes(x = factor(sal_range), fill = sal_range)) +
+  geom_bar(fill="#53baa3") +
+  coord_flip() +  
+  labs(title="Frequency of Salary Ranges") +
+  xlab('Range (max-min)') +
+  ylab('Frequency') 
+
+
+```
+
+
+
+
+
+
+## Glassdoor Text Analysis
+
+In this analysis we used several functions to compute the most frequently occurring words in the data set. The data came from jobs posted on Glassdoor that were scraped into a text file on August 1, 2020. Our goal was to determine if there were any traits or trends that a data scientist would need. To do so, we narrowed our search down to those skills generally thought to be desirable traits of a data scientist based on what we understood as existing norms. This led to an extraction process that gave us the tools, technical skills, and soft skills present in the posting of data science positions for that point in time. 
+
+Ideally, the extracted information would be able to tell us what recruiters are looking for and what applicants should have already mastered. Technical skills could be more relevant to express skills related to machine learning and math. Soft skills are relevant to interpersonal behavior. 
+
+
+```{r results = 'hide', message = FALSE}
+# Reading in data
+gd_url="https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/glassdoor_ds_jobs.csv"
+gd_df <- read_csv(url(gd_url))
+```
+
+
+
+#### Word Counts
+
+As a first iteration of the analysis, we looked at the most frequently occuring words across all job descriptions. Notice in the code, that we anti_join with ‘stop words’. ‘Stop words’ are lexicons that are commonly occuring words that are usually functional in syntax but provide little content (eg: in, the, who, was). This will make our dataset smaller and more compliant for further manipulation.
+
+
+```{r}
+
+gd_df <-
+  gd_df %>%
+    mutate(job_id = row_number())
+
+tidy_gd_df <- gd_df %>%
+  unnest_tokens(word, Summary)
+
+# remove words that don't mean much
+tidy_gd_df <- tidy_gd_df %>%
+  anti_join( stop_words, by="word")
+
+# tells you most frequently occuring words across all job descriptions
+
+global_word_count <-
+  tidy_gd_df %>%
+    count(word, sort = TRUE)
+
+global_word_count %>%
+  head(15)
+
+```
+
+#### Wordcloud
+
+The wordcloud below nicely visualizes the most frequently occurring words. The most frequently used words are relevant to describe the data science industry as a whole. However, there isn’t much insight we can glean about the most desirable traits of a data scientist just from a simple count.
+
+
+```{r}
+
+# Words must have occured in the dataset at least 100 times.
+
+tidy_gd_df %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+```
+
+
+#### In-demand Skills
+Our methodology was to observe the most frequently occurring words in the job descriptions of each posting. This is appropriate because tools are usually named as single words which indicate hard skills demanded by the potential employer. We start by curating a list of technical skills and see how frequently these words appear in our Glassdoor job description dataset. Instead of scraping a list of technical skills/tools from scratch, we started with some tools that appeared in the Kaggle Survey dataset. After analyzing the results with just the tools that appeared in the Kaggle survey, we found that the data was sparse and hypothesized that the list of technical skills was not inclusive enough to capture the story behind the Glassdoor dataset. Hence, we manually entered more frequently used engineering tools and got better results.
+
+
+```{r}
+# reading raw csv but probably more ideal to bring data from database
+url_mult_response="https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/multiple_choice_responses_2.csv"
+mult_response_df <- read_csv(url(url_mult_response))
+
+# create dataframe just for question 18
+q_18 <- mult_response_df %>%
+  select(starts_with("Q18"))
+# get rid of row 1 bc it has the question
+q_18 <- q_18[-1,]
+
+prog_languages <-
+  q_18 %>%
+    gather(key="question", value="response")  %>%
+      group_by(response) %>%
+        summarize(count_reponse = n()) %>%
+          arrange(desc(response)) %>%
+            head(12)
+
+prog_languages_list <- tolower(prog_languages$response)
+
+q_16 <- mult_response_df %>%
+  select(starts_with("Q16"))
+
+# get rid of row 1 bc it has the question
+q_16 <- q_16[-1,]
+
+dev_env <-
+  q_16 %>%
+      gather(key="question", value="response")  %>%
+        group_by(response) %>%
+          summarize(count_reponse = n()) %>%
+            arrange(desc(response)) %>%
+              head(12)
+
+dev_env_list <- tolower(dev_env$response)
+
+clean_devEnvList <- c()
+
+# clean list of development environment tools
+for (text in dev_env_list) {
+  devList <- strsplit(text, "[/(),]")
+  for (item in devList) {
+    clean_devEnvList <- c(clean_devEnvList,item)  
+  }
+}
+
+# adding more tools that dataset might not include
+my_list <- c("git", "github", "sublime", "sublime text", "docker", "command line", "php", "intellij", "intellij idea", "slack", "gitlab", "iterm", "iterm2", "pycharm", "unity", "jetbrains", "linux", "postman", "api","sas", "apache","spark", "apache spark", "bigml", "excel", "ggplot", "ggpolt2", "tableau", "hadoop", "scikit", "scikitlearn" ,"scikit learn", "tensorflow", "sas","json", "xml", "")
+
+technical_traits <- c(prog_languages_list,clean_devEnvList,my_list )
+technical_traits <- trimws(technical_traits, which = c("both"))
+
+# Global Words that intersect with list of scraped technical traits
+technical_skills <- tidy_gd_df %>%
+  filter(word %in% technical_traits)
+
+technical_word_count <-
+  technical_skills %>%
+    count(word, sort = TRUE)
+
+technical_word_count
+
+```
+
+#### Technical Wordcloud
+We can see from the Wordcloud and the data frame, Python and SQL are the most sought after technical skills by a significant margin. The second and third sought more frequently sought after tools include Spark and Tableau but the large gap between the top two and the next two, suggests that there are technical skills which may not be single word tools. We investigated further in more advanced natural language processing frameworks. 
+
+
+```{r}
+technical_skills %>%
+  count(word) %>%
+  with(wordcloud(word, n))
+```
+
+#### TF and TF-IDF
+In the previous section we looked at which words were mentioned the most frequently across all job descriptions on Glassdoor. In this section, we investigated which traits of a data scientist were most desirable by term frequency. Term frequency here is defined a little differently than a global word count because this calculation is grouped by ‘document’ (which in our use case is a company). This means that the frequency of a word takes into account how many times a word was mentioned relative to the total word count of the company. Next we looked at TF-IDF which is another way of evaluating if a word is significant. Previously we looked at popular words, with tf-idf, we are looking to measure the rarity of a word. Oftentimes, uniquely used words will give us some insight about the entire document, more than the most popular word.
+
+
+ 
+
+
+```{r}
+
+# grouped so that each company is a "document" and each word is a "token"
+term_freq <- tidy_gd_df %>%
+  anti_join( stop_words, by="word") %>%
+    group_by(`Company Name`) %>%
+      count(word, sort = TRUE)
+
+term_freq <-
+  term_freq %>%
+    mutate(tot_word_count = sum(n))
+
+term_freq_by_rank <- term_freq %>%
+  mutate(rank = row_number(),
+         term_freq = n/tot_word_count)
+
+# bind_tf_idf
+term_freq_by_rank <-
+  term_freq_by_rank %>%
+    bind_tf_idf(word, `Company Name`, n) %>%
+    arrange(desc(tf_idf))
+
+term_freq_by_rank
+
+```
+
+Unfortunately, the tf-idf doesn’t give us much helpful additional insight in discovering which traits make a most desirable data scientist. However, it does show us that the top words are jargon specific to a specialized industry. (eg: arbitrage, banking, scm).
+
+#### N-gram Analysis
+As mentioned, it is reasonable to search for tools with a global count because tools are often single words. However, soft skills and technical skills may be expressed more frequently with two words, or perhaps even three words. In this section we look at n_grams, which is an investigation as to how often n number of words occur together.
+
+
+
+```{r}
+
+subset_gd_df <- gd_df[,c(3,5)]
+
+# common pairs of words
+gd_bigrams <- subset_gd_df  %>%
+  unnest_tokens(bigram, Summary, token = "ngrams", n = 2)
+
+bigrams_separated <- gd_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+
+bigrams_separated <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+bigram_counts <- bigrams_separated %>%
+  count(word1, word2, sort = TRUE)
+```
+
+Here we can see that the most frequently occuring couplings of words do illustrate the most sought after technical and soft skills. Let us use the visual below to investigate further.
+
+```{r}
+bigram_counts
+```
+
+Here we’re able to visualize the relationship between couplings of words. The darkness of the arrow expresses how strong the relationship between two words is, and the arrow indicates the direction of the relationship. Using n-grams when n equals 2 lists a lot of technical skills, some of which include: ‘machine learning’, ‘data analytics’, ‘communication skills’, ‘data mining’,‘deep learning’.
+
+```{r}
+set.seed(2022)
+
+bigram_graph <- bigram_counts %>%
+  filter(n > 120) %>%
+  graph_from_data_frame()
+
+
+a <- grid::arrow(type = "closed", length = unit(.05, "inches"))
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
+                 arrow = a, end_cap = circle(.07, 'inches')) +
+  geom_node_point(color = "lightblue", size = 3) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1, size=2) +
+  theme_void()
+```
+
+Looking at n-grams where n equals three shows us many more soft skills that are sought after. Some of the most sought after soft skills include: written communication skills, fast paced environment, cross functional teams, verbal communication skills, agile software development, and strong analytical skills.
+
+```{r}
+
+# common 3 words
+
+gd_trigrams <- subset_gd_df  %>%
+  unnest_tokens(trigram, Summary, token = "ngrams", n = 3)
+
+gd_trigrams_separated <- gd_trigrams %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ")
+
+trigrams_separated <- gd_trigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word)
+
+trigrams_counts <- trigrams_separated %>%
+  count(word1, word2,word3, sort = TRUE)
+
+trigrams_counts
+```
+ 
+
+
+# Conclusion
+
+It is interesting to see that as we write this report in R, the most in-demand language for data science and machine learning appears to be Python from both the Glassdoor and Kaggle analyses. This was closely followed by SQL with both languages maintaining a strong lead. With Python being the most frequently used language, it is a natural progression to see Matplotlib as the most frequently used visualization tool. It comes as no surprise that the other tools for machine learning frameworks, linear regressions, and modeling are also based on working with the Python programming language. This is easily the most notable hard skill and tool demanded from the programming portion of what data scientists do; but it is not the only skill.   
+
+Soft skills, elucidated by the tables and clusters of words displayed in the Glassdoor analysis, gives another look into what these positions require. We found that having experience, especially in data, was another high priority. Employers are interested in individuals who can work well in teams and above all, possess some business knowledge. These word clouds added to more hard skills for an aspiring data scientist to learn Spark and Tableau. 
+
+There is no clear choice in the data science community when it comes to selecting cloud platforms. The top 3 in use, according to the Kaggle survey analysis were: Amazon’s AWS, Google’s Cloud, and Microsoft Azure. Although it is important to note that many people did not respond to this at all, which could mean those respondents are using multiple or no cloud platforms. Regardless, selecting one of those main three would be a good place to start for aspiring data scientists. 
+
+From Indeed, we can also see that the salary information available at the time of the scrape is inconsistent with prior literature. Although most employers did not list salary information, there appears to be a slightly lower salary for data scientists. However, this may be due to several factors including the numerous government jobs listed at that particular time and the conditions of the economy. Scraping the site with more frequency over time might give us a better sample. It may also be possible that salaries show wider discrepancies when factored by country. For example, salaries in India may be much lower than those in the United States. 
+
+Importantly, we are living in an unprecedented time. A pandemic has rearranged and continues rearrange company dynamics as we adapt to a new lifestyle across the world. We have no doubt that these changes have influenced the data.  
+
+For us, this project was meant to teach us how to collaborate on a project of this size, work with messy data, and learn a bit more about the field we all are entering. It felt a bit like peeling back the layers of an onion, seeing each other's code and findings made us pose more questions and think of new directions to pursue. So much data, so little time. We hope the analysis above gives others some preliminary insight into the demands and expectations of the data science field, and prompts readers to peel back another layer of the onion. 
+
+
+
+
+## Sources
+
+Gan, James. “Various Data Science Titled Jobs in Singapore 2020.” Kaggle, 16 Aug. 2020, www.kaggle.com/jamesgsw/various-data-science-titled-jobs-in-singapore-2020/metadata. 
+
+Human Resources, University of Pennsylvania. “What's Driving the Demand for Data Scientists?” Knowledge@Wharton, 8 Mar. 2019, knowledge.wharton.upenn.edu/article/whats-driving-demand-data-scientist
+
+Milan. “GlassDoor(Data Scientist).” Kaggle, 1 Aug. 2020, 
+www.kaggle.com/milan400/glassdoordata-scientist. 
+
+Palmore, Zach. “Indeed.csv” Data Scientist\ Jobs, Employment | Indeed.com, 13 Oct. 2020, www.indeed.com/jobs?q=data+scientist%5C. 
+
+## Contributors
+
+> Douglas Barley: database storage, Kaggle Survey tidying, presenter  
+
+> Atina Karim: database storage, Kaggle Survey analysis, lead presenter  
+
+> Rachel Greenlee: project manager, Indeed analysis, graphing support, writing support  
+
+> Ellen Kim: github master, Glassdoor tidying and analysis, presenter  
+
+> Zachary Palmore: Indeed scrape, Indeed tidying, lead project writer  
+
+

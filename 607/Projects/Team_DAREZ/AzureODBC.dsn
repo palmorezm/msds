@@ -1,0 +1,7 @@
+[ODBC]
+DRIVER=SQL Server
+UID=Professor607
+WSID=LAPTOP-TSF1560E
+APP=Microsoft® Windows® Operating System
+SERVER=data607.database.windows.net
+Description=Azure

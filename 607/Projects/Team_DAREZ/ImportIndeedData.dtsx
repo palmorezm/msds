@@ -1,0 +1,948 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="10/9/2020 9:35:42 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="LAPTOP-TSF1560E"
+  DTS:CreatorName="LAPTOP-TSF1560E\dougl"
+  DTS:Description="SSIS Package Description"
+  DTS:DTSID="{97567F78-0A57-4491-9A8E-7001ECB00467}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.118"
+  DTS:LocaleID="1033"
+  DTS:MaxErrorCount="0"
+  DTS:ObjectName="ImportIndeedData"
+  DTS:VersionGUID="{E2A1BD3A-2883-4B26-A158-AED4B4D467FB}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{AE539A67-01F7-4A59-82CE-92B5FEB76002}"
+      DTS:ObjectName="DestinationConnectionOLEDB">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=data607.database.windows.net;User ID=Project2admin;Initial Catalog=Project3;Provider=SQLNCLI11;Auto Translate=false;">
+          <DTS:Password
+            DTS:Name="Password"
+            Sensitive="1"
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAdRZRwetDB0K9q9k3M2DQdQAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAAABCF5goxvB4jYTJ912yuIANLKYwiBY5AjnVHllhS0GAgAAAAAOgAAAAAIAACAAAAD5Lcdv7jG8eKzNJnwHJtzizcR3+6EwK7FeToIYD5oj2CAAAAArveQjouD1146q/cKN5NdFRKBI6ZIYIaknhkftPSuE2EAAAABcI3oJmdqzJg4Tj4mkN7u7/5kJQ4hIH8unJdOGu48Zy6wshr4WAS8yubTXr9bbJxKhhqvNNHRT1d+NE/+hFdN9</DTS:Password>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+      DTS:CreationName="FLATFILE"
+      DTS:DTSID="{310BDF59-B1AA-4076-AF3D-6D7C9C1F5553}"
+      DTS:ObjectName="SourceConnectionFlatFile">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:Format="Delimited"
+          DTS:LocaleID="1033"
+          DTS:HeaderRowDelimiter="_x000D__x000A_"
+          DTS:ColumnNamesInFirstDataRow="True"
+          DTS:RowDelimiter=""
+          DTS:TextQualifier="_x0022_"
+          DTS:CodePage="1252"
+          DTS:ConnectionString="C:\Users\dougl\Desktop\CUNY local\DATA607\DATA607_project3\indeed_scrape_1.csv">
+          <DTS:FlatFileColumns>
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Column 0"
+              DTS:DTSID="{897BF7D4-5595-4F41-908C-E866C0684AD6}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="source"
+              DTS:DTSID="{57262035-F901-498D-8CA8-9819BB391524}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="title"
+              DTS:DTSID="{3C6AFD11-D542-45F8-A640-4BCE88C0A0BB}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="company"
+              DTS:DTSID="{15CBD825-4232-440B-808A-80D2EC24811C}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="location"
+              DTS:DTSID="{E2491CB2-75CE-423A-9FE6-BB805FB9E48A}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="summary"
+              DTS:DTSID="{B6D56F89-85B6-4589-A122-AB10ED822908}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x000D__x000A_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="link"
+              DTS:DTSID="{25E8BCF3-001E-4274-B3EF-72A9D95925BE}"
+              DTS:CreationName="" />
+          </DTS:FlatFileColumns>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Data Flow Task 1"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{47A1E343-FD9E-4F71-9316-7B323F91514F}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:FailPackageOnFailure="True"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Flow Task 1"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          defaultBufferSize="3145728"
+          version="1">
+          <components>
+            <component
+              refId="Package\Data Flow Task 1\Data Conversion 0 - 0"
+              componentClassID="Microsoft.DataConvert"
+              contactInfo="Data Conversion;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Data Conversion"
+              name="Data Conversion 0 - 0"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]"
+                  name="Data Conversion Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[source]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="source"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[source]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[title]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="title"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[title]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[company]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="company"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[company]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[location]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="location"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[location]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[summary]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="summary"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[summary]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[link]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="link"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[link]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output]"
+                  exclusionGroup="1"
+                  name="Data Conversion Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[source]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[source]"
+                      name="source"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[source]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[title]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="4000"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[title]"
+                      name="title"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[title]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[company]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[company]"
+                      name="company"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[company]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[location]"
+                      codePage="1252"
+                      dataType="str"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[location]"
+                      name="location"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[location]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[summary]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[summary]"
+                      name="summary"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[summary]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[link]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[link]"
+                      name="link"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[link]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Data Conversion Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Data Conversion 0 - 1"
+              componentClassID="Microsoft.DataConvert"
+              contactInfo="Data Conversion;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Data Conversion"
+              name="Data Conversion 0 - 1"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input]"
+                  name="Data Conversion Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input].Columns[source]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="255"
+                      cachedName="source"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[source]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input].Columns[title]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="4000"
+                      cachedName="title"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[title]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input].Columns[company]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="255"
+                      cachedName="company"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[company]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input].Columns[location]"
+                      cachedCodepage="1252"
+                      cachedDataType="str"
+                      cachedLength="255"
+                      cachedName="location"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[location]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output]"
+                  exclusionGroup="1"
+                  name="Data Conversion Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[source]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[source]"
+                      name="source"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[source]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[title]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="4000"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[title]"
+                      name="title"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[title]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[company]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[company]"
+                      name="company"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[company]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[location]"
+                      dataType="wstr"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      length="255"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[location]"
+                      name="location"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[location]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Data Conversion Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Destination - indeed_scrape_1"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="Destination - indeed_scrape_1"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[indeed_scrape_1]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  connectionManagerRefId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[source]"
+                      cachedDataType="wstr"
+                      cachedLength="255"
+                      cachedName="source"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[source]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[source]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[title]"
+                      cachedDataType="wstr"
+                      cachedLength="4000"
+                      cachedName="title"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[title]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[title]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[company]"
+                      cachedDataType="wstr"
+                      cachedLength="255"
+                      cachedName="company"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[company]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[company]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[location]"
+                      cachedDataType="wstr"
+                      cachedLength="255"
+                      cachedName="location"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[location]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output].Columns[location]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[summary]"
+                      cachedDataType="nText"
+                      cachedName="summary"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[summary]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[summary]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].Columns[link]"
+                      cachedDataType="nText"
+                      cachedName="link"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[link]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[link]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[SurveyID]"
+                      dataType="i4"
+                      name="SurveyID" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[source]"
+                      dataType="wstr"
+                      length="255"
+                      name="source" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[title]"
+                      dataType="wstr"
+                      length="4000"
+                      name="title" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[company]"
+                      dataType="wstr"
+                      length="255"
+                      name="company" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[location]"
+                      dataType="wstr"
+                      length="255"
+                      name="location" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[summary]"
+                      dataType="nText"
+                      name="summary" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input].ExternalColumns[link]"
+                      dataType="nText"
+                      name="link" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv"
+              componentClassID="Microsoft.FlatFileSource"
+              contactInfo="Flat File Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Flat File Source"
+              localeId="1033"
+              name="Source - indeed_scrape_1_csv"
+              usesDispositions="true"
+              version="1">
+              <properties>
+                <property
+                  dataType="System.Boolean"
+                  description="Specifies whether zero-length columns are treated as null."
+                  name="RetainNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of an output column containing the file name. If no name is specified, no output column containing the file name will be generated."
+                  name="FileNameColumnName"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Connections[FlatFileConnection]"
+                  connectionManagerID="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  connectionManagerRefId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  name="FlatFileConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output]"
+                  name="Flat File Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[Column 0]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[Column 0]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[Column 0]"
+                      name="Column 0"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[source]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[source]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[source]"
+                      name="source"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[title]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[title]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[title]"
+                      name="title"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[company]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[company]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[company]"
+                      name="company"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[location]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[location]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[location]"
+                      name="location"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[summary]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[summary]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[summary]"
+                      name="summary"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[link]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[link]"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].Columns[link]"
+                      name="link"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[Column 0]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Column 0" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[source]"
+                      codePage="1252"
+                      dataType="text"
+                      name="source" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[title]"
+                      codePage="1252"
+                      dataType="text"
+                      name="title" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[company]"
+                      codePage="1252"
+                      dataType="text"
+                      name="company" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[location]"
+                      codePage="1252"
+                      dataType="text"
+                      name="location" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[summary]"
+                      codePage="1252"
+                      dataType="text"
+                      name="summary" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output].ExternalColumns[link]"
+                      codePage="1252"
+                      dataType="text"
+                      name="link" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output]"
+                  isErrorOut="true"
+                  name="Flat File Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      codePage="1252"
+                      dataType="text"
+                      description="Flat File Source Error Output Column"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      name="Flat File Source Error Output Column" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Data Flow Task 1.Paths[Data Conversion Output]"
+              endId="Package\Data Flow Task 1\Data Conversion 0 - 1.Inputs[Data Conversion Input]"
+              name="Data Conversion Output"
+              startId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output]" />
+            <path
+              refId="Package\Data Flow Task 1.Paths[Data Conversion Output1]"
+              endId="Package\Data Flow Task 1\Destination - indeed_scrape_1.Inputs[Destination Input]"
+              name="Data Conversion Output"
+              startId="Package\Data Flow Task 1\Data Conversion 0 - 1.Outputs[Data Conversion Output]" />
+            <path
+              refId="Package\Data Flow Task 1.Paths[Flat File Source Output]"
+              endId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]"
+              name="Flat File Source Output"
+              startId="Package\Data Flow Task 1\Source - indeed_scrape_1_csv.Outputs[Flat File Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+</DTS:Executable>

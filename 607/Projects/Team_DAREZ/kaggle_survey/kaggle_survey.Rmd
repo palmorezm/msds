@@ -1,0 +1,336 @@
+---
+title: "Lab Name"
+author: "Author Name"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro) 
+library (readr)
+library(tidyr)
+library(janeaustenr)
+library(dplyr)
+library(stringr)
+#install.packages("janeaustenr")
+#install.packages('tidytext')
+#install.packages("wordcloud")
+library(wordcloud)
+library(janeaustenr)
+library(tidytext)
+ # install.packages("igraph")
+#install.packages("ggraph")
+library(igraph)
+library(ggraph)
+
+```
+ 
+
+### Reading in Data
+
+```{r results = 'hide'}
+gd_url="https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/glassdoor_ds_jobs.csv"
+gd_df <- read_csv(url(gd_url))
+# gd_sample <- gd_df[1:4,]
+```
+
+
+
+### Examining Most desired traits based on most frequently occcuring words in dataset. 
+Globally what are the most frequently occuring words across all job descriptions?
+
+```{r}
+
+gd_df <-
+  gd_df %>% 
+    mutate(job_id = row_number())
+
+tidy_gd_df <- gd_df %>%
+  unnest_tokens(word, Summary)
+ 
+# remove words that don't mean much
+tidy_gd_df <- tidy_gd_df %>%
+  anti_join( stop_words, by="word")
+
+# tells you most frequently occuring words across all job descriptions
+
+global_word_count <-
+  tidy_gd_df %>%
+    count(word, sort = TRUE) 
+
+global_word_count %>%
+  head(15)
+
+```
+#### Word Cloud for most frequently occuring words 
+```{r}
+
+# Words must have occured in the dataset at least 100 times.
+
+tidy_gd_df %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+```
+
+
+
+### What technical skills are most sought after?
+Methodology: Look at most frequently occuring words. This is appropriate because tools are usually named as single words. We start by curating a list of technical skills and see how frequently these words appear in our Glassdoor job description dataset. Instead of scraping a list of technical skills/tools from scratch, we started with some tools that appeared in the Kaggle Survey dataset. After analyzing the results with just the tools that appeared in the Kaggle survey, we found that the data was sparse and hypothesized that the list of technical skills was not inclusive enough to capture the story behind the Glassdoor dataset. Hence, we manually entered more frequently used engineering tools and got better results. 
+
+```{r}
+# reading raw csv but probably more ideal to bring data from database
+url_mult_response="https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/multiple_choice_responses_2.csv"
+mult_response_df <- read_csv(url(url_mult_response))
+
+# create dataframe just for question 18
+q_18 <- mult_response_df %>% 
+  select(starts_with("Q18"))
+# get rid of row 1 bc it has the question
+q_18 <- q_18[-1,]
+
+prog_languages <-
+  q_18 %>% 
+    gather(key="question", value="response")  %>% 
+      group_by(response) %>%
+        summarize(count_reponse = n()) %>%
+          arrange(desc(response)) %>%
+            head(12)
+
+prog_languages_list <- tolower(prog_languages$response)
+
+q_16 <- mult_response_df %>% 
+  select(starts_with("Q16"))
+
+# get rid of row 1 bc it has the question
+q_16 <- q_16[-1,]
+
+dev_env <- 
+  q_16 %>% 
+      gather(key="question", value="response")  %>% 
+        group_by(response) %>%
+          summarize(count_reponse = n()) %>%
+            arrange(desc(response)) %>%
+              head(12)
+
+dev_env_list <- tolower(dev_env$response)
+
+clean_devEnvList <- c()
+
+# clean list of development environment tools
+for (text in dev_env_list) {
+  devList <- strsplit(text, "[/(),]")
+  for (item in devList) {
+    clean_devEnvList <- c(clean_devEnvList,item)  
+  }
+}
+
+# adding more tools that dataset might not include
+my_list <- c("git", "github", "sublime", "sublime text", "docker", "command line", "php", "intellij", "intellij idea", "slack", "gitlab", "iterm", "iterm2", "pycharm", "unity", "jetbrains", "linux", "postman", "api","sas", "apache","spark", "apache spark", "bigml", "excel", "ggplot", "ggpolt2", "tableau", "hadoop", "scikit", "scikitlearn" ,"scikit learn", "tensorflow", "sas","json", "xml", "")
+
+technical_traits <- c(prog_languages_list,clean_devEnvList,my_list )
+technical_traits <- trimws(technical_traits, which = c("both"))
+
+# Global Words that intersect with list of scraped technical traits
+technical_skills <- tidy_gd_df %>%
+  filter(word %in% technical_traits) 
+```
+
+### Wordcloud for technical traits
+
+```{r}
+technical_skills %>% 
+  count(word) %>%
+  with(wordcloud(word, n))
+```
+
+```{r}
+technical_skills
+library(ggplot2)
+
+p <- ggplot(data= technical_skills, aes(x=word, y=len)) +
+  geom_bar(stat="identity")
+
+p
+
+```
+
+### What words were more 
+tf vs TF_IDF
+whats the difference?
+Why do we care?
+
+```{r}
+ 
+# grouped so that each person is a "document" and each word is a "token"
+
+term_freq <- gd_sample_df %>%
+  anti_join( stop_words, by="word") %>%
+    group_by(job_id) %>%
+      count(word, sort = TRUE) 
+
+term_freq <-
+  term_freq %>%
+    mutate(tot_word_count = sum(n))
+
+term_freq_by_rank <- term_freq %>% 
+  mutate(rank = row_number(), 
+         term_freq = n/tot_word_count)
+
+# bind_tf_idf
+term_freq_by_rank <-
+  term_freq_by_rank %>%
+    bind_tf_idf(word, job_id, n) %>%
+    arrange(desc(tf_idf))
+
+
+# term frequency when glassdoor is a document
+ 
+sample_freq_by_rank <- sample_freq %>% 
+  mutate(rank = row_number(), 
+         term_freq = n/tot_word_count)
+
+sample_freq_by_rank %>%
+  bind_tf_idf(word,source, n) %>%
+  arrange(desc(tf_idf))
+
+
+book_words <- book_words %>%
+  bind_tf_idf(word, book, n)
+
+# what words are most rare? 
+```
+
+
+
+
+### FULL DATASET
+Each document should be a company
+
+How is this different from popular count vs tf- idf?
+```{r}
+
+# grouped so that each company is a "document" and each word is a "token"
+
+term_freq <- tidy_gd_df %>%
+  anti_join( stop_words, by="word") %>%
+    group_by(`Company Name`) %>%
+      count(word, sort = TRUE) 
+
+term_freq <-
+  term_freq %>%
+    mutate(tot_word_count = sum(n))
+
+term_freq_by_rank <- term_freq %>% 
+  mutate(rank = row_number(), 
+         term_freq = n/tot_word_count)
+
+# bind_tf_idf
+term_freq_by_rank <-
+  term_freq_by_rank %>%
+    bind_tf_idf(word, `Company Name`, n) %>%
+    arrange(desc(tf_idf))
+
+```
+
+
+
+```{r}
+
+subset_gd_df <- gd_df[,c(3,5)]
+ 
+# common pairs of words
+
+gd_bigrams <- subset_gd_df  %>% 
+  unnest_tokens(bigram, Summary, token = "ngrams", n = 2)
+
+bigrams_separated <- gd_bigrams %>%
+  separate(bigram, c("word1", "word2"), sep = " ")
+  
+bigrams_separated <- bigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word)
+
+bigram_counts <- bigrams_separated %>% 
+  count(word1, word2, sort = TRUE)
+
+set.seed(2022) 
+
+bigram_graph <- bigram_counts %>%
+  filter(n > 120) %>%
+  graph_from_data_frame()
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link() +
+  geom_node_point() +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1)
+
+```
+
+```{r}
+set.seed(2022)
+a <- grid::arrow(type = "closed", length = unit(.05, "inches"))
+
+ggraph(bigram_graph, layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n), show.legend = FALSE,
+                 arrow = a, end_cap = circle(.07, 'inches')) +
+  geom_node_point(color = "lightblue", size = 3) +
+  geom_node_text(aes(label = name), vjust = 1, hjust = 1, size=2) +
+  theme_void()
+
+
+```
+
+
+
+```{r}
+
+
+# common 3 words 
+
+gd_trigrams <- subset_gd_df  %>% 
+  unnest_tokens(trigram, Summary, token = "ngrams", n = 3)
+
+gd_trigrams_separated <- gd_trigrams %>%
+  separate(trigram, c("word1", "word2", "word3"), sep = " ")
+  
+trigrams_separated <- gd_trigrams_separated %>%
+  filter(!word1 %in% stop_words$word) %>%
+  filter(!word2 %in% stop_words$word) %>%
+  filter(!word3 %in% stop_words$word)
+
+trigrams_counts <- trigrams_separated %>% 
+  count(word1, word2,word3, sort = TRUE)
+
+```
+
+
+
+
+### Sample Dataframe - DELETE ONCE EVERYTHING WORKS
+Smaller and easier to test transformations on 
+
+```{r}
+# create pk -> job_id
+gd_sample <-
+  gd_sample %>% 
+    mutate(job_id = row_number())
+
+gd_sample_df <- gd_sample %>%
+  unnest_tokens(word, Summary)
+
+# remove words that don't mean much
+tidy_gd_sample <- gd_sample_df %>%
+  anti_join( stop_words, by="word")
+
+sample_freq <- tidy_gd_sample %>%
+  count(word, sort = TRUE) 
+
+tidy_gd_sample %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100))
+
+```
+

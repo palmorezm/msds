@@ -1,0 +1,660 @@
+---
+title: "Project 3"
+author: "Team DAREZ"
+date: "10/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# DeleteMe Notes
+
+Delete these prior to posting.
+Zach and Rachel will reorder sections and make sure the heading levles are correct once we have all the code in the same RMD. 
+
+```{r include=FALSE, message=FALSE}
+# This is formatted from a previous project. That example project can be found through the link:
+# https://rpubs.com/deepakmongia/Data-607-Project-3
+```
+
+
+## Introduction
+
+Example paragraph:
+An October 2012 Harvard Business Review article called Data Scientist the “sexiest job of the 21st century.” In 21st-century time, 2012 is eons ago. Glassdoor, the popular career and company review site, has named Data Scientist the best job in America for three years running. We hear tales of huge starting salaries and high demand for talent. Still, for a number of reasons, we’re cautious.
+
+### Setup 
+
+How did we gather the data? What tools did we use? Examplain our setup for the analysis
+
+```{r}
+# For Web-scrap of Indeed
+library(rvest)
+library(readr)
+library(tidyverse)
+library(DT)
+library(xml2)
+
+# For graphing and nice tables
+library("ggplot2")
+library("rcartocolor")
+library("kableExtra")
+
+```
+
+
+## Analysis
+
+What are you going to look for in the data (besides just skills)? How are you going to get there? What cleaning was necessary?
+
+How is our review relevant to data science today? Why did we choose these examples?
+
+### Azure SQL Database
+
+We wanted to store our data in an Azure online database. Atina created an account and initialized the database. She set up permissions and granted each user access to the databased based on their IP addresses.
+
+Douglas created tables for each of the data sources and imported the data to each table, saving the import packages as SSIS (.dtsx) files. The initial tables included one table for the survey information from both indeed and Glassdoor, and three tables to store the Kaggle survey data. He also created a "read only" user account that was shared with each of the team members so that they could read the data. The "read only" connection is in the code below:
+
+```{r Azure_connection}
+library(odbc) # create connection to SQL database
+library(DBI)  # query SQL database tables
+
+# connect to the server
+my_connection <- dbConnect(drv = odbc::odbc(),
+         Driver = "SQL Server",
+         server = "data607.database.windows.net",
+         database = "Project3",
+         uid = "Professor607",
+         pwd = "TeamDAREZ#1")
+```
+
+### Kaggle Survey 
+
+In this first one, we could review the lit available from forums and publishers like Kaggle, Medium, Towards Data Science, Reddit, etc... then report on it.
+
+### Tidying and Munging the Kaggle Data
+
+The 2019 Kaggle survey contains thirty-four questions and the corresponding recorded responses. The team decided to make a dataframe for each of the questions/responses. The code to accomplish this task is below for each dataframe.
+
+    Q1 - What is your age (# years)?
+
+```{r message = FALSE}
+# create dataframe just for question 1
+
+q_01 <- dbGetQuery(my_connection,'
+  SELECT "Q1"
+    FROM "multiple_choice_responses"
+    wHERE "Q1" != \'\'
+      AND "Q1" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_01 <- data.frame(q_01) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_01
+```
+
+    Q2 - What is your gender?
+
+```{r message = FALSE}
+# create dataframe just for question 2
+
+q_02 <- dbGetQuery(my_connection,'
+  SELECT "Q2"
+    FROM "multiple_choice_responses"
+    wHERE "Q2" != \'\'
+      AND "Q2" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_02 <- data.frame(q_02) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_02
+```
+
+    Q3 - In which country do you currently reside?
+
+```{r message = FALSE}
+# create dataframe just for question 3
+
+q_03 <- dbGetQuery(my_connection,'
+  SELECT "Q3"
+    FROM "multiple_choice_responses"
+    wHERE "Q3" != \'\'
+      AND "Q3" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_03 <- data.frame(q_03) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_03
+```
+
+    Q4 - What is the highest level of formal education that you have attained or
+    plan to attain within the next 2 years?
+
+```{r message = FALSE}
+# create dataframe just for question 4
+
+q_04 <- dbGetQuery(my_connection,'
+  SELECT "Q4"
+    FROM "multiple_choice_responses"
+    wHERE "Q4" != \'\'
+      AND "Q4" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_04 <- data.frame(q_04) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_04
+```
+
+    Q5 - Select the title most similar to your current role (or most recent title if retired):
+
+```{r message = FALSE}
+# create dataframe just for question 5
+
+q_05 <- dbGetQuery(my_connection,'
+  SELECT "Q5"
+    FROM "multiple_choice_responses"
+    wHERE "Q5" != \'\'
+      AND "Q5" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_05 <- data.frame(q_05) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_05
+```
+
+    Q6 - What is the size of the company where you are employed?
+
+```{r message = FALSE}
+# create dataframe just for question 6
+
+q_06 <- dbGetQuery(my_connection,'
+  SELECT "Q6"
+    FROM "multiple_choice_responses"
+    wHERE "Q6" != \'\'
+      AND "Q6" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_06 <- data.frame(q_06) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_06
+```
+
+    Q7 - Approximately how many individuals are responsible for data science
+    workloads at your place of business?
+
+```{r message = FALSE}
+# create dataframe just for question 7
+
+q_07 <- dbGetQuery(my_connection,'
+  SELECT "Q7"
+    FROM "multiple_choice_responses"
+    wHERE "Q7" != \'\'
+      AND "Q7" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_07 <- data.frame(q_07) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_07
+```
+
+    Q8 - Does your current employer incorporate machine learning methods into their business?
+
+```{r message = FALSE}
+# create dataframe just for question 8
+
+q_08 <- dbGetQuery(my_connection,'
+  SELECT "Q8"
+    FROM "multiple_choice_responses"
+    wHERE "Q8" != \'\'
+      AND "Q8" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_08 <- data.frame(q_08) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_08
+```
+
+    Q9 - Select any activities that make up an important part of your role at work:
+    (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 9
+
+q_09 <- dbGetQuery(my_connection,'
+  SELECT "Q9_Part_1", "Q9_Part_2", "Q9_Part_3", "Q9_Part_4"
+        , "Q9_Part_5", "Q9_Part_6", "Q9_Part_7", "Q9_Part_8"
+    FROM "multiple_choice_responses"
+    wHERE "Q9_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_09 <- data.frame(q_09) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_09
+```
+
+    Q10 - What is your current yearly compensation (approximate $USD)?
+
+```{r message = FALSE}
+# create dataframe just for question 10
+
+q_10 <- dbGetQuery(my_connection,'
+  SELECT "Q10"
+    FROM "multiple_choice_responses"
+    wHERE "Q10" != \'\'
+      AND "Q10" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_10 <- data.frame(q_10) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_10
+```
+
+    Q11 - Approximately how much money have you spent on machine learning and/or
+    cloud computing products at your work in the past 5 years?
+
+```{r message = FALSE}
+# create dataframe just for question 11
+
+q_11 <- dbGetQuery(my_connection,'
+  SELECT "Q11"
+    FROM "multiple_choice_responses"
+    wHERE "Q11" != \'\'
+      AND "Q11" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_11 <- data.frame(q_11) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_11
+```
+
+    Q12 - Who/what are your favorite media sources that report on data science
+    topics? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 12
+
+q_12 <- dbGetQuery(my_connection,'
+  SELECT "Q12_Part_1", "Q12_Part_2", "Q12_Part_3", "Q12_Part_4"
+        , "Q12_Part_5", "Q12_Part_6", "Q12_Part_7", "Q12_Part_8"
+        , "Q12_Part_9", "Q12_Part_10", "Q12_Part_11"
+        , "Q12_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q12_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_12 <- data.frame(q_12) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_12 <- q_12[-1,]
+q_12
+```
+
+    Q13 - On which platforms have you begun or completed data science courses? 
+    (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 13
+
+q_13 <- dbGetQuery(my_connection,'
+  SELECT "Q13_Part_1", "Q13_Part_2", "Q13_Part_3", "Q13_Part_4", "Q13_Part_5"
+        , "Q13_Part_6", "Q13_Part_7", "Q13_Part_8", "Q13_Part_9", "Q13_Part_10"
+        , "Q13_Part_11", "Q13_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q13_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_13 <- data.frame(q_13) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_13 <- q_13[-1,]
+q_13
+```
+
+    Q14 - What is the primary tool that you use at work or school to analyze data?
+    (Include text response) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 14
+
+q_14 <- dbGetQuery(my_connection,'
+  SELECT "Q14"
+    FROM "multiple_choice_responses"
+    wHERE "Q14" != \'\'
+      AND "Q14" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_14 <- data.frame(q_14) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_14
+```
+
+    Q15 - How long have you been writing code to analyze data (at work or at school)?
+
+```{r message = FALSE}
+# create dataframe just for question 15
+
+q_15 <- dbGetQuery(my_connection,'
+  SELECT "Q15"
+    FROM "multiple_choice_responses"
+    wHERE "Q15" != \'\'
+      AND "Q15" NOT LIKE \'%?%\'  -- remove the record with the question
+')
+
+q_15 <- data.frame(q_15) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_15
+```
+
+    Q16 - Which of the following integrated development environments (IDE's) do
+    you use on a regular basis? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 16
+
+q_16 <- dbGetQuery(my_connection,'
+  SELECT "Q16_Part_1", "Q16_Part_2", "Q16_Part_3", "Q16_Part_4", "Q16_Part_5"
+      , "Q16_Part_6", "Q16_Part_7", "Q16_Part_8", "Q16_Part_9", "Q16_Part_10"
+      , "Q16_Part_11", "Q16_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q16_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_16 <- data.frame(q_16) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_16 <- q_16[-1,]
+q_16
+```
+
+    Q17 - Which of the following hosted notebook products do you use on a regular
+    basis? (Select all that apply) - Selected Choice
+
+```{r message = FALSE}
+# create dataframe just for question 17
+
+q_17 <- dbGetQuery(my_connection,'
+  SELECT "Q17_Part_1", "Q17_Part_2", "Q17_Part_3", "Q17_Part_4", "Q17_Part_5"
+        , "Q17_Part_6", "Q17_Part_7", "Q17_Part_8", "Q17_Part_9", "Q17_Part_10"
+        , "Q17_Part_11", "Q17_Part_12"
+    FROM "multiple_choice_responses"
+    wHERE "Q17_Part_1" NOT LIKE \'%selected Choice%\'  -- remove the record with the questions
+')
+
+q_17 <- data.frame(q_17) %>%
+  gather(key="question", value="response")  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+
+q_17 <- q_17[-1,]
+q_17
+```
+
+### Indeed Scrape
+
+Here, we could perform a small web-scraping study of a popular job site like Indeed and review the data for confirmation or denial of example 1.
+
+Questions might include: 
+  * What was the search for?  
+    - i.e. title of data science
+  * How many jobs in this scrape?
+  * Where are they located?
+  * What skills are required/preferred?
+    - Are there any repeats?
+    - Are most soft or hard skills?
+  * What is the minimum experience?
+  * What company is hiring the most?
+  * How frequently are new jobs posted?
+  * What is the average salary? 
+
+Initial Run:
+
+```{r echo=FALSE, eval = FALSE}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+job_data_html <- html_nodes(webpage,'.jobtitle , #sja0 b') 
+job_data <- html_text(job_data_html)
+head(job_data)
+```
+
+Found this string to be the most effective at parsing into usable form.
+
+```{r, eval = FALSE}
+str_extract(job_data, "(\\w+.+)+")
+```
+
+Repeat process for salary. Might be best to have it as a separate analysis without it being attached to jobs directly. It requires a lot of cleaning and figuring out how to categorize the ranges to understand the distribution. 
+
+```{r, eval = FALSE}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+sal_data_html <- html_nodes(webpage,'.salaryText') 
+sal_data <- html_text(sal_data_html)
+head(sal_data)
+```
+
+Cleaning begins with:
+
+```{r, eval = FALSE}
+# Extracting the ranges provided as characters
+salary_data <- str_extract(job_data, "(\\w+.+)+") 
+# Removing the hourly rates - compare apples-apples
+salary_data <- str_remove_all(salary_data, "\\d+ an hour")
+# Remove the label " a year" since all shoudl be 
+salary_data <- str_remove_all(salary_data, " a year")
+# Remove the dollar sign
+salary_data <- str_remove_all(salary_data,"\\$")
+# Anticipating duplcicates - testing a solution
+salary_data <- as.data.frame(salary_data)
+salary_data[2,1] <- ("70,000 - $90,000")
+salary_data %>% 
+  mutate(salary = as.factor(job_data)) %>%
+  count(salary)
+
+
+```
+
+Will need to run with more data to determine if effective. 
+
+```{r message=FALSE, include=FALSE, eval = FALSE}
+     ############################
+    #      Do Not Run!         #
+   #    See Data In Repo      #
+  #     Labeled *Indeed*     #
+ #        For Results       #
+############################
+
+empties <- data.frame(title=character(),
+                    date=character(),
+                  company=character(), 
+                 salary=character(),
+                 maxsal=character(),
+                 minsal=character(),
+                 location=character(), 
+                 summary=character(), 
+                 links=character(),
+                 stringsAsFactors=FALSE) 
+for (i in seq(0, 800, 10)){
+  url_ds <- paste0('https://www.indeed.com/jobs?q=data%20scientist&l&vjk=dd25f8809ed80778',i)
+  var <- read_html(url_ds)
+  Sys.sleep(3)
+title <-  var %>% 
+      html_nodes('.jobtitle, #sja0 b') %>%
+    html_text() %>%
+      str_extract("(\\w+.+)+") 
+date <-  var %>% 
+      html_nodes('.date') %>%
+    html_text() %>%
+      str_extract("\\d+|Just posted|Today") 
+company <- var %>% 
+      html_nodes('.company') %>%
+    html_text() %>%
+      str_extract("(\\w+).+") 
+job_data <- var %>%
+    html_nodes('.salaryText') %>%
+    html_text()
+      salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\$")
+      maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+       str_remove_all("- \\$| ")
+      minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+    str_remove_all(" |\\$")
+location <- var %>%
+        html_nodes('.location') %>%
+      html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}")   
+summary <- var %>%
+        html_nodes('.summary') %>%
+      html_text() %>%
+        str_extract(".+")
+links <- var %>%
+        html_nodes('.jobtitle .turnstileLink, a.jobtitle') %>%
+      html_attr('href') 
+        link <- paste0("https://www.indeed.com",link)
+        
+Indeed <- rbind(empties, as.data.frame(cbind(title,
+                                                  date,
+                                                  company,
+                                                  salary,
+                                                  maxsal,
+                                                  minsal,
+                                                  location,
+                                                  summary,
+                                                  links
+                                                  )))
+}
+```
+
+Creates a data frame of the publicly posted jobs on Indeed at the time of the scrape called *Indeed*. It contains several attributes of the posted jobs, namely, the job title, the company name or employer,  location, job summary, and a link to the job page. 
+
+## Indeed Analysis
+
+The code above results in the CSV stored in our Github repository, which I'll read into a dataframe. 
+
+```{r}
+indeed_df <- read.csv(url("https://raw.githubusercontent.com/Lnkiim/DATA607_project3/main/Indeed.csv"), stringsAsFactors=FALSE)
+indeed_df$minsal <- str_remove(indeed_df$minsal, "[,]")
+indeed_df$minsal <- as.numeric(as.character(indeed_df$minsal))
+indeed_df$maxsal <- str_remove(indeed_df$maxsal, "[,]")
+indeed_df$maxsal <- as.numeric(as.character(indeed_df$maxsal))
+glimpse(indeed_df)
+```
+
+Our Indeed scrape provides information on job posting locations, companies, and salaries. First, we can see that by far the greatest number of job posting at the time of this scrape were in Washington, DC and Lexington Park, MD (and NA) with over 100 in each location. 
+
+```{r, message=FALSE}
+
+indeed_toploc <- count(indeed_df, location, sort=TRUE)
+indeed_toploc <- (top_n(indeed_toploc, 20))
+indeed_toploc <- indeed_toploc %>%
+  filter(rank(desc(n))<=50)
+
+kable(indeed_toploc, format = "markdown")
+
+indeed_toploc$location <- factor(indeed_toploc$location, levels = indeed_toploc$location[order(indeed_toploc$n)])
+
+ggplot(indeed_toploc, aes(x = n, y = location, fill = n)) +
+  geom_bar(stat="identity", fill="#53baa3") +
+  labs(title="Job Listings for Top 20 Locations") +
+  xlab('# of Listings') +
+  ylab('Locations')
+   
+
+```
+
+Taking a closer look, we see that for DC the postings primarily come from the CIA and the US Dept of the Treasury. All of the Lexington Park, MD postings are from the KBR. This is just a point-in-time snapshot of the job listings at the time of the scrape (during a strange economic time as well) - but it seems fair to conclude that in general the largest quantity of 'Data Science' jobs are available on the East Coast - one could say that proximity to a urban center is a desireable attribute for a data scientist, as that is where the work seems to be!
+
+```{r}
+indeed_dc <- subset(indeed_df, (location == "Washington, DC"))
+indeed_topdc <- count(indeed_dc, company, sort=TRUE)
+kable(top_n(indeed_topdc, 15), format = "markdown")
+
+indeed_lex <- subset(indeed_df, (location == "Lexington Park, MD"))
+indeed_toplex <- count(indeed_lex, company, sort=TRUE)
+kable(top_n(indeed_toplex, 15), format = "markdown")
+```
+
+
+Finally, looking at the salary ranges, where they were avaiable, we see that the mean minimum on the salary range is $83,578 and the mean maximum is $139,151. Further, the mean range of the salary is $55,623 - which is also plotted. While there are certainly many missing values, it's interesting to see the variation in the salary range offered from this Indeed scrape.
+
+```{r}
+
+mean(indeed_df$minsal, na.rm=TRUE)
+mean(indeed_df$maxsal, na.rm=TRUE)
+
+indeed_df <- indeed_df %>%
+  mutate(indeed_df, sal_range = maxsal - minsal)
+
+mean(indeed_df$sal_range, na.rm=TRUE)
+
+ggplot(indeed_df, aes(x = factor(sal_range), fill = sal_range)) +
+  geom_bar(fill="#53baa3") +
+  coord_flip() +  
+  labs(title="Frequency of Salary Ranges") +
+  xlab('Range (max-min)') +
+  ylab('Frequency') 
+
+
+```
+
+
+
+
+
+
+### Glassdoor Text Analysis
+
+This might be the best spot to demonstrate the results of a survey or another research example. 
+
+## Conclusion
+
+Which are the most valued data science skills? How do we know? Did we learn anything different than what the articles/literature said?
+
+## Sources
+
+Where did the data come from? Who analyzed each part of the data?

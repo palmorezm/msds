@@ -1,0 +1,348 @@
+---
+title: "Project 3"
+author: "Atina Karim"
+output:
+---
+# 2019 Kaggle ML and DS Survey
+
+*Load Libraries*
+```{r load libraries}
+library(odbc)
+library(DBI)
+library (tidyverse)
+library(ggplot2)
+library (stringr)
+```
+
+*Connecting to Azure*
+```{r, include=FALSE}
+my_connection <- dbConnect(drv = odbc::odbc(),
+                           Driver = "SQL Server",
+                           server = "data607.database.windows.net",
+                           database = "Project3",
+                           uid = "",
+                           pwd = "")
+```
+
+## Dataset:Multiple Choice Responses
+```{r}
+Data <- dbGetQuery(my_connection,"Select * FROM dbo.multiple_choice_responses")
+```
+
+```{r table-kaggle}
+knitr::kable(Data,caption='Kaggle Survey Responses')
+```
+## Converting to a tibble
+
+```{r tibble}
+Data_Tibble <-as_tibble(Data)
+```
+## Filtering out non data roles
+Since our research question is "What are the most sought after skills for data scientists?" we are only interested in looking at the information for data roles.
+```{r}
+DataScientists <- filter (Data_Tibble,Q5 == "Data Scientist" | Q5 == "Data Analyst" | Q5 == "Data Engineer")
+```
+
+## Responses
+
+We are going to store the responses for **questions 18-34** in separate data frames (q_18,q_19,q_20 and so on till q_34).However, we have excluded questions that are not relevant for our analysis (non skills based questions) 
+
+Question 18:What programming languages do you use on a regular basis?
+```{r}
+q_18 <- DataScientists %>% 
+  select(starts_with("Q18")& !"Q18_OTHER_TEXT")
+q_18 <-q_18 %>% 
+  gather(Q,Response)  %>% 
+    group_by(Response) %>%
+      summarize(count_response = n())
+```
+Question 19: What programming language would you recommend an aspiring data scientist to learn first?
+```{r}
+q_19 <- DataScientists %>% 
+  select(starts_with("Q19")& !"Q19_OTHER_TEXT")
+q_19 <- q_19 %>% 
+  gather(Q,Response)  %>% 
+    group_by(Response) %>%
+      summarize(count_response = n())
+```
+Question 20: What data visualization libraries or tools do you use on a regular basis? 
+```{r}
+q_20 <- DataScientists %>% 
+  select(starts_with("Q20")& !"Q20_OTHER_TEXT")
+
+q_20 <-q_20 %>% 
+  gather(Q20,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 24: Which of the following ML algorithms do you use on a regular basis? 
+```{r}
+q_24 <- DataScientists %>% 
+  select(starts_with("Q24")& !"Q24_OTHER_TEXT")
+
+q_24 <-q_24 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 25: Which categories of ML tools do you use on a regular basis?
+```{r}
+q_25 <- DataScientists %>% 
+  select(starts_with("Q25")& !"Q25_OTHER_TEXT")
+q_25 <-q_25 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 26: Which categories of computer vision methods do you use on a regular basis?
+```{r}
+q_26 <- DataScientists %>% 
+  select(starts_with("Q26")& !"Q26_OTHER_TEXT")
+q_26 %>% 
+  gather(Q26,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+
+```
+Question 27: Which of the following natural language processing (NLP) methods do you use on a regular basis?
+```{r}
+q_27 <- DataScientists %>% 
+  select(starts_with("Q27")& !"Q27_OTHER_TEXT")
+q_27 %>% 
+  gather(Q27,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 28: Which of the following machine learning frameworks do you use on a regular basis?
+```{r}
+q_28 <- DataScientists %>% 
+  select(starts_with("Q28")& !"Q28_OTHER_TEXT")
+q_28 <-q_28 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 29: Which of the following cloud computing platforms do you use on a regular basis? 
+```{r}
+q_29 <- DataScientists %>% 
+  select(starts_with("Q29")& !"Q29_OTHER_TEXT")
+
+q_29 <-q_29 %>% 
+  gather(Q29,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 30: Which specific cloud computing products do you use on a regular basis? 
+```{r}
+q_30 <- DataScientists %>% 
+  select(starts_with("Q30")& !"Q30_OTHER_TEXT")
+q_30 <- q_30 %>% 
+  gather(Q30,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 31: Which specific big data / analytics products do you use on a regular basis?
+```{r}
+q_31 <- DataScientists %>% 
+  select(starts_with("Q31")& !"Q31_OTHER_TEXT")
+
+q_31 <-
+q_31 %>% 
+  gather(Q31,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 32: Which of the following machine learning products do you use on a regular basis? 
+```{r}
+q_32 <- DataScientists %>% 
+  select(starts_with("Q32")& !"Q32_OTHER_TEXT")
+q_32<- q_32 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+Question 33: Which automated machine learning tools (or partial AutoML tools) do you use on a regular basis? 
+```{r}
+q_33 <- DataScientists %>% 
+  select(starts_with("Q33")& !"Q33_OTHER_TEXT")
+q_33 <-q_33 %>% 
+  gather(Q33,response)  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+```
+Question 34: Which of the following relational database products do you use on a regular basis? 
+```{r}
+q_34 <- DataScientists %>% 
+  select(starts_with("Q34")& !"Q34_OTHER_TEXT")
+q_34 <-q_34 %>% 
+  gather(Q,response)  %>% 
+    group_by(response) %>%
+      summarize(count_response = n())
+```
+
+## Most cited skills
+
+It looks like the majority of the skills-based questions can be categorized into the following areas-
+1.**Programming Languages**: Questions 18 and 19
+2.**Data Visualization**: Question 20
+3.**ML Tools and Products**: Questions 25,32 and 33
+4.**ML Algorithms**: Questions 24 
+5.**ML Framework**: Question 28
+5.**Big Data**: Question 31
+6.**Cloud Platforms**: Questions 29 and 30
+7.**Relational Databases**:Question 34 
+8.Computer Vision: Question 26
+9.NLP: Question 27
+
+We are particularly interested in understanding what the most cited tools or skills were for #1-7 above.
+
+1.Programming Languages
+
+We will combine the individual data frame for each question first before plotting the data.
+
+```{r}
+PL <- rbind(q_18,q_19)
+PL <-PL %>% 
+    group_by(Response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(PL)
+```
+We don't need to see the blank responses
+```{r}
+PL$Response[PL$Response == ""|PL$Response =="None"] <- NA
+PL <-PL %>% 
+    group_by(Response) %>%
+      summarize(sum_response= sum(sum_response))
+PL <- na.omit(PL)
+knitr::kable(PL)
+```
+
+```{r}
+ggplot(data=PL, aes(x=Response,y=sum_response, fill=Response))+geom_col()+ geom_text(label=(PL$sum_response))+
+  ggtitle("Programming Languages")
+```
+
+2. Data Visualization
+```{r}
+ggplot(data=q_20, aes(x=response,y=count_response, fill=response))+geom_col()+ geom_text(label=(q_20$count_response))+
+  ggtitle("Data Visualization Tools")
+```
+
+3. ML Tools/Products
+
+```{r}
+ML <- rbind(q_25,q_32,q_33)
+ML <-ML %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(ML)
+```
+```{r}
+ggplot(data=ML, aes(x=response,y=sum_response, fill=response))+geom_col()+ geom_text(label=(ML$sum_response))+
+  ggtitle("ML Tools and Products")
+```
+4. ML Algorithm 
+
+```{r}
+ggplot(data=q_24, aes(x=response,y=count_response, fill=response))+geom_col()+ geom_text(label=(q_24$count_response))+
+  ggtitle("ML Algorithms")
+```
+
+5. ML Framework
+```{r}
+ggplot(data=q_28, aes(x=response,y=count_response, fill=response))+geom_col()+ geom_text(label=(q_28$count_response))+
+  ggtitle("ML Framework")
+```
+6. Cloud Platforms
+
+```{r}
+CloudPlatform <- rbind(q_29,q_30)
+CloudPlatform <-CloudPlatform %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(count_response))
+knitr::kable(CloudPlatform)
+```
+```{r}
+CloudPlatform$response[CloudPlatform$response == ""|CloudPlatform$response=="None"] <- NA
+```
+
+For cloud platforms, we are only interested in seeing the combined results for the service provider. Therefore, we will combine the responses from Question 30 to only reflect the provider for the tool. For instance, for AWS we are currently seeing 5 naming variations. We would like to  reconcile the naming variations under AWS to get the combined results. This applies to Azure and Google Cloud as well.
+
+```{r}
+x <- str_detect(CloudPlatform$response,"AWS")
+y <- str_detect(CloudPlatform$response,"Azure")
+z <- str_detect (CloudPlatform$response,"Google")
+```
+
+```{r}
+CloudPlatform$response <-ifelse(x,"Amazon Web Services (AWS)",CloudPlatform$response)
+CloudPlatform$response <-ifelse(y,"Microsoft Azure",CloudPlatform$response)
+CloudPlatform$response <-ifelse(z,"Google Cloud Platform",CloudPlatform$response)
+CloudPlatform <- na.omit(CloudPlatform)
+CloudPlatform <-CloudPlatform %>% 
+    group_by(response) %>%
+      summarize(sum_response= sum(sum_response))
+knitr::kable(CloudPlatform)
+```  
+
+```{r}
+ggplot(data=CloudPlatform, aes(x=response,y=sum_response, fill=response))+geom_col()+ geom_text(label=(CloudPlatform$sum_response))+
+  ggtitle("Cloud Platforms")
+```
+
+
+
+
+## Dataset 2 (Other Text responses)
+Free form responses for those who selected the other option in the main multiple choice survey.
+
+### Data
+```{r}
+Data2 <- dbGetQuery(my_connection,"Select * FROM dbo.other_text_responses")
+```
+
+### Filtering out non-data roles
+We are only going to look at respondents primary responsibilities presumably entail working with data on a daily basis, given their titles.
+
+```{r}
+DataRoles <- dbGetQuery(my_connection,"Select * 
+           FROM dbo.other_text_responses
+           WHERE 
+           [Q5_OTHER_TEXT] like '%Data%' OR 
+           [Q5_OTHER_TEXT] like '%Machine     Learning%' 
+OR [Q5_OTHER_TEXT] like   '%Artifical Intelligence%' OR [Q5_OTHER_TEXT] like '%Business Intelligence%'
+OR  [Q5_OTHER_TEXT] like '%Analytics%'
+OR  [Q5_OTHER_TEXT] like '%Algorithm%'
+OR  [Q5_OTHER_TEXT] like '%Analyst%'
+OR  [Q5_OTHER_TEXT] like '%Developer%'
+OR  [Q5_OTHER_TEXT] like '%AI%'
+OR  [Q5_OTHER_TEXT] like '%Programmer%'
+OR  [Q5_OTHER_TEXT] like '%Math%'")
+DataRoles
+```
+###Primary Tool
+
+The survey question where a significant amount of respondents picked the other option is Question 14 (What is the primary tool that you use at work or school to analyze data? (Include text response) - Selected Choice). Therefore, we would like to see if there are any other skillsets or tools here that are worth looking into besides the ones mentioned in the main dataset.
+
+```{r}
+PrimaryTool <- DataRoles %>% 
+  select("Q14_OTHER_TEXT")
+
+PrimaryTool <-PrimaryTool %>% 
+  gather(Q14other,response)  %>% 
+    group_by(response) %>%
+      summarize(count_reponse = n())
+PrimaryTool
+```
+Respondents were allowed to input more than one answer in this field,i.e. one respondent can list multiple tools in their response, usually separated by a comma. We will therefore split the responses into separate columns first and then convert the dataset from wide to long.
+```{r}
+PrimaryTool <- separate(PrimaryTool,response,
+         into=c("T1","T2","T3"),
+         sep=",")
+PrimaryTool %>% gather(Tool,Response,
+        T1,T2,T3)%>% group_by(Response)%>%
+  summarize(Sum_response=sum(count_reponse))
+      
+```
+Looks like Python might be the winner here.
+

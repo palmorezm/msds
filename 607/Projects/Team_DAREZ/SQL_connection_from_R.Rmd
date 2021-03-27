@@ -1,0 +1,153 @@
+---
+title: "SQL Server Connection"
+author: "Team DAREZ"
+date: "10/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+install.packages("odbc")
+library(odbc) # create connection to SQL database
+library(DBI)  # query SQL database tables
+```
+
+## Connection to the SQL server tables
+
+The following code establishes a connection to the SQL server using a 'read only' account.
+
+```{r }
+# connect to the server
+my_connection <- dbConnect(drv = odbc::odbc(),
+         Driver = "SQL Server",
+         server = "data607.database.windows.net",
+         database = "Project3",
+         uid = "Professor607",
+         pwd = "TeamDAREZ#1")
+``` 
+
+## Read the indeed survey data into an R dataframe 
+### 1524 observations of 7 variables
+
+Using the DBI package\'s `dbGetQuery` function, read the data into R.
+
+``` {r read_indeed}
+# read indeed data into a data frame named "df_indeed"
+df_indeed <- dbGetQuery(my_connection,'
+  SELECT "SurveyID", "source", "title", "company", "location", "summary", "link"
+  FROM "indeed_scrape_1"
+  WHERE "source" = \'indeed\'
+')
+
+head(df_indeed)
+```
+
+## Read the Glassdoor survey into an R dataframe
+### 1710 observations of 7 variables
+
+Rinse and repeat process for each table.
+
+``` {r read_Glassdoor}
+# read Glassdoor data into a data frame named "df_Glassdoor"
+df_Glassdoor <- dbGetQuery(my_connection,'
+  SELECT "SurveyID", "source", "title", "company", "location", "summary", "link"
+  FROM "indeed_scrape_1"
+  WHERE "source" = \'Glassdoor\'
+')
+
+head(df_Glassdoor)
+```
+
+
+## Read survey schema table into an R dataframe
+### 10 observations of 35 variables
+
+...still importing data...
+
+``` {r read_survey_schema}
+# read survey schema data into a data frame named "df_survey_schema"
+df_survey_schema <- dbGetQuery(my_connection,'
+  SELECT "2019 Kaggle Machine Learning and Data Science Survey", "Q1", "Q2", "Q3", "Q4"
+  , "Q5", "Q6", "Q7", "Q8", "Q9", "Q10", "Q11", "Q12", "Q13", "Q14", "Q15", "Q16", "Q17"
+  , "Q18", "Q19", "Q20", "Q21", "Q22", "Q23", "Q24", "Q25", "Q26", "Q27", "Q28", "Q29"
+  , "Q30", "Q31", "Q32", "Q33", "Q34"
+  FROM "survey_schema"
+')
+
+head(df_survey_schema)
+```
+
+
+## Read survey multiple choice responses table into an R dataframe
+### 19,718 observations of 246 variables (give it a minute or more to load...my connection took about 3 minutes)
+
+...this one is rather large, it takes several minutes to load...
+
+``` {r read_survey_multi_choice}
+# read survey multiple choice data into a data frame named "df_survey_multi_choice"
+
+df_survey_multi_choice <- dbGetQuery(my_connection,'
+  SELECT "Time from Start to Finish (seconds)"
+  , "Q1", "Q2", "Q2_OTHER_TEXT", "Q3", "Q4", "Q5", "Q5_OTHER_TEXT"
+  , "Q6", "Q7", "Q8", "Q9_Part_1", "Q9_Part_2", "Q9_Part_3", "Q9_Part_4"
+  , "Q9_Part_5", "Q9_Part_6", "Q9_Part_7", "Q9_Part_8", "Q9_OTHER_TEXT"
+  , "Q10", "Q11", "Q12_Part_1", "Q12_Part_2", "Q12_Part_3", "Q12_Part_4", "Q12_Part_5"
+  , "Q12_Part_6", "Q12_Part_7", "Q12_Part_8", "Q12_Part_9", "Q12_Part_10", "Q12_Part_11"
+  , "Q12_Part_12", "Q12_OTHER_TEXT", "Q13_Part_1", "Q13_Part_2", "Q13_Part_3", "Q13_Part_4"
+  , "Q13_Part_5", "Q13_Part_6", "Q13_Part_7", "Q13_Part_8", "Q13_Part_9", "Q13_Part_10"
+  , "Q13_Part_11", "Q13_Part_12", "Q13_OTHER_TEXT", "Q14", "Q14_Part_1_TEXT", "Q14_Part_2_TEXT"
+  , "Q14_Part_3_TEXT", "Q14_Part_4_TEXT", "Q14_Part_5_TEXT", "Q14_OTHER_TEXT", "Q15"
+  , "Q16_Part_1", "Q16_Part_2", "Q16_Part_3", "Q16_Part_4", "Q16_Part_5", "Q16_Part_6"
+  , "Q16_Part_7", "Q16_Part_8", "Q16_Part_9", "Q16_Part_10", "Q16_Part_11", "Q16_Part_12", "Q16_OTHER_TEXT"
+  , "Q17_Part_1", "Q17_Part_2", "Q17_Part_3", "Q17_Part_4", "Q17_Part_5", "Q17_Part_6", "Q17_Part_7", "Q17_Part_8"
+  , "Q17_Part_9", "Q17_Part_10", "Q17_Part_11", "Q17_Part_12", "Q17_OTHER_TEXT", "Q18_Part_1", "Q18_Part_2"
+  , "Q18_Part_3", "Q18_Part_4", "Q18_Part_5", "Q18_Part_6", "Q18_Part_7", "Q18_Part_8", "Q18_Part_9", "Q18_Part_10"
+  , "Q18_Part_11", "Q18_Part_12", "Q18_OTHER_TEXT", "Q19", "Q19_OTHER_TEXT", "Q20_Part_1", "Q20_Part_2"
+  , "Q20_Part_3", "Q20_Part_4", "Q20_Part_5", "Q20_Part_6", "Q20_Part_7"
+  , "Q20_Part_8", "Q20_Part_9", "Q20_Part_10", "Q20_Part_11", "Q20_Part_12", "Q20_OTHER_TEXT", "Q21_Part_1"
+  , "Q21_Part_2", "Q21_Part_3", "Q21_Part_4", "Q21_Part_5", "Q21_OTHER_TEXT", "Q22", "Q23", "Q24_Part_1"
+  , "Q24_Part_2", "Q24_Part_3", "Q24_Part_4", "Q24_Part_5", "Q24_Part_6", "Q24_Part_7", "Q24_Part_8"
+  , "Q24_Part_9", "Q24_Part_10", "Q24_Part_11", "Q24_Part_12", "Q24_OTHER_TEXT", "Q25_Part_1", "Q25_Part_2"
+  , "Q25_Part_3", "Q25_Part_4", "Q25_Part_5", "Q25_Part_6", "Q25_Part_7", "Q25_Part_8", "Q25_OTHER_TEXT"
+  , "Q26_Part_1", "Q26_Part_2", "Q26_Part_3", "Q26_Part_4", "Q26_Part_5", "Q26_Part_6", "Q26_Part_7"
+  , "Q26_OTHER_TEXT", "Q27_Part_1", "Q27_Part_2", "Q27_Part_3", "Q27_Part_4", "Q27_Part_5", "Q27_Part_6"
+  , "Q27_OTHER_TEXT", "Q28_Part_1", "Q28_Part_2", "Q28_Part_3", "Q28_Part_4", "Q28_Part_5", "Q28_Part_6"
+  , "Q28_Part_7", "Q28_Part_8", "Q28_Part_9", "Q28_Part_10", "Q28_Part_11", "Q28_Part_12", "Q28_OTHER_TEXT"
+  , "Q29_Part_1", "Q29_Part_2", "Q29_Part_3", "Q29_Part_4", "Q29_Part_5", "Q29_Part_6", "Q29_Part_7", "Q29_Part_8"
+  , "Q29_Part_9", "Q29_Part_10", "Q29_Part_11", "Q29_Part_12", "Q29_OTHER_TEXT"
+  , "Q30_Part_1", "Q30_Part_2", "Q30_Part_3", "Q30_Part_4", "Q30_Part_5", "Q30_Part_6", "Q30_Part_7"
+  , "Q30_Part_8", "Q30_Part_9", "Q30_Part_10", "Q30_Part_11", "Q30_Part_12", "Q30_OTHER_TEXT"
+  , "Q31_Part_1", "Q31_Part_2", "Q31_Part_3", "Q31_Part_4", "Q31_Part_5", "Q31_Part_6", "Q31_Part_7"
+  , "Q31_Part_8", "Q31_Part_9", "Q31_Part_10", "Q31_Part_11", "Q31_Part_12", "Q31_OTHER_TEXT"
+  , "Q32_Part_1", "Q32_Part_2", "Q32_Part_3", "Q32_Part_4", "Q32_Part_5", "Q32_Part_6", "Q32_Part_7"
+  , "Q32_Part_8", "Q32_Part_9", "Q32_Part_10", "Q32_Part_11", "Q32_Part_12", "Q32_OTHER_TEXT"
+  , "Q33_Part_1", "Q33_Part_2", "Q33_Part_3", "Q33_Part_4", "Q33_Part_5", "Q33_Part_6"
+  , "Q33_Part_7", "Q33_Part_8", "Q33_Part_9", "Q33_Part_10", "Q33_Part_11", "Q33_Part_12", "Q33_OTHER_TEXT"
+  , "Q34_Part_1", "Q34_Part_2", "Q34_Part_3", "Q34_Part_4", "Q34_Part_5", "Q34_Part_6"
+  , "Q34_Part_7", "Q34_Part_8", "Q34_Part_9", "Q34_Part_10", "Q34_Part_11", "Q34_Part_12", "Q34_OTHER_TEXT"
+  FROM "multiple_choice_responses"
+')
+
+head(df_survey_multi_choice)
+```
+
+## Read survey other text responses table into an R dataframe 
+### 19,718 observations of 28 variables (also give it a minute to load)
+
+...last one, a bit faster to load than the previous one.
+
+``` {r read_survey_other_text}
+# read survey other text response (free form) data into a data frame named "df_survey_other_text"
+
+df_survey_other_text <- dbGetQuery(my_connection,'
+  SELECT "Q12_OTHER_TEXT", "Q13_OTHER_TEXT", "Q14_OTHER_TEXT", "Q14_Part_1_TEXT", "Q14_Part_2_TEXT"
+  , "Q14_Part_3_TEXT", "Q14_Part_4_TEXT", "Q14_Part_5_TEXT", "Q16_OTHER_TEXT", "Q17_OTHER_TEXT", "Q18_OTHER_TEXT"
+  , "Q19_OTHER_TEXT", "Q20_OTHER_TEXT", "Q21_OTHER_TEXT"
+  , "Q24_OTHER_TEXT", "Q25_OTHER_TEXT", "Q26_OTHER_TEXT", "Q27_OTHER_TEXT", "Q28_OTHER_TEXT", "Q29_OTHER_TEXT"
+  , "Q2_OTHER_TEXT", "Q30_OTHER_TEXT", "Q31_OTHER_TEXT", "Q32_OTHER_TEXT", "Q33_OTHER_TEXT", "Q34_OTHER_TEXT"
+  , "Q5_OTHER_TEXT", "Q9_OTHER_TEXT"
+  FROM "other_text_responses"
+')
+
+head(df_survey_other_text)
+```

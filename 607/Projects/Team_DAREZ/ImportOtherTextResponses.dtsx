@@ -1,0 +1,1540 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="10/9/2020 11:34:16 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="LAPTOP-TSF1560E"
+  DTS:CreatorName="LAPTOP-TSF1560E\dougl"
+  DTS:Description="SSIS Package Description"
+  DTS:DTSID="{B0A8E43C-65CA-4811-AEE5-93124406C9B9}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.118"
+  DTS:LocaleID="1033"
+  DTS:MaxErrorCount="0"
+  DTS:ObjectName="ImportOtherTextResponses"
+  DTS:VersionGUID="{B35E76DB-7704-40BE-AAD1-837A4E2E62DB}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{5BC172CD-BD9F-4249-ABA9-C4B240286B2D}"
+      DTS:ObjectName="DestinationConnectionOLEDB">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=data607.database.windows.net;User ID=Project2admin;Initial Catalog=Project3;Provider=SQLNCLI11;Auto Translate=false;">
+          <DTS:Password
+            DTS:Name="Password"
+            Sensitive="1"
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAdRZRwetDB0K9q9k3M2DQdQAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAACXzl56S8vpWSF0XCF+Eeq/qWRJgmYSIsG1cTAeAkk87gAAAAAOgAAAAAIAACAAAACXpqVHpMi0RqfoQEGQH1FxJFsyUkgnp2kBbqwpH0dbvSAAAADQy3QHZWKmikr3KLF/cXvIAEt6ZnQy5bnrORKl+UwBQEAAAABkOHNO2S8BzlOUKcMSRWB7Dw1mlwr9FmPLAho5IhtyBs17AtP6OOAkHDS+8xEcwpkBk5nAzwqhQokazPVgdFbe</DTS:Password>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+      DTS:CreationName="FLATFILE"
+      DTS:DTSID="{E801E0A9-1688-44E7-B368-45C5FAC4E2F8}"
+      DTS:ObjectName="SourceConnectionFlatFile">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:Format="Delimited"
+          DTS:LocaleID="1033"
+          DTS:HeaderRowDelimiter="_x000D__x000A_"
+          DTS:ColumnNamesInFirstDataRow="True"
+          DTS:RowDelimiter=""
+          DTS:TextQualifier="_x0022_"
+          DTS:CodePage="1252"
+          DTS:ConnectionString="C:\Users\dougl\Desktop\CUNY local\DATA607\Project 3\other_text_responses.csv">
+          <DTS:FlatFileColumns>
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q12_OTHER_TEXT"
+              DTS:DTSID="{B6AE0D87-BC88-47E7-96FD-C7D040279E24}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q13_OTHER_TEXT"
+              DTS:DTSID="{1140CEE0-5DC0-4C7C-ABFA-014D532D75A2}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_OTHER_TEXT"
+              DTS:DTSID="{29625AA3-DB3E-4D6B-811F-1D81E9592396}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_Part_1_TEXT"
+              DTS:DTSID="{11B05546-5725-47C4-8D6A-43B3A69656D0}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_Part_2_TEXT"
+              DTS:DTSID="{5716E5D5-447C-4AAB-9A61-00ECA134BA74}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_Part_3_TEXT"
+              DTS:DTSID="{7BCC6AA3-7CAF-4A06-BE1F-02AED29AC21F}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_Part_4_TEXT"
+              DTS:DTSID="{21593DC4-9280-4C83-B42B-B0BC97A03323}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14_Part_5_TEXT"
+              DTS:DTSID="{1C890BFF-40D5-454B-9AF3-5C1E33E76B95}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q16_OTHER_TEXT"
+              DTS:DTSID="{60A6DD88-B2DC-452B-97FC-F91FD6A627C5}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q17_OTHER_TEXT"
+              DTS:DTSID="{E595BFA1-DB89-4947-85CF-E51CFF9D20EA}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q18_OTHER_TEXT"
+              DTS:DTSID="{CEDE21DB-DC4D-433F-B126-1B7024976369}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q19_OTHER_TEXT"
+              DTS:DTSID="{943BED39-6AF2-4AA9-92D6-9E7D8CDA7092}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q20_OTHER_TEXT"
+              DTS:DTSID="{8B037665-72B9-445A-8580-D545BE4C874F}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q21_OTHER_TEXT"
+              DTS:DTSID="{3D69463F-39F1-4C05-8697-2F95B477BD2E}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q24_OTHER_TEXT"
+              DTS:DTSID="{5274DA9E-1D6F-44F7-9040-236F02D5A2B9}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q25_OTHER_TEXT"
+              DTS:DTSID="{1047D78B-2D25-46DA-8132-55CD51511960}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q26_OTHER_TEXT"
+              DTS:DTSID="{6F731CAC-0517-44A1-AD19-64C847B53483}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q27_OTHER_TEXT"
+              DTS:DTSID="{5131C84E-77D8-42CF-B9BF-AD18C99CF193}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q28_OTHER_TEXT"
+              DTS:DTSID="{4186F67F-665F-474F-B3EE-A8AD465450A9}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q29_OTHER_TEXT"
+              DTS:DTSID="{A3A369B1-E134-459D-A9C7-AE6A5EF4BC35}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q2_OTHER_TEXT"
+              DTS:DTSID="{3BB5AE0C-16E2-4472-98CA-3D23982D03F2}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q30_OTHER_TEXT"
+              DTS:DTSID="{8004069E-BEF5-4254-88AE-F533BF099714}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q31_OTHER_TEXT"
+              DTS:DTSID="{AA2598C0-2560-4B10-B0CD-D4D4F491F38F}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q32_OTHER_TEXT"
+              DTS:DTSID="{49258169-D714-4D98-854F-4BD813B69990}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q33_OTHER_TEXT"
+              DTS:DTSID="{F5D2F799-0282-4FC5-ADD7-1895B38076C2}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q34_OTHER_TEXT"
+              DTS:DTSID="{0278B407-1E47-43FB-8BBE-0723A2625C1D}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q5_OTHER_TEXT"
+              DTS:DTSID="{7AC9A8EA-70DC-4374-AB60-1B7F99BDFE1E}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x000D__x000A_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q9_OTHER_TEXT"
+              DTS:DTSID="{8F3B7C22-ABB0-4BC7-BFD4-0C3D708DF1CD}"
+              DTS:CreationName="" />
+          </DTS:FlatFileColumns>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Data Flow Task 1"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{2DD6D50B-E9EE-483D-95F6-4E920688CC25}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:FailPackageOnFailure="True"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Flow Task 1"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          defaultBufferSize="3145728"
+          version="1">
+          <components>
+            <component
+              refId="Package\Data Flow Task 1\Destination - other_text_responses"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="Destination - other_text_responses"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[other_text_responses]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Destination - other_text_responses.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  connectionManagerRefId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q12_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q12_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q12_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q12_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q13_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q13_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q13_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q13_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_Part_1_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_Part_1_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_1_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_1_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_Part_2_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_Part_2_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_2_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_2_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_Part_3_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_Part_3_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_3_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_3_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_Part_4_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_Part_4_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_4_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_4_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q14_Part_5_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14_Part_5_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_5_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_5_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q16_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q16_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q16_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q16_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q17_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q17_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q17_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q17_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q18_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q18_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q18_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q18_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q19_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q19_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q19_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q19_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q20_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q20_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q20_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q20_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q21_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q21_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q21_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q21_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q24_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q24_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q24_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q24_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q25_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q25_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q25_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q25_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q26_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q26_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q26_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q26_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q27_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q27_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q27_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q27_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q28_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q28_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q28_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q28_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q29_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q29_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q29_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q29_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q2_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q2_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q2_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q2_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q30_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q30_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q30_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q30_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q31_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q31_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q31_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q31_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q32_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q32_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q32_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q32_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q33_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q33_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q33_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q33_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q34_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q34_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q34_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q34_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q5_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q5_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q5_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q5_OTHER_TEXT]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].Columns[Q9_OTHER_TEXT]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q9_OTHER_TEXT"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q9_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q9_OTHER_TEXT]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q12_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q12_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q13_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q13_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_1_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_1_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_2_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_2_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_3_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_3_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_4_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_4_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q14_Part_5_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_5_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q16_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q16_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q17_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q17_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q18_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q18_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q19_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q19_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q20_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q20_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q21_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q21_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q24_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q24_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q25_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q25_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q26_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q26_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q27_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q27_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q28_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q28_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q29_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q29_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q2_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q2_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q30_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q30_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q31_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q31_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q32_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q32_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q33_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q33_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q34_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q34_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q5_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q5_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input].ExternalColumns[Q9_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q9_OTHER_TEXT" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Destination - other_text_responses.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - other_text_responses.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - other_text_responses.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - other_text_responses.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Source - other_text_responses_csv"
+              componentClassID="Microsoft.FlatFileSource"
+              contactInfo="Flat File Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Flat File Source"
+              localeId="1033"
+              name="Source - other_text_responses_csv"
+              usesDispositions="true"
+              version="1">
+              <properties>
+                <property
+                  dataType="System.Boolean"
+                  description="Specifies whether zero-length columns are treated as null."
+                  name="RetainNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of an output column containing the file name. If no name is specified, no output column containing the file name will be generated."
+                  name="FileNameColumnName"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Connections[FlatFileConnection]"
+                  connectionManagerID="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  connectionManagerRefId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  name="FlatFileConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output]"
+                  name="Flat File Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q12_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q12_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q12_OTHER_TEXT]"
+                      name="Q12_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q13_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q13_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q13_OTHER_TEXT]"
+                      name="Q13_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_OTHER_TEXT]"
+                      name="Q14_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_1_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_1_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_1_TEXT]"
+                      name="Q14_Part_1_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_2_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_2_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_2_TEXT]"
+                      name="Q14_Part_2_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_3_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_3_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_3_TEXT]"
+                      name="Q14_Part_3_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_4_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_4_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_4_TEXT]"
+                      name="Q14_Part_4_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_5_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_5_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q14_Part_5_TEXT]"
+                      name="Q14_Part_5_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q16_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q16_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q16_OTHER_TEXT]"
+                      name="Q16_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q17_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q17_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q17_OTHER_TEXT]"
+                      name="Q17_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q18_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q18_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q18_OTHER_TEXT]"
+                      name="Q18_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q19_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q19_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q19_OTHER_TEXT]"
+                      name="Q19_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q20_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q20_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q20_OTHER_TEXT]"
+                      name="Q20_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q21_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q21_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q21_OTHER_TEXT]"
+                      name="Q21_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q24_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q24_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q24_OTHER_TEXT]"
+                      name="Q24_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q25_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q25_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q25_OTHER_TEXT]"
+                      name="Q25_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q26_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q26_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q26_OTHER_TEXT]"
+                      name="Q26_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q27_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q27_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q27_OTHER_TEXT]"
+                      name="Q27_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q28_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q28_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q28_OTHER_TEXT]"
+                      name="Q28_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q29_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q29_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q29_OTHER_TEXT]"
+                      name="Q29_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q2_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q2_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q2_OTHER_TEXT]"
+                      name="Q2_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q30_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q30_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q30_OTHER_TEXT]"
+                      name="Q30_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q31_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q31_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q31_OTHER_TEXT]"
+                      name="Q31_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q32_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q32_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q32_OTHER_TEXT]"
+                      name="Q32_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q33_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q33_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q33_OTHER_TEXT]"
+                      name="Q33_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q34_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q34_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q34_OTHER_TEXT]"
+                      name="Q34_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q5_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q5_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q5_OTHER_TEXT]"
+                      name="Q5_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q9_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q9_OTHER_TEXT]"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].Columns[Q9_OTHER_TEXT]"
+                      name="Q9_OTHER_TEXT"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q12_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q12_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q13_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q13_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_1_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_1_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_2_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_2_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_3_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_3_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_4_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_4_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q14_Part_5_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14_Part_5_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q16_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q16_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q17_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q17_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q18_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q18_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q19_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q19_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q20_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q20_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q21_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q21_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q24_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q24_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q25_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q25_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q26_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q26_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q27_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q27_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q28_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q28_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q29_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q29_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q2_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q2_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q30_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q30_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q31_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q31_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q32_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q32_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q33_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q33_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q34_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q34_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q5_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q5_OTHER_TEXT" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output].ExternalColumns[Q9_OTHER_TEXT]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q9_OTHER_TEXT" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output]"
+                  isErrorOut="true"
+                  name="Flat File Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      codePage="1252"
+                      dataType="text"
+                      description="Flat File Source Error Output Column"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      name="Flat File Source Error Output Column" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Data Flow Task 1.Paths[Flat File Source Output]"
+              endId="Package\Data Flow Task 1\Destination - other_text_responses.Inputs[Destination Input]"
+              name="Flat File Source Output"
+              startId="Package\Data Flow Task 1\Source - other_text_responses_csv.Outputs[Flat File Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+</DTS:Executable>

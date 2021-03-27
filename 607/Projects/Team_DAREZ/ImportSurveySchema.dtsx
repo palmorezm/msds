@@ -1,0 +1,2757 @@
+<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="10/9/2020 10:40:47 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="LAPTOP-TSF1560E"
+  DTS:CreatorName="LAPTOP-TSF1560E\dougl"
+  DTS:Description="SSIS Package Description"
+  DTS:DTSID="{43507ADE-C808-4913-B09C-585B7294F57D}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="15.0.2000.118"
+  DTS:LocaleID="1033"
+  DTS:MaxErrorCount="0"
+  DTS:ObjectName="ImportSurveySchema"
+  DTS:VersionGUID="{960236A3-DF94-4773-888D-210619A31066}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:ConnectionManagers>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+      DTS:CreationName="OLEDB"
+      DTS:DTSID="{80C4630D-36A1-4A60-9739-D9A889BE8DF3}"
+      DTS:ObjectName="DestinationConnectionOLEDB">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:ConnectionString="Data Source=data607.database.windows.net;User ID=Project2admin;Initial Catalog=Project3;Provider=SQLNCLI11;Auto Translate=false;">
+          <DTS:Password
+            DTS:Name="Password"
+            Sensitive="1"
+            Encrypted="1">AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAdRZRwetDB0K9q9k3M2DQdQAAAAAIAAAARABUAFMAAAAQZgAAAAEAACAAAAD26wNxxOeXQmo8Wc5Vg19QVcamE7SqyrudSJaSMomuKgAAAAAOgAAAAAIAACAAAABm18hlCWdN/XRoBEO58fwNLwVd3713VKbir+fJoM5D+yAAAACzfr6Xi8POs3C0e0VONWCqztaIZ93nAGsQ4KYlJjL+QEAAAADHFbk4toUJMGhgp2Xx5DjWzXYxSysMj3rmmB/TbPct4OF121kN2bJOP9tzn4gtkvsoO6eyyH7oNM6uUhdayeUv</DTS:Password>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+    <DTS:ConnectionManager
+      DTS:refId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+      DTS:CreationName="FLATFILE"
+      DTS:DTSID="{D9AF8541-104F-495F-BEDF-5274EBBDF6B0}"
+      DTS:ObjectName="SourceConnectionFlatFile">
+      <DTS:ObjectData>
+        <DTS:ConnectionManager
+          DTS:Format="Delimited"
+          DTS:LocaleID="1033"
+          DTS:HeaderRowDelimiter="_x000D__x000A_"
+          DTS:ColumnNamesInFirstDataRow="True"
+          DTS:RowDelimiter=""
+          DTS:TextQualifier="_x0022_"
+          DTS:CodePage="1252"
+          DTS:ConnectionString="C:\Users\dougl\Desktop\CUNY local\DATA607\Project 3\survey_schema.csv">
+          <DTS:FlatFileColumns>
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="2019 Kaggle Machine Learning and Data Science Survey"
+              DTS:DTSID="{123C282D-CCE8-4F98-9082-047A33F0BDE2}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q1"
+              DTS:DTSID="{A41EF3C9-BCD7-458D-9B8A-CF04007742B5}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q10"
+              DTS:DTSID="{3351D1A0-6651-434D-B236-C8178F7B2626}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q11"
+              DTS:DTSID="{E9E5E3E8-0916-489C-885A-6A8885525498}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q12"
+              DTS:DTSID="{92AEEB46-D3B8-4381-9899-995644924598}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q13"
+              DTS:DTSID="{0DB7D93F-D7F7-486E-A067-CAEB0F4675AE}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q14"
+              DTS:DTSID="{43BA6A7B-ABF5-4E11-B3C1-F5DE387CCD2D}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q15"
+              DTS:DTSID="{85C9AAF8-F0C1-4B40-99C7-16C3A0AC26C6}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q16"
+              DTS:DTSID="{AF566F6E-648A-4F53-8C4F-427DA04A9530}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q17"
+              DTS:DTSID="{491CD364-561A-413C-BFAF-EBEDEDDEB25C}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q18"
+              DTS:DTSID="{3887415E-695C-4D63-A0AA-D24F5FBB8236}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q19"
+              DTS:DTSID="{795CE241-687C-4FC1-82D2-20D05AEECB41}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q2"
+              DTS:DTSID="{C103A604-FB89-44D5-BB02-3D7C7074E468}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q20"
+              DTS:DTSID="{568FC029-9781-4881-BEDE-8AFE0D472D64}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q21"
+              DTS:DTSID="{96D139E8-FDF7-4BFB-9128-B4576D11B6F9}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q22"
+              DTS:DTSID="{F804310B-CF5C-4416-ACAF-28314D82D575}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q23"
+              DTS:DTSID="{3E488385-2EE1-44C9-AE3F-0D705EF086D5}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q24"
+              DTS:DTSID="{BB7694D9-6276-4086-8611-E3D9082FAF73}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q25"
+              DTS:DTSID="{E88D3B67-1BE7-4E51-A7CF-CFA858C30A3E}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q26"
+              DTS:DTSID="{23268653-1591-4733-A272-B53EA085D10C}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q27"
+              DTS:DTSID="{B179EF84-7696-40DB-84DD-42E5E5385633}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q28"
+              DTS:DTSID="{1BC0BD35-BBCC-4056-95C1-458ED58804AD}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q29"
+              DTS:DTSID="{D499195D-2BA5-4326-A067-195848A5D5AB}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q3"
+              DTS:DTSID="{1178967C-5EF1-484C-A6AB-51CB086185AC}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q30"
+              DTS:DTSID="{FF963C16-435C-4402-8307-D24DA64D5CFE}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q31"
+              DTS:DTSID="{BBD21300-BBD5-4507-9C20-32097B97A5BC}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q32"
+              DTS:DTSID="{72B0E342-3E75-409D-A383-76C00CAAE424}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q33"
+              DTS:DTSID="{A8C24CF9-114F-404C-97F6-5CAE470F2C51}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q34"
+              DTS:DTSID="{9AB5507E-1669-4841-BAF5-6550819983E6}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q4"
+              DTS:DTSID="{1C94EB72-5849-454B-A24B-26ECE745501A}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q5"
+              DTS:DTSID="{47335507-8F5F-4C07-B711-ECDB1A86DF7C}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q6"
+              DTS:DTSID="{A18E3DA7-0A62-4DE6-AB4D-2C273FBCFBA6}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q7"
+              DTS:DTSID="{C079C343-6DAB-4AF6-8CC0-C20E77B84AC0}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x002C_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q8"
+              DTS:DTSID="{0E859DE3-ADDD-4D6F-AE91-5791DD6D14DB}"
+              DTS:CreationName="" />
+            <DTS:FlatFileColumn
+              DTS:ColumnType="Delimited"
+              DTS:ColumnDelimiter="_x000D__x000A_"
+              DTS:DataType="302"
+              DTS:TextQualified="True"
+              DTS:ObjectName="Q9"
+              DTS:DTSID="{500654CE-A4FE-4FCD-97FF-A4839BDE6F40}"
+              DTS:CreationName="" />
+          </DTS:FlatFileColumns>
+        </DTS:ConnectionManager>
+      </DTS:ObjectData>
+    </DTS:ConnectionManager>
+  </DTS:ConnectionManagers>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Data Flow Task 1"
+      DTS:CreationName="Microsoft.Pipeline"
+      DTS:DTSID="{1CA849CE-18DA-4C01-9AC8-7369A596F4EC}"
+      DTS:ExecutableType="Microsoft.Pipeline"
+      DTS:FailPackageOnFailure="True"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Data Flow Task 1"
+      DTS:TaskContact="Performs high-performance data extraction, transformation and loading;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <pipeline
+          defaultBufferSize="3145728"
+          version="1">
+          <components>
+            <component
+              refId="Package\Data Flow Task 1\Data Conversion 0 - 0"
+              componentClassID="Microsoft.DataConvert"
+              contactInfo="Data Conversion;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;0"
+              description="Data Conversion"
+              name="Data Conversion 0 - 0"
+              usesDispositions="true">
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]"
+                  name="Data Conversion Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="2019 Kaggle Machine Learning and Data Science Survey"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q1]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q1"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q1]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q10]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q10"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q10]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q11]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q11"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q11]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q12]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q12"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q12]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q13]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q13"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q13]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q14]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q14"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q14]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q15]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q15"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q15]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q16]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q16"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q16]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q17]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q17"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q17]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q18]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q18"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q18]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q19]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q19"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q19]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q2]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q2"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q2]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q20]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q20"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q20]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q21]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q21"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q21]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q22]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q22"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q22]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q23]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q23"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q23]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q24]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q24"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q24]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q25]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q25"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q25]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q26]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q26"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q26]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q27]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q27"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q27]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q28]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q28"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q28]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q29]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q29"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q29]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q3]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q3"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q3]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q30]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q30"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q30]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q31]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q31"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q31]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q32]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q32"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q32]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q33]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q33"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q33]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q34]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q34"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q34]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q4]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q4"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q4]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q5]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q5"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q5]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q6]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q6"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q6]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q7]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q7"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q7]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q8]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q8"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q8]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input].Columns[Q9]"
+                      cachedCodepage="1252"
+                      cachedDataType="text"
+                      cachedName="Q9"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q9]" />
+                  </inputColumns>
+                  <externalMetadataColumns />
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output]"
+                  exclusionGroup="1"
+                  name="Data Conversion Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      name="2019 Kaggle Machine Learning and Data Science Survey"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q1]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q1]"
+                      name="Q1"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q1]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q10]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q10]"
+                      name="Q10"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q10]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q11]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q11]"
+                      name="Q11"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q11]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q12]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q12]"
+                      name="Q12"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q12]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q13]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q13]"
+                      name="Q13"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q13]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q14]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q14]"
+                      name="Q14"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q14]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q15]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q15]"
+                      name="Q15"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q15]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q16]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q16]"
+                      name="Q16"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q16]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q17]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q17]"
+                      name="Q17"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q17]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q18]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q18]"
+                      name="Q18"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q18]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q19]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q19]"
+                      name="Q19"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q19]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q2]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q2]"
+                      name="Q2"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q2]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q20]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q20]"
+                      name="Q20"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q20]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q21]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q21]"
+                      name="Q21"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q21]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q22]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q22]"
+                      name="Q22"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q22]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q23]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q23]"
+                      name="Q23"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q23]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q24]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q24]"
+                      name="Q24"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q24]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q25]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q25]"
+                      name="Q25"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q25]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q26]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q26]"
+                      name="Q26"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q26]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q27]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q27]"
+                      name="Q27"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q27]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q28]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q28]"
+                      name="Q28"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q28]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q29]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q29]"
+                      name="Q29"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q29]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q3]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q3]"
+                      name="Q3"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q3]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q30]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q30]"
+                      name="Q30"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q30]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q31]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q31]"
+                      name="Q31"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q31]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q32]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q32]"
+                      name="Q32"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q32]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q33]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q33]"
+                      name="Q33"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q33]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q34]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q34]"
+                      name="Q34"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q34]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q4]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q4]"
+                      name="Q4"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q4]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q5]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q5]"
+                      name="Q5"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q5]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q6]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q6]"
+                      name="Q6"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q6]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q7]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q7]"
+                      name="Q7"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q7]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q8]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q8]"
+                      name="Q8"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q8]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q9]"
+                      dataType="nText"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="IgnoreFailure"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q9]"
+                      name="Q9"
+                      truncationRowDisposition="IgnoreFailure">
+                      <properties>
+                        <property
+                          containsID="true"
+                          dataType="System.Int32"
+                          description="Specifies the input column used as the source of data for the conversion."
+                          name="SourceInputColumnLineageID">#{Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q9]}</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="Data Conversion Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Destination - survey_schema"
+              componentClassID="Microsoft.OLEDBDestination"
+              contactInfo="OLE DB Destination;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;4"
+              description="OLE DB Destination"
+              name="Destination - survey_schema"
+              usesDispositions="true"
+              version="4">
+              <properties>
+                <property
+                  dataType="System.Int32"
+                  description="The number of seconds before a command times out.  A value of 0 indicates an infinite time-out."
+                  name="CommandTimeout">0</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of the database object used to open a rowset."
+                  name="OpenRowset">[dbo].[survey_schema]</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the variable that contains the name of the database object used to open a rowset."
+                  name="OpenRowsetVariable"></property>
+                <property
+                  dataType="System.String"
+                  description="The SQL command to be executed."
+                  name="SqlCommand"
+                  UITypeEditor="Microsoft.DataTransformationServices.Controls.ModalMultilineStringEditor"></property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the column code page to use when code page information is unavailable from the data source."
+                  name="DefaultCodePage">1252</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Forces the use of the DefaultCodePage property value when describing character data."
+                  name="AlwaysUseDefaultCodePage">false</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies the mode used to access the database."
+                  name="AccessMode"
+                  typeConverter="AccessMode">3</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the values supplied for identity columns will be copied to the destination. If false, values for identity columns will be auto-generated at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepIdentity">false</property>
+                <property
+                  dataType="System.Boolean"
+                  description="Indicates whether the columns containing null will have null inserted in the destination. If false, columns containing null will have their default values inserted at the destination. Applies only if fast load is turned on."
+                  name="FastLoadKeepNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies options to be used with fast load.  Applies only if fast load is turned on."
+                  name="FastLoadOptions">TABLOCK,CHECK_CONSTRAINTS</property>
+                <property
+                  dataType="System.Int32"
+                  description="Specifies when commits are issued during data insertion.  A value of 0 specifies that one commit will be issued at the end of data insertion.  Applies only if fast load is turned on."
+                  name="FastLoadMaxInsertCommitSize">2147483647</property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Destination - survey_schema.Connections[OleDbConnection]"
+                  connectionManagerID="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  connectionManagerRefId="Package.ConnectionManagers[DestinationConnectionOLEDB]"
+                  description="The OLE DB runtime connection used to access the database."
+                  name="OleDbConnection" />
+              </connections>
+              <inputs>
+                <input
+                  refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input]"
+                  errorOrTruncationOperation="Insert"
+                  errorRowDisposition="FailComponent"
+                  hasSideEffects="true"
+                  name="Destination Input">
+                  <inputColumns>
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      cachedDataType="nText"
+                      cachedName="2019 Kaggle Machine Learning and Data Science Survey"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q1]"
+                      cachedDataType="nText"
+                      cachedName="Q1"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q1]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q1]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q10]"
+                      cachedDataType="nText"
+                      cachedName="Q10"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q10]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q10]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q11]"
+                      cachedDataType="nText"
+                      cachedName="Q11"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q11]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q11]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q12]"
+                      cachedDataType="nText"
+                      cachedName="Q12"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q12]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q12]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q13]"
+                      cachedDataType="nText"
+                      cachedName="Q13"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q13]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q13]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q14]"
+                      cachedDataType="nText"
+                      cachedName="Q14"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q14]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q14]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q15]"
+                      cachedDataType="nText"
+                      cachedName="Q15"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q15]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q15]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q16]"
+                      cachedDataType="nText"
+                      cachedName="Q16"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q16]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q16]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q17]"
+                      cachedDataType="nText"
+                      cachedName="Q17"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q17]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q17]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q18]"
+                      cachedDataType="nText"
+                      cachedName="Q18"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q18]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q18]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q19]"
+                      cachedDataType="nText"
+                      cachedName="Q19"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q19]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q19]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q2]"
+                      cachedDataType="nText"
+                      cachedName="Q2"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q2]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q2]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q20]"
+                      cachedDataType="nText"
+                      cachedName="Q20"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q20]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q20]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q21]"
+                      cachedDataType="nText"
+                      cachedName="Q21"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q21]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q21]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q22]"
+                      cachedDataType="nText"
+                      cachedName="Q22"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q22]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q22]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q23]"
+                      cachedDataType="nText"
+                      cachedName="Q23"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q23]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q23]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q24]"
+                      cachedDataType="nText"
+                      cachedName="Q24"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q24]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q24]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q25]"
+                      cachedDataType="nText"
+                      cachedName="Q25"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q25]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q25]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q26]"
+                      cachedDataType="nText"
+                      cachedName="Q26"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q26]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q26]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q27]"
+                      cachedDataType="nText"
+                      cachedName="Q27"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q27]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q27]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q28]"
+                      cachedDataType="nText"
+                      cachedName="Q28"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q28]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q28]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q29]"
+                      cachedDataType="nText"
+                      cachedName="Q29"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q29]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q29]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q3]"
+                      cachedDataType="nText"
+                      cachedName="Q3"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q3]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q3]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q30]"
+                      cachedDataType="nText"
+                      cachedName="Q30"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q30]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q30]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q31]"
+                      cachedDataType="nText"
+                      cachedName="Q31"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q31]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q31]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q32]"
+                      cachedDataType="nText"
+                      cachedName="Q32"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q32]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q32]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q33]"
+                      cachedDataType="nText"
+                      cachedName="Q33"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q33]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q33]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q34]"
+                      cachedDataType="nText"
+                      cachedName="Q34"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q34]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q34]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q4]"
+                      cachedDataType="nText"
+                      cachedName="Q4"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q4]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q4]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q5]"
+                      cachedDataType="nText"
+                      cachedName="Q5"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q5]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q5]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q6]"
+                      cachedDataType="nText"
+                      cachedName="Q6"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q6]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q6]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q7]"
+                      cachedDataType="nText"
+                      cachedName="Q7"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q7]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q7]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q8]"
+                      cachedDataType="nText"
+                      cachedName="Q8"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q8]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q8]" />
+                    <inputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].Columns[Q9]"
+                      cachedDataType="nText"
+                      cachedName="Q9"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q9]"
+                      lineageId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output].Columns[Q9]" />
+                  </inputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      dataType="nText"
+                      name="2019 Kaggle Machine Learning and Data Science Survey" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q1]"
+                      dataType="nText"
+                      name="Q1" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q2]"
+                      dataType="nText"
+                      name="Q2" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q3]"
+                      dataType="nText"
+                      name="Q3" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q4]"
+                      dataType="nText"
+                      name="Q4" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q5]"
+                      dataType="nText"
+                      name="Q5" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q6]"
+                      dataType="nText"
+                      name="Q6" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q7]"
+                      dataType="nText"
+                      name="Q7" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q8]"
+                      dataType="nText"
+                      name="Q8" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q9]"
+                      dataType="nText"
+                      name="Q9" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q10]"
+                      dataType="nText"
+                      name="Q10" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q11]"
+                      dataType="nText"
+                      name="Q11" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q12]"
+                      dataType="nText"
+                      name="Q12" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q13]"
+                      dataType="nText"
+                      name="Q13" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q14]"
+                      dataType="nText"
+                      name="Q14" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q15]"
+                      dataType="nText"
+                      name="Q15" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q16]"
+                      dataType="nText"
+                      name="Q16" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q17]"
+                      dataType="nText"
+                      name="Q17" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q18]"
+                      dataType="nText"
+                      name="Q18" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q19]"
+                      dataType="nText"
+                      name="Q19" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q20]"
+                      dataType="nText"
+                      name="Q20" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q21]"
+                      dataType="nText"
+                      name="Q21" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q22]"
+                      dataType="nText"
+                      name="Q22" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q23]"
+                      dataType="nText"
+                      name="Q23" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q24]"
+                      dataType="nText"
+                      name="Q24" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q25]"
+                      dataType="nText"
+                      name="Q25" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q26]"
+                      dataType="nText"
+                      name="Q26" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q27]"
+                      dataType="nText"
+                      name="Q27" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q28]"
+                      dataType="nText"
+                      name="Q28" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q29]"
+                      dataType="nText"
+                      name="Q29" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q30]"
+                      dataType="nText"
+                      name="Q30" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q31]"
+                      dataType="nText"
+                      name="Q31" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q32]"
+                      dataType="nText"
+                      name="Q32" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q33]"
+                      dataType="nText"
+                      name="Q33" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input].ExternalColumns[Q34]"
+                      dataType="nText"
+                      name="Q34" />
+                  </externalMetadataColumns>
+                </input>
+              </inputs>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Destination - survey_schema.Outputs[OLE DB Destination Error Output]"
+                  exclusionGroup="1"
+                  isErrorOut="true"
+                  name="OLE DB Destination Error Output"
+                  synchronousInputId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input]">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - survey_schema.Outputs[OLE DB Destination Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Destination - survey_schema.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Destination - survey_schema.Outputs[OLE DB Destination Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+            <component
+              refId="Package\Data Flow Task 1\Source - survey_schema_csv"
+              componentClassID="Microsoft.FlatFileSource"
+              contactInfo="Flat File Source;Microsoft Corporation; Microsoft SQL Server; (C) Microsoft Corporation; All Rights Reserved; http://www.microsoft.com/sql/support;1"
+              description="Flat File Source"
+              localeId="1033"
+              name="Source - survey_schema_csv"
+              usesDispositions="true"
+              version="1">
+              <properties>
+                <property
+                  dataType="System.Boolean"
+                  description="Specifies whether zero-length columns are treated as null."
+                  name="RetainNulls">false</property>
+                <property
+                  dataType="System.String"
+                  description="Specifies the name of an output column containing the file name. If no name is specified, no output column containing the file name will be generated."
+                  name="FileNameColumnName"></property>
+              </properties>
+              <connections>
+                <connection
+                  refId="Package\Data Flow Task 1\Source - survey_schema_csv.Connections[FlatFileConnection]"
+                  connectionManagerID="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  connectionManagerRefId="Package.ConnectionManagers[SourceConnectionFlatFile]"
+                  name="FlatFileConnection" />
+              </connections>
+              <outputs>
+                <output
+                  refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output]"
+                  name="Flat File Source Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      name="2019 Kaggle Machine Learning and Data Science Survey"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q1]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q1]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q1]"
+                      name="Q1"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q10]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q10]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q10]"
+                      name="Q10"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q11]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q11]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q11]"
+                      name="Q11"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q12]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q12]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q12]"
+                      name="Q12"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q13]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q13]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q13]"
+                      name="Q13"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q14]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q14]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q14]"
+                      name="Q14"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q15]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q15]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q15]"
+                      name="Q15"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q16]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q16]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q16]"
+                      name="Q16"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q17]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q17]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q17]"
+                      name="Q17"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q18]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q18]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q18]"
+                      name="Q18"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q19]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q19]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q19]"
+                      name="Q19"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q2]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q2]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q2]"
+                      name="Q2"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q20]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q20]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q20]"
+                      name="Q20"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q21]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q21]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q21]"
+                      name="Q21"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q22]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q22]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q22]"
+                      name="Q22"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q23]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q23]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q23]"
+                      name="Q23"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q24]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q24]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q24]"
+                      name="Q24"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q25]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q25]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q25]"
+                      name="Q25"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q26]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q26]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q26]"
+                      name="Q26"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q27]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q27]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q27]"
+                      name="Q27"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q28]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q28]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q28]"
+                      name="Q28"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q29]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q29]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q29]"
+                      name="Q29"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q3]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q3]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q3]"
+                      name="Q3"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q30]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q30]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q30]"
+                      name="Q30"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q31]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q31]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q31]"
+                      name="Q31"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q32]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q32]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q32]"
+                      name="Q32"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q33]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q33]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q33]"
+                      name="Q33"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q34]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q34]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q34]"
+                      name="Q34"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q4]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q4]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q4]"
+                      name="Q4"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q5]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q5]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q5]"
+                      name="Q5"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q6]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q6]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q6]"
+                      name="Q6"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q7]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q7]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q7]"
+                      name="Q7"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q8]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q8]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q8]"
+                      name="Q8"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q9]"
+                      codePage="1252"
+                      dataType="text"
+                      errorOrTruncationOperation="Conversion"
+                      errorRowDisposition="FailComponent"
+                      externalMetadataColumnId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q9]"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].Columns[Q9]"
+                      name="Q9"
+                      truncationRowDisposition="FailComponent">
+                      <properties>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the column uses the faster, locale-neutral parsing routines."
+                          name="FastParse">false</property>
+                        <property
+                          dataType="System.Boolean"
+                          description="Indicates whether the data is in binary format."
+                          name="UseBinaryFormat">false</property>
+                      </properties>
+                    </outputColumn>
+                  </outputColumns>
+                  <externalMetadataColumns
+                    isUsed="True">
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[2019 Kaggle Machine Learning and Data Science Survey]"
+                      codePage="1252"
+                      dataType="text"
+                      name="2019 Kaggle Machine Learning and Data Science Survey" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q1]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q1" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q10]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q10" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q11]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q11" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q12]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q12" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q13]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q13" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q14]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q14" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q15]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q15" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q16]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q16" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q17]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q17" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q18]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q18" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q19]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q19" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q2]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q2" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q20]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q20" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q21]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q21" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q22]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q22" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q23]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q23" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q24]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q24" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q25]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q25" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q26]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q26" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q27]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q27" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q28]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q28" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q29]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q29" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q3]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q3" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q30]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q30" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q31]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q31" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q32]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q32" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q33]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q33" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q34]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q34" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q4]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q4" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q5]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q5" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q6]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q6" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q7]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q7" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q8]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q8" />
+                    <externalMetadataColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output].ExternalColumns[Q9]"
+                      codePage="1252"
+                      dataType="text"
+                      name="Q9" />
+                  </externalMetadataColumns>
+                </output>
+                <output
+                  refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output]"
+                  isErrorOut="true"
+                  name="Flat File Source Error Output">
+                  <outputColumns>
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      codePage="1252"
+                      dataType="text"
+                      description="Flat File Source Error Output Column"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[Flat File Source Error Output Column]"
+                      name="Flat File Source Error Output Column" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[ErrorCode]"
+                      name="ErrorCode"
+                      specialFlags="1" />
+                    <outputColumn
+                      refId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      dataType="i4"
+                      lineageId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Error Output].Columns[ErrorColumn]"
+                      name="ErrorColumn"
+                      specialFlags="2" />
+                  </outputColumns>
+                  <externalMetadataColumns />
+                </output>
+              </outputs>
+            </component>
+          </components>
+          <paths>
+            <path
+              refId="Package\Data Flow Task 1.Paths[Data Conversion Output]"
+              endId="Package\Data Flow Task 1\Destination - survey_schema.Inputs[Destination Input]"
+              name="Data Conversion Output"
+              startId="Package\Data Flow Task 1\Data Conversion 0 - 0.Outputs[Data Conversion Output]" />
+            <path
+              refId="Package\Data Flow Task 1.Paths[Flat File Source Output]"
+              endId="Package\Data Flow Task 1\Data Conversion 0 - 0.Inputs[Data Conversion Input]"
+              name="Flat File Source Output"
+              startId="Package\Data Flow Task 1\Source - survey_schema_csv.Outputs[Flat File Source Output]" />
+          </paths>
+        </pipeline>
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+</DTS:Executable>
