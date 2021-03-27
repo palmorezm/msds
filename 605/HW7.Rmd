@@ -1,0 +1,160 @@
+---
+title: "HW7"
+author: "Zachary Palmore"
+date: "3/8/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+header-includes: 
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1. 
+
+Let X1, X2, . . . , Xn be n mutually independent random variables, each of
+which is uniformly distributed on the integers from 1 to k. Let Y denote the
+minimum of the Xi’s. Find the distribution of Y.
+
+
+$$Y \hspace{4pt}over \hspace{4pt}the\hspace{4pt}interval\hspace{4pt} 1 \leq v \leq k, \hspace{4pt}f(v)\hspace{4pt} = \frac{(k - v + 1)^n - (k - v)^n}{k^n}$$
+
+Where k is the number of possibilities in n mutually independent variables uniformly distributed from 1 to k, v the variables of at least one X, and f(v) the distribution function. 
+
+```{r include=FALSE}
+# https://math.dartmouth.edu/archive/m20f10/public_html/HW5Solutions.pdf
+```
+
+
+## 2. Your organization owns a copier (future lawyers, etc.) or MRI (future doctors). This machine has a manufacturer’s expected lifetime of 10 years. This means that we expect one failure every ten years. (Include the probability statements and R Code for each part.).
+
+
+### a. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a geometric. (Hint: the probability is equivalent to not failing during the first 8 years..)
+
+Modeled as an geometric distribution...
+
+```{r}
+y <- 8 # eighth year
+p <- 1/10 # fails once every 10 years
+pgeom(y, p, lower.tail = FALSE) # geometric probability of no failure in n years
+pgeom(y, p, lower.tail = TRUE) # geometric probability of failure after n years
+```
+
+
+```{r}
+# expected value
+1/p
+```
+
+
+```{r}
+# standard deviation 
+round(sqrt((1-p)/(p^2)),4)
+```
+
+The probability that the machine will fail after 8 years is `r round(pgeom(y, p, lower.tail = FALSE), 4)`. 
+
+
+### b. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as an exponential. 
+
+Modeled as an exponential distribution...
+
+```{r}
+y <- 8 # number of years
+p = 1/10 # probability of failure
+pexp(y, p, lower.tail = FALSE) # exponential probability of no failure in n years
+pexp(y, p, lower.tail = TRUE) # exponential probability of failure after n years
+```
+
+```{r}
+e <- 1/p # expected value
+e
+e # standard deviation
+```
+
+The probability that the machine will fail after 8 years is `r round(pexp(y, p, lower.tail = FALSE), 4)`. 
+
+
+
+### c. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a binomial. (Hint: 0 success in 8 years) 
+
+Modeled as a binomial distribution...
+
+```{r}
+y <- 8 # number of years
+p = 1/10 # probability of failure
+pbinom(0, y, p, lower.tail = FALSE)    # binomial probability of no failure in n years
+pbinom(0, y, p, lower.tail = TRUE)  # binomial probability of failure after n years
+```
+
+
+```{r}
+# expected value 
+u <- y * p
+u
+```
+
+
+```{r}
+# standard deviation
+sqrt(u * (1-p))
+```
+
+The probability that the machine will fail after 8 years is `r round(pbinom(0, y, p, lower.tail = TRUE), 4)`.
+
+
+
+### d. What is the probability that the machine will fail after 8 years?. Provide also the expected value and standard deviation. Model as a Poisson. 
+
+
+Modeled as a poisson distribution...
+
+```{r}
+y <- 8 # number of years
+p = 1/10 # probability of failure
+lam <- y * p
+ppois(0, lam, lower.tail = FALSE)    # poisson probability of no failure in n years
+ppois(0, lam, lower.tail = TRUE)   # poisson probability of failure after n years
+```
+
+
+
+```{r}
+# expected value
+lam
+```
+
+
+```{r}
+# standard deviation
+sqrt(lam)
+```
+
+The probability that the machine will fail after 8 years is `r round(ppois(0, lam, lower.tail = TRUE), 4)`.
+
+
+```{r include=F}
+# https://math.dartmouth.edu/archive/m20f10/public_html/HW5Solutions.pdf
+# https://rpubs.com/raghu_74us/Assignment7
+# https://rpubs.com/ofomicheva86/371898
+# https://rpubs.com/Vishal0229/538609
+# https://rstudio-pubs-static.s3.amazonaws.com/369146_0dcb8019640d4f65afce618d36d7d4e6.html
+```
+
+
+
+
+
+
+
+
+
+
+
+

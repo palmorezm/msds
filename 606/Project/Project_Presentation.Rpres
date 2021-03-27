@@ -1,0 +1,565 @@
+Project_Presentation
+========================================================
+author: Zachary Palmore
+date: December 1, 2020
+autosize: true
+
+```{r include=FALSE}
+# Packages
+require(reshape2)
+require(tidyverse)
+require(readr)
+require(DT)
+require(ggpubr)
+require(rstatix)
+require(scales)
+require(kableExtra)
+```
+
+
+```{r include=FALSE}
+# Load Data
+income_2018_bystate  <-  read_csv("https://raw.githubusercontent.com/palmorezm/msdsdata606/master/Project/ACSST5Y2018.S2001.csv") 
+
+# Select relevant income-specific variables by state
+earnings <- income_2018_bystate[2:53,1:242] %>%
+  select(c(
+    # General Identifier
+        NAME, # State Name
+    
+    # Population and overall earnings
+    S2001_C03_002E,	# Male median earnings 16+ 
+    S2001_C05_002E, # Female median earnings 16+ 
+    S2001_C03_013E, # Male full-time median earnings  
+    S2001_C05_013E, # Female full-time median earnings
+    S2001_C03_015E, # Male median earnings 25+ 
+    S2001_C05_015E, # Female median earnings 25+ 
+
+    # Male earnings by education
+    S2001_C03_016E, # Less than high school diploma
+    S2001_C03_017E, # High school diploma
+    S2001_C03_018E, # Some college or associates degree
+    S2001_C03_019E, # Bachelors degree
+    S2001_C03_020E, # Masters Degree
+    
+    
+    # Female earnings by education 
+    S2001_C05_016E, # Less than high school diploma
+    S2001_C05_017E, # High school diploma
+    S2001_C05_018E, # Some college or associates degree
+    S2001_C05_019E, # Bachelors degree
+    S2001_C05_020E # Masters Degree
+    
+  )) %>% 
+  rename(
+    State = NAME, 
+    m16 = S2001_C03_002E,
+    f16 = S2001_C05_002E,  
+    mft = S2001_C03_013E,   
+    fft = S2001_C05_013E, 
+    m25 = S2001_C03_015E, 
+    f25 = S2001_C05_015E, 
+    flt = S2001_C05_016E, 
+    fhs = S2001_C05_017E,
+    fas = S2001_C05_018E,  
+    fbs = S2001_C05_019E, 
+    fms = S2001_C05_020E,
+    mlt = S2001_C03_016E,
+    mhs = S2001_C03_017E, 
+    mas = S2001_C03_018E, 
+    mbs = S2001_C03_019E, 
+    mms = S2001_C03_020E 
+  ) 
+# Convert numeric data to useful types
+earnings[,2:17] <- lapply(earnings[,2:17], as.numeric)
+head(earnings, 3)
+```
+
+
+
+```{r include=FALSE}
+# Further data extraction
+income_2018_bystate <- income_2018_bystate[2:52,] %>% 
+  select(c(
+    # General Reference Variables
+    GEO_ID, # Unique Geographic Identifier of state
+           NAME, # State Name
+                S2001_C01_001E, # Total population 16+ MOE
+                              S2001_C01_001M, # Total population 16+ 
+    
+    # Mean Earnings for FULL-TIME Workers (age 16+) 
+           S2001_C03_002E,
+           S2001_C03_002M, # Median Female Earnings
+           S2001_C05_002E,
+           S2001_C05_002M, # Median 
+
+           # Male Variables  
+           S2001_C03_016E,
+           S2001_C03_016M,
+           S2001_C03_017E,
+           S2001_C03_017M,
+           S2001_C03_018E,
+           S2001_C03_018M,
+           S2001_C03_019E,
+           S2001_C03_019M,
+           S2001_C03_020E, 
+           S2001_C03_020M,
+           
+           # Female Variables
+           S2001_C05_016E,
+           S2001_C05_016M,
+           S2001_C05_017E,
+           S2001_C05_017M,
+           S2001_C05_018E,
+           S2001_C05_018M,
+           S2001_C05_019E,
+           S2001_C05_019M,
+           S2001_C05_020E,
+           S2001_C05_020M
+           )) %>% 
+  rename(
+  # Location Information
+    GEO_ID = GEO_ID,
+           State = NAME,
+  
+     # General Statistics on Male and Female Earnings aged 16+
+          TotalPop = S2001_C01_001E,
+          TotalPop_moe = S2001_C01_001M,
+           M_Earnings = S2001_C03_002E, # Female
+           M_Earnings_moe =  S2001_C03_002M,
+           F_Earnings = S2001_C05_002E,
+           F_Earnings_moe =  S2001_C05_002M,
+   
+   # Male Earnings by Level of Education (aged 25+)
+         M_LTHS = S2001_C03_016E,
+           M_HS = S2001_C03_017E,
+           M_AS = S2001_C03_018E,
+           M_BS = S2001_C03_019E,
+           M_MS = S2001_C03_020E,
+      
+        # Male Margins of Error by Education
+         M_LTHS_moe = S2001_C03_016M,
+           M_HS_moe = S2001_C03_017M,
+           M_AS_moe = S2001_C03_018M,
+           M_BS_moe = S2001_C03_019M,
+           M_MS_moe = S2001_C03_020M,
+  
+  # Female Earnings by Level of Education (aged 25+)
+         F_LTHS = S2001_C05_016E,
+           F_HS = S2001_C05_017E,
+           F_AS = S2001_C05_018E,
+           F_BS = S2001_C05_019E,
+           F_MS = S2001_C05_020E,
+        
+        # Female Margins of Error by Education
+          F_LTHS_moe = S2001_C05_016M,
+           F_HS_moe = S2001_C05_017M,
+           F_AS_moe = S2001_C05_018M,
+           F_BS_moe = S2001_C05_019M,
+           F_MS_moe = S2001_C05_020M,
+         )
+# Converting data types 
+income_2018_bystate[,3:28] <- lapply(income_2018_bystate[,3:28], as.numeric)
+income_2018_bystate$GEO_ID <- as.factor(income_2018_bystate$GEO_ID)
+income_2018_bystate<- as.data.frame(income_2018_bystate)
+
+# Checking for missing values - there should be none
+sum(is.na(income_2018_bystate))
+
+# Creating subsets of the data to isolate variables of interest 
+
+# excluding geo_id and moe for summary purposes
+pop_income_2018 <- income_2018_bystate[,c(2,3,5,7)]
+male_income_2018 <- income_2018_bystate[, c(2,seq(9, 18, 2))]
+female_income_2018 <- income_2018_bystate[, c(2,seq(19, 28, 2))]
+
+# These male and female stats can also be recombined
+mf_income_2018 <- cbind(female_income_2018, male_income_2018[2:6])
+
+# Calculate observed differences for the entire study
+pop_obs <- pop_income_2018 %>% 
+  mutate(Obs_diff = M_Earnings - F_Earnings) %>%
+  mutate(Pmf = F_Earnings/M_Earnings)
+
+# Create a table with the highs and lows of states
+# Alternatively tail could be used:
+# min(tail(sort(pop_obs$Obs_diff),5))
+top5 <- pop_obs %>% 
+  filter(Obs_diff >= min(head(sort(pop_obs$Obs_diff, decreasing=TRUE), 5))) 
+top5$Gap <- as.factor("Wide")
+low5 <- pop_obs %>% 
+  filter(Obs_diff <= max(head(sort(pop_obs$Obs_diff, decreasing=FALSE), 5)))
+low5$Gap <- as.factor("Narrow")
+hilo_obs <- rbind(top5,low5)
+
+# Calculating the observed differences of sex
+mf_obs <- mf_income_2018 %>% 
+  mutate(obs_diff_lths = M_LTHS - F_LTHS) %>% 
+  mutate(obs_diff_hs = M_HS - F_HS) %>% 
+  mutate(obs_diff_as = M_AS - F_AS) %>% 
+  mutate(obs_diff_bs = M_BS - F_BS) %>% 
+  mutate(obs_diff_ms = M_MS - F_MS) 
+
+# Give each variable its own row in education
+mf_stateobs <- melt(mf_obs)
+mf_stateobs[4] <- as.numeric(seq(1:51))
+  mf_stateobs  <- mf_stateobs %>%
+    rename(Category = variable,
+           Observation = value, 
+           ID = V4)
+mf_state_obsdiffs <- melt(mf_obs[,12:16])
+  mf_state_obsdiffs <- mf_state_obsdiffs %>% 
+    rename(Observation = variable, 
+           Difference = value)
+mf_earnings_byedu <- melt(mf_obs[,2:11])
+# summarizing the education earning using means
+mf_earnings_byedu <- mf_earnings_byedu %>%
+  group_by(variable) %>% 
+  summarise(AvgEarning = mean(value)) %>% 
+  rename(Education = variable)
+# Add in the variable of sex for later comparisons
+mf_earnings_byedu$Sex <- c("Female","Female","Female","Female","Female","Male","Male","Male","Male","Male")
+# Rename the education observations to be descriptive of
+# the entire data set and remove the male/female bounds of edu
+mf_earnings_byedu$Education <- 
+  c("LTHS","HS","AS","BS","MS","LTHS","HS","AS","BS","MS")
+# Variables chosen to describe the data are not mutually exclusive
+# For example 'BS' is not just for Bachelors of Science.
+# That category includes all those individuals that
+# attained a bachelors degree on the ACS in 2018
+# and as another example 'AS' contains those with 'some college' 
+# from the ACS in 2018. These variables were only used for ease 
+# in describing the variables visually
+```
+
+```{r include=FALSE}
+mfobs.mean <- mf_stateobs[1:510,] %>% 
+  summarise(mean = mean(Observation))
+mfobs.anova <- anova_test(mf_state_obsdiffs, Difference ~ Observation)
+mfobs.anova
+```
+
+
+
+Overview
+========================================================
+In this analysis we examine the earnings from education attainment and the gender wage gap of the United States
+
+
+Overview
+========================================================
+In this analysis we examine the earnings from education attainment and the gender wage gap of the United States
+
+Common thoughts:
+
+Overview
+========================================================
+In this analysis we examine the earnings from education attainment and the gender wage gap of the United States
+
+Common thoughts:
+
+- Education increases earnings for both genders
+
+Overview
+========================================================
+In this analysis we examine the earnings from education attainment and the gender wage gap of the United States
+
+Common thoughts:
+
+- Education increases earnings for both genders
+- Education decreases the gender wage gap
+
+Overview
+========================================================
+In this analysis we examine the earnings from education attainment and the gender wage gap of the United States
+
+Common thoughts:
+
+- Education increases earnings for both genders
+- Education decreases the gender wage gap
+- Some states have significantly improved the gap
+
+
+Objective
+========================================================
+To determine the validity of these thoughts a question was formed
+
+
+Objective
+========================================================
+To determine the validity of these thoughts a question formed
+
+"For people age twenty-five and older, does the level of education attained have an affect on the average
+annual earnings of males and females across the United States in 2018? If so, is there a difference by state?" 
+
+
+
+
+Summary: Data
+========================================================
+Data from the ACS was used with the median incomes of individuals' earnings in each state. It included:
+
+- Median individual earnings
+- Education levels
+- Binary genders
+- State names
+- Demographics
+
+Used ACS 2018 5-year survey
+
+Summary: Part 1
+========================================================
+Presence of a wage gap:
+
+```{r}
+pfm.ft <- earnings %>% 
+  summarise(Pfm_ft = mean(fft)/mean(mft))
+pfm.ft <- round(pfm.ft, digits = 4)
+pfm.ft
+```
+
+The proportion of female to male earnings is about 80% In no state was the proportion greater than 87%.
+
+Summary: Part 2
+========================================================
+Does education increase median earnings? 
+
+```{r include=FALSE}
+avgincomebyedu_col_earnswkly <- mf_earnings_byedu %>% 
+  group_by(Education) %>%
+  mutate(Mean_Earnings = mean(AvgEarning)) %>%
+  filter(Sex == "Male") %>%
+  mutate(AvgEarn_wkdollars = Mean_Earnings / 48) %>%
+  ggplot( aes(x = reorder(Education, AvgEarn_wkdollars), y = AvgEarn_wkdollars)) + 
+  geom_col(aes(fill = Education)) + 
+  labs(x = "Education", 
+       y = "Weekly Earnings ($)", 
+       title = "Average Income by Education in the U.S.", 
+       subtitle = "Using the Mean of Indiviudal Earnings in 2018", 
+       caption = "Data orginates from the ACS") +
+  theme_classic() + 
+  coord_flip() +
+  theme(legend.position = "none",
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+avgincomebyedu_col_earnswkly
+```
+
+Yes! Otherwise, why are so many of us here?
+
+Summary: Part 2
+========================================================
+Same chart, new units for reference.
+
+```{r include=FALSE}
+avgincomebyedu_col_earnsyrly <- mf_earnings_byedu %>% 
+  group_by(Education) %>%
+  mutate(Mean_Earnings = mean(AvgEarning)) %>%
+  filter(Sex == "Male") %>%
+  ggplot( aes(x = reorder(Education, Mean_Earnings), y = Mean_Earnings)) + 
+  geom_col(aes(fill = Education)) + 
+  labs(x = "Education", 
+       y = "Annual Earnings ($)", 
+       title = "Average Income by Education in the U.S.", 
+       subtitle = "Using the Mean of Indiviudal Earnings in 2018", 
+       caption = "Data orginates from the ACS") +
+  theme_classic() + 
+  coord_flip() +
+  theme(legend.position = "none",
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+avgincomebyedu_col_earnsyrly
+```
+
+
+Summary: Part 3
+========================================================
+How does education effect the difference in wage of gender?
+
+```{r include=FALSE}
+obsdif_earns_edu <- ggplot(mf_state_obsdiffs, aes(x = reorder(Observation,Difference), y = Difference)) + geom_boxplot(aes(fill = Observation)) + 
+  ylim(0,45000) +
+  scale_fill_discrete(name = "Education", labels = c("<HS", "HS", "AS", "BS", "MS")) +
+  labs(x = "Education",
+       y = "Annual Earnings ($)",
+       title = "Observed Differences in Earnings",
+       subtitle = "Using the Median of Indiviudal Earnings in 2018",
+       caption = "Data orginates from the ACS") +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5), 
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+obsdif_earns_edu
+```
+
+It appears to increase and spread with higher education
+
+Summary: Part 3
+========================================================
+How does education effect the difference in earnings by gender AND state?
+
+```{r include=FALSE}
+state_earnings_wedu <- ggplot(mf_stateobs[1:510,], aes(ID - 1, Observation)) + geom_point(aes(color = Category)) + 
+  geom_hline(yintercept = mfobs.mean$mean)+ 
+  labs(x = "State ID", 
+       y = "Earnings ($)", 
+       title = "Earnings by State", 
+       subtitle = "Includes all sexes and education levels", 
+       caption = "Data source: ACS survey") +
+  coord_flip() +
+  theme_classic() +
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+state_earnings_wedu
+```
+
+Summary: Part 3
+========================================================
+Examples of states observed differences in earnings
+
+```{r include=FALSE}
+sel5states_gap <- ggplot(hilo_obs, aes(x = reorder(State, -Obs_diff), y = Obs_diff)) + 
+  labs(x = "State", 
+       y = "Mean Difference ($)", 
+       title = "Differences in Average Earnings by State",
+       subtitle = "Includes all sexes and education levels") +
+  geom_col(aes(fill=Gap)) + 
+  coord_flip() + 
+  theme_classic() + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+sel5states_gap
+```
+
+
+
+Summary: Part 3
+========================================================
+Gap between state types is wide and stretching?
+
+```{r include=FALSE}
+stategap_dif_box <- ggplot(hilo_obs, aes(x = Gap, y = Obs_diff, fill = Gap)) +
+
+  labs(x = "Relative Gap Type", 
+       y = "Mean Difference ($)", 
+       title = "Differences in Average Earnings in US", 
+       subtitle = "Includes all sexes and education levels") +
+
+  geom_boxplot() + 
+  theme_classic() + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) + 
+  coord_flip()
+```
+
+```{r}
+stategap_dif_box
+```
+
+
+Statistics
+========================================================
+Two calculations were made using one-way analysis variance (ANOVA). 
+
+Test #1
+
+- null: There is no evidence education has an effect on median earnings for individuals in 2018
+- alternate: There is evidence education has an effect on median earnings for individuals in 2018
+
+Statistics
+========================================================
+Results of test #1
+
+```{r}
+mfobs.mean <- mf_stateobs[1:510,] %>% 
+  summarise(mean = mean(Observation))
+mfobs.anova <- anova_test(mf_state_obsdiffs, Difference ~ Observation)
+mfobs.anova
+```
+
+Significant at a level of 0.0001. Increasing earnings with higher education is extremely unlikely to have occurred by chance. Higher education has a strong correlation with higher average earnings. 
+
+Statistics
+========================================================
+Test #2
+
+- null: There is no significant difference by state in the observed differences of earnings from education of individuals
+- alternate: There is a significant difference by state in the observed differences of earnings from education of individuals
+
+
+Statistics
+========================================================
+Results of test #2
+
+```{r}
+mfstobs.anova <- anova_test(mf_stateobs[1:510,], Observation ~ ID)
+mfstobs.anova
+```
+
+Results of this hypothesis test are not significant and the variation in the median earnings of each education level by state is likely due to chance.
+
+Statistics
+========================================================
+When we review, this result makes sense. There is no cluster of states nor a solid block of color in the state earnings by education level. 
+
+```{r include=FALSE}
+stateedu_earnings_clusters <- ggplot(mf_stateobs[1:510,], aes(Observation, Category, color = ID)) + 
+  geom_point() + 
+  geom_vline(xintercept = mfobs.mean$mean) + 
+  labs(x = "Earnings ($)", 
+       y = "Category", 
+       title = "Earnings by State", 
+       subtitle = "Includes all sexes and education levels", 
+       caption = "Data source: ACS survey") +
+  theme_classic() +
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+```{r}
+stateedu_earnings_clusters
+```
+
+Conclusion
+========================================================
+Returning to those thoughts:
+
+- Education increases earnings for both genders (TRUE)
+- Education decreases the gender wage gap (FALSE)
+- Some states have significantly improved the gap (FALSE)
+
+Additionally
+========================================================
+On average across this entire study, females working full-time make $11,510 less than males per year. 
+
+From 25 to 54, this could result in a difference of $333,790 if trends in observed differences held constant. 
+
+The average male earns $51,477 per year 
+and would accumulate $1,492,833 over the same working duration if variables remained constant. 
+
+
+
+
+

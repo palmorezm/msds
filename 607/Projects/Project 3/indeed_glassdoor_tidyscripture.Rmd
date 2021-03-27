@@ -1,0 +1,477 @@
+---
+title: "Indeed Data Science Research"
+author: "Team DAREZ"
+date: "10/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+require(rvest)
+require(readr)
+require(tidyverse)
+require(DT)
+require(odbc)
+require(xml2)
+```
+
+
+```{r}
+library(odbc)
+my_connection <- dbConnect(drv = odbc::odbc(),
+Driver = "SQL Server",
+                 server = "data607.database.windows.net",
+         database = "Project2",
+         uid = "project2admin",
+         pwd = "DATA607login")
+```
+
+
+## Scraping Indeed
+
+```{r}
+#Specifying the url for desired website to be scraped
+# url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+
+#Reading the HTML code from the website
+#webpage <- read_html(url)
+
+#Using CSS selectors to scrape the rankings section
+#job_data_html <- html_nodes(webpage,'.jobtitle , #sja0 b') 
+# The characters '.text-primary' came from selector gadget
+
+#Converting the ranking data to text
+#job_data <- html_text(job_data_html)
+
+#Let's have a look at the rankings
+#head(job_data)
+```
+
+
+Sample Test
+
+```{r}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+job_data_html <- html_nodes(webpage,'.jobtitle , #sja0 b') 
+job_data <- html_text(job_data_html)
+head(job_data)
+```
+```{r}
+str_extract(job_data, "(\\w+.+)+") 
+```
+
+```{r}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+job_data_html <- html_nodes(webpage,'.salaryText') 
+job_data <- html_text(job_data_html)
+head(job_data)
+```
+```{r}
+# First set of digits that are formatted like sal per year
+# AKA Min Salary of the range
+MinSal_data <- str_extract(job_data, "\\$\\d+,\\d+ ")
+MinSal_data <- str_remove_all(MinSal_data, " |\\$")
+# Max salary of the range
+MaxSal_data <- str_extract(job_data, "- \\$\\d+,\\d+ ")
+MaxSal_data <- str_remove_all(MaxSal_data, "- \\$| ")
+# salary_data <- str_extract(job_data, "(\\d+.+)+") 
+salary_data <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\$")
+salary_data <- str_remove_all(salary_data, "\\n")
+# salary_data <- str_remove_all(salary_data, " a year")
+# salary_data <- str_remove_all(salary_data,"\\$")
+salary_data
+MinSal_data
+MaxSal_data
+```
+
+
+```{r}
+salary_data <- str_remove_all(salary_data, "\\d+ an hour")
+salary_data <- str_remove_all(salary_data, " a year")
+salary_data <- as.data.frame(salary_data)
+salary_data[2,1] <- ("70,000 - $90,000")
+salary_data %>% 
+  mutate(salary = as.factor(salary_data)) %>%
+  count(salary)
+```
+
+
+```{r}
+url <- 'https://www.indeed.com/jobs?q=data%20scientist&l&vjk=00ba1a22ba67ffd2'
+webpage <- read_html(url)
+date_data_html <- html_nodes(webpage,'.date') 
+date_data <- html_text(date_data_html)
+head(date_data)
+```
+```{r}
+date_data
+str_extract(date_data, "\\d+|Just posted|Today")
+```
+
+  #get the job title
+  job_title <- page %>% 
+    rvest::html_nodes("div") %>%
+    rvest::html_nodes(xpath = '//a[@data-tn-element = "jobTitle"]') %>%
+    rvest::html_attr("title")
+    
+```{r}
+empties <- data.frame(title=character(),
+                    date=character(),
+                 company=character(),
+                  salary=character(),
+                    maxsal=character(),
+                  minsal=character(),
+                 location=character(), 
+                  summary=character(), 
+                    link=character(), 
+                  # description = character(),
+                 stringsAsFactors=FALSE) 
+for (i in seq(0, 800, 10)){
+  url <- paste0('https://www.indeed.com/jobs?q=data%20scientist&start=10&vjk=c03d341a13e2bb74',i)
+  var <- read_html(url)
+  # job title    
+    title <-  var %>% 
+        html_nodes('#resultsCol .jobtitle') %>%
+          html_text() %>%
+        str_extract("(\\w+.+)+") 
+# job posting date
+    date <-  var %>% 
+        html_nodes('.date') %>%
+          html_text() %>%
+        str_extract("\\d+|Just posted|Today") 
+# employer name
+    company <- var %>% 
+        html_nodes('#resultsCol .company') %>%
+          html_text() %>%
+        str_extract("(\\w+).+") 
+# salary ranges
+    job_data <- var %>%
+        html_nodes('.salaryText') %>%
+          html_text()
+            salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\n|\\$")
+            maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+              str_remove_all("- \\$| ")
+            minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+              str_remove_all(" |\\$")
+# job location
+    location <- var %>%
+        html_nodes('#resultsCol .location') %>%
+          html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}") 
+# job summary
+    summary <- var %>%
+        html_nodes('#resultsCol .summary') %>%
+          html_text() %>%
+        str_extract(".+")
+# link to the job description
+    link <- var %>%
+        html_nodes('#resultsCol .jobtitle .turnstileLink, #resultsCol a.jobtitle') %>%
+          html_attr('href') 
+            link <- paste0("https://www.indeed.com",link)
+
+  Indeed <- rbind(empties, as.data.frame(cbind(title,
+                                                  date,
+                                                  company,
+                                                  salary,
+                                                  maxsal,
+                                                  minsal,
+                                                  location,
+                                                  summary,
+                                                  link)))
+}
+```
+
+
+
+```{r}
+Indeed
+```
+
+
+
+```{r}
+write.csv(listings, "C:/bigdata/Indeed.csv")
+```
+
+    
+    
+
+```{r}
+empties <- data.frame(title=character(),
+                    date=character(),
+                  company=character(), 
+                 salary=character(),
+                 maxsal=character(),
+                 minsal=character(),
+                 location=character(), 
+                 summary=character(), 
+                 links=character(),
+                 stringsAsFactors=FALSE) 
+for (i in seq(0, 50, 10)){
+  url <- paste0('https://www.indeed.com/jobs?q=data%20scientist&start=10&vjk=c03d341a13e2bb74',i)
+  var <- read_html(url)
+  
+  
+title <-  var %>% 
+      html_nodes('.jobtitle, #sja0 b') %>%
+    html_text() %>%
+      str_extract("(\\w+.+)+") 
+# date <-  var %>% 
+#      html_nodes('.date') %>%
+#    html_text() %>%
+#      str_extract("\\d+|Just posted|Today") 
+company <- var %>% 
+      html_nodes('.company') %>%
+    html_text() %>%
+      str_extract("(\\w+).+") 
+#job_data <- var %>%
+#    html_nodes('.salaryText') %>%
+#    html_text()
+#      salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\n|\\$")
+#      maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+#       str_remove_all("- \\$| ")
+#      minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+#    str_remove_all(" |\\$")
+location <- var %>%
+        html_nodes('.location') %>%
+      html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}")   
+summary <- var %>%
+        html_nodes('.summary') %>%
+      html_text() %>%
+        str_extract(".+")
+links <- var %>%
+        html_nodes('.jobtitle .turnstileLink, a.jobtitle') %>%
+      html_attr('href') 
+        links <- paste0("https://www.indeed.com",links)
+        
+Indeed <- rbind(empties, as.data.frame(cbind(title,
+                                                  #date,
+                                                  company,
+                                                  #salary,
+                                                  #maxsal,
+                                                  #minsal,
+                                                  location,
+                                                  summary,
+                                                  links
+                                                  )))
+}
+```
+
+
+
+
+
+```{r}
+Indeed
+```
+
+
+
+
+```{r}
+write.csv(listings, "C:\bigdata")
+```
+
+
+
+
+  #get the company name
+  company_name <- page %>% 
+    rvest::html_nodes("span")  %>% 
+    rvest::html_nodes(xpath = '//*[@class="company"]')  %>% 
+    rvest::html_text() %>%
+    stringi::stri_trim_both() -> company.name 
+  
+  
+  #get job location
+  job_location <- page %>% 
+    rvest::html_nodes("span") %>% 
+    rvest::html_nodes(xpath = '//*[@class="location"]')%>% 
+    rvest::html_text() %>%
+    stringi::stri_trim_both()
+
+
+```{r}
+page_result_start <- 10 # starting page 
+page_result_end <- 30 # last page results
+page_results <- seq(from = page_result_start, to = page_result_end, by = 10)
+
+full_df <- data.frame()
+for(i in seq_along(page_results)) {
+  first_page_url <- "https://www.indeed.com/jobs?q=data%20scientist&l&vjk=68011ffc792c1cc8"
+  url <- paste0(first_page_url, "&start=", page_results[i])
+  page <- xml2::read_html(url)
+  Sys.sleep(2)
+  
+  # get links
+  links <- page %>% 
+    rvest::html_nodes("div") %>%
+    rvest::html_nodes(xpath = '//*[@data-tn-element="jobTitle"]') %>%
+    rvest::html_attr("href")
+  
+  job_description <- c()
+  for(i in seq_along(links)) {
+    
+    url <- paste0("https://ca.indeed.com/", links[i])
+    page <- xml2::read_html(url)
+    
+    job_description[[i]] <- page %>%
+      rvest::html_nodes("span")  %>% 
+      rvest::html_nodes(xpath = '//*[@class="jobsearch-JobComponent-description icl-u-xs-mt--md"]') %>% 
+      rvest::html_text() %>%
+      stringi::stri_trim_both()
+  }
+  df <- data.frame(job_description)
+  full_df <- rbind(full_df, df)
+}
+```
+
+
+## Cleaning that data
+
+```{r}
+# strsplit(title_data, "\n")
+```
+
+
+
+
+```{r}
+data <- read_delim(job_data, "\t", quote = "\\\"", 
+    escape_double = FALSE, col_names = FALSE, 
+    na = "empty", trim_ws = TRUE)
+```
+
+
+
+# From Example
+
+Create an empty data frame called listings with the type of character()
+
+
+```{r}
+empties <- data.frame(title=character(),
+                    date=character(),
+                  company=character(), 
+                 salary=character(),
+                 maxsal=character(),
+                 minsal=character(),
+                 location=character(), 
+                 summary=character(), 
+                 links=character(),
+                 stringsAsFactors=FALSE) 
+for (i in seq(0, 20, 10)){
+  url_ds <- paste0('https://www.indeed.com/jobs?q=data%20scientist&l&vjk=dd25f8809ed80778',i)
+  var <- read_html(url_ds)
+  Sys.sleep(3)
+title <-  var %>% 
+      html_nodes('.jobtitle, #sja0 b') %>%
+    html_text() %>%
+      str_extract("(\\w+.+)+") 
+date <-  var %>% 
+      html_nodes('.date') %>%
+    html_text() %>%
+      str_extract("\\d+|Just posted|Today") 
+company <- var %>% 
+      html_nodes('.company') %>%
+    html_text() %>%
+      str_extract("(\\w+).+") 
+job_data <- var %>%
+    html_nodes('.salaryText') %>%
+    html_text()
+      salary <- str_remove_all(job_data, "\\d+.+ an hour| a year|\\$")
+      maxsal <- str_extract(job_data, "- \\$\\d+,\\d+ ") %>%
+       str_remove_all("- \\$| ")
+      minsal <- str_extract(job_data, "\\$\\d+,\\d+ ") %>%
+    str_remove_all(" |\\$")
+location <- var %>%
+        html_nodes('.location') %>%
+      html_text() %>%
+        str_extract("(\\w+.)+,.[A-Z]{2}")   
+summary <- var %>%
+        html_nodes('.summary') %>%
+      html_text() %>%
+        str_extract(".+")
+links <- var %>%
+        html_nodes('.jobtitle .turnstileLink, a.jobtitle') %>%
+      html_attr('href') 
+        link <- paste0("https://www.indeed.com",link)
+        
+Indeed <- rbind(empties, as.data.frame(cbind(title,
+                                                  date,
+                                                  company,
+                                                  salary,
+                                                  maxsal,
+                                                  minsal,
+                                                  location,
+                                                  summary,
+                                                  links
+                                                  )))
+}
+```
+
+```{r}
+links_descs <- data.frame(links=character(),
+                    descriptions=character())
+
+for (i in seq(0, 20, 10)){
+  url_ds <- paste0('https://www.indeed.com/jobs?q=data%20scientist&l&vjk=dd25f8809ed80778',i)
+  var <- read_html(url_ds)
+  Sys.sleep(3)
+  #links
+  links <- var %>%
+    html_nodes('.jobtitle .turnstileLink, a.jobtitle') %>%
+    html_attr('href') 
+    link <- paste0("https://www.indeed.com",link)
+  
+  for(i in seq_along(link)) {
+    url <- paste0("https://www.indeed.com/", link[i])
+    full_desc <- read_html(url) 
+
+    description[[i]] <- full_desc %>%
+      html_nodes('.jobsearch-ViewJobLayout-innerContentGrid')  %>% 
+      html_text() %>% 
+    }
+  descriptions <- rbind(links_descs, as.data.frame(cbind(links,
+                                                   descriptions
+                                                  )))
+}
+```
+
+
+
+
+```{r}
+  links <- str_remove_all(links,"^ w+")
+  url <- paste0("https://www.indeed.com", links[2])
+  
+  
+```
+
+
+
+```{r}
+datatable(descriptions)
+```
+
+
+Bringing it all together in a table
+
+```{r}
+datatable(listings)
+```
+
+
+
+```{r}
+head(listings$links, 3)
+```
+
+

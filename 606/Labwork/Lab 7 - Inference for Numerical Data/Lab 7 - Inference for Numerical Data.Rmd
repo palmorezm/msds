@@ -1,0 +1,467 @@
+---
+title: "Inference_for_Numerical_Data"
+author: "Zachary Palmore"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(infer)
+library(statsr)
+library(psych)
+```
+
+### Pre-exercise
+
+Loading the data for this lab.
+
+```{r}
+data(yrbss)
+```
+
+Looking at the meaning of variables.
+
+```{r eval=FALSE}
+?yrbss
+```
+
+
+
+### Exercise 1
+
+What are the cases in this data set? How many cases are there in our sample?
+
+```{r}
+glimpse(yrbss)
+```
+
+There at 13,583 rows which is also the number of cases in this sample. The 13 cases in this data set were listed as:
+
+    * age
+    * gender
+    * grade
+    * hispanic
+    * race
+    * height
+    * weight
+    * helmet_12m
+    * text_while_driving_30d
+    * physically_active_7d 
+    * hours_tv_per_school_day
+    * strength_training_7d
+    * school_night_hours_sleep 
+ 
+
+
+### Exercise 2
+
+How many observations are we missing weights from?
+
+Altogether, there are 9,476 missing values. 
+
+```{r}
+sum(is.na(yrbss))
+```
+
+Under the observations of *weights* we have 1004 missing values.
+
+```{r}
+sum(is.na(yrbss$weight))
+```
+
+We could also use the summary function which confirms these missing values as the total number of NA in each column and provides some basic statistics. Here, we selected the weight column from the cases.
+
+```{r}
+summary(yrbss[,7])
+```
+
+
+### Exercise 3
+
+Make a side-by-side boxplot of physical_3plus and weight. Is there a relationship between these two variables? What did you expect and why?
+
+Creating the variable *physical_3plus* and filling in the case values with "yes" if the individual was physically active for at least 3 days in the week or "no" if they were not. 
+
+```{r}
+yrbss <- yrbss %>% 
+  mutate(physical_3plus = ifelse(yrbss$physically_active_7d > 2, "yes", "no")) 
+```
+
+A side-by-side boxplot will be made but keep in mind the missing variables listed as "NA" in the data frame are also plotted.  
+
+```{r}
+sum(is.na(yrbss$physical_3plus))
+```
+
+There are 273 of them which is a small proportion of the number of observations overall. 
+
+```{r}
+ggplot(yrbss, aes(x=weight, y=physical_3plus)) + geom_boxplot() + theme_bw()
+```
+
+We could remove these from the data frame entirely by adding to a parameter to the chunk where the *physical_3plus* column was created then plot again. 
+
+```{r}
+yrbss2 <- yrbss %>% 
+  mutate(physical_3plus = ifelse(yrbss$physically_active_7d > 2, "yes", "no")) %>%
+  na.exclude()
+ggplot(yrbss2, aes(x=weight, y=physical_3plus)) + geom_boxplot() + theme_bw()
+```
+
+The relationship between a student's weight and if they are physically active at least 3 times per week seems to show that those who are not physically active at least 3 times per week weigh less than those who are physically active at least 3 times per week. This is interesting as I would have expected those who were physically active at least 3 times per week to weigh less than those who were not physically active at least 3 times per week. My assumption comes from the idea that being physically active burns calories and fat, which over time, reduces a person's weight. Although, these results are contrary to that assumption. 
+
+We can check the statistics by comparing numeric values as well. 
+
+```{r}
+yrbss %>%
+  group_by(physical_3plus) %>%
+  summarise(mean_weight = mean(weight, na.rm = TRUE))
+```
+
+With this, the relationship continues. Those who are physically active at least 3 days per week have a higher mean weight at 68.45 kg than those who are not physically active at least 3 times per week at 66.67 kg. 
+
+### Exercise 4
+
+Are all conditions necessary for inference satisfied? Comment on each. You can compute the group sizes with the summarize command above by defining a new variable with the definition n().
+
+
+There are two conditions, independence and normality. Based on the information from the CDC, the data is a representative sample of many students across national, state, tribal, and local school systems and is independent. To determine normality we can look at the sample size and distribution of the boxplots. With a sample size well over 1000 (the threshold is 30) and no particularly extreme outliers, we can assume the normality condition is satisfied. The sample size of the weights is calculated by physical activity below. 
+
+```{r}
+yrbss %>% 
+  group_by(physical_3plus) %>% 
+  summarise(freq = table(weight)) %>%
+  summarise(n = sum(freq))
+```
+
+
+### Exercise 5
+
+Write the hypotheses for testing if the average weights are different for those who exercise at least times a week and those who don’t.
+
+Null hypothesis: Students who are physically active 3 or more days per week have the same average weight as those who are not physically active 3 or more days per week. 
+
+Alternative hypothesis: Students who are physically active 3 or more days per week have a different average weight when compared to those who are not physically active 3 or more days per week. 
+
+### Exercise 6
+
+How many of these null permutations have a difference of at least obs_stat?
+
+From lab we begin by initializing the test,
+
+```{r}
+obs_diff <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+```
+
+simulating test on null and then visualizing the results. 
+
+```{r}
+set.seed(10142020)
+null_dist <- yrbss %>%
+  specify(weight ~ physical_3plus) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+visualize(null_dist) + 
+  shade_p_value(obs_stat = obs_diff, direction = "two_sided")
+```
+
+Using the red line as a mark of the obs_stat, it appears to far from the data to have any values at or above it. To find the quantity of null permutations that have a difference of at least obs_stat we can filter the stat values in the null_dist data to show the total of those that are greater than or equal to obs_stat.
+
+```{r}
+null_dist %>%
+  filter(stat >= obs_diff)
+```
+
+We could also sum the number of stat values in null_dist that are greater. Both produce the same result. 
+
+
+```{r}
+sum(null_dist$stat >= obs_diff$stat)
+```
+
+To check the p-value we can use the get_p_value function. 
+
+```{r}
+null_dist %>%
+  get_p_value(obs_stat = obs_diff, direction = "two_sided")
+```
+
+The result is a very small number, lower than a 0.001 significance level. 
+
+
+### Exercise 7
+
+Construct and record a confidence interval for the difference between the weights of those who exercise at least three times a week and those who don’t, and interpret this interval in context of the data.
+
+
+
+```{r}
+inference(data = yrbss, y = weight, x = physical_3plus,
+          statistic = "mean",
+          type = "ci", 
+          null = NULL, 
+          alternative = "twosided", 
+          method = "theoretical")
+```
+
+The confidence interval for the difference between the weights of those who exercise at least three times a week and those who don't can also be calculated on the null distribution with a Welch Two Sample t-test. This assumes the variances of the two are not equivalent. 
+
+```{r}
+t.test(data = yrbss, weight ~ physical_3plus)
+```
+
+
+We can also calculate the intervals manually using the equation $\bar{x}\pm t_{df}*\frac{s}{\sqrt{n}}$ for comparison but to do so we need some parameters first. 
+
+Find the standard deviation of each category.
+
+```{r}
+yrbss %>% 
+  group_by(physical_3plus) %>% 
+  summarise(sd_weight = sd(weight, na.rm = TRUE))
+```
+
+The standard deviation is 17.638 for those who do are not physically active at least 3 days per week and 16.478 for those who are. 
+
+Find the mean of the weights in each category.
+
+```{r}
+yrbss %>% 
+  group_by(physical_3plus) %>% 
+  summarise(mean_weight = mean(weight, na.rm = TRUE))
+```
+
+This agrees with the results from earlier that the mean weight is 66.674 for those who do are not physically active at least 3 days per week and 68.448 for those who are. 
+
+Lastly, the sample size of the whole was calculated as 13,583 with missing values. We want the sample sizes of each category. 
+
+```{r}
+yrbss %>% 
+  group_by(physical_3plus) %>% 
+  summarise(freq = table(weight)) %>%
+  summarise(n = sum(freq))
+```
+
+For example, the sample size of those who were physically active for at least 3 days per week is 8,342 while the sample size of those who were not physically active for at least 3 days per week is 4,022. Missing values were not included since they do not convey any meaning here. 
+
+
+We can now calculate the confidence interval of each category using a 95% confidence level. 
+
+```{r}
+x_not3plus <- 66.67389
+n_not3plus <- 4022
+s_not3plus <- 17.63805
+x_3plus <- 68.44847
+n_3plus <- 8342
+s_3plus <- 16.47832
+# At 95% confidence level where n is so large it is ~= z* of
+# normal distribution
+t = 1.96
+
+# Not physically active 3 plus days per week
+upper_ci_not <- x_not3plus + t*(s_not3plus/sqrt(n_not3plus))
+lower_ci_not <- x_not3plus - t*(s_not3plus/sqrt(n_not3plus))
+
+# physically active 3 plus days per week
+upper_ci <- x_3plus + t*(s_3plus/sqrt(n_3plus))
+lower_ci <- x_3plus - t*(s_3plus/sqrt(n_3plus))
+
+upper_ci_not
+lower_ci_not
+
+upper_ci
+lower_ci
+```
+
+We can be 95% confident that those students who exercise at least three times a week have an average weight between 68.095 kg and 68.802 kg. We can also be confident that those students who do not exercise at least three times a week have an average weight between 66.129 kg and 67.219 kg. 
+
+### Exercise 8 
+
+Calculate a 95% confidence interval for the average height in meters (height) and interpret it in context.
+
+
+```{r}
+# Verifying sum of frequency / counts = n without NAs
+table_height <- as.data.frame(table(yrbss$height))
+freq_height <- sum(table_height$Freq)
+
+x_height <- mean(yrbss$height, na.rm = TRUE)
+sd_height <- sd(yrbss$height, na.rm = TRUE)
+n_height <- yrbss %>% 
+  summarise(freq = table(height)) %>%
+  summarise(n = sum(freq, na.rm = TRUE))
+
+upper_ci_height <- x_height + t*(sd_height/sqrt(n_height))
+lower_ci_height <- x_height - t*(sd_height/sqrt(n_height))
+upper_ci_height
+lower_ci_height
+```
+
+We can be 95% confident that the average height of the students in this population is between 1.689m and 1.693m.  
+
+### Exercise 9
+
+Calculate a new confidence interval for the same parameter at the 90% confidence level. Comment on the width of this interval versus the one obtained in the previous exercise.
+
+```{r}
+# At 90% confidence level where n is so large it is ~= z-score of normal distribution 
+t_90 <- 1.645
+upper_ci_height_90 <- x_height + t_90*(sd_height/sqrt(n_height))
+lower_ci_height_90 <- x_height - t_90*(sd_height/sqrt(n_height))
+upper_ci_height_90
+lower_ci_height_90
+```
+
+The new confidence interval is 1.689705 to 1.692777. Our intervals at a 95% confidence level were 1.689411 and 1.693071. We can find the difference in these two confidence intervals and compare 90% to 95% confidence. 
+
+```{r}
+rng_hgt_95 <- (upper_ci_height - lower_ci_height)
+rng_hgt_90 <- (upper_ci_height_90 - lower_ci_height_90)
+rng_hgt_95
+rng_hgt_90
+```
+
+
+As expected, the 95% confidence interval has a slightly larger range than the confidence interval 90%. This larger range is necessary to be more certain about the population parameter. 
+
+
+### Exercise 10
+
+Conduct a hypothesis test evaluating whether the average height is different for those who exercise at least three times a week and those who don’t.
+
+Null hypothesis: There is no difference in the average height of those who are physically active at least 3 days per week and those who are not. 
+
+Alternative hypothesis: There is a difference in the average height of those who are physically active at least 3 days per week and those who are not. 
+
+
+```{r}
+obs_diff_hgt <- yrbss %>%
+  specify(height ~ physical_3plus) %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+set.seed(10152020)
+null_dist_hgt <- yrbss %>%
+  specify(height ~ physical_3plus) %>%
+  hypothesize(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means", order = c("yes", "no"))
+visualize(null_dist_hgt) + 
+  shade_p_value(obs_stat = obs_diff_hgt, direction = "two_sided")
+null_dist_hgt %>%
+  get_p_value(obs_stat = obs_diff_hgt, direction = "two_sided")
+```
+
+The p-value is very small, smaller than 0.05. At this level, we should reject the null hypothesis. 
+
+```{r}
+inference(data = yrbss, y = height, x = physical_3plus,
+          statistic = "mean",
+          type = "ci", 
+          null = NULL, 
+          alternative = "twosided", 
+          method = "theoretical")
+```
+
+
+
+
+
+```{r}
+x_nhgt <- 1.6665
+n_nhgt <- 4022
+s_nhgt <- 0.1029
+x_yhgt <- 1.7032
+n_yhgt <- 8342
+s_yhgt <- 0.1033
+# At 95% confidence level where n is so large it is ~= z* of
+# normal distribution
+t = 1.96
+
+# Not physically active 3 plus days per week
+upper_ci_nhgt <- x_nhgt + t*(s_nhgt/sqrt(n_nhgt))
+lower_ci_nhgt <- x_nhgt - t*(s_nhgt/sqrt(n_nhgt))
+
+# physically active 3 plus days per week
+upper_ci_yhgt <- x_yhgt + t*(s_yhgt/sqrt(n_yhgt))
+lower_ci_yhgt <- x_yhgt - t*(s_yhgt/sqrt(n_yhgt))
+
+upper_ci_nhgt
+lower_ci_nhgt
+
+upper_ci_yhgt
+lower_ci_yhgt 
+```
+
+We can be 95% confident that the average height of students who are physically active at least 3 days per week is between 1.705 and 1.701 while the average height of students who are not physically active at least 3 days per week is between 1.670 and 1.663. 
+
+
+### Exercise 11
+
+Now, a non-inference task: Determine the number of different options there are in the dataset for the hours_tv_per_school_day there are.
+
+If the question is referring to the number of combinations (or options) of the variable hours_tv_per_school_day, then the answer would depend on whether or not the order of the options matter and if we should repeat or replace the variables once they are used. We can easily calculate the number of different variables including hours_tv_per_school_day at 14 and see each of their labels below. 
+
+```{r}
+ncol(yrbss)
+colnames(yrbss)
+```
+
+There are also only 14 different options if the variable hours_tv_per_school_day can only be paired with exactly one other variable from the dataset only once and including itself. 
+
+If the question is referring to the number of options within the variable hours_tv_per_school_day then we can calculate the quantity of unique values for this particular variable in the dataset.
+
+```{r}
+unique(yrbss$hours_tv_per_school_day)
+length(unique(yrbss$hours_tv_per_school_day))
+```
+
+We can see the options here are "do not watch", "<1", 1, 2, 3, 4, 5+, and NA. If we are to include missing values as an option within this dataset then we are left with 8 options of the variable hours_tv_per_school_day. If we were to remove the missing values as an option in the variable then the answer is 7 options without NA. 
+
+
+### Exercise 12
+
+Come up with a research question evaluating the relationship between height or weight and sleep. Formulate the question in a way that it can be answered using a hypothesis test and/or a confidence interval. Report the statistical results, and also provide an explanation in plain language. Be sure to check all assumptions, state your α level, and conclude in context.
+
+Setup:
+
+Null hypothesis: The average weight of students has no affect on the average number of hours of sleep students receive on school nights.  
+
+Alternative hypothesis: The average weight of students has an affect on the average number of hours of sleep students receive on school nights. 
+
+An analysis of variance(ANOVA) would work best for this to determine if the means of all the groups are different from the null. We know the data are independent already and are approximately normal. Since we have more than two means to compare, this is a good place to start. To be more specific, there are 8 groups to find means of. 
+
+```{r}
+unique(yrbss$school_night_hours_sleep)
+length(unique(yrbss$school_night_hours_sleep))
+```
+
+We can call these eight options in the school_night_hours_sleep variable the sleeping groups. For each sleeping group we will find the mean and other statistics. First, let's look at a boxplot for outliers. 
+
+```{r}
+ggplot(yrbss, aes(x = weight, y = school_night_hours_sleep)) + geom_boxplot()
+```
+
+Based on the boxplot, all of the medians appear similar with some subtle variations. Each sleeping group also has similar IQRs but we should take a closer look. 
+
+```{r}
+desc <- describeBy(yrbss$weight, yrbss$school_night_hours_sleep, mat=TRUE)[,c(2,4,5,6)]
+desc$Var <- desc$sd^2
+print(desc, row.names=FALSE)
+```
+
+The sample sizes of each sleeping group are greater than 30 and based on the boxplots and means calculated for each sleeping group, there are very few particularly extreme values. There is clear variation in sleeping groups, however, they are close enough to perform an anova. 
+
+```{r}
+aov.out <- aov(data=yrbss, weight ~ school_night_hours_sleep )
+summary(aov.out)
+```
+
+This produces a p-value that is significant to the 0.001 level. This provides strong evidence that we should reject the null hypothesis in favor of the alternative. In other words, the average weight of students appears to have an affect on the average number of hours of sleep students receive on school nights. 
+...
+

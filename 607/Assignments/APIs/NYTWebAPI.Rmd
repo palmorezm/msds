@@ -1,0 +1,212 @@
+---
+title: "Web APIs"
+subtitle: "Using the New York Times Movie Ratings"
+author: "Zachary Palmore"
+date: "10/21/2020"
+output:
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<div style="margin-bottom:50px;">
+</div>
+## Directions
+
+The New York Times web site provides a rich set of APIs, as described here:
+https://developer.nytimes.com/apis
+
+You’ll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it into an R DataFrame
+
+___
+<div style="margin-bottom:50px;">
+</div>
+### Tools
+
+Several packages were used in the extraction of data from the json files and to make a few visualizations. These packages are listed here:
+
+```{r message = FALSE}
+library(tidyr)
+library(jsonlite)
+library(tidyverse)
+library(devtools)
+```
+
+To get access to any of the APIs for the New York Times (NYT), we first needed to make a developers account and create an app. This was done to get a free API key from the NYT. The key is stored in the system environment as NYT_Key. You will see the variable used in the calls to request the data but not the api key itself. 
+
+```{r include = FALSE}
+# Sys.setenv(NYT_Key="qGBdM2VExnQOTf8KHm3HJZFAxphMWdUW")
+NYT_Key <- "qGBdM2VExnQOTf8KHm3HJZFAxphMWdUW"
+```
+
+___
+<div style="margin-bottom:50px;">
+</div>
+
+### Extracting Data
+
+For this assignment, we will extract data from the New York Times movie ratings API. Some people hold the ratings of the New York Time's critics in high regard and they have been doing it for a long time. It may be interesting to look at their reviews for certain movies from the oldest reviews available to their most recent record. 
+
+The extracted file is a json, which is why we will use our jsonlite tool to make the work easier. It will extract the JSON object and make it an R object. We also specify the term *flatten = TRUE* to convert the data from its nested form to a non-nested data. Information about the API and how to use it, can be found on the NYT's "movie reviews api" guide for developers. Here, we use their method to collect the reviews from the New York Times of all movies with the characters "Panther" in the title.   
+
+```{r}
+Panthertxt <- fromJSON(paste0("https://api.nytimes.com/svc/movies/v2/reviews/search.json?query=panther&api-key=",NYT_Key), flatten = TRUE)
+Panthertxt$num_results # Displays the number of results
+```
+
+We can see there are 14 results with the characters 'Panther' in the movie's title from a search of all of the movie ratings they had but, it is not perfect. The data needs to be in a functional form so that we can visualize it. For this, we need to clean it up and create a data frame with the text values extracted. 
+
+___
+
+<div style="margin-bottom:50px;">
+</div>
+### Tidying
+
+We can tidy this up with a simple function *data.frame()* thanks to the formatting of the json file. For ease, we piped through the text file from json into the data frame function which assigned it to another data frame under a new name all in one step.
+
+```{r}
+panthermovies <- Panthertxt %>% 
+  data.frame()
+```
+
+If we had multiple pages of information that we wanted, we might need to call those pages individually from the API which could take more time. An alternative to doing this manually is to use a loop. Steps to extract multiple pages in a loop are demonstrated here:
+
+```{r eval=FALSE}
+data <- list()# Create an empty data set for storage
+for(i in 0:totalpages # Specify the total pages
+){ 
+  # Using the same process extract the data and flatten it with json tool
+  jsontxtfile <- fromJSON(paste0(API, "&page=", i), flatten = TRUE) %>% data.frame() 
+  message("Working...", i)
+  # Store the data in the empty data set 
+  data[[i+1]] <- jsontxtfile
+  # Tell your computer to break for 2 second between runs
+  Sys.sleep(2) 
+  # Repeats until last page (or total pages)
+}
+```
+
+Now, although all those pages are stored in the data set, they are not accessible nor neatly placed. As we are about to do with the movie data, they need cleaning and tidying to be functional. We could start by combine those pages with a function like this:
+
+```{r eval=FALSE}
+panthermovie_reviews <- rbind(files)
+# however, this is not the case for this movie's ratings
+# The ratings of movies with "panther" in the title do not have multiple pages
+# Then we could look at the data frame dimensions. 
+```
+
+Of course, for this particular movie ratings API, this is not necessary. Going back to the movie ratings for those with 'panther' written in the title, we can look at how many rows and columns there are and decide if there are any we do not need. Odds are, we extracted more data than we needed. 
+
+```{r}
+glimpse(panthermovies)
+```
+
+As expected, there are multiple columns that simply take up space. There are also a few columns with missing values. We can tidy this up by selecting the columns we want, removing the missing values where applicable, creating a new variable "none" in the ratings column, and assigning the results to a new data frame. Now we can move on to some quick summarizing. 
+
+```{r}
+# First, we create a new data frame with selected data
+panther_ratings <- panthermovies[,c(5:9,11:13)]
+# Create the value "none" for movies that were not rated on mpaa scale
+mpaa_rating <- data.frame(ifelse(panther_ratings$results.mpaa_rating == "", "None", panther_ratings$results.mpaa_rating))
+panther_ratings <- cbind(panther_ratings, mpaa_rating)
+panther_ratings <- panther_ratings %>% 
+  rename(mpaa_rating = 9) %>%
+  mutate(mpaa_rating = as.character(mpaa_rating))
+# remove missing values
+panther_rating <- na.exclude(panther_ratings)
+```
+
+We have created two new data frames that we can work from. The first one, *panther_ratings* is the closest to the original with all but a few selected columns. It also saves all ratings, and contains a few missing values. The second, *panther_rating* has all partial records removed and thus, no missing values.
+
+___
+<div style="margin-bottom:50px;">
+</div>
+
+### Summarizing
+
+Using the original, we can find the total Motion Picture Association (MPAA) ratings given for these 'Panther' movies. When you think of movies with 'Panther' in the title, what do you think of? Are they appropriate for children? This is one way to find out. 
+
+```{r}
+results <- panther_ratings %>%
+  group_by(mpaa_rating) %>%
+  summarise(ratings = table(mpaa_rating)) 
+rmarkdown::paged_table(results)
+```
+
+Their rating system is G for General audiences where all ages can be admitted, PG for parental guidance as "some material might not be suitable for children", PG-13, which may contain material inappropriate for children under 13 and R for restricted where those under 17 require adult supervision. Another angle some might be interested in are the mpaa ratings shown visually. With so few ratings this situation does not leave a lot of options for viewing. However, this dotplot may be a good example. 
+
+```{r}
+ggplot(panther_ratings, aes(x = results.mpaa_rating,y = results.critics_pick)) + 
+  geom_dotplot(shape = 19, size = 5, aes(fill = results.critics_pick)) +
+  theme_minimal() +
+  theme(axis.title.x = element_text(hjust = .5),
+        axis.text.y = element_blank(),
+        plot.caption = element_text(hjust = .5),
+        plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5),
+        legend.position = "none") +
+  labs(title = "Frequency of MPAA Movie Ratings", 
+       subtitle = "Includes Any Movies with 'Panther' in the Title", 
+       x = "MPAA Rating", 
+       y = "Number of Ratings", 
+       caption = "Critics choice highlighted in light blue \n Data Source: New York Times") 
+```
+
+Note that, in this dotplot, there are 4 movies that did not have an MPAA rating assigned. This may be because the rating system was not established until 1968. It was also unlikely the New York Times was able to retroactively establish ratings for all movies that existed. For this reason, we are also missing the one of the critics movie choices. 
+
+We might also want to create a visual timeline of the data where we can observe the opening dates of the panther movies and compare when the critics choices were awarded to each title. It is also nice to see the movie titles stacked up across time. 
+
+```{r}
+ggplot(panther_rating, aes(x = results.display_title, y = results.opening_date)) + 
+  geom_point(shape = 19, size = 5, aes(color = results.critics_pick)) +
+  theme_minimal() +
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = .5),
+        plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5),
+        legend.position = "none") +
+  labs(title = "Timeline of Movie Openings", 
+       subtitle = "Includes Any Movies with 'Panther' in the Title", 
+       x = " ", 
+       y = "Opening Date", 
+       caption = "Critics choice highlighted in light blue \n Data Source: New York Times")  + coord_flip()
+```
+
+Here is that same graph flipped with the titles removed and timeline extended from bottom to top chronologically on the vertical axis rather than the horizontal. This helps to describe the distance of time between the panther movies with the critics choice award. 
+
+```{r}
+ggplot(panther_rating, aes(x = results.display_title, y = results.opening_date)) + 
+  geom_point(shape = 19, size = 5, aes(color = results.critics_pick)) +
+  theme_minimal() +
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = .5),
+        plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5),
+        legend.position = "none") +
+  labs(title = "Timeline of Movie Openings", 
+       subtitle = "Includes Any Movies with 'Panther' in the Title", 
+       x = " ", 
+       y = "Opening Date", 
+       caption = "Critics choice highlighted in light blue \n Data Source: New York Times")  
+```
+
+We can also pull the data from the data frame to see all the information on the two movies that were given the critics choice. Are there any similarities? We could dig into it, but we won't for this assignment. 
+
+```{r}
+critics_pick <- panther_rating %>% 
+  filter(results.critics_pick == 1)
+rmarkdown::paged_table(critics_pick)
+```
+
+It turns out, the critics choice was given by two different critics. The Pink Panther and Black Panther were both awarded but were opened at very different times and under different circumstances. Imagine the world in the 1964 compared to 2018. Then remember, the original Pink Panther was over 50 years ago!  
+
+
+
+
+
+
+

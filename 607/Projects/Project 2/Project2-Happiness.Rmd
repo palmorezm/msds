@@ -1,0 +1,74 @@
+---
+title: "Project 2 - Happiness and GDP"
+author: "Zachary Palmore"
+date: "10/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Objective
+
+In this part of project 2, I will be tidying and briefly analyzing data on the happiness and GDP in select countries. It contains the quarterly earnings before interest, taxes, depreciation, and amortization (EBITDA). What we would like to know is;
+
+  * Max, min, and mean of temperatures for each station     
+  * Variance in temperature over the study area (SE Brazil) 
+  * Relationship between temperature and humidity  
+
+To get those answers, the data needs to be cleaned and tidied before we can make use of it.
+
+```{r}
+require(tidyverse)
+require(magick)
+require(tesseract)
+require(reshape2)
+```
+
+
+
+### Importing
+
+
+```{r}
+# Making a better image with magick
+gdphappy <- image_read("happybygdp.png") %>%
+  image_negate() %>% 
+  image_morphology(method = "Thinning", 
+                   kernel = "Rectangle") %>%
+  image_contrast(sharpen = 1) %>%
+  image_negate() %>%
+  image_crop(geometry_area(0, 0, 0, -20))
+gdphappy
+```
+
+
+
+### Tidying
+
+
+```{r}
+gdphappy <- gdphappy %>%
+  image_ocr()
+gdphappy <- read_delim(gdphappy, col_names = FALSE, 
+                        " ", escape_double = FALSE,
+                     comment = "")
+# gdphappy column names
+colnames(gdphappy) <- c("Rank",
+                         "Country",
+                         "Score",
+                         "PerCaptia",
+                         "SocialSupport",
+                         "LifeExpectancy",
+                         "Freedom",
+                         "Generosity",
+                        "Corruption")
+gdphappy[3:9] <- sapply(gdphappy[3:9], as.double)
+glimpse(gdphappy)
+```
+
+
+### Analysis
+
+

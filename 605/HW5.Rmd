@@ -1,0 +1,392 @@
+---
+title: "HW5"
+author: "Zachary Palmore"
+date: "2/22/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Directions
+
+Complete the problems. 
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(kableExtra)
+```
+
+
+## 1) Bayesian
+
+A new test for multinucleoside-resistant (MNR) human immunodeficiency virus type 1
+(HIV-1) variants was recently developed. The test maintains 96% sensitivity, meaning that, for those
+with the disease, it will correctly report “positive” for 96% of them. The test is also 98% specific,
+meaning that, for those without the disease, 98% will be correctly reported as “negative.” MNR HIV-1
+is considered to be rare (albeit emerging), with about a .1% or .001 prevalence rate. Given the
+prevalence rate, sensitivity, and specificity estimates, what is the probability that an individual who is
+reported as positive by the new test actually has the disease? If the median cost (consider this the best
+point estimate) is about \$100,000 per positive case total and the test itself costs $1000 per
+administration, what is the total first-year cost for treating 100,000 individuals?
+
+
+In a hypothetical population of 100,000 people the following table is constructed using the sensitivity, prevalence rate, and specificity estimates. 
+
+```{r}
+tbl <- matrix(c(96, 1998, 2094, 4, 97902, 97906, 100, 99900, 100000), 
+              ncol = 3, byrow = TRUE)
+colnames(tbl) <- c("Diseased","Not Diseased","Total")
+rownames(tbl) <- c("Test +","Test -","Total")
+kbl(tbl)
+```
+
+Of the 100 diseased people (0.1% of the population) 96% of them will be true positives or actually have the disease. This is equivalent to about 96 people in this scenario. The probability that an individual who tests positive for the disease actually has the disease is 0.04585 or about 4.6% 
+
+There is also an error rate with those in the non-diseased group which in this case corresponds to about 99,900 individuals found by $(100,000-(0.001*100,000))$. In that group, 2% of them come back as positive which is equivalent to about 1,998 individuals in this case. This is based on the specificity that states for those without the disease, 98% will be correctly reported as “negative." To find the remaining values in the table, each row and column was summed while ensuring the values added up to our hypothetical population and our given specificity and sensitivity held true. 
+
+If the median cost is about \$100,000 per positive case and the test itself cost $1000 per administration then the first-year cost for tests and treatment of 100,000 individuals is found through the product of total positive cases and its treatment cost, added to the cost of administering tests to the population. Assuming we are including false positives (those who do not have the disease but test positive), then the total number of positive cases is given in the table as 2,094 individuals. The cost of treatment for each of those individuals is \$100,000. The product of these two is \$209,400,00. Then we add the cost of administering each test to the 100,000 individuals which itself costs \$1,000 per test. Thus the cost of administering tests to each of the \$100,000 individuals is \$100,000,000. Add these two costs together and the total cost of testing every individual and treating those positive cases is about \$309,400,000.
+
+
+## 2) Binomial 
+
+The probability of your organization receiving a Joint Commission inspection in any given
+month is .05. What is the probability that, after 24 months, you received exactly 2 inspections? What is
+the probability that, after 24 months, you received 2 or more inspections? What is the probability that
+your received fewer than 2 inspections? What is the expected number of inspections you should have
+received? What is the standard deviation?
+
+Considering the type of probability: 
+    
+    - Normal binomial probability 
+        "What is the probability that, after 24 months, you received exactly 2 inspections?" 
+    - Cumulative binomial probability 
+        "What is the probability that, after 24 months, you received 2 or more inspections?" 
+    - Cumulative binomial probability 
+        "What is the probability that your received fewer than 2 inspections?" 
+        (the opposite of the one above, it could be subtracted from 1 to find the result)
+    - Normal binomial mean 
+        "What is the expected number of inspections you should have received?"
+    - Normal binomial standard deviation 
+        "What is the standard deviation?"
+
+Given that any month has a 0.05 probability of receiving an inspection, the probability that in any 24 month time period exactly two inspections are received is found through the general binomial probability formula. This is because only two events can occur; either there is an inspection or there is not, and it satisfies the remaining assumptions of independence between events and contains the same probability for each event. 
+
+
+```{r}
+GenBiProb <- function(p,n,k){
+  P1 <- (p^k)*(1-p)^(n-k)
+  E <- (factorial(n))/(factorial(k)*(factorial(n-k)))
+  Punbias <- (E)/(2^n)
+  Pbias <- (E*P1)
+  df <- format(as.data.frame(c(format(P1), format(E), format(Punbias), format(Pbias))))
+  def <- as.data.frame(c("Probability of each event", "Number of events possible", 
+                         "Unbiased Event Probability (50/50)", "Biased Event Probability"))
+  df <- cbind(df,def)
+  names(df)[1] <- "Values"
+  names(df)[2] <- "Description"
+  print(df)
+}
+GenBiProb(0.05, 24, 2)
+```
+
+
+The probability of receiving exactly 2 inspections in 24 months is about 22%. This was determined by calculating the total number of events where an inspection could occur, finding the probability of each event's occurrence in the scenario, and solving for $P(k\hspace{4pt}out\hspace{4pt}of\hspace{4pt}n)$ where $n$ is the number of options (months in this case), and $k$ the amount of inspections specified to occur in each. The full formula is shown below where $p$ is the given probability of occurrence in each option.
+
+$$P(k\hspace{4pt}out\hspace{4pt}of\hspace{4pt}n) = \frac{n!}{k!(n-k)!}p^k(1-p)^{n-k}$$
+
+The following question "What is the probability that, after 24 months, you received 2 or more inspections?" is a cumulative probability that adheres to the same rules of a binomial. For this calculation, R's built in function 'pbinom' is used. The probability of getting 2 or more inspections in the 24 months when it was possible is about 12%. This is shown below where we specify, once again, the number of events we are testing for in the options available (2), the number of options (24) and the probability of each event (0.05).   
+
+```{r}
+# Probability of 2 or more inspections in 24 months 
+gt2_24 <- 1-pbinom(2, 24, 0.05)
+# Probability of 2 or fewer inspections in 24 months 
+lt2_24 <- pbinom(2, 24, 0.05)
+print(paste("The probability of 2 or more inspections in 24 months is approximately", 
+            round(gt2_24, digits=3)))
+print(paste("The probability of fewer than 2 inspections in 24 months is approximately", 
+            round(lt2_24, digits=3)))
+```
+
+Since they are cumulative, the resultant probabilities must sum to one. This is why we subtracted the probability of greater than two events from one to determine the probability of receiving less than two inspections in 24 months. This can also be shown on a distribution plot of probability over events. In this case, the number of trials is set at 276 which is equivalent to the number of events possible in this inspection scenario. 
+
+```{r}
+n <- 24
+x <- seq(0,24, by=1) 
+y <- dbinom(x, 276, 0.05, log=FALSE)
+df <- data.frame(cbind(x,y))
+ggplot(df, aes(x,y)) + geom_point() + geom_line() + theme_bw()
+```
+ 
+In short, the calculation summed the probabilities of receiving greater than 2 inspections, that is, everything on the chart from two upwards. When calculating the opposite we need only subtract this value from one to find the lower tail of this distribution. Since the less than two months in the 24 months time period is also a cumulative binomial probability question, it must sum to one along with the probability having greater than two months in the same time period. 
+
+The last portion asks to find the expected number of inspections you should have received and the standard deviation of this distribution. The expected value is represented by the mean, or average number of inspections expected in the interval. This is equivalent to $n*p$. The standard deviation uses the same variables but is found by taking the square root of the variance with the formula; $$\sqrt{((n*p)*(1-p))}$$. 
+
+```{r}
+# Expected value 
+p <- 0.05
+ev <- n * p
+# Standard deviation
+sd <- sqrt((n*p)*(1-p))
+print(paste("Expected Value =", ev))
+print(paste("Standard deviation =", sd))
+```
+
+Our expected value is 1.2 inspections within the 24 month time period and the standard deviation is about 1.07 inspections. When thinking about this, it seems the rate of inspections is in agreement with the small probability of having one. Since the time period is two years and the probability of having an inspection is only 0.05 as given, this makes sense.   
+
+## 3) Poisson
+
+You are modeling the family practice clinic and notice that patients arrive at a rate of 10 per
+hour. What is the probability that exactly 3 arrive in one hour? What is the probability that more than
+10 arrive in one hour? How many would you expect to arrive in 8 hours? What is the standard
+deviation of the appropriate probability distribution? If there are three family practice providers that can
+see 24 templated patients each day, what is the percent utilization and what are your recommendations?
+
+
+Assuming this follows the poisson distribution, the probability that exactly 3 arrive in one hour is given by; $$\frac{(e^{-\lambda}\lambda^k))}{k!}$$ This can also be checked with the built in function 'dpois' which takes the arguments $k$ as the number of events we are interested in finding the probability of occurring and $\lambda$, the rate at which the events occur. The probability that more than 10 arrive in one hour is found the same as a cumulative binomial probability using the poisson distribution. In this the lower tails is specified to be false because we looking for the probability that more than 10 individuals arrive in one hour at a rate of 10 per hour. These are shown below in different ways. 
+
+```{r}
+# Manual calculation of P(3 in 1 hour)
+lam <- 10
+k <- 3
+P3in1 <- (lam^k)*(exp(1)^-lam)/factorial(k)
+# Which can also be checked with 
+P3in1 <- dpois(k, lam)
+# Probability that more than 10 arrive in one hour
+k <- 10
+P10in1 <- ppois(k, lam, lower.tail = FALSE)
+print(paste("The probability that exactly 3 people arrive in one hour is =", 
+            round(P3in1, digits=3)))
+print(paste("The probability that more than 10 people arrive in one hour is =", 
+            round(P10in1, digits=3)))
+```
+
+Given the rate of $\lambda$ at 10 per hour we would expect the number of individuals to arrive in 8 hours to be found by the rate times the number of hours. That value is simply 10 individuals per hour times 8 hours = 80 individuals per 8 hours. This is shown in the calculations below with the letter $u$ to represent the average expected number of individuals in a workday. The standard deviation is also calculated using this value, assuming the average workday is 8 hours.
+
+Another assumption is made when considering the next question which can be interpreted in more than one way. It states if there are three family practice providers that can see 24 patients each day, what is the percent utilization and what are your recommendations? For this, we do not know if these 24 patients are shared amongst all providers or if each one sees 24 patients each day. We are also left to make assumptions about the hours available to see patients in each day. A reasonable approach might be to assume 8 hours in a typical day, since that is typical of the average worker. This is one assumption made. 
+
+```{r}
+# average number of individuals in an 8 hour work day
+u <- lam*8
+# average number of individuals per hour
+u2 <- 10
+# standard deviation of the average workday (8 hours)
+sd_u <- sqrt(u)
+# standard deviation of the typical hour 
+sd_u2 <- sqrt(u2)
+print(paste("The standard deviations of an 8 hour workday is =", round(u, digits=3)))
+```
+
+In addressing the percent utilization of the three family practice providers we must make other assumptions in addition to assuming 8 hours in the workday available to see patients. We assume that the three family practices share their 24 patients each day. This leads us to assume again that the average number of individuals seen at each family practice per day is equivalent to this many patients per hour at each practice on average. These may or may not be good assumptions, they are just parameters considered to address the question properly. From these assumptions we can form an average rate of patients seen for each practice using the number of patients, practices, and hours in a workday as shown below. Then, using this rate, we can find the percent utilization, that is, how efficient these practices are (on average) at seeing patients when compared with the given rate of 10 patients per hour. This also assumes that the rate given can be used as a benchmark to compare how well these practices are utilizing their time to see patients. 
+
+```{r}
+# Assuming: 
+  # an 8 hour workday
+  # shared patients 
+  # averaged rate per practice is representative
+peps <- 24 # patients
+prac <- 3 # practices
+avg_peps_prac <- peps/prac # calculates average patients per practice
+hours <- 8 # hours in workday
+u <- avg_peps_prac/hours # rate of patients seen per hour in workday
+pu <- u/lam*100 # Using 10 per hour as a benchmark
+print(paste0("Under these assumptions, their percent utilization is about = ", pu, "%"))
+```
+
+Notice that, when this is calculated under these assumptions, the amount of patient per practice is only 8. With that, there are only 8 hours in any singular day to see those patients. Thus, their rate, or the number of patients seen per hour at each practice on average is 1 patient per hour. Given these parameters and using 10 per hour as a benchmark, the percent utilization is estimated at about 10%. The recommendation should be to increase the average number of patients seen per hour since they are well below their utilization potential given that the benchmark rate is 10 per hour.  
+
+
+## 4) Hypergeometric
+
+Your subordinate with 30 supervisors was recently accused of favoring nurses. 15
+of the subordinate’s workers are nurses and 15 are other than nurses. As evidence of malfeasance, the
+accuser stated that there were 6 company-paid trips to Disney World for which everyone was eligible.
+The supervisor sent 5 nurses and 1 non-nurse. If your subordinate acted innocently, what was the
+probability he/she would have selected five nurses for the trips? How many nurses would we have
+expected your subordinate to send? How many non-nurses would we have expected your subordinate to
+send?
+
+The probability of selecting five nurses and one other person can be found through a combination of choices and the hypergeometric probability equation. This equation is represented by the product of several choices where the values of $n$ and $k$ vary depending upon the choice being made. We could show it as a combination of choices such as: 
+
+$$Probability\hspace{4pt}of\hspace{4pt}a\hspace{4pt}combination\hspace{4pt}of\hspace{4pt}choices= \frac{\frac{n!}{k!(n-k)!}*\frac{c!}{t!(c-t)!}}{\frac{z!}{b!(z-b)!}}$$
+
+This is not the actual hypergeometric probability equation, but rather an easier method of understanding and computing these choices. The values of $n$,$k$,$c$,$t$,$z$, and $b$, will depend on the number of events possible given by $n$, $c$, and $z$ and the number of choices to be made from them represented by $k$, $t$, and $b$. For example, we have 15 nurses and 15 non-nurses in a workplace. There are 6 trips available for the supervisor to select individuals to go on. Only one individual may be selected but in this case, we assume they could be selected multiple times. If my subordinate acted innocently and we assume that statistics is the only factor to consider here, then the probability of their selection would come close to the ratio of nurses to non-nurses since there is an equally likely chance that either could be selected. A function was created to compute the combinations of choices with the function name 'C' and the values input into the equation listed above. The expected number of nurses and non-nurses was also calculated given the assumption that each had an equally likely chance at getting selected. This process is documented below. 
+
+```{r}
+C <- function(n,k){ # create a function to compute the combination of choices
+  E <- (factorial(n))/(factorial(k)*(factorial(n-k))) # Equivalent to within'n' pick 'k'
+  print(E)
+}
+PC <- C(15,1)*C(15,5)/C(30,6) # find the probability of that combination of choices
+PC # results of probability of combination of choices
+expectNurse <- 6*15/30 # Expected number of nurses 
+expectNonNurse <- 6*15/30 # Expected number of non-nurses 
+# Print results
+print(paste("Probability of five nurses =", round(PC, digits = 3)))
+print(paste("Expected number of nurses =", expectNurse))
+print(paste("Expected number of non-nurses =", expectNonNurse))
+```
+
+Based solely on the statistics and the probability of each choice the supervisor made, the likelihood that they would have chose five nurses (and thereby one non-nurse) is about 8%. This does not work in their favor because the ratio of nurses to non-nurses is 50/50 if chosen 'fairly.' The expected number of nurses should have been 3 individuals and the expected number of non-nurses should have also been 3 individuals. Instead, the supervisor deviated from these expected values and appears statistically to have been biased in favor of nurses for the six available trips. 
+
+## 5) Geometric
+
+The probability of being seriously injured in a car crash in an unspecified location is about
+.1% per hour. A driver is required to traverse this area for 1200 hours in the course of a year. What is
+the probability that the driver will be seriously injured during the course of the year? In the course of 15
+months? What is the expected number of hours that a driver will drive before being seriously injured?
+Given that a driver has driven 1200 hours, what is the probability that he or she will be injured in the
+next 100 hours? 
+
+
+A function was created to calculate the geometric probability of being injured in the unspecified location given a certain number of hours and the probability of injury. It was model from this equation; 
+
+$$P(X = k) = (1-p)^k(p)$$ 
+
+In this case, we consider injury as a success in the probability equation since that is the event we are trying to find. During the year at 100 hours per month or 1200 hours per year we input these values into the equation. This is labeled 'h1200' as in 1200 hours since the probability of injury remains the same throughout. In the course of 15 months or 1500 total hours (at 100 hours per month) the probability is recalculated and stored in the variable 'h1500.' The expected number of hours that a driver will drive before being injured is found using the equation $\mu=\frac{1-p}{p}$ where p is the probability of injury. The result is stored in the variable 'hinj' as in hour until injury. The full process is described here;
+
+```{r}
+G <- function(x,p){ # create geometric probability function
+  o <- (1-p)^(x-1)
+  p <- o*p
+  return(p)
+}
+h1200 <- G(1200,0.001) # find probability of injury (success) at 1200 hours
+h1500 <- G(1500, 0.001) # find probability of injury at 15 months
+hinj <- (1 - 0.001) / 0.001 # compute expected number of hours before 
+                              # injury while driving in this area
+print(paste("The probability of injury at 1200 hours is about", 
+            signif(h1200, digits=3)))
+print(paste("The probability of injury at 15 months is about", 
+            signif(h1500, digits=3)))
+print(paste("The expected number of hours before injury while driving in this area is about", 
+            signif(hinj, digits=3)))
+```
+
+There is also a question of injury after driving 1200 hours. Given the constant geometric progression in probability, the results should produce a lower probability of injury than that of the driver's chances at 1200 hours. Since the driver has not been injured in 1200 hours, the probability that they will be injured in the next 100 is the probability that they will be injured in 1200 hours plus 100 hours which is 1300 hours. The geometric function 'G' is used again to compute this with results stored as 'h1300.' The results are printed below. 
+
+```{r}
+h1300 <- G(1300, 0.001)
+print(paste("The probability of injury at 1300 hours is about", 
+            signif(h1300, digits=3)))
+```
+
+Lastly, we can examine the probability that the driver will be injured in the first 100 hours as well to answer the question given. When thinking about this as a product of the geometric progression, the result in the earlier hours should be larger than the result in the proceeding hours because the probability of injury decreases constantly. The function is used to compute this earlier hour and stored as 'h100.' The results are printed below. 
+
+```{r}
+h100 <- G(100, 0.001)
+print(paste("The probability of injury at 100 hours is about",
+            signif(h100, digits=3)))
+```
+
+
+
+## 6) Unspecified
+
+You are working in a hospital that is running off of a primary generator which fails about once in 1000
+hours. What is the probability that the generator will fail more than twice in 1000 hours? What is the
+expected value?
+
+Under the assumption that this generator follows a binomial distribution and meets the assumptions necessary to use it, we can calculate the probability of failure in some amount of hours as its 'reliability' through the general binomial probability formula used in the first question. For this calculation we will only use the built-in R function rather than demonstrating the 'GenBiProb' function that was created because it gives us more than is necessary for this reliability estimates . The probability that the generator will fail more than two times in 1000 hours is a cumulative probability. Since there are only two possible outcomes, that the generator works in the hour or that the generator does not, we can find the probability that there are less than two first by subtracting the cumulative sum from 1. Then value we want is what's leftover between 1 and the probability of less than two failures in 1000 hours given the probability that it fails about once every 1000 hours. 
+
+Additionally, the rate of failure is also calculated and set to the variable 'p' as in probability. This contains the average probability of failure for this particular generator. The expected value, that is, the number of times the generator is expected to fail on average is found through the product of $n$ and $p$ as shown in the first problem. All calculations are made in this chunk below:
+
+```{r}
+n <- 1000
+p <- 1/1000
+e <- 1000*p
+lt2_fail <- 1-pbinom(2, n, p)
+gt2_fail <- pbinom(2, n, p)
+print(paste("The probability of less than two failures is", 
+            signif(lt2_fail, digits=3)))
+print(paste("The probability of greater than two failures is", 
+            round(gt2_fail, digits=4)))
+print(paste("The expected value of the generator is about", 
+            signif(e, digits=3), "in every 1000 hours"))
+```
+
+
+
+## 7) Unspecified
+
+A surgical patient arrives for surgery precisely at a given time. Based on previous analysis (or a lack of
+knowledge assumption), you know that the waiting time is uniformly distributed from 0 to 30 minutes.
+What is the probability that this patient will wait more than 10 minutes? If the patient has already
+waited 10 minutes, what is the probability that he/she will wait at least another 5 minutes prior to being
+seen? What is the expected waiting time?
+
+
+The probability of waiting more than 10 minutes is found through the uniform distribution probability formula where one over event $b$ is subtracted from event $a$. Keep in mind, since this distribution is uniform, there is no change in the slope of the distribution within in the interval specified. In our case, the interval is from 0 to 30 minutes. The equation for the uniform distribution formula look like this; 
+
+$$f(x) = \frac{1}{b -a}$$ 
+When computing the probability of waiting more than 10 minutes event b is the final value possible in this uniform interval. Thus, $b$ must be equal to 30, otherwise we leave the interval. Alternatively, we are traveling from event $a$ to even $b$ and $a$ represents our start. Therefore, event $a$ must be 10 in this case. The same principle applies to every uniform probability calculation, including the expected wait time. With the expected wait time, we need only find the average over the interval since the mean and median are the same in a uniform distribution. The work is shown with notes and response to describe the results of each value.
+
+```{r}
+min10 <- 1/(30-10) # probability of waiting at least 10 minutes
+min15 <- 1/(30-(10+5)) # probability of waiting at least another 5
+                        # minutes after waiting 10 minutes
+avg_wait <- (0+30)/2 # the expected waiting time over the interval
+print(paste("The probability of waiting at least 10 minutes is", 
+            round(min10, digits = 3)))
+print(paste("The probability of waiting at least 5 minutes after waiting 10 minutes is", 
+            round(min15, digits = 3)))
+print(paste("The expected waiting time over the interval is", 
+            avg_wait, "minutes"))
+```
+
+
+## 8) Unspecified
+
+
+Your hospital owns an old MRI, which has a manufacturer’s lifetime of about 10 years (expected value).
+Based on previous studies, we know that the failure of most MRIs obeys an exponential distribution.
+What is the expected failure time? What is the standard deviation? What is the probability that your
+MRI will fail after 8 years? Now assume that you have owned the machine for 8 years. Given that you
+already owned the machine 8 years, what is the probability that it will fail in the next two years? 
+
+In an exponential distribution the mean or expected value and standard deviation are the same. This is due to the distribution itself, having to expand exponentially by some value which also pushes the mean towards the larger values. Thus, the expected failure time is in year 10. This is given. The standard deviation is the same, at 10 years. The probability is found through the function of probability density shown here;
+
+$$f(x;\lambda)=\lambda e^{-\lambda x}$$
+Where x is the variable used to determine the probability of its occurrence in the exponential distribution, $\lambda$ is the rate of change, and e is Euler's constant. In this case the rate of failure is our rate of change $\lambda$ at 1 in every 10 years or 1/10. The probability of x occuring depends on where we want to test. In this first question, we are to find the probability that this MRI machine will fail after 8 years. It is a cumulative probability since we a want to know how likely it will fail after 8 years, as in beyond the eighth year. Thus, x is 8 and we enter the values into R's function 'pexp' to get results and store it as 'p8yr.'
+
+```{r}
+p8yr <- pexp(8, 1/10)
+print(paste("The probability that it will fail after 8 years is about", 
+            round(p8yr, digits=3)))
+```
+
+
+The same process applies to the next question of how likely the machine is to fail in the next two years after you owned it for 8. In that case, it has been owned for eight years already but we want to find the likelihood that it will fail only in the next two years after year 8. There are a couple ways to do this but for our purposes, we will find the probability that it will fail beyond 8 years (this was completed above) and subtract the probability that it will fail after 10 years. The results for the probability of failure from the 10th year on is stored in a variable 'p10yr.' With the results stored, their difference in calculated. This will give us the interval between year 10 and year 8 which is exactly what was asked for. 
+
+```{r}
+p10yr <- pexp(10, 1/10, lower.tail = FALSE)
+p2yrs_8to10 <- p8yr - p10yr
+print(paste("The probability that it will fail after 10 years is about", 
+            round(p10yr, digits=3)))
+print(paste("The probability that it will fail in the next two years after year 8 is about", 
+            round(p2yrs_8to10, digits=3)))
+```
+
+We can also visualize the exponential process as the probability changes over time with a plot. Notice that this exponential slope is quite shallow but, given the rate of failure as 1 in every 10 years, this should be quite shallow. It is a useful visual to identify the probability of failure at any point on its axis.  
+
+
+```{r}
+u <- 10
+x <- seq(0, 10, length.out=1000)
+df <- data.frame(x=x, Px=dexp(x, rate=(1/u)))
+ggplot(df, aes(x=x, y=Px)) + geom_line() + theme_bw()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

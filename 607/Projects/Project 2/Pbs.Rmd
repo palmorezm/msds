@@ -1,0 +1,128 @@
+---
+title: "Project 2 - Pbs"
+author: "Zachary Palmore"
+date: "10/2/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Objective
+
+
+```{r}
+require(tidyverse)
+library(magrittr)
+# install.packages("magick")
+library(magick)
+# install.packages("tesseract")
+library(tesseract)
+```
+
+
+
+### Loading
+
+```{r}
+# download file
+#url <- "https://pbs.twimg.com/media/Dv3pIsIUwAEdu--.jpg:large"
+#download.file(url, destfile = "table.jpg")
+```
+
+
+
+```{r}
+# preprocessing
+img <- image_read("pbsimage.jpg") %>% 
+  image_transparent("white", fuzz=82) %>% 
+  image_background("white") %>%
+  image_negate() %>%
+  image_morphology(method = "Thinning", kernel = "Rectangle:20x1+0+0^<") %>%
+  image_negate() %>%
+  image_crop(geometry_area(0, 0, 80, 25))
+
+img
+```
+
+
+```{r}
+img
+
+pbs <- image_ocr(img)
+as.data.frame(pbs)
+```
+
+```{r}
+pbs2 <- str_split(pbs, " | ")
+pbs3 <- str_split(pbs2, "]")
+str_split(pbs3, "\t")
+
+
+```
+
+
+
+```{r}
+# read img and ocr
+data <- img %>%
+  image_ocr() 
+
+# some wrangling
+data %>%
+  stringi::stri_split(fixed = "\n") %>%
+  purrr::map(~ stringi::stri_split(str = ., fixed = "‘")) %>%
+  .[[1]] %>%
+  purrr::map_df(~ tibble::tibble(Date = .[1], Price = .[2], Change = .[3])) %>%
+  dplyr::glimpse()
+```
+
+
+
+
+
+```{r}
+data
+```
+
+
+
+
+
+
+### Tidying
+
+
+```{r}
+# read img and ocr
+data <- img %>%
+  image_ocr() 
+# some wrangling
+data %>%
+  stringi::stri_split(fixed = "\n") %>%
+  purrr::map(~ stringi::stri_split(str = ., fixed = "‘")) %>%
+  .[[1]] %>%
+  purrr::map_df(~ tibble::tibble(Date = .[1], Price = .[2], Change = .[3])) %>%
+  dplyr::glimpse()
+# remove grid
+remove_grid <- "convert table_bw.jpg -negate -define morphology:compose=darken -morphology Thinning 'Rectangle:1x80+0+0<' -negate table_wo_grid.jpg"
+system(remove_grid)
+
+# read img and ocr
+data <- image_read("table_wo_grid.jpg") %>%
+  image_crop(geometry_area(0, 0, 80, 25)) %>%
+  image_ocr() %>%
+  stringi::stri_split(fixed = "\n")
+
+head(data[[1]])
+```
+
+
+
+
+### Analysis
+
+
+
+### Conclusion

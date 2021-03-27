@@ -1,0 +1,169 @@
+---
+title: "Reading Comma Seperated Values"
+author: "Zachary Palmore"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Objective 
+
+In this assignment we are to create a vignette to describe a function from any package within the tidyverse. This example is one of the most basic but often under-appreciated functions used to get data from a file source. It is called the *read_csv* function. Our objective here is to document in long-form how this function works. Let's get started. 
+
+
+## Package 
+
+```{r results='hide', include=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+This function is included in the *readr* package. It was created and is maintained by Hadley Wickham, Chief Scientist at RStudio and Adjunct Professor of Statistics at the University of Auckland, Stanford University, and Rice University. This package, along with many others of his creation used in the process of cleaning data, are available in an all-in-one installation with the *tidyverse* package. Download with *install.packages("tidyverse")* and run the code *?tidyverse* for further information. 
+
+## Description
+
+read_csv() is a function designed specifically for reading files of common separated values. These files can be a direct path to a local file, a connection, or raw data as a string or individually listed vectors. By default, the field separator is a "," and the values of " " and "NA" are both read as missing values. Only one file can imported at a time. 
+
+Importantly, the file, connection, or raw data must contain at least one new line of values to be recognized as data. Compressed files with the extensions .gz, .bz2, .xz, or .zip are automatically decompressed and imported. Connections with http://, https://, ftp://, or ftps:// are also automatically imported with this function. 
+
+
+## Usage
+
+```
+read_csv(file, col_names = TRUE, col_types = NULL,
+  locale = default_locale(), na = c("", "NA"), quoted_na = TRUE,
+  quote = "\"", comment = "", trim_ws = TRUE, skip = 0,
+  n_max = Inf, guess_max = min(1000, n_max),
+  progress = show_progress(), skip_empty_rows = TRUE)
+``` 
+        
+        
+## Arguments
+
+```
+file
+
+```
+A local path, connection, or raw data in the form of a string or vectors. Extensions .gz, .bz2, .xz, or .zip are automatically unzipped or decompressed. Connections are also automatically downloaded as well and those with the extensions of https://, ftp://, or ftps:// are automatically imported. Default separator is ",".
+
+```
+col_names 
+
+```
+If there are column names in the file specify TRUE, otherwise FALSE. The default is "TRUE". The "FALSE" specification generates column names in the sequence X1, X2, X3... until each column with information has a name. 
+
+Where the column names are missing (NA or " ") new names are automatically generated and filled with "X1" for the first missing column name, "X2" for the second, "X3" for the third and so on until all columns with row observations are given a name. 
+
+```
+col_types 
+
+```
+Default is "NULL" where the first 1000 columns are assigned a type based on the values present in the file. This is a process of guessing based on the file information. 
+
+If this fails or there are more columns to interpret than guessing allows, column types will need to be specified. This can be done with a compact string representation where each character represents one column: c = character, i = integer, n = number, d = double, l = logical, f = factor, D = date, T = date time, t = time, ? = guess, or _/- to skip the column. 
+
+Another option is to specify cols_only() with the the column name or location of each column as an index value separated with a ",". This is limited to 1000 as well. 
+
+```
+locale = default_locale()
+
+```
+
+Determines defaults of time zone, encoding, decimal marks, and day/month names. Default is US-centric.
+
+```
+na = c("", "NA")
+
+```
+Identifies what vectors should be considered missing values from the file. Set to character() to indicate there are no missing values. 
+
+```
+quoted_na = TRUE
+
+```
+
+Determines whether to include missing values as strings that are inside quotation marks denoted in the *quote =" "* variable."TRUE" does not include them. "FALSE" does. Default is is "TRUE". 
+
+```
+quote = "\""
+
+```
+Defines the marking of quotation marks as a specific symbol or string. The default is a " mark. 
+
+```
+comment = ""
+
+```
+Allows comments to be written within the " " that are not shown in the file. 
+
+```
+trim_ws = TRUE
+
+```
+Default is to remove the white space before and after the observations in the file. White space can be included by specifying "FALSE".
+
+```
+skip = 0
+
+```
+
+Determines the number of rowed lines that should be skipped before reading and importing the data.
+
+```
+n_max = Inf 
+
+```
+Sets the maximum number of records to be read and imported. The default is infinity (or all available records).
+
+```
+guess_max = min(1000, n_max)
+
+```
+Sets the number of columns and records that should be used to guess and assign a column type to. 1000 columns is the default and the maximum number of records is equal to the n_max value.
+  
+```  
+progress = show_progress()
+
+```
+Set to show_progress() to see the status of the import. It can be removed by specifying "FALSE" after "=" . 
+
+```
+skip_empty_rows = TRUE
+
+```
+Determines if rows made up entirely of missing values should be skipped. Default is "TRUE". It can be removed to include all rows even those with nothing listed by specifying "FALSE".
+
+## Result
+
+The result is a *tibble()*. Where the function fails, an error may display problems with parsing while specifying how many issues there were. Further information can be accessed using the *problems()* function to see the issues descriptively. 
+
+## Examples
+
+Reading from local path:
+
+```{r eval=FALSE, results='asis'}
+read_csv("C:/Users/Owner/Documents/Data/538approvalratings.csv")
+```
+
+
+Reading from connection or link:
+
+```{r, echo=TRUE, results='asis', eval=FALSE}
+read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/congress-generic-ballot/generic_topline_historical.csv")
+```
+
+Reading from raw data: 
+
+```{r eval = FALSE, results='asis'}
+read_csv("dem_estimate,rep_estimate\n50.00,50.31\n55.37,43.63", col_types = list(col_double(), col_character()))
+```
+

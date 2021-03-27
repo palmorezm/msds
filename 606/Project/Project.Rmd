@@ -1,0 +1,755 @@
+---
+title: "Education and the Wage Gap"
+subtitle: "An Analysis by States of the United States"
+author: "Zachary Palmore"
+date: "11/16/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# Packages
+require(reshape2)
+require(tidyverse)
+require(readr)
+require(DT)
+require(ggpubr)
+require(rstatix)
+require(scales)
+require(kableExtra)
+```
+
+
+
+## Abstract
+
+Although efforts have been made to reduce the gender wage gap and studies suggest that people support efforts to promote pay equity, evidence of this gap, measured through the average earnings of males and females, show that there has been little change since 2004. However, some studies point towards an increasing average annual salary for women during this time and attribute the cause to factors such as education. For this analysis we observe for those aged twenty-five and older, if the level of education attained has an effect on the average annual earnings of males and females across the United States in 2018. We extend this analysis further to determine if there is a difference at the state level in wages and discover where, if any, state has significantly reduced their gender wage gap in 2018. Preliminary results suggest that higher education does assist women in increasing their average annual earnings but it does not reduce the gender wage gap.
+
+
+## Introduction
+
+Women who are 16 years of age or older and employed in the United States have lower average annual salaries than men. According to the U.S. Bureau of Labor Statistics, full-time wage and salaried workers had the lowest difference in their median weekly earnings in 2014 with women earning 82.5% of the median male earnings. This difference was greater in 1979 with women earning 62% of men’s earnings. Since 1979 when comparable salary data became available, there has not been an occasion in which the average earnings of women in any state within the United States has met or exceeded the average earnings of men. However, some studies have shown that education helped increase the average earnings of women during this timespan.   
+
+Among the population of individuals who are 25 years of age or older and employed in the United States, those with higher levels of education have higher earnings on average. Using 1979 as a benchmark, workers with only high school diplomas have experienced an overall decline in wages but the decline for women was smaller with a 10% reduction compared to 29% for men. Additionally, workers with a bachelor's degree over this timespan have increased in wages overall with women experiencing a greater increase of 35% than men’s 20%. This suggests education may have a significant impact on the reduction of the gender wage gap. 
+
+When considering this gender wage gap, or the difference in average earnings of the traditional sexes of male and female, it is important to acknowledge several factors outside of education that influence the average earnings of individuals. First, that certain industries are majority male while others are majority female. Some argue that this is the reason for discrepancies in pay, suggesting women choose lower-paying roles. However, these studies tend to omit the other variables influencing an individual’s average earnings. 
+
+Two other factors often cited when considering why women earn less than men, is that women have fewer years of experience and work fewer hours thus earning less in wage on average. Both factors could be due to a restructuring and prioritization of time for children and family-related responsibilities. Since cultural norms traditionally rely on women to bear the brunt of family responsibilities, they are unable to dedicate as much time to their occupations as men. This results in lost opportunities for women to potentially increase their wage. Given the prevalence of this phenomenon in society, these factors should be acknowledged as influences that, when controlled for, cause the analysis to miss the social impact these cultural norms have on the gender pay gap. 
+
+Lastly, although the Equal Pay Act of 1963 was enacted by Congress to “prohibit discrimination on account of sex in the payment of wages by employers” it must be acknowledged that certain types of discrimination remain and they can have a direct influence on an individuals pay, especially for women and minorities. Discrimination is varied and widespread. To give just one example taken from the Center for American Progress, an employer may not actively choose to pay a woman less for the same position as a man, but may instead base her salary on her previous compensation and offer a certain percentage increase equal to the offer given to a man. In circumstances where any gendered wage discrimination has occurred in the past, this may only further the act of discrimination. Actions, such as this, are largely uncontrollable. For this reason, the best course of action when analyzing the gender wage gap is to take a comprehensive approach. 
+
+This analysis includes all of these major influencing factors as well as those which may not be named while reviewing the gender wage gap in education. It is unadjusted and describes the full-picture of the gender wage gap in the United States broken down by state. 
+
+A report published by the Economics Policy Institute in 2020, describes how “adjusted” measures (those that try to control for these factors) will always produce less realistic results. The tradeoff of these adjustments is informative and notably useful in understanding the gender wage gap from one perspective in which women and men are gauged on whether they are receiving equal pay for equal work. However, these ignore the differences in opportunities presented to each sex that change the nature of their connection with their employer prior to and during wage negotiations.  
+
+Additionally, for this analysis, reviewing the gender wage gap across education levels by state adds another host of variables that are difficult to control for when already considering the multitude of other factors that influence the gender wage gap. Although multivariate regression could assist in singling out those factors, it is beyond the scope of this analysis and would degrade the applicability of the results to the real-world. 
+
+To understand the gender wage gap and how education impacts it, we review the most recent data from the U.S. Census Bureau’s American Community Survey. Through this analysis we expect a continuation of trends in the gender wage gap- that the gap remains close to the same level as it has since 2004- but intend to look into this further for statistical significance. To apply a perhaps more useful measure, the data is calculated by state to reveal localized changes and discover recent trends in how education impacts the gender wage gap.  
+
+
+## Data
+
+This data comes from the American Community Survey (ACS) of the United States Census Bureau. They collect a random sample from the American population every year that is not decennial census year with no household ever receiving the survey more than once every five years. The ACS has a large sample size (approximately 2.143 million individuals) for this study and the data is widely considered a representative estimate of the population within their margins of error. Those margins are provided in the *income_2018_bystate* data frame. The ACS follows strict protocol on form-filled survey data collection and adheres to Approximate normality is reinforced in the small difference between the mean and median of the sample observations. See the reference to Census Bureau methodology listed in the references section for further details.
+
+A copy of the data used in this survey was made available in the public Github repository listed below with the reference by the author. It was made available as a csv file and can be read remotely from any connected device to improve the reproducibility of this work. 
+
+In this analysis, the survey data is called directly from the remotely accessible repository and used throughout. Subsets of the spreadsheet are broken out into smaller tables and data frames for use in the analysis. We begin with the essentials of state identifiers, median earnings for the population of working age (16), and median earnings for educational attainment. Each is broken down by the traditional male or female gender for comparison. 
+
+```{r}
+# Load Data
+income_2018_bystate  <-  read_csv("https://raw.githubusercontent.com/palmorezm/msdsdata606/master/Project/ACSST5Y2018.S2001.csv") 
+
+# Select relevant income-specific variables by state
+earnings <- income_2018_bystate[2:53,1:242] %>%
+  select(c(
+    # General Identifier
+        NAME, # State Name
+    
+    # Population and overall earnings
+    S2001_C03_002E,	# Male median earnings 16+ 
+    S2001_C05_002E, # Female median earnings 16+ 
+    S2001_C03_013E, # Male full-time median earnings  
+    S2001_C05_013E, # Female full-time median earnings
+    S2001_C03_015E, # Male median earnings 25+ 
+    S2001_C05_015E, # Female median earnings 25+ 
+
+    # Male earnings by education
+    S2001_C03_016E, # Less than high school diploma
+    S2001_C03_017E, # High school diploma
+    S2001_C03_018E, # Some college or associates degree
+    S2001_C03_019E, # Bachelors degree
+    S2001_C03_020E, # Masters Degree
+    
+    
+    # Female earnings by education 
+    S2001_C05_016E, # Less than high school diploma
+    S2001_C05_017E, # High school diploma
+    S2001_C05_018E, # Some college or associates degree
+    S2001_C05_019E, # Bachelors degree
+    S2001_C05_020E # Masters Degree
+    
+  )) %>% 
+  rename(
+    State = NAME, 
+    m16 = S2001_C03_002E,
+    f16 = S2001_C05_002E,  
+    mft = S2001_C03_013E,   
+    fft = S2001_C05_013E, 
+    m25 = S2001_C03_015E, 
+    f25 = S2001_C05_015E, 
+    flt = S2001_C05_016E, 
+    fhs = S2001_C05_017E,
+    fas = S2001_C05_018E,  
+    fbs = S2001_C05_019E, 
+    fms = S2001_C05_020E,
+    mlt = S2001_C03_016E,
+    mhs = S2001_C03_017E, 
+    mas = S2001_C03_018E, 
+    mbs = S2001_C03_019E, 
+    mms = S2001_C03_020E 
+  ) 
+# Convert numeric data to useful types
+earnings[,2:17] <- lapply(earnings[,2:17], as.numeric)
+head(earnings, 3)
+```
+
+From this sample of the data we notice the column variables are not descriptive, they are coded. Other than the state name, there is *m16* which represents the median values for males aged 16 and older. Similarly, *f16* represents the same for age females. The variable *mft* represents the males that work full time while *mlt*, *mhs*, *mas*, *mbs*, and *mms* each represent median earnings of the education levels of individuals with less than a high school, high school diplomas, some college or associates degrees, bachelors degrees, masters or graduate degrees respectively. The same categories apply but for females where the variable name starts with an 'f'.
+
+There are 23 variables and 52 observations in this data set, one for each state, the District of Columbia and Puerto Rico. Each case is the median earnings of individuals listed in their annual form for the year 2018.
+
+Due to longstanding practice, data representation for individuals who do not fit within traditional gender rules, is lacking. This is not to say that this analysis intends to exclude anyone from the analysis, only that the data to perform it is absent. Furthermore, including these factors would only serve to improve the results and their applicability to the real-world as there is a proportion of the population that such data would serve better than that of typical data sets such as this one. 
+
+In addition to the earnings data extracted from the ACS survey, we will also extract some state-specific data for later use. To perform certain tests, the data will need enough cases to make inferences from. With the calculations of medians for each state already cleaned and organized we will need to reverse some of the process while maintaining the integrity of those same median calculations. Our goal here being, to supply a data set with observations of differences their gender and education, categories as well as their associated proportions. Notes are made for guidance in the process of extracting these additional variables. 
+
+```{r}
+# Further data extraction
+income_2018_bystate <- income_2018_bystate[2:52,] %>% 
+  select(c(
+    # General Reference Variables
+    GEO_ID, # Unique Geographic Identifier of state
+           NAME, # State Name
+                S2001_C01_001E, # Total population 16+ MOE
+                              S2001_C01_001M, # Total population 16+ 
+    
+    # Mean Earnings for FULL-TIME Workers (age 16+) 
+           S2001_C03_002E,
+           S2001_C03_002M, # Median Female Earnings
+           S2001_C05_002E,
+           S2001_C05_002M, # Median 
+
+           # Male Variables  
+           S2001_C03_016E,
+           S2001_C03_016M,
+           S2001_C03_017E,
+           S2001_C03_017M,
+           S2001_C03_018E,
+           S2001_C03_018M,
+           S2001_C03_019E,
+           S2001_C03_019M,
+           S2001_C03_020E, 
+           S2001_C03_020M,
+           
+           # Female Variables
+           S2001_C05_016E,
+           S2001_C05_016M,
+           S2001_C05_017E,
+           S2001_C05_017M,
+           S2001_C05_018E,
+           S2001_C05_018M,
+           S2001_C05_019E,
+           S2001_C05_019M,
+           S2001_C05_020E,
+           S2001_C05_020M
+           )) %>% 
+  rename(
+  # Location Information
+    GEO_ID = GEO_ID,
+           State = NAME,
+  
+     # General Statistics on Male and Female Earnings aged 16+
+          TotalPop = S2001_C01_001E,
+          TotalPop_moe = S2001_C01_001M,
+           M_Earnings = S2001_C03_002E, # Female
+           M_Earnings_moe =  S2001_C03_002M,
+           F_Earnings = S2001_C05_002E,
+           F_Earnings_moe =  S2001_C05_002M,
+   
+   # Male Earnings by Level of Education (aged 25+)
+         M_LTHS = S2001_C03_016E,
+           M_HS = S2001_C03_017E,
+           M_AS = S2001_C03_018E,
+           M_BS = S2001_C03_019E,
+           M_MS = S2001_C03_020E,
+      
+        # Male Margins of Error by Education
+         M_LTHS_moe = S2001_C03_016M,
+           M_HS_moe = S2001_C03_017M,
+           M_AS_moe = S2001_C03_018M,
+           M_BS_moe = S2001_C03_019M,
+           M_MS_moe = S2001_C03_020M,
+  
+  # Female Earnings by Level of Education (aged 25+)
+         F_LTHS = S2001_C05_016E,
+           F_HS = S2001_C05_017E,
+           F_AS = S2001_C05_018E,
+           F_BS = S2001_C05_019E,
+           F_MS = S2001_C05_020E,
+        
+        # Female Margins of Error by Education
+          F_LTHS_moe = S2001_C05_016M,
+           F_HS_moe = S2001_C05_017M,
+           F_AS_moe = S2001_C05_018M,
+           F_BS_moe = S2001_C05_019M,
+           F_MS_moe = S2001_C05_020M,
+         )
+# Converting data types 
+income_2018_bystate[,3:28] <- lapply(income_2018_bystate[,3:28], as.numeric)
+income_2018_bystate$GEO_ID <- as.factor(income_2018_bystate$GEO_ID)
+income_2018_bystate<- as.data.frame(income_2018_bystate)
+
+# Checking for missing values - there should be none
+sum(is.na(income_2018_bystate))
+
+# Creating subsets of the data to isolate variables of interest 
+
+# excluding geo_id and moe for summary purposes
+pop_income_2018 <- income_2018_bystate[,c(2,3,5,7)]
+male_income_2018 <- income_2018_bystate[, c(2,seq(9, 18, 2))]
+female_income_2018 <- income_2018_bystate[, c(2,seq(19, 28, 2))]
+
+# These male and female stats can also be recombined
+mf_income_2018 <- cbind(female_income_2018, male_income_2018[2:6])
+
+# Calculate observed differences for the entire study
+pop_obs <- pop_income_2018 %>% 
+  mutate(Obs_diff = M_Earnings - F_Earnings) %>%
+  mutate(Pmf = F_Earnings/M_Earnings)
+
+# Create a table with the highs and lows of states
+# Alternatively tail could be used:
+# min(tail(sort(pop_obs$Obs_diff),5))
+top5 <- pop_obs %>% 
+  filter(Obs_diff >= min(head(sort(pop_obs$Obs_diff, decreasing=TRUE), 5))) 
+top5$Gap <- as.factor("Wide")
+low5 <- pop_obs %>% 
+  filter(Obs_diff <= max(head(sort(pop_obs$Obs_diff, decreasing=FALSE), 5)))
+low5$Gap <- as.factor("Narrow")
+hilo_obs <- rbind(top5,low5)
+
+# Calculating the observed differences of sex
+mf_obs <- mf_income_2018 %>% 
+  mutate(obs_diff_lths = M_LTHS - F_LTHS) %>% 
+  mutate(obs_diff_hs = M_HS - F_HS) %>% 
+  mutate(obs_diff_as = M_AS - F_AS) %>% 
+  mutate(obs_diff_bs = M_BS - F_BS) %>% 
+  mutate(obs_diff_ms = M_MS - F_MS) 
+
+# Give each variable its own row in education
+mf_stateobs <- melt(mf_obs)
+mf_stateobs[4] <- as.numeric(seq(1:51))
+  mf_stateobs  <- mf_stateobs %>%
+    rename(Category = variable,
+           Observation = value, 
+           ID = V4)
+mf_state_obsdiffs <- melt(mf_obs[,12:16])
+  mf_state_obsdiffs <- mf_state_obsdiffs %>% 
+    rename(Observation = variable, 
+           Difference = value)
+mf_earnings_byedu <- melt(mf_obs[,2:11])
+# summarizing the education earning using means
+mf_earnings_byedu <- mf_earnings_byedu %>%
+  group_by(variable) %>% 
+  summarise(AvgEarning = mean(value)) %>% 
+  rename(Education = variable)
+# Add in the variable of sex for later comparisons
+mf_earnings_byedu$Sex <- c("Female","Female","Female","Female","Female","Male","Male","Male","Male","Male")
+# Rename the education observations to be descriptive of
+# the entire data set and remove the male/female bounds of edu
+mf_earnings_byedu$Education <- 
+  c("LTHS","HS","AS","BS","MS","LTHS","HS","AS","BS","MS")
+# Variables chosen to describe the data are not mutually exclusive
+# For example 'BS' is not just for Bachelors of Science.
+# That category includes all those individuals that
+# attained a bachelors degree on the ACS in 2018
+# and as another example 'AS' contains those with 'some college' 
+# from the ACS in 2018. These variables were only used for ease 
+# in describing the variables visually
+```
+
+This shortened table displays the first 10 statistics used in this study and the associated margins of error provided by the ACS for their calculations of the median and other relevant statistics in the year 2018. These provide a general reference to those interested in determining the exact values of the medians and other statistics used throughout this analysis. They are used to consider which estimates are the safest in this work and help to ensure quality data is used in the figures but they are for reference only and are not included in the calculations made. 
+
+```{r}
+head(income_2018_bystate,10)
+```
+
+Our final data frames with which the majority of the analysis will be used are the *earnings* and *income_2018_bystate*. From each of these we can evaluate the median earnings of education by state but they differ in a few details. 
+
+In the *income_2018_bystate* the earnings variables are medians but include all the wage earners of the population. Therefore, it also lists the total population of each state, median earnings by gender and education by those same states, as well as the margins of error for each relevant statistic provided by the ACS. The geographic identifier of each state and the District of Columbia was also included as an option for visualizing the data further into the analysis. We extract from this basic data set the remaining subsets of the data frame that as necessary.  
+
+```{r}
+# Here we review the data as a whole for ACS. Since all states have
+# larger incomes for males we can find the proportion of a females
+# income to that of a males across the states. The mean dollar amounts
+# are listed in the "Obs_diff" column.
+kable(head(pop_obs[,c(1,5,6)], 5))
+```
+
+The *earnings* data frame lists the minimum necessary to perform the gender wage gap analysis. A sample is provided in the table below where the first 3 states are listed with their data. The unique features of this data frame are the inclusion of Puerto Rico as a state (although it is not formally) and the different median annual earnings variables such as that of male and female full-time and earnings of those aged 25+ instead of only 16 and older. 
+
+```{r}
+head(earnings, 3)
+```
+
+From the data frame we calculate multiple new variables such as the observed difference in wages by gender, the proportion of median female earnings to median male earnings in categories consistent with the literature.    
+
+## Analysis
+
+First, we determine the presence or absence of a difference in the entire sample from the ACS. This provides a baseline set of information to build upon. We can then compute the observed differences between males and females average earnings in each state to examine the patterns among the states. With that, we can show the presence of a difference in earnings of male and female Americans in 2018 that has been observed in plethora of peer-reviewed studies. 
+
+As mentioned, there are several ways to approach this. We have the median annual earnings from those who are 16 years of age and older, 25 years and older, and those who are considered full-time workers with any income within the year. Since the literature often cites full-time workers earnings weekly or annually, we will follow their example. 
+
+```{r}
+pfm.ft <- earnings %>% 
+  summarise(Pfm_ft = mean(fft)/mean(mft))
+pfm.ft <- round(pfm.ft, digits = 4)
+pfm.ft
+```
+
+The proportion of the median wages of full-time female earners to full-time male earners in 2018 is `r pfm.ft`. Importantly, this statistic is considered *raw* by the standards of the literature due to its unadjusted features in the calculation. All variables that may influence the calculation of this proportion are included, regardless of consideration to the applicability of the statistic to the terms "equal pay for equal work". In this analysis, unequal worker pay and majority-gender occupations and industries are considered because it is necessary to understand the scope of differences between men and women in this study.  
+
+```{r echo=FALSE}
+earnings <- earnings %>% 
+  mutate(dif.ft = mft - fft) %>% 
+  mutate(dif.16 = m16 - f16) %>%
+  mutate(dif.25 = m25 - f25) %>% 
+  mutate(Pft = fft/mft) %>%
+  mutate(P16 = f16/m16) %>%
+  mutate(P25 = f25/m25) 
+max.pft <- summary(earnings$Pft)[6]
+```
+
+
+Differences in the median earnings of each gender category are were calculated alongside the proportions of females and males. The proportion is found by observing how the female median earnings compare to the male median earnings. This is because the median male earnings were always larger than the median female earnings for the categories. The only exception to this rule is in Puerto Rico where the median earnings of women who work full time is slightly higher than median male earnings by `r (max.pft -1)*100` percent. 
+
+```{r}
+earnings <- earnings %>% 
+  mutate(dif.ft = mft - fft) %>% 
+  mutate(dif.16 = m16 - f16) %>%
+  mutate(dif.25 = m25 - f25) %>% 
+  mutate(Pft = fft/mft) %>%
+  mutate(P16 = f16/m16) %>%
+  mutate(P25 = f25/m25) 
+max.pft <- summary(earnings$Pft)[6]
+```
+
+Given the other factors that are part of this exception, we will omit Puerto Rico from this analysis of the states. If the statehood status were to change and these values were to be included into the results, the data would shift towards a less realistic expectation of the experiences of individuals across the 50 states and District of Columbia. Summary statistics for each of the categories common to the states are displayed alongside with Puerto Rico separately.  
+
+```{r}
+earnings[which.max(earnings$Pft),]
+earnings <- earnings[1:51,]
+earnings.summary <- summary(earnings[2:7])
+education.summary <- summary(earnings[8:17])
+kable(earnings.summary)
+```
+
+
+
+```{r include=FALSE}
+earnings.summary
+mft.mean <- 52437
+fft.mean <- 41668
+mft.med <- 51477
+fft.med <- 39967
+m16.med <- 39570
+f16.med <- 26936
+m25.med <- 45873
+f25.med <- 31575
+
+ft.mean.dif <- mft.mean - fft.mean
+ft.med.dif <- mft.med - fft.med
+education.summary
+mlt.med <- 28353
+mlt.max <- 37429
+mlt.min <- 23782
+flt.med <- 17509
+flt.max <- 22943
+flt.min <- 13994
+mhs.med <- 36868
+mhs.max <- 44567
+mhs.min <- 30959
+fhs.med <- 23916
+fhs.max <- 29586
+fhs.min <- 20875
+mas.med <- 44162
+mas.max <- 53070 
+mas.min <- 37693
+fas.med <- 29575
+fas.max <- 37502
+fas.min <- 24306
+mbs.med <- 62715
+mbs.max <- 79459  
+mbs.min <- 50625
+fbs.med <- 41833
+fbs.max <- 60319 
+fbs.min <- 33735
+mms.med <- 81613
+mms.max <- 107362  
+mms.min <- 64379
+fms.med <- 56662
+fms.max <- 84124
+fms.min <- 48650 
+```
+
+
+Full time earnings of males and females in the 50 states and District of Columbia have a median of `r dollar(m16.med)` and `r dollar(f16.med)` for those 16 and older, `r dollar(mft.med)` and `r dollar(fft.med)` for those employed full-time with earnings in the past 12 months, along with `r dollar(m25.med)` and `r dollar(fft.med)` for those age 25 and older. Taking the difference of these medians and proportioning them create a new variable called the observed difference and proportion of median female earnings to male earnings. In the table these are abbreviated to *obs_dif* and *P'x'* where 'x' can take the place of the variable full-time ('ft'), the number 16 for those with earnings aged 16 and older, or 25 for those with earnings that are age 25 and older in these calculations. 
+
+```{r}
+kable(earnings[,c(1,18:23)])
+```
+
+Observations made here display a trend of decreasing proportions of median female to male earnings as we change the variables from those with full-time employment to those who may not be employed full time. Between the ages of 16 and 25, the likelihood of being employed full-time is lower than for those who are 25 and older. However, there appears to be enough individuals not employed full-time in the 25 and up age group to cause the proportion of 25 and older to drop lower than for the category of full-time wage earners. We could speculate on a number of factors that could cause this but for now, we should only recognize this trend as it pertains the analysis of education across the gender wage gap. 
+
+The same process is used when computing the observed differences, proportions, and mean of proportions in the median earnings of educational attainment of individuals in this study. We organize the categories using abbreviations of science degrees for simplicity in visualizing. They are in no way exclusive and do not fully capture the depth of the data collected by the ACS. The ACS includes all educational attainment in the categories of *less than high school diploma*, *high school diploma*, *some college or an associates degree*, *bachelors degree*, and *graduate or professional degree*. We abbreviate these as LTHS, HS, AS, BS, and MS respectively. 
+
+```{r}
+male_earnings_byedu <- mf_earnings_byedu %>% 
+  filter(Sex == "Male")
+female_earnings_byedu <- mf_earnings_byedu %>% 
+  filter(Sex == "Female")
+mf_earn_ed <- cbind(male_earnings_byedu, female_earnings_byedu)
+mf_earn_ed <- mf_earn_ed[-4] %>%
+  rename(Median_M = AvgEarning, 
+         Median_F = AvgEarning.1,
+         Sex.M = Sex, 
+         Sex.F = Sex.1) %>% 
+  mutate(Pfm = Median_F / Median_M) %>% 
+  mutate(obs_dif = Median_M - Median_F) %>% 
+  mutate(Mean_Pfm = mean(Pfm))
+mf_earn_ed
+```
+
+
+
+Through this table, it is clear that education increases the mean earnings of each gender and that the proportion of mean female to male earnings also increases with it. This can be read as the values where the proportion of mean female to male earnings changes from `r dollar(mf_earn_ed[1,7])` with less than a high school diploma to `r dollar(mf_earn_ed[5,7])` with a graduate degree. This is a decrease in the wage gap by `r dollar(mf_earn_ed[5,7] - mf_earn_ed[1,7])` percentage points. 
+
+Another pattern in this data show that as education attainment level increases, so too does the observed difference in dollars. That is, as the earnings of both genders increase with higher levels of education, the dollar amount of earnings that a male earns starts and increases at a greater rate than females. We can also visualize this in few ways. 
+
+This chart displays how a higher levels of education attainment results in higher median earnings. In this case, the earned wages are displayed as weekly earnings starting with zero and extending to nearly $1,500.00 for the higher educational attainment category listed in this analysis, the master's degree. Importantly, this data takes the mean of the median average earnings to calculate its weekly earnings, making it slightly different than the commonly discrete median or mean selected in literature.  
+
+```{r}
+mf_earnings_byedu %>% 
+  group_by(Education) %>%
+  mutate(Mean_Earnings = mean(AvgEarning)) %>%
+  filter(Sex == "Male") %>%
+  mutate(AvgEarn_wkdollars = Mean_Earnings / 48) %>%
+  ggplot( aes(x = reorder(Education, AvgEarn_wkdollars), y = AvgEarn_wkdollars)) + 
+  geom_col(aes(fill = Education)) + 
+  labs(x = "Education", 
+       y = "Weekly Earnings ($)", 
+       title = "Average Income by Education in the U.S.", 
+       subtitle = "Using the Mean of Indiviudal Earnings in 2018", 
+       caption = "Data orginates from the ACS") +
+  theme_classic() + 
+  coord_flip() +
+  theme(legend.position = "none",
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+Information from the chart can also be displayed as annual earnings. To make things easier, that conversion has already been completed in the following chart. Note that these annul earnings also use the mean of the median. Results will vary slightly from commonly accepted values. 
+
+```{r}
+mf_earnings_byedu %>% 
+  group_by(Education) %>%
+  mutate(Mean_Earnings = mean(AvgEarning)) %>%
+  filter(Sex == "Male") %>%
+  ggplot( aes(x = reorder(Education, Mean_Earnings), y = Mean_Earnings)) + 
+  geom_col(aes(fill = Education)) + 
+  labs(x = "Education", 
+       y = "Annual Earnings ($)", 
+       title = "Average Income by Education in the U.S.", 
+       subtitle = "Using the Mean of Indiviudal Earnings in 2018", 
+       caption = "Data orginates from the ACS") +
+  theme_classic() + 
+  coord_flip() +
+  theme(legend.position = "none",
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+
+Another useful comparison of the median earnings of gender by each level of educational attainment is through this column chart. The same categories are used for the levels of education and median male and female annual earnings are reported for all individuals with any earnings in 2018.
+
+
+```{r}
+ggplot(mf_earnings_byedu, aes(x = reorder(Education, AvgEarning), y = AvgEarning, fill = Sex)) + 
+  geom_col(position = "dodge") + 
+  ylim(0,100000) +
+  labs(x = "Education", 
+       y = "Annual Earnings ($)", 
+       title = "Average Income by Sex in the U.S.", 
+       subtitle = "Using the Median of Indiviudal Earnings in 2018", 
+       caption = "Data orginates from the ACS") +
+  theme_classic() + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+From this column chart we observe that in every mean of every education type, the male earnings bar in blue is taller than the bars of female earnings in red. Since each bar represents the median annual earnings of the individuals in each category of education, this visually displays how the annual earnings of females does not meet the median male earnings at any education level. Although, the median earning of females do increase with higher levels of education. A boxplot adds some detail to this. 
+
+```{r}
+ggplot(mf_state_obsdiffs, aes(x = reorder(Observation,Difference), y = Difference)) + geom_boxplot(aes(fill = Observation)) + 
+  ylim(0,45000) +
+  scale_fill_discrete(name = "Education", labels = c("<HS", "HS", "AS", "BS", "MS")) +
+  labs(x = "Education",
+       y = "Annual Earnings ($)",
+       title = "Observed Differences in Earnings",
+       subtitle = "Using the Median of Indiviudal Earnings in 2018",
+       caption = "Data orginates from the ACS") +
+  theme_classic() +
+  theme(axis.text.x = element_blank(),
+        plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5), 
+        plot.subtitle = element_text(hjust = 0.5))
+
+```
+
+As the level of education increases, so too do the average annual earnings of individuals. This boxplot also shows that the variation of individuals' earnings may increase with higher levels if education attainment too. Further research is needed to test these hypotheses and compare but strong trends are present. 
+
+To break the information into localized segments, the differences in individual earnings by state can be shown in the following chart. Only the states with the highest 5 and lowest 5 differences in earnings were selected for clarity. The states with the highest differences can be thought of as having a wider earnings gap. The reverse applies for the lowest where their earnings gap can be thought of as narrower relative to the rest of the states.
+
+
+```{r}
+ggplot(hilo_obs, aes(x = reorder(State, -Obs_diff), y = Obs_diff)) + 
+  labs(x = "State", 
+       y = "Mean Difference ($)", 
+       title = "Differences in Average Earnings by State",
+       subtitle = "Includes all sexes and education levels") +
+  geom_col(aes(fill=Gap)) + 
+  coord_flip() + 
+  theme_classic() + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+With the observational differences computed and the types of gap labeled based on the average median (or the median of the medians) we can see that there is not as much of change between those states with a wide gap and other states with wide gaps. The range of these wide gap states is `r dollar(max(top5[,5]) - min(top5[,5]))` with a maximum observed difference of `r dollar(max(top5[,5]))` and a minimum of `r dollar(min(top5[,5]))`. They have a mean proportion of female to male annual earnings of `r round(mean(top5$Pmf), digits = 4)`.   
+
+The same pattern applies to the states with narrowest gap having an observed maximum difference of `r dollar(max(low5[,5]))`, minimum of `r dollar(min(low5[,5]))` and range of `r dollar(max(top5[,5]) - min(top5[,5]))` when compared against other states with relatively narrow differences in wage compared to other states. The mean proportion of female to male annual earnings of `r round(mean(low5$Pmf), digits = 4)` which is lower because the states themselves have a narrower gap in their earnings by gender overall. 
+
+In contrast, the difference between the gender wage gaps of narrow an wide states is greater than the range of the wide or narrow gaped states when compared within groups. The range of all 10 selected states is `r dollar(max(hilo_obs[,5]) - min(hilo_obs[,5]))` with a maximum observed difference of `r dollar(max(hilo_obs[,5]))` and minimum of `r dollar(min(hilo_obs[,5]))`. This represents the full range of all states since the data frame includes the highest and lowest observational values of each state's gender gap type. A full table of these select states is shown below.
+
+
+```{r}
+hilo_obs
+```
+
+Notice that the proportion of earnings is not always higher when the observed difference in earnings is high. The same applies to states where the observed difference in earnings is low, the resultant proportion is not always lower. 
+
+
+For example in the state of `r hilo_obs[1,1]` where the observed difference in wage is `r dollar(hilo_obs[1,5])` there is a proportional gap of `r round(hilo_obs[1,6], digits = 3)`. Now we observe the state of `r hilo_obs[4,1]` with an observational difference of `r dollar(hilo_obs[4,4])`. If trends were to hold steady, then the the proportional gap of `r hilo_obs[4,1]` should show a proportion approximately equal to `r hilo_obs[1,1]` or around `r round(hilo_obs[1,6], digits = 3)`. However, when reviewing the data we see that the trend is not as steady as originally thought. The proportional wage gap of `r hilo_obs[4,1]` with an observational difference of `r dollar(hilo_obs[4,4])` has a proportion of `r round( hilo_obs[4,6], digits =3)` that is not approximately equal to the state of `r hilo_obs[1,1]`. In fact, the state of `r hilo_obs[2,1]` is the only other proportion that is nearly equal to what this observational difference should be with a proportion of `r round(hilo_obs[2,6], digits = 3)` yet its observational difference is `r dollar(hilo_obs[2,5])`. 
+
+This could be due to random variation or the unique span of ranges between male and female populations of each state. Regardless, it seems to suggest that the observed difference is dollars between median male and female earning is not always an exact indicator of the gender wage gap. Given that the gender wage gap is measured by the difference in the median earnings between males and females, such a phenomenon presents a challenge in determining the significance of gender wage gaps by state. 
+
+Take another look at the gender wage gap by type. Keep in mind that both boxes represent a difference in the gender wages with their only differences stemming from their distribution and magnitude. 
+
+
+```{r}
+ggplot(hilo_obs, aes(x = Gap, y = Obs_diff, fill = Gap)) +
+
+  labs(x = "Relative Gap Type", 
+       y = "Mean Difference ($)", 
+       title = "Differences in Average Earnings in US", 
+       subtitle = "Includes all sexes and education levels") +
+
+  geom_boxplot() + 
+  theme_classic() + 
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5)) + 
+  coord_flip()
+
+```
+
+
+Aside from the large gap between these two boxes, observe their distributions. States that contain relatively narrow gaps also seem to be more tightly distributed with a median located at high observational differences within in its interquartile range. On the bottom side in red, we see how wider gender wage gaps at the state level result in a looser distribution with greater upper range, little to no range below it interquartile and its median has situated itself much lower within its interquartile range. These larger differences in distribution may be stronger influencing factor on wages than previously considered. 
+
+As it stands in the boxplots, the difference in states gender wage gap exhibits a stretching of features that might be worthy of consideration for inference. The lower tail of the narrow states' distribution extends farther than it upper tail. Simultaneously, the lower tail of the wide states' distribution is shorter than its elongated upper tail. Each gap type appears as though their medians have been dragged in opposite directions. The narrow gap states whole distribution is getting pushed down while it median tried to maintain itself in one position. Again at the same time, the wider gap states whole distribution is being pulled up but the factors controlling this shift remain unknown.  
+
+
+## Inference
+
+The benchmark for this unadjusted full-picture gender wage gap analysis is `r round(pfm.ft, digits = 3)` which suggests that women earn about `r round(pfm.ft*100, digits = 3)` percent of the median annual earnings of men on average. With this we can infer that the gender gap in 2018 is approximately `r round(1-pfm.ft, digits = 3)` using the median annual earnings of full-time men and women for its calculation. We can evaluate the significance of education at increasing the individuals median earnings but not the causality. 
+
+Our null hypothesis is that there is no effect on the median annual earnings of males and females in 2018 with higher education. Alternatively, would reject this null if there is an effect on median annual earnings of males and females in 2018 with higher education. We select the median observed differences of male and female variables in which the individuals education levels are categorized as having less than a high school diploma, having a high school diploma, an associates degree, bachelors degree, or masters degree for this inference. 
+
+```{r}
+mfdif.mean <- mf_state_obsdiffs %>% 
+  summarise(mean = mean(Difference))
+```
+
+
+The mean of the observed differences in earnings between genders in all educational categories is `r dollar(mfdif.mean$mean)`. 
+
+Before proceeding, refer to the observed differences boxplot with median individual earnings categorized by education level from each state. These differences measured the specific amount of dollars that separated male and female earnings in 2018. It is clear from that figure that higher education does increase the average earnings of individuals as the individual attains higher levels of education. We evaluate the likelihood that this trend is random chance with an analysis of variance (anova) which will compare the differences in means across each education level. 
+
+
+```{r}
+mfobs.mean <- mf_stateobs[1:510,] %>% 
+  summarise(mean = mean(Observation))
+mfobs.anova <- anova_test(mf_state_obsdiffs, Difference ~ Observation)
+mfobs.anova
+```
+
+
+We may infer from the results of the anova that this trend is significant at a level of 0.0001 with an p-value of `r round(mfobs.anova$p, digits=5)` and f-value of `r round(mfobs.anova$F, digits=5)`. These indicate that the trend of increasing earnings with higher education is extremely unlikely to have occurred by chance. Another method of visualizing this is with the earnings in each category of male and female education levels plotted by each state. 
+
+
+```{r}
+ggplot(mf_stateobs[1:510,], aes(ID - 1, Observation)) + geom_point(aes(color = Category)) + 
+  geom_hline(yintercept = mfobs.mean$mean)+ 
+  labs(x = "State ID", 
+       y = "Earnings ($)", 
+       title = "Earnings by State", 
+       subtitle = "Includes all sexes and education levels", 
+       caption = "Data source: ACS survey") +
+  coord_flip() +
+  theme_classic() +
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+
+The solid black line displays the mean earnings of all individuals in this study while the ID is a numerical representation of the state  with the District of Columbia included. The median earnings of each individuals income calculated for each state is used to produce one point on the scatterplot. 
+
+Those that are above the line have above average income and tend to have higher levels of education. Perhaps most notably in this figure, we see males and females that have less than a high school diplomas sit more closely and tightly packed together with lower earnings toward the bottom of the figure. Higher earners are more educated and spread out with greater variation in their medians for each state. Here again, the trend shows that with higher education levels, higher earnings are likely. 
+
+Another analysis of variance can determine the significance of the difference in male and female earnings of each education category by state. Using the the same scatterplot, we would look to see how well the colors of the points line up in a singular bar (with upper and lower bounds) with one another. If each state had exactly the same observed differences in earnings by education then a perfectly ordered block of a single color would show for each education level. This does not appear to occur. 
+
+We can infer from the figure that there are differences in the observations of earnings for each state. We have already noted the top 5 states with the highest wage gap and the lowest 5 states with the narrowest gap. We can use the information from that analysis to determine the difference in every state. Using the observations of both genders presented in each category of this data set, we calculate the observed differences modeled by each state. 
+
+
+```{r}
+mfstobs.anova <- anova_test(mf_stateobs[1:510,], Observation ~ ID)
+mfstobs.anova
+```
+
+Our null hypothesis of this section would be that there is no significant difference by state in the observed differences of earnings by education. Alternatively, if this hypothesis were proven incorrect, we could say that this a significant difference in the observed differences of earnings by education in the states of the United States. However, this is not the case and we fail to reject the null hypothesis. 
+
+With an F-value of `r round(mfstobs.anova$F, digits=5)` and p-value of `r round(mfstobs.anova$p, digits=5)` the results of this hypothesis test are not significant and the variation in the median earnings of each education level by state is likely due to chance.
+
+
+Now we can review all states by their ID values. These values were assigned to the states in alphabetical order starting with Alabama and include the District of Columbia. The darker the shade of blue the earlier the state occurs in the alphabetical list. 
+
+
+```{r}
+ggplot(mf_stateobs[1:510,], aes(Observation, Category, color = ID)) + 
+  geom_point() + 
+  geom_vline(xintercept = mfobs.mean$mean) + 
+  labs(x = "Earnings ($)", 
+       y = "Category", 
+       title = "Earnings by State", 
+       subtitle = "Includes all sexes and education levels", 
+       caption = "Data source: ACS survey") +
+  theme_classic() +
+  theme(plot.caption = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5))
+```
+Variables in the category of female start with an F, followed by the abbreviation for their education level. The same rule applies to male categories and both are concentrated on the upper and lower halves of the chart. 
+
+It appears as though there might be a cluster of slightly darker points on the right side of the data for the female education categories of *less than high school*, *high school*, and *some college or an associates degree*. However, the same does not occur for the rest of female education categories nor any male category. Additionally, there are a few darker points located on the far left sides of the data in these categories and they all seem to be randomly spread throughout as depicted in the results of the analysis of variance. 
+
+
+## Conclusion
+
+Through an analysis of variance on the observed differences in wages at the educational levels of less than high school, high school, some college or associates degree, bachelors degree, masters or graduate degree, we can conclude that higher levels of education did increase the average annual earnings of males and females age 25 and older in 2018. However, we were unable to prove that results at the state level were significantly different from one another, suggesting no state has reduced its wage gap beyond that of random variation in the same year. 
+
+Results for the increase in earnings by higher education attainment were significant at the 0.0001 level with a p-value of `r round(mfobs.anova$p, digits=5)` and f-value of `r round(mfobs.anova$F, digits=5)`. Higher education has a strong correlation with higher average earnings. Variations in this data is extremely unlikely to have occurred by chance. 
+
+Results for the difference in earnings by state suggest that any variation in the observed differences in wages or proportions of female to male earnings is likely to have occurred by chance. It had a p-value of `r round(mfstobs.anova$p, digits=5)` and thus is not significant at the 0.05 alpha level. The associated f-value `r round(mfstobs.anova$F, digits=5)` being very near 1 demonstrates the increased probability that there is no state with a significant difference in the wage gap.  
+
+```{r include = FALSE, echo = FALSE}
+earnings.summary
+mft.mean <- 52437
+fft.mean <- 41668
+mft.med <- 51477
+fft.med <- 39967
+ft.mean.dif <- mft.mean - fft.mean
+ft.med.dif <- mft.med - fft.med
+education.summary
+mlt.med <- 28353
+mlt.max <- 37429
+mlt.min <- 23782
+flt.med <- 17509
+flt.max <- 22943
+flt.min <- 13994
+mhs.med <- 36868
+mhs.max <- 44567
+mhs.min <- 30959
+fhs.med <- 23916
+fhs.max <- 29586
+fhs.min <- 20875
+mas.med <- 44162
+mas.max <- 53070 
+mas.min <- 37693
+fas.med <- 29575
+fas.max <- 37502
+fas.min <- 24306
+mbs.med <- 62715
+mbs.max <- 79459  
+mbs.min <- 50625
+fbs.med <- 41833
+fbs.max <- 60319 
+fbs.min <- 33735
+mms.med <- 81613
+mms.max <- 107362  
+mms.min <- 64379
+fms.med <- 56662
+fms.max <- 84124
+fms.min <- 48650 
+```
+
+
+On average across this entire study, females working full-time make `r dollar(ft.med.dif)` less than males per year. For females in their prime working ages of 25 to 54, this could result in a difference of `r dollar(ft.med.dif*29)` over this 29 year span if trends in observed differences held constant. For reference, the average male earns `r dollar(mft.med)` per year and would accumulate `r dollar(mft.med*29)` over the same working duration if variables remained constant.   
+
+For both males and females education is likely to improve their average earnings but it does not mitigate the observed differences in earnings between men and women. Instead, the observed differences (the gap) increase with higher education. 
+
+For example, those in the category with the lowest level of education attainment earned `r dollar(mlt.med)` for males and `r dollar(flt.med)` for females on average. This is a difference of `r dollar(mft.med - fft.med)` for those with less than a high school education. Apply this to the the highest category of education, those with a master or graduate degree, and we see a difference of `r dollar(mms.med - fms.med)` with males having earned `r dollar(mms.med)` and females having earned `r dollar(fms.med)` dollars on average. 
+
+The range of the highest and lowest earnings for education is `r dollar(mms.med - mlt.med)` dollars for the average male and `r dollar(fms.med - flt.med)` dollars for the average female. This difference implies female earnings are distributed less widely than males. Additionally, there is a smaller gap in earnings at lower levels of education and lower earnings.
+
+These results are unadjusted and include individuals choices of occupation, differences in experience levels, hours worked, salary negotiations, and all other variables associated with the earnings of individuals in United States. This analysis depicts a more realistic view of the gender wage gap in the United States for the year 2018 and elucidates some common misconceptions about education's effect on the gender wage gap in the United States. 
+
+
+## References
+
+Blau, D. F., Kahn, M. L. (2000). Gender Differences in Pay. Journal of Economic Perspectives. 14(4) 75-99  doi:10.1257/jep.14.4.75
+
+Bleiweis, Robin. (2020, March 24). Quick Facts about the Gender Pay Gap. Center for American Progress. Retrieved from https://cdn.americanprogress.org/content/uploads/2020/03/23133916/Gender-Wage-Gap-.pdf?_ga=2.138595639.58056853.1606596914-958559537.1606596914
+
+Bureau of Labor Statistics. (2018, April). Measuring the value of education : Career Outlook. Retrieved from https://www.bls.gov/careeroutlook/2018/data-on-display/education-pays.htm
+
+Bureau of Labor Statistics (2017, August). Rep. No. 1069. Highlights of women’s earnings in 2016. Retrieved https://www.bls.gov/opub/reports/womens-earnings/2016/home.htm
+
+Card, D. (2000). The causal effect of education on earnings. Dept. of Economics, University of California, Berkeley. Retrieved from https://eml.berkeley.edu/~card/papers/causal_educ_earnings.pdf
+
+Graf, N., Brown, A., &amp; Patten, E. (2020, August 14). The narrowing, but persistent, gender gap in pay. Pew Research Center. Retrieved from https://www.pewresearch.org/fact-tank/2019/03/22/gender-pay-gap-facts/
+
+Gould, R. (2016, October 20). What is the gender pay gap and is it real?: The complete guide to how women are paid less than men and why it can't be explained away. Economics Policy Institute. Retrieved from https://www.epi.org/publication/what-is-the-gender-pay-gap-and-is-it-real/
+
+Hamidullah, M. F., Riccucci, N. M., &amp; Lee, I. P. (2020). Citizens’ perceptions of closing the gender pay gap: An experimental study. Public Management Review, 1-24. doi:10.1080/14719037.2020.1722207
+
+Hegewisch, A.,Heidi Hartmann, P. (2020, August 25). The Gender Wage Gap: 2018 Earnings Differences by Race and Ethnicity. Retrieved from https://iwpr.org/iwpr-general/the-gender-wage-gap-2018-earnings-differences-by-race-and-ethnicity/
+
+Lewis, G. B., Boyd, J., Pathak, R. (2017). Progress toward Pay Equity in State Government. Public Administration Review, 78(3), 386-397. doi:10.1111/puar.12897
+
+The Equal Pay Act of 1963. (n.d.). Retrieved from https://www.eeoc.gov/statutes/equal-pay-act-1963
+
+U.S. Census Bureau. (2020, August 27). Methodology. Retrieved December 01, 2020, from https://www.census.gov/programs-surveys/acs/methodology.html
+
+Gould, Elise. (2019, February 20). State of Working America Wages 2018: Wage inequality marches on-and is even threatening data reliability. Economic Policy Institute. Retrieved from https://www.epi.org/publication/state-of-american-wages-2018/ 
+

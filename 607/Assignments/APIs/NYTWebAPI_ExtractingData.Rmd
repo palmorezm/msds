@@ -1,0 +1,111 @@
+---
+title: "Web APIs"
+author: "Zachary Palmore"
+date: "10/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Directions
+
+The New York Times web site provides a rich set of APIs, as described here:
+https://developer.nytimes.com/apis
+
+You’ll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it into an R DataFrame
+
+### Tools
+
+```{r}
+library(tidyr)
+library(jsonlite)
+library(tidyverse)
+library(devtools)
+devtools::install_github("mkearney/nytimes")
+```
+
+```{r}
+NYT_Key <- "qGBdM2VExnQOTf8KHm3HJZFAxphMWdUW"
+```
+
+
+
+I have access to movies and most popular APIs
+
+### Extract JSON
+
+```{r}
+# What to search for:
+term <- "data+science" # Should be plenty on this
+begin_date <- "20200101" # Date formatted yyyymmdd
+end_date <- "2020201"
+
+# First run
+nytpopulars <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term,
+                  "&begin_date=",begin_date,"&end_date=",end_date,
+                  "&facet_filter=true&api-key=",NYT_Key, sep="")
+nytpopulars
+DJTtxt <- fromJSON(nytpopulars)
+
+# Status and should be OK and copyrights *should all say NYT 
+DJTtxt$status
+DJTtxt$copyright
+
+# How many pages of articles are there?
+DJTtxt$response$meta$hits # 54,857
+
+# Some Math
+# 54,857/10 = 5,485.7 with the pages starting at 0
+totalpgs <- round((DJTtxt$response$meta$hits[1] / 100)-1) 
+```
+
+
+```{r}
+DJTlist <- list()
+for(i in 0:totalpgs){
+  djtreq <- fromJSON(paste0(nytpopulars, "&page=", i), flatten = TRUE) %>% data.frame() 
+  message("Retrieving page ", i)
+  DJTlist[[i+1]] <- djtreq
+  Sys.sleep(2) 
+}
+```
+
+
+```{r}
+Panthertxt <- fromJSON("https://api.nytimes.com/svc/movies/v2/reviews/search.json?query=panther&api-key=qGBdM2VExnQOTf8KHm3HJZFAxphMWdUW")
+Pantherlist <- list()
+# Number of results
+num_results <- Panthertxt$num_results
+
+for(i in Panthertxt){
+  dat <- fromJSON((Panthertxt), flatten = TRUE) %>% data.frame() 
+  message("Retrieving page ", i)
+  Pantherlist[[i+1]] <- dat
+  Sys.sleep(1) 
+}
+dat <- fromJSON((readlines(Panthertxt), flatten = TRUE))
+```
+
+
+### Tidy Text
+
+
+
+```{r}
+# If we had multiple pages:
+DJT_articles <- rbind_pages(pages)
+# The ratings of movies with word "panther" do not
+```
+
+
+```{r}
+as.data.frame(Pantherlist)
+```
+
+
+
+

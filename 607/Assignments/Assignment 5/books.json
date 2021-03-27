@@ -1,0 +1,10 @@
+{ 
+   "ID":["1","2","3"],
+   "Title":["Magical Mushrooms and Mischeivous Molds","Ecological Restoration","Environmental Science" ],
+   "Author1":["Hudler George W","Clewell Andre F","Cunningham William P"],
+"Author2":["NA","James Aronson","Cunningham Mary Ann"],
+   "PublishYr":[ "1998","2007","2008"],
+   "Edition":[ "NA","NA","10"],
+	"Subject":[ "Nature","Nature","Nature"],
+"Statement":[ "The remarkable story of the fungus kingdom and its impact on human affairs","Priciples, Values, and Structure of an Emerging Profession","A Global Concern"]
+}

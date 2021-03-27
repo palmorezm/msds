@@ -1,0 +1,9 @@
+{ 
+   "ID":["1","2","3"],
+   "Title":["Magical Mushrooms and Mischeivous Molds","Ecological Restoration","Environmental Science A Global Concern" ],
+   "Author1":["Hudler George W","Clewell Andre F","Cunningham William P"],
+"Author2":["NA","James Aronson","Cunningham Mary Ann"],
+   "PublishYr":[ "1998","2007","2008"],
+   "Edition":[ "NA","NA","10"],
+	"Subject":[ "Nature","Nature","Nature"]
+}

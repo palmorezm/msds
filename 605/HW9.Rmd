@@ -1,0 +1,86 @@
+---
+title: "HW9"
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+author: "Zachary Palmore"
+date: "3/18/2021"
+output:
+  pdf_document: 
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Part 1
+
+### Page 363 Question 11
+
+The price of one share of stock in the Pilsdorff Beer Company (see Exercise 8.2.12) is given by Yn on the nth day of the year. Finn observes that the differences Xn = Yn+1 − Yn appear to be independent random variables with a common distribution having mean µ = 0 and variance σ 2 = 1/4. If Y1 = 100, estimate the probability that Y365 is
+
+$$(a) \geq 100$$
+
+```{r}
+1-pnorm((100-100)/(0.5*sqrt(365-1)))
+```
+
+$$(b) \geq 110$$
+
+```{r}
+1-pnorm((110-100)/(0.5*sqrt(365-1)))
+```
+
+$$(c) \geq 120$$
+
+```{r}
+1-pnorm((120-100)/(0.5*sqrt(365-1)))
+```
+
+
+## Part 2
+
+### Calculate the expected value and variance of the binomial distribution using the moment generating function. 
+
+$$Moment \hspace{4pt} Generating \hspace{4pt} Function$$ 
+$$g(t) = \sum^{n}_{j = 0}e^{tj}(\frac{n}{j})p^{j}q^{n-j}$$
+$$g(t) = \sum^{n}_{j = 0}(\frac{n}{j})(pe^{t})^{j}q^{n-j}$$
+$$g(t) = ((pe^{t}) + (q))^{n}$$
+
+$$Expected \hspace{4pt} Value$$
+
+$$\mu = g(0) = n(p + q)^{n - 1}p$$
+$$\mu = g(0) = np$$ 
+$$\mu = np$$
+
+$$Variance$$
+
+$$\sigma^{2} = n(n-1)p^2 + np - np^2$$
+$$\sigma^{2} = np((np - p) - np + 1)$$
+$$\sigma^2=np(1-p)$$
+
+The expected value of the binomial distribution using the moment generating function is $\mu=np \hspace{4pt} where \hspace{4pt} t=0$ and the variance is $\sigma^2=np(1-p)$. 
+
+## Part 3
+
+### Calculate the expected value and variance of the exponential distribution using the moment generating function.
+
+$$Exponential \hspace{4pt} Distribution$$ 
+$$= f_{X}(x) - \lambda e^{-\lambda x} \hspace{4pt}$$ 
+$$Moment \hspace{4pt} Generating \hspace{4pt} Function$$ 
+$$M_{X}(t) = \int^{\infty}_{0} e^{tx}f_{X}(x)d(x)$$
+$$M_{X}(t) = g(t) = \int^{\infty}_{0} e^{tx}\lambda e^{-\lambda x}d(x)$$
+$$g(t) = \frac{(\lambda e^{(t - \lambda) x})}{t - \lambda} \hspace{4pt} for \hspace{4pt} t \int^{\infty}_{0}$$
+$$g(t) = \frac{\lambda}{\lambda - t}$$
+
+$$g(t) = \frac{\lambda}{\lambda - t}$$
+$$g'(t) = \frac{\lambda}{(\lambda - t)^2}$$
+$$g'(t) = \frac{\lambda}{(\lambda^2)}$$
+$$g'(t) = \frac{1}{(\lambda)}$$
+$$g''(t) = \frac{2\lambda}{(\lambda- t)^3}$$
+$$g''(t) = \frac{2\lambda}{(\lambda- t)^3}$$
+$$g''(t) = \frac{2\lambda}{(\lambda)^3}$$
+$$g''(t) = \frac{2}{(\lambda)^2}$$
+
+The expected value of the exponential distribution using the moment generating function is $\mu= \frac{1}{\lambda}$ and the variance is $\sigma^2= \frac{1}{\lambda^2}$. 
+

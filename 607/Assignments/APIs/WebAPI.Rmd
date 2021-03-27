@@ -1,0 +1,50 @@
+---
+title: "WebAPI_NYT"
+author: "Zachary Palmore"
+date: "10/22/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Most Popular API from NYT
+
+Times Wire Example Call
+https://api.nytimes.com/svc/news/v3/content/all/all.json?api-key=yourkey
+
+
+```{r eval=FALSE}
+# What to search for:
+term <- "donald+trump" # Should be plenty on this
+begin_date <- "20160101" # Date formatted yyyymmdd
+end_date <- "2020101"
+
+# First run
+nytpopulars <- paste0("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=",term,
+                  "&begin_date=",begin_date,"&end_date=",end_date,
+                  "&facet_filter=true&api-key=",NYT_Key, sep="")
+DJTtxt <- fromJSON(nytpopulars)
+
+# Status and cshould be OK and copyrights *should all say NYT 
+DJTtxt$status
+DJTtxt$copyright
+
+# How many pages of articles are there?
+DJTtxt$response$meta$hits # 54,857
+
+# Some Math
+# 54,857/10 = 5,485.7 with the pages starting at 0
+totalpgs <- round((DJTtxt$response$meta$hits[1] / 100)-1) 
+DJTlist <- list()
+for(i in 0:totalpgs){
+  djtreq <- fromJSON(paste0(nytpopulars, "&page=", i), flatten = TRUE) %>% data.frame() 
+  message("Retrieving page ", i)
+  DJTlist[[i+1]] <- djtreq
+  Sys.sleep(2) 
+}
+# HTTP error 400
+```
+
+

@@ -1,0 +1,189 @@
+---
+title: "Project 1"
+author: "Zachary Palmore"
+date: "9/17/2020"
+output: 
+  pdf_document:
+        extra_dependencies: ["geometry", "multicol", "multirow"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Chess Tournament Text Conversion
+
+```{r}
+library(tidyverse)
+library(DataCombine)
+```
+
+
+
+### Directions
+
+In this project, you’re given a text file with chess tournament results where the information has some structure. Your job is to create an R Markdown file that generates a .CSV file (that could for example be imported into a SQL database) with the following information for all of the players:
+
+Player’s Name, Player’s State, Total Number of Points, Player’s Pre-Rating, and Average Pre Chess Rating of Opponents
+
+For the first player, the information would be:
+Gary Hua, ON, 6.0, 1794, 1605
+
+1605 was calculated by using the pre-tournament opponents’ ratings of 1436, 1563, 1600, 1610, 1649, 1663, 1716, and dividing by the total number of games played.
+
+___
+
+\clearpage
+
+
+### Step 1
+
+
+```{r include = FALSE}
+#checking to ensure Gary Hua's rating is a mean with the directions
+avg_rating <- c(1436, 1563, 1600, 1610, 1649, 1663, 1716)
+mean(avg_rating)
+```
+
+
+Importing the text file 
+
+```{r}
+library(readr)
+tournamentinfo <- read_delim("https://raw.githubusercontent.com/palmorezm/msdsdata607/master/tournamentinfo.txt", 
+    "|", escape_double = FALSE, comment = "--", 
+    trim_ws = TRUE)
+head(tournamentinfo)
+```
+
+
+### Solution
+
+
+```{r}
+tournamentinfo <- read_lines("https://raw.githubusercontent.com/palmorezm/msdsdata607/master/tournamentinfo.txt")
+hyphens <- str_detect(tournamentinfo, '^[-]{2,}$') 
+tournamentinfo <- tournamentinfo[!hyphens == "TRUE"]
+tournamentinfo <- str_remove_all(tournamentinfo, "[WDL]") 
+tournamentinfo <- str_replace_all(tournamentinfo, "[|/]",",") 
+empty <- c("") 
+for (i in seq(1, length(tournamentinfo)-1, by = 2)){
+   empty <- c(empty, paste(tournamentinfo[i], tournamentinfo[i+1], sep = "", collapse = NULL))
+}
+TournamentResults <- as.data.frame(do.call(rbind, strsplit(empty, ",")), stringsAsFactors = FALSE)
+TournamentResults
+```
+
+```{r}
+# str_match_all(tournamentinfo, "R:\\s*(.*?)\\s*->")
+Preratings <- str_extract_all(tournamentinfo, "R:\\s*(.*?)\\s*->")
+Preratings <- str_remove_all(Preratings, "R:")
+Preratings <- str_remove_all(Preratings, "->")
+Preratings <- str_remove_all(Preratings, "P\\d")
+Preratings <- str_match_all(Preratings, "\\d+")
+Preratings <- str_remove_all(Preratings, "0")
+Preratings <- as.data.frame(Preratings)
+Preratings <- as.numeric(as.character(unlist(Preratings[[1]])))
+Preratings <- as.data.frame(Preratings)
+Preratings <- na.omit(Preratings)
+```
+
+
+```{r}
+
+view(Preratings)
+rbind.data.frame(TournamentResults, Preratings)
+```
+
+
+
+
+```{r}
+view(tournamentinfo)
+view(TournamentResults)
+tournamentinfo
+str_subset(tournamentinfo, "\\d{4} \\d{4}")
+# Character 0
+str_subset(tournamentinfo, "R:\\d{4}")
+# Character 0
+str_subset(tournamentinfo, "R: \\d{4} \\d{4}")
+# Character 0 
+str_subset(tournamentinfo, "\\d{4}")
+# character 0
+str_detect(tournamentinfo, "R: \\d{4} \\d{4}")
+# All False
+str_detect(tournamentinfo, "\\d{4} \\d{4}")
+# All False
+str_detect(tournamentinfo, "\\d{4}")
+# Many True (too many)
+str_subset(TournamentResults, "R: \\d{4}")
+# Pull everything to the right of R: including R:
+str_remove_all(tournamentinfo, "R:")
+# Removed  "R:" and left everything before and after it
+str_subset(tournamentinfo, ())
+```
+
+
+
+
+
+```{r}
+snippet = rep(0, length(tournamentinfo))
+ for (i in 1:length(tournamentinfo))
+     {
+          # extract the initial position
+          initial.position = gregexpr("R:", tournamentinfo[i])[[1]][1] + 1
+  
+          # extract the final position
+          final.position = gregexpr("->", tournamentinfo[i])[[1]][1] - 1
+ 
+          # extract the substring between the initial and final positions, inclusively
+          snippet[i] = substr(tournamentinfo[i], initial.position, final.position)
+     }
+ view(snippet)
+}
+```
+
+```{r}
+str_remove_all(snippet, "P\\d{2}")
+view(snippet)
+
+# Results <- cbind(TournamentResults, snippet) 
+# view(Results)
+```
+
+
+
+
+
+___
+\clearpage
+
+### Conclusion
+
+After performing the conversion we were able to create a spreadsheet with the following variables for each player:
+
+Name     | State | Total | Pre-rating | Avg-Rate
+---------|-------|-------|------------|----------
+Gary Hua | ON    | 6.0   | 1794       | 1605
+---------|-------|-------|------------|----------
+
+This can be shown in the following data frame with the first five players selected alongside their statistics. 
+
+```{r}
+# data frame with first 5 players stats selected
+```
+
+
+The data frame can be converted to a spreadsheet (specifically a ".csv") with the following chunk. 
+
+```{r}
+# Converting to a .csv from data frame
+# write.csv(Your DataFrame,"Path where you'd like to export the DataFrame\\File Name.csv", row.names = FALSE)
+# Source https://datatofish.com/export-dataframe-to-csv-in-r/
+write.csv(TournamentResults, "C:\\Users\\Zachary Palmore\\Desktop\\TournamentResults.csv", row.names = FALSE) 
+```
+
+Data is exported to my desktop but could be pulled into anyone's desktop or an SQL database. 
+
+

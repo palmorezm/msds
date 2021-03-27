@@ -1,0 +1,257 @@
+---
+title: "HW6"
+author: "Zachary Palmore"
+date: "3/6/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+C <- function(n,k){ # create a function to compute the combination of choices
+  E <- (factorial(n))/(factorial(k)*(factorial(n-k))) # Equivalent to within 'n' pick 'k'
+  return(E)
+}
+P <- function(n,k){ # create a function to compute permutations
+  R <- (factorial(n)/factorial(n-k))
+  return(R)
+}
+```
+
+
+# Question 1
+
+A bag contains 5 green and 7 red jellybeans. How many ways can 5 jellybeans be
+withdrawn from the bag so that the number of green ones withdrawn will be less than
+2?
+
+```{r}
+g <- 5 # green jellybeans
+r <- 7 # red jellybeans
+n <- g + r 
+C(n,5) # total number of ways to pick out 5 jellybeans from the bag
+```
+
+
+```{r}
+C(7, 5) # within 7 red jellybeans pick 5 
+C(7, 4) # within 7 red jellybeans pick 4 
+C(7, 4)*5 # multiply it by 5 since there are 5 possibles ways to pick 1 green
+C(7,5) + C(7,4)*5 # Bring it all together
+q1 <- C(7,5) + C(7,4)*5
+```
+
+There are `r q1` ways.
+
+# Question 2
+
+A certain congressional committee consists of 14 senators and 13 representatives. How
+many ways can a subcommittee of 5 be formed if at least 4 of the members must be
+representatives?
+
+
+```{r}
+C(13, 4) # Pick 4 reps from the 13 available 
+C(13, 4)*14 # For each combination of reps, there are 14 potential senators
+           # (they just have to pick one of them but it does not matter which)
+C(13, 5) # Pick 5 reps from the 13 available
+sum(C(13,4)*14, C(13,5)) # Add outcomes together
+q2 <- sum(C(13,4)*14, C(13,5))
+```
+
+There are `r q2` ways. 
+
+# Question 3 
+
+If a coin is tossed 5 times, and then a standard six-sided die is rolled 2 times, and finally
+a group of three cards are drawn from a standard deck of 52 cards without
+replacement, how many different outcomes are possible?
+
+
+```{r}
+2^5 # 2 possibilities for each of 5 different tosses
+6^2 # 6 possibilities for each of 2 rolls
+C(52,3) # from 52 cards pick any 3 
+2^5 * 6^2 * C(52,3)
+q3 <- 2^5 * 6^2 * C(52,3)
+```
+
+There are `r q3` possible outcomes. 
+
+# Question 4
+
+3 cards are drawn from a standard deck without replacement. What is the probability
+that at least one of the cards drawn is a 3? Express your answer as a fraction or a
+decimal number rounded to four decimal places.
+
+
+```{r}
+PA <- 4/52 # Odds of pulling a 3 from the deck 
+PB <- 4/51 # Odds of pulling a 3 from the deck after pulling one and 
+        # assuming the 3 was not pulled from the deck
+PC <- 4/50 # Odds of pulling a 3 from the deck after pulling two and 
+        # assuming the 3 was not pulled from the deck
+q4 <- prod(PA, PB, PC)
+```
+
+The probability is about $\frac{1}{2000}$ or `r round(q4, digits=8)`.
+
+
+
+# Question 5 
+
+Lorenzo is picking out some movies to rent, and he is primarily interested in
+documentaries and mysteries. He has narrowed down his selections to 17
+documentaries and 14 mysteries.
+
+Step 1. How many different combinations of 5 movies can he rent?
+
+
+```{r}
+k <- 14 + 17 # total movies available
+q5.1<- C(k, 5) # from the 31 options pick 5 movies
+```
+There are `r q5.1` possible combinations.
+
+
+Step 2. How many different combinations of 5 movies can he rent if he wants at least
+one mystery?
+
+
+```{r}
+C(17, 4) # from 17 docs pick 4 
+o1 <- C(14, 5) # from 14 mysteries pick 5
+o2 <- C(14, 4) * C(17, 1) # from 14 mysteries pick 4
+         # with 17 options for one doc
+o3 <- C(14, 3) * C(17, 2) # from 14 mysteries pick 3 
+         # then pick 2 docs from 17 available
+o4 <- C(14, 2) * C(17, 3) # from 14 mysteries pick 4
+         # then pick 2 docs from 17 available
+q5.2 <- sum(o1, o2, o3, o4)
+```
+
+There are `r q5.2` possible combinations. 
+
+
+# Question 6 
+
+In choosing what music to play at a charity fund raising event, Cory needs to have an
+equal number of symphonies from Brahms, Haydn, and Mendelssohn. If he is setting up
+a schedule of the 9 symphonies to be played, and he has 4 Brahms, 104 Haydn, and 17
+Mendelssohn symphonies from which to choose, how many different schedules are
+possible? Express your answer in scientific notation rounding to the hundredths place.
+
+
+```{r}
+# Each must be 3 since they must be equal amounts of 3 in 9 
+b <- C(4,3) # from 4 pick 3 symphonies from Brahms
+h <- C(104, 3) # from 104 pick 3 symphonies from Haydn
+m <- C(17, 3) # from 4 pick 3 symphonies from Mendelssohn
+prod(b, h, m)
+q6 <- prod(b, h, m)
+```
+
+There are `r formatC(q6, format = "e", digits = 2)` possible schedules. 
+
+# Question 7 
+
+An English teacher needs to pick 13 books to put on his reading list for the next school
+year, and he needs to plan the order in which they should be read. He has narrowed
+down his choices to 6 novels, 6 plays, 7 poetry books, and 5 nonfiction books.
+
+Step 1. If he wants to include no more than 4 nonfiction books, how many different
+reading schedules are possible? Express your answer in scientific notation rounding to
+the hundredths place.
+
+
+```{r}
+c.1.1 <- C(5,4) # from 5 pick 4 nonfiction - no more than this
+c.1.2 <- C(19, 9) # from the rest of the books (nonfiction excluded) 
+        # pick 9 - any book will do from these
+c.2.1 <- C(5, 3) # from 5 pick 3 nonfiction
+c.2.2 <- C(19, 10) # from the rest of the books (nonfiction excluded)
+        # pick 10 - any book will do from these
+c.3.1 <- C(5, 2) # from 5 pick 2 nonfiction
+c.3.2 <- C(19, 11) # from the rest of the books (nonfiction excluded)
+        # pick 11 - any book will do from these
+c.4.1 <- C(5, 1) # from 5 pick 1 nonfiction
+c.4.2 <- C(19, 12) # from the rest of the books (nonfiction excluded)
+        # pick 12 - any book will do from these
+# add them to find the total combinations 
+q7.1 <- sum(c.1.1, c.1.2,c.2.1, c.2.2,c.3.1, c.3.2,c.4.1, c.4.2)
+```
+
+There are `r formatC(q7.1, format = "e", digits = 2)` possible schedules. 
+
+
+Step 2. If he wants to include all 6 plays, how many different reading schedules are
+possible? Express your answer in scientific notation rounding to the hundredths place.
+
+
+```{r}
+# total books with plays removed
+books <- sum(6,6,7,5)-6
+# assuming 18 total books after removing plays and because we pick only 13 
+# subtract 6 plays from our pick, 7 picks remain
+q7.2 <- C(books, 7) # from 18 pick 7 
+```
+
+There are `r formatC(q7.2, format = "e", digits = 2)` possible schedules. 
+
+
+# Question 8 
+
+Zane is planting trees along his driveway, and he has 5 sycamores and 5 cypress trees to
+plant in one row. What is the probability that he randomly plants the trees so that all 5
+sycamores are next to each other and all 5 cypress trees are next to each other?
+Express your answer as a fraction or a decimal number rounded to four decimal places
+
+
+
+```{r}
+q8 <- 2 / C(10, 5) # from 10 (5+5) positions there 5 random trees
+            # in which there is only 2 ways for both to line up in rows
+           # all cypress on one side and all sycamore on the other and its inverse
+```
+
+
+The probability is about `r round(q8, digits=4)`. 
+
+# Question 9
+
+If you draw a queen or lower from a standard deck of cards, I will pay you $4. If not, you
+pay me $16. (Aces are considered the highest card in the deck.)
+
+Step 1. Find the expected value of the proposition. Round your answer to two decimal
+places. Losses must be expressed as negative values.
+
+```{r}
+v.low <- 4 # value of low cards
+v.high <- 16 # value of high cards
+p.low <- 44/52 # probability of queen or lower 
+p.high <- 8/52 # probability of higher than queen
+e.low <- p.low * v.low 
+e.high <- p.high * v.high
+ev <- e.low - e.high 
+```
+
+The expected value is \$`r round(ev, digits=2)`. 
+
+
+Step 2. If you played this game 833 times how much would you expect to win or lose?
+Round your answer to two decimal places. Losses must be expressed as negative
+values.
+
+```{r}
+winings <- (833 * ev)
+```
+
+
+Expect to win about \$`r round(winings, digits=2)`
+
+If you pulled every single card in the deck you would make \$48 dollars. The kings and aces would need to cost about \$24 before an expected loss. 
+
+

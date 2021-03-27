@@ -1,0 +1,370 @@
+---
+title: "HW3"
+author: "Zachary Palmore"
+date: "2/8/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+header-includes: 
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+- \newcommand{\bleft}{\begin{flushleft}}
+- \newcommand{\eleft}{\end{flushleft}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r packages, warning = FALSE}
+library(pracma)
+```
+
+
+
+## Directions
+
+Complete the problems in each problem set. Be sure to show your work. Please show your work using an R-markdown document. Please name your assignment submission with your first initial and last name.
+
+\vspace{36pt}
+
+## Problem Set 1
+
+### (1) What is the rank of the matrix $A$?
+
+$$
+A = 
+\begin{bmatrix}
+1 & 2 & 3 & 4 \\ -1 & 0 & 1 & 3 \\ 0 & 1 & -2 & 1 \\ 5 & 4 & -2 & -3
+\end{bmatrix}
+$$
+
+Answer: 
+
+The rank of matrix $A$ is 4. 
+
+\vspace{36pt}
+
+
+Explanation: 
+
+First we create matrix A using this bit. 
+
+```{r PS1P1}
+A <- matrix(c(1, 2, 3, 4, -1, 0, 1, 3, 0, 1, -2, 1, 5, 4, -2, -3), 
+            ncol = 4, nrow = 4, byrow = TRUE)
+```
+
+With that, we reduce it. To do this we use a function built into the R-package "pracma" that performs the computation. In reduced row echelon form (RREF) matrix $A$ becomes:  
+
+```{r}
+rref(A)
+```
+
+Step by step, this found the factors of matrix $A$ that allowed the matrix to have all zero rows at the bottom of the matrix, the leading entries of any nonzero row to be 1, and places the leading entry of each nonzero row to the right of the leading entry of the previous row. However, these factors for converting the matrix are not what determine the rank. 
+
+Since rank is the maximum of the pivot columns, it can be determined by counting the quantity of pivot columns, where the pivot columns are the first nonzero entries of each row in reduced row echelon form. The number of columns is the basis of column space in the matrix. This is because the linear independence of the pivot rows in reduced form implies independence of the same columns in matrix $A$. Thus, our matrix manipulation is final. The rank is 4 based on the reduced form of this matrix.
+
+We can also check this process with a built in function $Rank$ in the same package. We assume that the function follows the same process by computing the sum of pivot columns in the reduced form of matrix $A$. The result is shown below. 
+
+```{r}
+Rank(A)
+```
+
+
+
+### (2) Given an $m*n$ matrix where $m > n$, what can be the maximum rank? The minimum rank, assuming that the matrix is non-zero?
+
+Answer: 
+
+$Rank_{max} = n \\ Rank_{min} = 1$
+
+\vspace{36pt}
+
+Explaination:
+
+Let us call this matrix $M$ with dimensions $m*n$ where $M_{m>n}$. Given the rank as the maximum number of linearly independence column vectors in the matrix $M_{m>n}$, the maximum rank possible is the limiting dimension of the matrix $n$. This is because the matrix, could not produce any pivot columns greater than its smallest dimension. 
+
+Similarly, the minimum rank can be determined by the lowest possible quantity of pivot columns in the matrix $M_{m>n}$. When it is in reduced row echelon form, even a matrix with one element must have one linearly independent column vector. Thus, the minimum rank should always be at least 1. 
+
+
+### (3) What is the rank of matrix B?
+
+$$
+B = 
+\begin{bmatrix}
+1 & 2 & 1 \\ 3 & 6 & 3  \\ 2 & 4 & 2 
+\end{bmatrix}
+$$
+
+```{r include = FALSE}
+B <- matrix(c(1, 2, 1, 3, 6, 3, 2, 4, 2), ncol = 3, nrow = 3, byrow = TRUE)
+Rank(B)
+```
+
+
+Answer: 
+
+The rank of matrix $B$ is `r Rank(B)`. 
+
+\vspace{36pt}
+
+Explanation:
+
+```{r PS1P3}
+B <- matrix(c(1, 2, 1, 3, 6, 3, 2, 4, 2), ncol = 3, nrow = 3, byrow = TRUE)
+Rank(B)
+```
+
+If we review $B$ in reduced row echelon form we can see how this is calculated once again. 
+
+
+```{r}
+rref(B)
+```
+
+Notice there is only one row that begins with a 1 of this 3x3 matrix. This value of 1 in the first row is the only linearly independent row vector in the matrix. As such, its rank can only be 1. 
+
+\pagebreak
+
+## Problem Set 2
+
+### Compute the eigenvalues and eigenvectors of the matrix A. You’ll need to show your work. You’ll need to write out the characteristic polynomial and show your solution.
+
+$$
+A = 
+\begin{bmatrix}
+1 & 2 & 3 \\ 0 & 4 & 5  \\ 0 & 0 & 6 
+\end{bmatrix}
+$$
+
+
+
+
+```{r include = FALSE}
+A <- matrix(c(1, 2, 3, 0, 4, 5, 0, 0, 6), ncol = 3, nrow = 3, byrow = TRUE)
+```
+
+
+
+Answer: 
+
+The eigenvalues of $A$ are `r eigen(A)$values`.  
+The characteristic polynomial is $p_{A} = -\lambda^3 + 11\lambda^2 - 34 \lambda + 24$   
+The eigenvectors of $A$ are as follows;
+
+Where $\lambda_{1} = 6$ the vectors have the relationship $\vec{x}_1 - \frac{8}{5}\vec{x}_3 = 0$ and $\vec{x}_2 - \frac{5}{2}\vec{x}_3 = 0$. When solved these become, $\vec{x}_1 = 8/5$, $\vec{x}_2 = 5/2$ and $\vec{x}_3 = \vec{x}_3$ or $\vec{x}_3 = 1$.
+
+$$
+Where \hspace{4pt} \lambda_{1} = 6; \hspace{4pt} Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+(8/5) \\ (5/2)  \\ 1  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+Where $\lambda_{2} = 4$ the vectors have the relationship $\vec{x}_1 - \frac{2}{3}\vec{x}_2 = 0$ and $\vec{x}_3 = 0$. When solved these become, $\vec{x}_1 = 1$, $\vec{x}_2 = 3/2$ and $\vec{x}_1 = 0$.   
+
+
+$$
+Where \hspace{4pt} \lambda_{2} = 4; \hspace{4pt} Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+1 \\ (3/2) \\ 0  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+Where $\lambda_{1} = 1$ the vectors become, $\vec{x}_1 = 1$, $\vec{x}_2 = 0$ and $\vec{x}_1 = 0$.
+
+$$
+Where \hspace{4pt} \lambda_{3} = 1; \hspace{4pt} Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+1 \\ 0 \\ 0  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+
+
+
+\vspace{36pt}
+
+
+Explanation: 
+
+First, the matrix $A$ is created as an object in R. Its eigenvalues are found by determining the roots of the polynomial $det(A - \lambda*I_{n}) = 0$. This is shown below using a base function in R called $eigen$. 
+
+```{r PS2P1}
+A <- matrix(c(1, 2, 3, 0, 4, 5, 0, 0, 6), ncol = 3, nrow = 3, byrow = TRUE)
+eigen(A, only.values = TRUE)
+```
+
+These eigenvalues could be read from the matrix $A$ on the diagonal. They could have also been found by hand. This could be done in at least two ways. One is known as cofactor expansion but it is not the only way. Another, perhaps quicker method, is by finding the sum of the products of a right diagonal of the vectors and subtracting the sum of the products of the left diagonal vectors (follows the Rule of Sarrus). These steps are shown below:
+
+```{r include=FALSE}
+write_matex2 <- function(x) {
+  begin <- "\\begin{bmatrix}"
+  end <- "\\end{bmatrix}"
+  X <-
+    apply(x, 1, function(x) {
+      paste(
+        paste(x, collapse = "&"),
+        "\\\\"
+      )
+    })
+  paste(c(begin, X, end), collapse = "")
+}
+```
+
+Following the equation $det(A - \lambda*I_{n}) = 0$ to determine the roots of the polynomial, matrix $A$ is rewritten as: 
+
+$$
+A = 
+\begin{bmatrix}
+1 - \lambda & 2 & 3 \\
+0 & 4 - \lambda  & 5 \\
+0 & 0 & 6 - \lambda 
+\end{bmatrix}
+$$
+
+Using the rule of sarrus and converting the matrix back into a system of equations the following terms emerge: 
+
+$$((1 - \lambda)+(4 - \lambda)+(6 - \lambda))-((2)(5)(0) - (3)(0)(0)- (0)(5)(1 - \lambda) - (0)(2)(6 - \lambda))$$
+Simplified this becomes the characteristic polynomial.
+
+$$ -\lambda^3+11\lambda^2-34\lambda+24$$
+Where the eigenvalues are found when the equation is solved for lambda becoming this: 
+
+$$(-\lambda + 1)(\lambda - 6)(\lambda - 4) = 0$$
+
+Before further simplification to discover our eigenvalues of: 
+
+$$\lambda = 1 , \hspace{8pt} \lambda = 6, \hspace{8pt} \lambda = 4 $$
+With those eigenvalues the eigenvectors and eigenspace can be found through substitution and further simplification. For matrix $A$ where $\lambda = 6$ the resultant matrix is shown. 
+
+$$
+A = 
+\begin{bmatrix}
+1 - 6 & 2 & 3 \\
+0 & 4 - 6 & 5 \\
+0 & 0 & 6 - 6 
+\end{bmatrix}
+$$
+
+This operation of subtraction is performed where applicable then the resultant matrix is converted into reduced row echelon form. This produces the following version of matrix $A$.  
+
+$$
+A = 
+\begin{bmatrix}
+ 5 & 2 & 3 \\
+0 & -2 & 5 \\
+0 & 0 & 0 
+\end{bmatrix}
+$$
+
+
+This matrix is rewritten into a system of equations and set equal to zero.
+The vectors are the values $x$ when the equations are solved. For this value of $\lambda$ the result is $\vec{x}_1 = 8/5, \hspace{8pt}\vec{x}_2 = 5/2, \hspace{8pt} \vec{x}_3 = 1$ The process is repeated for each eignevalue in place of $\lambda$. This can also be computed using R and it follows the same process. 
+
+
+The eigenvectors are given by the nonzero solutions of this equation $(A - \lambda*I_{n})*\vec{x}) = 0$ for each eigenvalue as $\lambda$. For this equation where $I_{n}$ is the identity matrix, $A$ is the original matrix, and $\lambda$ is represented by the eigenvalue, we substitute and reduce to find the eigenvectors of the matrix $A$. This can be completed using a matrix for each eigenvalue. Since we are only computing with three rows, an identity matrix with 3 rows was also created as an object and variable $I_{n}$ where $n = 3$. It will serve as the identity matrix for the remaining eigenvector calculations.
+
+
+For $\lambda_{1}$, where the eigenvalue is 1, $\lambda=6$. The equation is run with the matrix $A$ and its result is reduced to row echelon form below.
+
+
+
+
+```{r}
+I <- diag(3)
+lam1 <- rref(A - eigen(A)$values[1] * I)
+```  
+
+
+\center
+$`r  write_matex2(lam1)`$  
+\center
+
+\begin{flushleft}
+From there, the matrix is converted into a system of equations. These equations are set equal to zero to find the null value of each vector. The results are then converted back into matrix form. This is the eigenspace of the matrix for the eigenvalue of $\lambda_{1}$.   
+\end{flushleft}
+
+
+
+$$
+Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+(8/5) \\ (5/2) \\ 1  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+
+
+
+For $\lambda_{2}$, where the eigenvalue is 1, $\lambda=4$. The equation is run with the matrix $A$ and its result is reduced to row echelon form below.  
+
+```{r}
+lam2 <- round(rref(A - eigen(A)$values[2] * I), digits = 2)
+```
+
+
+
+\center
+$`r write_matex2(lam2)`$  
+\center  
+
+
+\begin{flushleft}
+From there, the matrix is converted into a system of equations. These equations are set equal to zero to find the null value of each vector. The results are then converted back into matrix form. This is the eigenspace of the matrix for the eigenvalue of $\lambda_{2}$.   
+\end{flushleft}
+
+
+$$
+Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+1 \\ (3/2) \\ 0  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+
+
+
+
+For $\lambda_{3}$, where the eigenvalue is 1, $\lambda=1$. The equation is run with the matrix $A$ and its result is reduced to row echelon form below.
+
+```{r}
+lam3 <- round(rref(A - eigen(A)$values[3] * I), digits = 2)
+```
+
+
+\center  
+$`r write_matex2(lam3)`$  
+\center
+
+
+\begin{flushleft}
+From there, the matrix is converted into a system of equations. These equations are set equal to zero to find the null value of each vector. The results are then converted back into matrix form. This is the eigenspace of the matrix for the eigenvalue of $\lambda_{3}$.
+\end{flushleft}
+
+$$
+Eigenspace = 
+\begin{Bmatrix}
+\begin{bmatrix}
+1 \\ 0 \\ 0  
+\end{bmatrix}
+\end{Bmatrix}
+$$
+
+
+

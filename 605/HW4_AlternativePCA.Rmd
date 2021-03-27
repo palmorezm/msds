@@ -1,0 +1,317 @@
+---
+title: "HW4 Alternative"
+author: "Zachary Palmore"
+date: "2/12/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+header-includes: 
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+- \newcommand{\bleft}{\begin{flushleft}}
+- \newcommand{\eleft}{\end{flushleft}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Directions
+
+With the attached data file, build and visualize  eigenimagery that accounts for 80% of the variability.  Provide full R code and discussion.
+
+## Preparation 
+
+To perform a principal component analysis (PCA) it is important to have and understand the data in the analysis. In this section, the data, which in this case is images, are read into our R environment. There are several considerations to make, such as how to extract the files and import them, what format we want the files in for the PCA, whether to scale the data to the same size, and more. This analysis begins by reading the images as a raster array. 
+
+The following packages were used during this analysis and should be installed prior to replication. 
+
+```{r message=FALSE, warning=FALSE}
+library(jpeg)
+library(EBImage) # Requires BiocManager::install('EBimage')
+library(RCurl)
+library(ggpubr)
+library(gridExtra)
+library(tidyverse)
+```
+
+
+
+### Image Arrays
+
+Using an 
+
+```{r test}
+n <- 17 # number of images present in folder
+locale <- "C:/data/images/jpg" # location on computer
+imgs <- list.files(locale,pattern="\\.jpg")[1:n] # list of image names
+imgs
+```
+
+Create an array to store the image files in when they are read in. At the same time, the dimensions of the array are set to be equivalent to that of the scaled images. 
+
+The height and width were given in the names of each image. They are all the same. 
+
+```{r parameters}
+h <- 1200 
+w <- 2500
+s <- 20
+ra <- array(rep(0, length(imgs)*h/s*w/s*3), # creates placeholder array elements
+            dim = c(length(imgs), h/s, w/s, 3)) # sets array dimensions 
+path <- "C:/data/images/jpg/"
+```
+
+
+
+
+```{r}
+for (i in 1:n){ 
+  rs <- resize(readJPEG(paste0(path, imgs[i])), h/s, w/s) # locates each file and adjusts h and w by the scale s
+  ra[i,,,] <- array(rs, dim = c(1, h/s, w/s, 3)) # Adds the image values to the placeholder array
+}
+```
+
+
+
+```{r}
+# Example function
+plot_jpeg = function(path, add=FALSE)
+{ jpg = readJPEG(path, native=T) # read the file
+  res = dim(jpg)[2:1] # get the resolution, [x, y]
+  if (!add) # initialize an empty plot area if add==FALSE
+    plot(1,1,xlim=c(1,res[1]),ylim=c(1,res[2]),asp=1,type='n',xaxs='i',yaxs='i',xaxt='n',yaxt='n',xlab='',ylab='',bty='n')
+  rasterImage(jpg,1,1,res[1],res[2])
+}
+par(mfrow=c(3,3))
+par(mai=c(.3,.3,.3,.3))
+for (i in 1:n){  # adjust to number of files present in folder
+plot_jpeg(writeJPEG(ra[i,,,])) # view shoes function applied here; plots the raster data
+}
+```
+
+
+
+```{r}
+vecs <- matrix(0, n, prod(dim(ra)))
+for (i in 1:n) { 
+  r <- as.vector(ra[i,,,1])
+  g <- as.vector(ra[i,,,2])
+  b <- as.vector(ra[i,,,3])
+  vecs[i,] <- t(c(r, g, b)) 
+}
+pre <- data.frame(t(vecs))
+```
+
+
+
+
+```{r}
+pre.cov <- cov(pre) # calculate covariance matrix for each 
+pre.eigens <- eigen(pre.cov) # find eigenvalues and eigenvectors of each matrix
+str(pre.eigens)
+phi <- -(pre.eigens$vectors[,1:2]) # Inverse of loadings for PC1 and PC2
+colnames(phi) <- c("PC1", "PC2")
+PC1 <- as.matrix(pre) %*% phi[,1]
+PC2 <- as.matrix(pre) %*% phi[,2]
+PCs <- data.frame(row.names = NULL, PC1, PC2)
+head(PCs)
+```
+
+
+```{r}
+PC1hist <- ggplot(PCs, aes(PC1)) + geom_histogram(binwidth = .1) + xlim(0, 4) + xlab(NULL)
+PC2hist <- ggplot(PCs, aes(PC2)) + geom_histogram(binwidth = .1) + xlim(0, 4) + xlab(NULL)
+PC2pnt <- ggplot(PCs, aes(PC2, PC1)) + geom_point() 
+PC1pnt <- ggplot(PCs, aes(PC1, PC2)) + geom_point()
+ggarrange(PC1hist, PC2hist, PC1pnt, PC2pnt)
+```
+
+
+
+```{r}
+PVE <- pre.eigens$values / sum(pre.eigens$values)
+PVE
+```
+
+
+
+
+
+```{r}
+# qplot(PVE, c(1:17)) + geom_line() + coord_flip()
+# qplot(c(1:17), cumsum(PVE)) + geom_line() 
+
+# PVE (aka scree) plot
+PVEplot <- qplot(c(1:17), PVE) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("PVE") +
+  ggtitle("Scree Plot") 
+
+# Cumulative PVE plot
+cumPVE <- qplot(c(1:17), cumsum(PVE)) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab(NULL) + 
+  ggtitle("Cumulative Scree Plot") 
+
+grid.arrange(PVEplot, cumPVE, ncol = 2)
+```
+
+
+
+
+```{r}
+post <- prcomp(pre, scale = TRUE)
+post$rotation <- -post$rotation
+post$x <- t(as.matrix(post$x))
+# post_biplot <- biplot(post, scale=0)
+post_test <- head(post$x, 3)
+```
+
+
+
+```{r}
+mypca_test <- head(mypca$scores, 3)
+post_test == mypca_test
+```
+
+
+
+```{r}
+newdata=ra
+dim(newdata)=c(length(imgs),h*w*3/s^2)
+mypca=princomp(t(as.matrix(newdata)), scores=TRUE, cor=TRUE)
+```
+
+
+```{r}
+mypca2=t(mypca$scores)
+dim(mypca2)=c(length(imgs), h/s, w/s,3)
+par(mfrow=c(3,3))
+par(mai=c(.3,.3,.3,.3))
+for (i in 1:n){#plot the first 25 Eigenshoes only
+plot_jpeg(writeJPEG(mypca2[i,,,]))  #complete without reduction
+}
+```
+
+
+```{r}
+va <- ra
+dim(va) <- c(n, h*w*3/s^2)
+princomp_results <- princomp(t(as.matrix(va)), scores=TRUE, cor=TRUE) 
+prcomp_results <- prcomp(t(as.matrix(va)))
+princomp_results_scores_3 <- head(princomp_results$scores, 3)
+princomp_results_scores_3 == head(prcomp_results$x, 3)
+```
+
+
+```{r}
+vispca_results <- t(prcomp_results$x)
+dim(vispca_results)=c(n, h/s, w/s,3)
+par(mfrow=c(5,5))
+par(mai=c(.001,.001,.001,.001))
+for (i in 1:n){#plot the first 25 Eigenshoes only
+plot_jpeg(writeJPEG(vispca_results[i,,,]))  #complete without reduction
+}
+```
+
+
+
+```{r}
+# pcarray <- im
+# dim(pcarray) <- c(length(imgs), h*w*3/s^2)
+postx <- (as.matrix(post$x))
+# dim(posta) <- c(length(imgs), h/s, w/s, 3)
+# par(mfrow <- c(3,3))
+```
+
+
+
+```{r}
+pcaresults <- array(rep(0, length(imgs)*h/s*w/s*3), # creates placeholder array elements
+            dim = c(length(imgs), h/s, w/s, 3)) # sets array dimensions 
+
+for (i in 1:n){ 
+  vs <- resize(readJPEG(paste0(path, imgs[i])), h/s, w/s) # locates each file and adjusts h and w by the scale s
+  pcaresults[i,,,] <- array(postx, dim = c(1, h/s, w/s, 3)) # Adds the image values to the placeholder array
+}
+
+par(mfrow=c(3,3))
+par(mai=c(.3,.3,.3,.3))
+for (i in 1:n){  # adjust to number of files present in folder
+plot_jpeg(writeJPEG(pcaresults[i,,,], bg = "white")) # view shoes function applied here; plots the raster data
+}
+```
+
+
+
+
+
+```{r}
+VE <- post$sdev^2
+PVE <- VE / sum(VE)
+round(PVE, 2)
+```
+
+
+```{r}
+qplot(PVE, c(1:17)) + geom_line() + coord_flip()
+qplot(c(1:17), cumsum(PVE)) + geom_line() 
+
+# PVE (aka scree) plot
+PVEplot2 <- qplot(c(1:17), PVE) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("PVE") +
+  ggtitle("Scree Plot Post PCA") 
+
+# Cumulative PVE plot
+cumPVE2 <- qplot(c(1:17), cumsum(PVE)) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab(NULL) + 
+  ggtitle("Cumulative Scree Plot Post PCA") 
+
+grid.arrange(PVEplot2, cumPVE2, ncol = 2)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

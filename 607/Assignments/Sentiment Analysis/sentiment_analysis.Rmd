@@ -1,0 +1,536 @@
+---
+title: "Sentiment Analysis"
+author: "Zachary Palmore"
+date: "10/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Directions
+
+In Text Mining with R, Chapter 2 looks at Sentiment Analysis. In this assignment, you should start by getting the primary example code from chapter 2 working in an R Markdown document. You should provide a citation to this base code. You’re then asked to extend the code in two ways:
+
+<ul>
+  <li>Work with a different corpus of your choosing, and </li>
+  <li>Incorporate at least one additional sentiment lexicon (possibly from another R package that you’ve found through research).</li>
+</ul>
+
+As usual, please submit links to both an .Rmd file posted in your GitHub repository and to your code on rpubs.com. You make work on a small team on this assignment. 
+
+## Objective
+
+Review *Text Mining with R* to create an example code. Test and rerun this code on another source of text using a different lexicon than the example to learn how to complete a sentiment analysis.   
+
+## Introduction
+
+In this assignment, we will perform a sentiment analysis of the Harry Potter series written by J.K. Rowling. We want to know how the words in each chapter are associated with positive or negative sentiments using different lexicons. We will also consider how the words can be grouped into a few other categories created with the bing, nrc, afinn, and loughran lexicons. Before we get started, take a look at the tools used and then follow along through a review of sentiment analysis as presented in the book *Text Mining with R* by Julia Silge and David Robinson. 
+
+## Tools
+
+The packages:
+
+```{r message=FALSE, warning=FALSE}
+library(tidytext)
+library(textdata) # Required for afinn download
+library(janeaustenr)
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+library(tidyverse)
+library(wordcloud)
+library(reshape2)
+library(harrypotter)
+library(RCurl)
+```
+
+The lexicons:
+
+```{r message=FALSE, results='hide'}
+get_sentiments("afinn") # Specify 1 to download 
+get_sentiments("bing")
+get_sentiments("nrc") # Specify 1 to download
+get_sentiments("loughran") # Specify 1 to download
+```
+
+## Review
+
+Using the source code, we can walk through the process of performing a sentiment analysis on the book titled "Emma." It is included in the packages installed as tools. The bing lexicon is used for the majority of this review unless otherwise specified in the source. The text files here are several books authored by Jane Austen. 
+
+### Basics
+
+Once the text data is tidied enough to be functional we can group and parse the strings into a data frame. We begin with the book "Emma" by selecting the words of each chapter and giving them their own rows with the NRC lexicon. The sentiment and visualization are then recreated with the bing lexicon. 
+
+```{r}
+# Group by chapters, ignore case, ungroup, and unnest for inner join 
+tidy_books <- austen_books() %>%
+  group_by(book) %>%
+  mutate(linenumber = row_number(),
+         chapter = cumsum(str_detect(text, regex("^chapter [\\divxlc]", 
+                                                 ignore_case = TRUE)))) %>%
+  ungroup() %>%
+  unnest_tokens(word, text) # Note 'word' as new name - same as lexicons
+# This creates df with one word per row
+# # # # # # # # # # # # # # # #
+# Perform the join on the 'joy' words from the NRC lexicon
+nrc_joy <- get_sentiments("nrc") %>% 
+  filter(sentiment == "joy")
+# Count the joy words in the book 'Emma'
+Emma_joy_words_nrc <- tidy_books %>%
+  filter(book == "Emma") %>%
+  inner_join(nrc_joy) %>%
+  count(word, sort = TRUE)
+head(Emma_joy_words_nrc, 10)
+```
+Many of these words are easily associated with joy. For example, the words, good, happy, and love, often give a sentiment of joy but other words like deal, present, and found, we might not associate as much with joy. Additionally, the true sentiment of the words often rely on context. We ignore this for now to continue reviewing how sentiment is found through the rest of Jane Austen's books. 
+
+```{r}
+# Using the bing lexicon count the words in each 80-lined section
+jane_austen_sentiment <- tidy_books %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(book, index = linenumber %/% 80, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>% # Separate positive/negative words 
+  mutate(sentiment = positive - negative) # Calculate sentiment overall
+# Visualize the sentiment with columns
+ggplot(jane_austen_sentiment, aes(index, sentiment, fill = book)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~book, ncol = 2, scales = "free_x")
+```
+
+From these charts we can see some variation in the plots of the books. We can see that negative sentiment words are most frequent in Northanger Abbey or perhaps Mansfield Park. However, the level of sentiment in each book is relatively the same. Most books are predominantly positive. Given that we are using the same lexicon and it is the same author, with a very similar writing style for each novel, it would be surprising to see a variation between the books as any larger than this. 
+
+### Comparing Lexicons
+
+Each lexicon is a little different. We can visualize exactly how different but first we need text to call it with. We are going to create another example of the positive and negative sentiment words using another Jane Austen novel to compare three lexicons, AFINN, Bing, and NRC. This time, we used the book Pride and Prejudice. 
+
+```{r}
+# Select 'Pride & Prejudice' from the tidytext books
+pride_prejudice <- tidy_books %>% 
+  filter(book == "Pride & Prejudice")
+rmarkdown::paged_table(pride_prejudice)
+```
+
+Now we repeat the process of inner joins, grouping, and summarizing by 80 lines but use a different lexicon for each new column. Index numbers are used as identifiers of the plot to show the changes over the length of the book. 
+
+```{r}
+# repeat of inner joins, group and summarise, over 80 lines by index
+afinn <- pride_prejudice %>% 
+  inner_join(get_sentiments("afinn")) %>% 
+  group_by(index = linenumber %/% 80) %>% 
+  summarise(sentiment = sum(value)) %>% 
+  mutate(method = "AFINN")
+
+bing_and_nrc <- bind_rows(pride_prejudice %>% 
+                            inner_join(get_sentiments("bing")) %>%
+                            mutate(method = "Bing et al."),
+                          pride_prejudice %>% 
+                            inner_join(get_sentiments("nrc") %>% 
+                                         filter(sentiment %in% c("positive", 
+                                                                 "negative"))) %>%
+                            mutate(method = "NRC")) %>%
+  count(method, index = linenumber %/% 80, sentiment) %>%
+  spread(sentiment, n, fill = 0) %>%
+  mutate(sentiment = positive - negative)
+# Visualize each section
+bind_rows(afinn, 
+          bing_and_nrc) %>%
+  ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 1, scales = "free_y")
+```
+
+We can see AFINN has the highest positive values and absolute values overall. Bing has the most negative sentiments and the largest lengths of contiguous text sentiment. NRC gives a higher absolute positive sentiment than Bing and has a fewer net negative sentiment overall. AFINN appears to have the most variation across the plot, however, the trends for each are roughly the same. Their peaks and troughs line up and seem to only differ in their levels sentiment expression.
+
+We can review why there is variation by observing the differences in the Bing and NRC lexicons. For this, a simple filter and counting of positive and negative word associations will suffice. 
+
+```{r}
+get_sentiments("nrc") %>% 
+     filter(sentiment %in% c("positive", 
+                             "negative")) %>% 
+  count(sentiment)
+
+get_sentiments("bing") %>% 
+  count(sentiment)
+```
+
+The ratio of negative to positive words is likely a partial cause of this variation. Both NRC and Bing have more negative words than positives but the ratio is higher in the Bing lexicon. Importantly, if the words of either lexicon do not match with Jane Austen's written words, then there will also be systematic differences in interpretation of the sentiment. Words are not counted if they do not match. 
+
+### Word Influence
+
+In every sentiment analysis there will be certain words that have more influence and weight on the overall sentiment than others. We can see this is several ways but one of the simplest is through a column chart of positive and negative words. Using the Bing lexicon we can create another example of the sentiment across all Jane Austen's works in the tidytext package. 
+
+```{r}
+# count and sort the words from bing lexicon on all tidytext books
+bing_word_counts <- tidy_books %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+# Visualize as columns
+bing_word_counts %>%
+  group_by(sentiment) %>%
+  top_n(10) %>%
+  ungroup() %>%
+  mutate(word = reorder(word, n)) %>%
+  ggplot(aes(word, n, fill = sentiment)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~sentiment, scales = "free_y") +
+  labs(y = "Contribution to sentiment",
+       x = NULL) +
+  coord_flip()
+```
+
+We can see that the word "miss" was a large influence on the negative sentiment for the books. In Jane Austen's novels, miss is not necessarily negative. In her works, it is common to refer to an unmarried woman as "miss" which is not how this word appears to be counted. We may define this word differently in the analysis as an unmarried woman should not be interpreted as inherently negative. This can be adjusted for by creating a custom category for this word and assigning it to a new data set.  
+
+```{r}
+# Create a new lexicon 'custom' for the word 'miss' in the df
+custom_stop_words <- bind_rows(tibble(word = c("miss"), 
+                                          lexicon = c("custom")), 
+                               stop_words)
+```
+
+### Word Clouds
+
+With the data organized we can also create useful visualizations without the use of ggplot. At times, a word cloud can be helpful in displaying the commonality of words in the text. Take a look here as this word cloud displays the count of the first 100 most common words from all Jane Austen books in this package.  
+
+```{r, message=FALSE, warning=FALSE}
+tidy_books %>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100)) 
+```
+
+In a word cloud, the size of the word represents the count of the words in the text overall. The larger the size of the word, the more frequently it occurs in the text. We can also use word clouds for comparison. 
+
+```{r}
+tidy_books %>%
+  inner_join(get_sentiments("bing")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("gray20", "gray80"),
+                   max.words = 100)
+```
+
+For comparing positive and negative words this word cloud separates the positives in a lighter shade to negatives in a darker shade. The closer the words are to the positive at the bottom, the more positive the sentiment. The more negative the word, the closer it is to the top of the word cloud. 
+
+### Sentence Sentiment 
+
+When we are reading, often the context of the word plays an important part in the sentiment of the word. In fact, the entire sentence can have its own sentiment depending on negation and other surrounding words. We can consider the sentences another option to review to understand sentiment. Let's use the book Pride and Prejudice again.  
+
+```{r}
+# Extracting the sentences of pride and prejudice
+PandP_sentences <- tibble(text = prideprejudice) %>% 
+  unnest_tokens(sentence, text, token = "sentences")
+# Viewing one sentence
+PandP_sentences$sentence[2]
+```
+
+This sentence can then be analyzed in a variety of ways. We start by counting the chapters in each book available in the tidytext package. This process is a repeat where the regular expression separates the books into chapters and the result is summarized through another count of those separations. 
+
+
+```{r}
+austen_chapters <- austen_books() %>%
+  group_by(book) %>%
+  unnest_tokens(chapter, text, token = "regex", 
+                pattern = "Chapter|CHAPTER [\\dIVXLC]") %>%
+  ungroup()
+
+chpt_austen <- austen_chapters %>% 
+  group_by(book) %>% 
+  summarise(chapters = n())
+rmarkdown::paged_table(chpt_austen)
+```
+Now we can find the overall sentiment in each chapter by reviewing each row which contains a sentence. It is then natural to repeat the process by finding the number of negative words and dividing by the total words in each chapter to compute the overall sentiment for those chapters. 
+
+```{r}
+# Collect the negative sentiment words from bing lexicon
+bingnegative <- get_sentiments("bing") %>% 
+  filter(sentiment == "negative")
+# Group the chapters by book titles and tally their total words
+wordcounts <- tidy_books %>%
+  group_by(book, chapter) %>%
+  summarize(words = n())
+# Calculate the sentiment of each chapter and select the highest from each book
+bingnegs <- tidy_books %>%
+  semi_join(bingnegative) %>%
+  group_by(book, chapter) %>%
+  summarize(negativewords = n()) %>%
+  left_join(wordcounts, by = c("book", "chapter")) %>%
+  mutate(ratio = negativewords/words) %>%
+  filter(chapter != 0) %>%
+  top_n(1) %>%
+  ungroup()
+rmarkdown::paged_table(bingnegs)
+```
+Observe the words column. These are the chapters with the highest negative word counts in each of Jane Austen's books. The ratio gives the overall sentiment by dividing each total of negative words by the total of words in the chapter. If you read the books, you will notice, each chapter has a good reason for appearing negative. 
+
+
+
+## Analysis
+
+For this analysis we will repeat this process on the Harry Potter novels by J.K. Rowling. The loughran lexicon will be our primary lexicon instead of AFINN, Bing, or NRC. We will also compare the loughran lexicon to our other lexicons. These books were made available in a package hosted on Github by Bradley Boehmke. For this assignment the URL to access this data is available here: https://github.com/bradleyboehmke/harrypotter/tree/master/data
+
+
+### Basics
+
+We need a place to store the information and ensure it is clean enough to work with. In this section will gather the titles of all the books into one list then fill that list with all the information that follows the title from the url. These steps are outlined in the code below. 
+
+```{r}
+# Create titles list
+titles <- c("Philosopher's Stone", 
+            "Chamber of Secrets", 
+            "Prisoner of Azkaban",
+            "Goblet of Fire", 
+            "Order of the Phoenix", "Half-Blood Prince",
+            "Deathly Hallows")
+# Fill titles list with contents of each book
+books <- list(philosophers_stone, 
+              chamber_of_secrets, 
+              prisoner_of_azkaban,
+              goblet_of_fire, 
+              order_of_the_phoenix, 
+              half_blood_prince,
+              deathly_hallows)
+# Create an empty tibble  
+series <- tibble()
+# Using the title follow this sequence to...
+for(i in seq_along(titles)) {
+        # extract the books by title
+        clean <- tibble(chapter = seq_along(books[[i]]),
+                        text = books[[i]]) %>%
+             unnest_tokens(word, text) %>%
+             mutate(book = titles[i]) %>%
+             select(book, everything())
+        # Include all the information contained in it
+        series <- rbind(series, clean)
+}
+# Use an ordered factor to keep the books in chronological order
+series$book <- factor(series$book, levels = rev(titles))
+# Perform a right join using the loughran lexicon
+lough_tbl <- series %>%
+        right_join(get_sentiments("loughran")) %>%
+        filter(!is.na(sentiment)) %>%
+        count(sentiment, sort = TRUE)
+rmarkdown::paged_table(lough_tbl)
+```
+
+Immediately we notice that this lexicon has different sentiment options than than AFINN, Bing, or NRC. In addition to negative and positive sentiments, words can be organized into the new categories of litigious, constraining, superfluous, and uncertainty. Keep this is mind as it changes our analysis.   
+
+For our purposes, this table is great for a quick check of the counts of words and their sentiment on the loughran scale, but a better visual might be a bar chart by index. If organized for each index number as we completed in the review of *Text Analysis with R* we may be able to see these changes over time for each book. For easy comparisons, we will only look at the positive and negative sentiments in this visual. 
+
+
+```{r}
+series %>%
+        group_by(book) %>% 
+        mutate(word_count = 1:n(),
+               index = word_count %/% 500) %>% 
+        inner_join(get_sentiments("loughran")) %>%
+        count(book, index = index , sentiment) %>%
+        ungroup() %>%
+        spread(sentiment, n, fill = 0) %>%
+        mutate(sentiment = positive - negative,
+               book = factor(book, levels = titles)) %>%
+        ggplot(aes(index, sentiment, fill = book)) +
+          geom_bar(alpha = 0.5, stat = "identity", show.legend = FALSE) +
+          facet_wrap(~ book, ncol = 2, scales = "free_x")
+```
+
+As in our review, there is variation in the plot of each novel. However, these novels contain many more words that give a negative sentiment. We can see this in the mostly negative level and scales of each book across its plot. Though these books are largely based on negative sentiments we should consider the possibility that it is this lexicon that causes such a shift in sentiment. 
+
+
+### Comparing Lexicons
+
+Did the loughran lexicon cause the sentiment of the Harry Potter series to appear more negative than it actually is? Is there a clear difference in this loughran lexicon when compared to Bing or NRC over the same series of text? We can create a few more examples to compare.
+
+```{r}
+# repeat of inner joins, group and summarise, over lines by index for loughran lexicon
+chamber_lough <- series %>%
+        group_by(book) %>% 
+        filter(book == "Chamber of Secrets") %>% 
+        mutate(word_count = 1:n(),
+               index = word_count %/% 500) %>% 
+        inner_join(get_sentiments("loughran")) %>%
+        count(book, index = index , sentiment) %>%
+        ungroup() %>%
+        spread(sentiment, n, fill = 0) %>%
+        mutate(sentiment = positive - negative,
+               book = factor(book, levels = titles)) %>% 
+    mutate(method = "loughran")
+# repeat of inner joins, group and summarise, over lines by index for nrc lexicon
+chamber_nrc <- series %>%
+        group_by(book) %>% 
+        filter(book == "Chamber of Secrets") %>%
+        mutate(word_count = 1:n(),
+               index = word_count %/% 500) %>% 
+        inner_join(get_sentiments("nrc")) %>%  
+        count(book, index = index , sentiment) %>% 
+        ungroup() %>% 
+        spread(sentiment, n, fill = 0) %>% 
+        mutate(sentiment = positive - negative,
+               book = factor(book, levels = titles)) %>% 
+    mutate(method = "nrc")
+# repeat of inner joins, group and summarise, over lines by index for bing lexicon
+chamber_bing <- series %>%
+        group_by(book) %>% 
+        filter(book == "Chamber of Secrets") %>%
+        mutate(word_count = 1:n(),
+               index = word_count %/% 500) %>% 
+        inner_join(get_sentiments("bing")) %>%  
+        count(book, index = index , sentiment) %>% 
+        ungroup() %>% 
+        spread(sentiment, n, fill = 0) %>% 
+        mutate(sentiment = positive - negative,
+               book = factor(book, levels = titles)) %>% 
+    mutate(method = "bing")
+# Create equal number of columns for binding 
+bing_cos <- subset(chamber_bing, select = c("index", "sentiment", "method"))
+nrc_cos <- subset(chamber_nrc, select = c("index", "sentiment", "method"))
+lough_cos <- subset(chamber_lough, select = c("index", "sentiment", "method"))
+# Bind them by rows with method as the identifier of lexicon
+rbind(bing_cos,
+        nrc_cos, 
+          lough_cos) %>% 
+  # Visualize the distribution over the lines by lexicon type
+  ggplot(aes(index, sentiment, fill = method)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~method, ncol = 1, scales = "free_y")
+```
+
+Although loughran appears to be slightly more negative than the Bing lexicon, it does not appear to be so different that it caused the sentiment to skew negative. In fact, the NRC lexicon has a slightly more negative sentiment than the loughran for this series. This confirms the notion that the loughran lexicon is very similar in negative and positive sentiment to that of Bing and NRC. It likely fits between the two on the sentiment scale, as it did for the Harry Potter series. 
+
+It is interesting to see the similarity between the lexicons. Now, recall the additional categories of uncertainty, litigious, superfluous, and constraining words that we found in the basic quick check of these books. There is more to the lexicon than simply positive or negative words. We can visualize this for simplicity. 
+
+```{r}
+lough_words <- series %>%
+  inner_join(get_sentiments("loughran")) %>%
+  count(word, sentiment, sort = TRUE) %>%
+  ungroup()
+lough_words %>%
+        group_by(sentiment) %>%
+        top_n(10) %>% 
+ggplot(aes(reorder(word, n), n, fill = sentiment)) +
+          geom_bar(alpha = 0.8, stat = "identity", 
+                   show.legend = FALSE) +
+          facet_wrap(~sentiment, scales = "free_y") +
+          labs(y = "Contribution to sentiment", x = NULL) +
+          coord_flip()
+```
+
+It is clear that the most common words fall into the uncertainty category. Could it the most common, which, for Harry Potter, makes sense. It is a story about a young boy curious about a magical world of witchcraft and wizardry. To be uncertain about it is exactly what J.K. Rowling attempts to portray in the plot of the books. 
+
+We can also see the positive words of good, great, better, and so on, creating another sentiment that adds to the positive sentiment throughout the books. At times, often when the protagonist is faced with challenges, the contrast between positives and negatives help to create the heroes we have come to know in each book. In this case, the most influential negative word is against. There is also a small number of influential litigious and constraining words but nearly none are superfluous when considering the sentiment of words throughout the series. 
+
+It may be interesting to take a dive into one of the books. As we did in the review with Jane Austen's Pride and Prejudice, we can extract a few sentence examples to see how the Chamber of Secrets by J.K. Rowling, is written. 
+
+
+```{r}
+# Extract the sentences from chapter 1 through the book
+chamber_sentences <- tibble(chapter = 1:length(chamber_of_secrets),
+                  text = chamber_of_secrets) %>% 
+                  unnest_tokens(sentence, text, token = "sentences")
+head(chamber_sentences[50:70,], 3)
+```
+
+The name "Harry" is used quite frequently in this example. Given that he is the main character it was likely that we would see his name more frequently than the rest. I would expect to see his immediate friends' names, Ron and Herminone, to closely follow in commonality. Before getting to that, let's review the sentiment across chapters in this book by sentences in the Chamber of Secrets, for context.  
+
+
+```{r}
+chamber_lines <- chamber_sentences %>%
+        group_by(chapter) %>%
+        mutate(sentence_num = 1:n(),
+               index = round(sentence_num / n(), 2)) %>%
+        unnest_tokens(word, sentence) %>%
+        inner_join(get_sentiments("loughran")) %>%
+        group_by(chapter, index)
+# Visualize as columns
+ggplot(chamber_lines, aes(sentiment, fill = sentiment)) + geom_bar(show.legend = FALSE) + theme_minimal() + coord_flip() 
+```
+
+As expected from the analysis of all the books, the sentiment sentences used in this book is mostly negative. The sentiment of uncertainty is the next largest followed by a positive sentences. There are no superfluous words and very small numbers of litigious and constraining sentiments. With these sentences categorized by the loughran lexicon we can go into more detail about the series. For example, we can ask, which chapter in each book is the most negative? We can use the same methods in the review to find out by calculating the ratio of negative sentiments to total sentiments in each chapter. 
+
+
+```{r}
+# Find the negative sentiment words of the loughran lexicon
+loughnegs <- get_sentiments("loughran") %>% 
+  filter(sentiment == "negative")
+# Count the total words by chapter in each book
+wordcounts <- series %>%
+  group_by(book, chapter) %>%
+  summarize(words = n())
+# Repeat review process - join negative loughran words with data, classify words by chapter,
+# summarize sentiment and create a new column with the ratio of sentiment to total words by chapter
+# lastly, select the top ratio of each chapter with the data and display it
+lough_mostnegchpts_ofbooks <- series %>%
+  semi_join(loughnegs) %>%
+  group_by(book, chapter) %>%
+  summarize(sentiment = n()) %>%
+  left_join(wordcounts, by = c("book", "chapter")) %>% 
+  mutate(ratio = (sentiment/words)) %>% 
+  filter(chapter != 0) %>% 
+  top_n(1) %>%
+  ungroup()
+# Organize the ratio in descending order
+lough_mostnegchpts_ofbooks <- lough_mostnegchpts_ofbooks %>%
+  arrange(desc(ratio)) 
+# round the ratio for visuals
+lough_mostnegchpts_ofbooks$ratio <- signif(lough_mostnegchpts_ofbooks$ratio, digits=3)
+# display information as a table
+rmarkdown::paged_table(lough_mostnegchpts_ofbooks)
+```
+
+In each chapter we have a ratio given to it. By organizing thse ratio in descending order, we visually pick out the most negative books to least negative books. It is also easy to see the chapter which gave it the most negative sentiment ratio possible but, a better visual might be a column chart. 
+
+
+```{r}
+# visualize as a column chart for each book and chapters by location in each book
+ggplot(lough_mostnegchpts_ofbooks, aes(x = reorder(book, ratio), y = ratio, fill = chapter)) +  
+  geom_col(show.legend = TRUE) + 
+  theme_minimal() + 
+  labs(title = "Most Negative Chapters of Harry Potter Series", 
+       xlab = "Percent", 
+       ylab = "Book Title", 
+       subtitle = "With Chapters Locations by Color", 
+       caption = "Written by J.K. Rowling") + 
+  coord_flip() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        plot.caption = element_text(hjust = 0.5))
+```
+
+Here we organize the data into descending columns by their negative sentiment ratio and color code them by chapter. Using this color coded method, we can see in each book where the most negative chapter occurred. For example, in the Half-Blood Prince very negative sentiments occur earlier in the book than any other. Meanwhile, Order of the Phoenix is the latest. In this book, the most negative sentiment does not occur until very near the end of the book as it has the brightest color of these chapters. This helps put the sentiments in context of the plot of each novel and goes beyond simply classifying the books as negative and ordering them on a column chart. It adds depth to understanding the sentiment of these novels. 
+
+Considering the name "Harry" appeared in the sentences randomly selected and displayed above, we can test how common his name is compared to other words. Our expectation is that his friends, given that they were his companions on nearly every wizarding adventure, will appear at a slightly less but similar frequency. As stated in the review, a word cloud will show us the counts of all the words in the book.
+
+```{r}
+series %>%
+  anti_join(stop_words) %>% 
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100)) 
+```
+
+There we have it. Harry's name, our main character and the person the entire plot revolves around, is the most commonly occurring word of all in this series. His companions and friends, Ron and Herminone, do occur in sequence after his but they are not as common as we would have guessed. If you look, you may notice Dumbledore's name is coming in close to the same frequencies as Ron and Herminone. In the books, he is sometimes referred to as "professor" as well. If the two frequencies of "Dumbledore" and "professor" were combined, it might be greater in commonality than Ron or Herminone. 
+
+This comes as a surprise but, it also makes sense given that Harry often wondered where Dumbledore was and what he knew. We should run this again but with each category of the loughran lexicon to see how a word cloud will separate the frequencies of these words throughout the books. We should not see names appear as these are categorized into the loughran lexicon.  
+
+```{r}
+series %>%
+  inner_join(get_sentiments("loughran")) %>%
+  
+  count(word, sentiment, sort = TRUE) %>%
+  acast(word ~ sentiment, value.var = "n", fill = 0) %>%
+  comparison.cloud(colors = c("blue", "red", "purple","orange","brown","dark green"),
+                   max.words = 300)
+```
+
+Using various colors we can see the separation of words into groups easier than if viewing them in black and white. Green represents the sentiment of uncertainty, blue a constraining sentiment, red is litigious, purple is negative, yellow is positive, and brown is superfluous. The word "whilst" is the most common superfluous word and has a larger share of the superfluous frequency making it the largest in this word cloud. However, it is more neutral than the word "efficacious" which, under the loughran lexicon, has a higher superfluous sentiment. 
+
+
+## Conclusion
+
+The loughran lexicon is my preferred lexicon for its sentiment classifiers. To me, this give a better and more practical indication of the text sentiment without going into too much detail in the lexicon itself and it could be applied in fiscal or contractual contexts. In this domain, too much detail could cause the sentiment to appear unorganized and be less thoughtful or impractical. AFINN, Bing, and NRC, each have their own classifiers that work fine. However, their categorization do not seem as practical for applying to real-world financial scenarios. The categories of sentiment presented in the loughran lexicon only enhance our understanding of the text while adding a bit of functionality to this domain. This is why I prefer it over AFINN, Bing, and NRC in this assignment.  
+
+## Source
+
+Silge, Julia. Robinson, David. Text Mining with R: A Tidy Approach. 7 March 2020. www.tidytextmining.com. 

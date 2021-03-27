@@ -1,0 +1,26 @@
+<books>
+  <ID>1</ID>
+	<Title>Magical Mushrooms and Mischeivous Molds</Title>
+  <Author1>Hudler George W</Author1>
+	  <Author2>NA</Author2>
+	<PublishYr>1998</PublishYr>
+	<Edition>NA</Edition>
+	<Subject>Nature</Subject>
+	<Statement>The remarkable story of the fungus kingdom and its impact on human affairs</Statement>
+  <ID>2</ID>
+	<Title>Ecological Restoration</Title>
+  <Author1>Clewell Andre F</Author1>
+	  <Author2>James Aronson</Author2>
+	<PublishYr>2007</PublishYr>
+	<Edition>NA</Edition>
+	<Subject>Nature</Subject>
+	<Statement>Priciples, Values, and Structure of an Emerging Profession</Statement>
+  <ID>3</ID>
+	<Title>Environmental Science</Title>
+	<Author1>Cunningham William P</Author1>
+	  <Author2>Cunningham Mary Ann</Author2>
+	<PublishYr>2008</PublishYr>
+	<Edition>10</Edition>
+	<Subject>Nature</Subject>
+	<Statement>A Global Concern</Statement>
+</books>

@@ -1,0 +1,115 @@
+---
+title: "HW8"
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+author: "Zachary Palmore"
+date: "3/18/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Section 7.2 Question 11 
+
+### Exponential Density Expected Value
+
+A company buys 100 lightbulbs, each of which has an expoential lifetime of 1000 hours. What is the expected time for the first of these bulbs to burn out? (See Exercise 10.)
+
+For reference, exercise 10 says Let $X_n$ be $n$ independent random variables each of which has an exponential density with mean $\mu$. Let $M$ be the minimum value of the $X_j$. Show that the density for $M$ is exponential with mean $\frac{\mu}{n}$. Hint: Use cumulative distribution functions. With that we use the given relationships:
+
+$$f_1(x) = nf(x)(1 - F(x))^{n-1}$$
+
+$$\lambda^` = n \lambda = \frac{n}{\mu} = \frac{1}{{\mu^`}}$$
+Where $\lambda = 1/1000$ and $n=100$ in this case the expected value for is simply $\mu$ which is $\frac{\mu}{n}$ or $\frac{1000}{100}$ or about 10 years. 
+
+## Section 7.2 Question 14
+
+### Exponential Density 
+
+Assume that $X_1$ and $X_2$ are independent random variables, each having an exponential density with parameter $\lambda$. Show that $Z = X_1 - X_2$ has density
+
+$$f_Z(z) = (1/2)\lambda e^{-\lambda |z|}$$
+
+
+With $f(x_1) = \lambda e^{-\lambda_{x_1}} \hspace{4pt}$ and $f(x_2) = \lambda e^{-\lambda_{x_2}} \hspace{4pt}$. For $X_1$, $X_2$ we have $f(x_{1,2})=\lambda^2 e^{-\lambda_{x_{1} + x_{2}}}$ $Z = X_1 - X_2$ rewritten this is $X_1 = z + x_2$ which is substituted into $\lambda^{2} e^{-\lambda (z+2x_2)}$. Then use convolution and consider $z$ -> $-\infty$ or $\infty$ with $X_1$ and $X_2$. 
+
+Such as 
+$$f_Z(z) = \int_{-\infty}^{\infty}$$
+
+For $-z$: 
+
+$$f_Z(z) = \int_{-\infty}^{\infty}z\lambda^{2}e^{-\lambda{(z+2x_{2}})}$$
+$$X_{2} \geq X_{1} ; \hspace{8pt} f_Z(z) = \frac{\lambda}{2}e^{-\lambda z}$$
+
+For $z$:
+
+$$f_Z(z) = \int_{-\infty}^{\infty}\frac{\lambda}{2}e^{-\lambda{(z+2x_{2}})}$$
+
+$$X_{1} \geq X_{2} ; \hspace{8pt} f_Z(z) = \frac{-\lambda}{2}e^{-\lambda z}$$
+
+In which the integral $-\infty$ -> $0$ cancels to become
+
+$f(z) = \frac{\lambda}{2}e^{-\lambda |z|}$
+
+
+## Section 8.2 Question 1 
+
+Let x be a continuous random variable with mean $\mu = 10$ and variance $\sigma = 100/3$. Using Chebyshev's Inequality, find an upper bound for the following probabilities. 
+
+Chebyshev's Inequality 
+
+$$P(|X - \mu| \geq k\sigma) \leq \frac{1}{k^{2}}$$
+Where the mean, $\mu = 10$ and standard deviation, $\sigma = 2$. 
+
+(a) $P(|x-10| \geq2)$ 
+
+$k\sigma =2$
+
+$k = \frac{2}{\sqrt{\frac{100}{3}}}$
+
+```{r}
+UP <- 1/(2/sqrt(100/3))^2
+```
+
+$\frac{1}{\frac{2}{\sqrt{\frac{100}{3}}}} =$ `r round(UP, digits=4)`. However, the highest is 1, thus the answer is approximately 1. 
+
+(b) $P(|x-10| \geq5)$
+
+$k\sigma =5$
+
+$k = \frac{2}{\sqrt{\frac{100}{3}}}$
+
+```{r}
+UP <- 1/(5/sqrt(100/3))^2
+```
+
+$\frac{1}{\frac{2}{\sqrt{\frac{100}{3}}}} =$ `r round(UP, digits=4)`. However, the highest is 1, thus the answer is approximately 1. 
+
+(c) $P(|x-10| \geq9)$
+
+$k\sigma =9$
+
+$k = \frac{2}{\sqrt{\frac{100}{3}}}$
+
+```{r}
+UP <- 1/(9/sqrt(100/3))^2
+```
+
+$\frac{1}{\frac{2}{\sqrt{\frac{100}{3}}}} =$ `r round(UP, digits=4)`.
+
+(d) $P(|x-10| \geq20)$
+
+
+$k\sigma =20$
+
+$k = \frac{2}{\sqrt{\frac{100}{3}}}$
+
+```{r}
+UP <- 1/(20/sqrt(100/3))^2
+```
+
+$\frac{1}{\frac{2}{\sqrt{\frac{100}{3}}}} =$ `r round(UP, digits=4)`.
+
+
+

@@ -1,0 +1,490 @@
+---
+title: "LifestyleChanges_EmissionsAnalysis"
+author: "Zachary Palmore"
+date: "11/23/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(tidyr)
+require(tidyverse)
+require(lubridate)
+require(quantmod)
+require(stats)
+```
+
+
+
+## Abstract
+
+
+Through data gathered from the U.S. Energy Information Administration we found national sources of emissions have decreased significantly from normal at 5,203.19 to an estimated 4,506.85 million metric tonnes of carbon dioxide for the year in 2020. During this time the United States experienced a rapid change in individual behavior due to a pandemic caused by the SARS-CoV-2 virus. Normal emissions were calculated using averaged data from the past 47 years where data is available. When evaluating the significance of these reductions for agreement with the Paris Climate Agreement, we found that further reductions must be made. 
+
+
+## Introduction
+
+According to the National Climate Assessment of the U.S. global change research program,  global climate is expected to continue changing, with the magnitude of change primarily dependent on the quantity of greenhouse gases we emit into the atmosphere (as well as how Earth’s systems respond to it). The U.S. is a significant contributor of greenhouse gas emissions, with over 5.1 billion metric tons of carbon dioxide (a prominent greenhouse constituent) being emitted from energy-related sources (USGS). 
+
+Using emission data from 2010, the IPCC found that over 65% of global emissions come from the burning of fossil fuels in industrial processes, including energy production. Transportation was estimated at 14%. In the following decade, countries have had varying levels of success in lowering their carbon dioxide emissions by limiting the burning of fossil fuels. Nearly all of these countries were attempting to comply with the Paris Climate Accord. However, on November 4, 2020, the United States formally withdrew from this agreement. 
+
+This formal withdrawal occurred in the midst of a viral pandemic that has pushed citizens into quarantine and work-from-home arrangements, in an attempt to quell the virus. Evidence suggests that this change in lifestyle has influenced carbon dioxide emissions, possibly by reducing emissions overall. 
+
+Furthermore, studies have shown that the energy consumed and produced by sectors has shifted. According to the U.S. Energy Information Administration, an independent energy analysis organization, energy consumed by the residential sector increased while commercial, transportation, and industrial sectors decreased in the same interval of time. The largest decrease seems to have occurred in the transportation sector with petroleum products such as gasoline. These shifts in usage reflect the change in behavior as many people were forced to work from home, were prohibited from traveling, and reduced their vehicle usage due to restrictions on businesses. 
+
+Since restrictions were placed by state-level governments, some have also suggested there was a lack of coherence in messaging in those restrictions across the nation which led many people to travel regardless of recommendations or prohibition. This time of great pause in daily routine traveling and switching from office sector work to work-from-home roles should be studied. There could be underlying benefits to this transition. One of the most worthwhile may be the mitigation of climate change.  
+
+
+
+## Data
+
+The data in this study comes from the United State’s Energy Information Administration, an independent statistics and analysis organization. As stated on their website, their role is “to promote sound policymaking, efficient markets, and public understanding of energy and its interaction with the economy and the environment.” This is achieved through the review and analysis of energy-related data collected from a combination of vetted industry and government sources. They are one of the world’s leading expert organizations in energy-related data and provide information to a broad spectrum of consumers including federal, state, and local governments, media, businesses, foreign governments, research communities and the general public.
+
+
+For ease of access, the data is made available through an open-source repository on Github. It is split into three spreadsheets, each with their own values but identical column names. To produce quality results, some of this information needs to be reviewed alongside values of the other spreadsheets. In simplifying the process, a fourth data frame was created with all values combined into a single spreadsheet. This process is explained with notes.  
+
+```{r message=FALSE}
+# Load the data from the remote repository
+producer <- read_csv("https://raw.githubusercontent.com/palmorezm/msdsdata607/master/Projects/Final/MER_T01_01.csv") 
+# Adds energy production data
+sector <- read_csv("https://raw.githubusercontent.com/palmorezm/msdsdata607/master/Projects/Final/MER_T02_01.csv") 
+# Adds energy consumption data by industry sectors
+source <- read_csv("https://raw.githubusercontent.com/palmorezm/msdsdata607/master/Projects/Final/MER_T11_01.csv") 
+# Adds emissions from energy sources
+
+
+# Source Cleaning
+    
+    # Extract monthly subsets of 2020
+    source.202001 <- subset(source, YYYYMM == 202001)
+    source.202002 <- subset(source, YYYYMM == 202002)
+    source.202003 <- subset(source, YYYYMM == 202003)
+    source.202004 <- subset(source, YYYYMM == 202004)
+    source.202005 <- subset(source, YYYYMM == 202005)
+    source.202006 <- subset(source, YYYYMM == 202006)
+    source.202007 <- subset(source, YYYYMM == 202007)
+    # Combine existing monthly subsets into data frame of the partial year 
+    source.2020 <- rbind(source.202001,source.202002,source.202003, source.202004,source.202005,source.202006,source.202007)
+
+    # Order the rows by their sources and assign each value a month
+    source.2020 <- source.2020 %>% 
+         arrange(desc(Column_Order))
+    source.2020$M <- rep(rep(1:7), length.out = 98)
+    
+    # Reformat dates to year-month-day
+    source$YYYYMM <- lubridate::parse_date_time(source$YYYYMM, c("ym"))
+    
+    # Extract rows that fail to parse then store as source data totals
+    source.totals <- source[rowSums(is.na(source)) > 0,]
+    
+    # generate a sequence of numbers that repeats each number 14 times starting with 1973 and ending with 2020 for a total of 47 repetitions and 658 number values
+    source.totals$YYYYMM2 <- rep(rep(1973:2020, times=47, each=14), length.out = 658)
+    
+    # generate a sequence of numbers that repeats each number 1 time starting with 1973 and ending with 2019 for a total of 46 repetitions and 658 number values
+    source.totals$YYYYMM <- rep(rep(1973:2019), length.out=658)
+
+    # Extract TETCEUS monthly totals
+    source.2020.totals <- source.2020 %>%
+      filter(MSN == "TETCEUS")
+  
+    # Compute average monthly totals of each year 1973 - 2019 using monthly observations of each year 
+    source.totals <- source.totals %>% 
+      filter(MSN == "TETCEUS") %>%
+      mutate(avg_month = Value/12)
+    
+    # remove missing values from monthly source data
+    source <- na.omit(source)
+    
+    
+    
+# Producer Cleaning
+    
+    # Extract monthly subsets of 2020
+    producer.202001 <- subset(producer, YYYYMM == 202001)
+    producer.202002 <- subset(producer, YYYYMM == 202002)
+    producer.202003 <- subset(producer, YYYYMM == 202003)
+    producer.202004 <- subset(producer, YYYYMM == 202004)
+    producer.202005 <- subset(producer, YYYYMM == 202005)
+    producer.202006 <- subset(producer, YYYYMM == 202006)
+    producer.202007 <- subset(producer, YYYYMM == 202007)
+    # Combine existing monthly subsets into data frame of the partial year 
+    producer.2020 <- rbind(producer.202001,producer.202002,producer.202003, producer.202004,producer.202005,producer.202006,producer.202007)
+    
+    # Reformat dates to year-month-day
+    producer$YYYYMM <- lubridate::parse_date_time(producer$YYYYMM, c("ym")) 
+    
+    # Extract rows that fail to parse then store as source data totals
+    producer.totals <- producer[rowSums(is.na(producer)) > 0,]
+
+  # Find rows with totals prior to 1973 and reassign their dates in sequences of 23 until 12 have been completed for a total of 299 year values
+  producer.pre73 <- producer.totals[c(1:24, 72:96, 143:167, 214:238, 285:309, 356:380, 427:451, 498:522, 569:593, 640:664, 711:735, 782:806),]
+  producer.pre73$YYYYMM <- rep(rep(1949:1972), length.out = 299)
+  
+    # Using 1973+ apply the sequence generation as yyyy-mm-dd to producers; repeat 1973 - 2019   
+  producer.totals <-  producer.totals[c(25:71,97:142,168:213, 239:284,310:355, 381:426, 452:497, 523:568, 594:639, 665:710, 736:781, 807:852),]
+  
+  
+  # remove missing values from monthly source data
+  producer <-  na.omit(producer)
+  
+  
+  
+# Sector Cleaning
+    
+     # Reformat dates to year-month-day
+    sector$YYYYMM <- lubridate::parse_date_time(sector$YYYYMM, c("ym")) 
+    
+    # Extract rows that fail to parse then store as source data totals
+    sector.totals <- sector[rowSums(is.na(sector)) > 0,]
+
+# Combine sources into one data frame
+all <- rbind(producer, sector, source) 
+```
+
+A subset of the source data set is shown below. Carbon dioxide emissions from the source data set will be the primary data frame to perform calculations and work from. Excluding the combined *all* data, other data frames will not contain emissions statistics as their duration and iterations of data collection differ from one another, and it is not necessary to extend this study further into the past. Retroactive studies have been completed before, our focus is on the change in levels of carbon dioxide for the year 2020 from the past nearly half-century's trends in emissions to determine its significance and potential implications. 
+
+
+```{r}
+source[1:4, c(1:3,5)]
+```
+
+This data frame displays the carbon dioxide emissions by source. There are 7,994 observations of 6 variable types. The columns for *Column_Order* and *Unit* have been removed as they are not necessary for display. They are, however, useful for calculations, munging, and filtering through vast swaths of this data. For our purposes, they remain hidden in the table.  
+
+Only the first 4 rows are shown. This is just enough to demonstrate variation in the column labeled *Value* which is the amount of emissions. These are measured in units of a million metric tons of carbon dioxide equivalent or mttco2e. Each column has its own key. Column name *MSN* is the unique identifier of source names and stands for mnemonic series names. Column *YYYYMM* provides the date in a date formatted with lubridate. Since they were not provided, all days were selected to the first two-digit day of the four-digit year and 2-digit month respectively. Lastly, the *Description* column supplies the unique identifier of source names in long-form for reference.  
+
+The combined data set *all* contains the values of energy producers and their production amount, emission sources and their total emissions of carbon dioxide, and the sectors energy flows through as well as the quantities consumed by those sectors. These are broken out further into subsections of the data since there are 21,908 observations of those same 6 variables across all the data in this data set. 
+
+
+
+## Analysis
+
+With clean data, we start by finding the averages of the total amount of carbon dioxide emissions from U.S. sources in our study year and over the duration of the study. We use emissions data spanning 1973 to 2019 to determine the normal level of emissions using a mean of sums where data was available. The average of 2020 was calculated by finding the mean of all available months within the year. This is our study year and it contains 7 values of total emissions by source beginning in January and running consecutively through the year by month. The calculation process is documented below.  
+
+```{r}
+# Mean CO2 since 1973 - given reliable source data
+normal.co2 <- source.totals %>% 
+  filter(Column_Order == 14) %>% 
+  summarise(since_1973 = mean(Value))
+
+# Total co2 in 2020 thus far
+thusfar.2020 <- source.2020 %>% 
+  filter(Column_Order == 14) %>% 
+  summarise(thusfar.2020 = sum(Value)) 
+  
+# Mean of co2 thus far in 2020
+thusfar.2020.mean <- source.2020 %>%
+  filter(Column_Order == 14) %>%
+  summarise(mean = mean(Value))
+
+# Find expected co2 with current mean emissions for year
+est.co2 <- signif(thusfar.2020 + (thusfar.2020.mean * 5), digits = 6)
+                  
+est.co2 <- data_frame(normal.co2, est.co2) %>% 
+  mutate(dif = since_1973 - thusfar.2020) %>% 
+  rename(est.2020 = thusfar.2020,
+         obs.1973 = since_1973) 
+
+# Change calculation values to numeric values outside the data frame
+totalco2.2020 <- round(thusfar.2020$thusfar.2020, digits= 2)
+meanco2.2020 <- round(thusfar.2020.mean$mean, digits = 2)
+
+# Differences as a proportion and percentage 
+Peo <- signif((est.co2$est.2020/est.co2$obs.1973), digits = 4)
+Peo.dif <- signif((est.co2$obs.1973 - est.co2$est.2020)/(est.co2$obs.1973), digits = 4)
+reduction.2020 <- signif((Peo - Peo.dif), digits = 4)
+```
+
+Total carbon dioxide emissions from January through July of 2020 is `r round(totalco2.2020, digits = 2)` million metric tons of carbon dioxide equivalent (mmtco2e). The average monthly amount of emissions from all energy sources is `r round(meanco2.2020, digits = 2)` mmtco2e. This is quantified by calculating the sum of total emission sources from January through July of 2020. If emissions are close to the average for the remaining five months (August through December) then the total emissions of the U.S. energy sources for the year would be about `r round(est.co2$est.2020, digits = 2)` mmtco2e. The average amount of total emissions from 1973 to 2019 is `r round(est.co2$est.2020, digits = 2)` mmtco2e. 
+
+Emissions for all completed years are plotted as a scatterplot in figure 1 showing the trends in emissions since 1973. A locally weighted scatterplot smoothing (loess) line was computed along with the points to normalize the pattern. In blue, the dashed line represents the average amount of total emissions under normal conditions in this study. In dark green, the dot-dashed line is the potential total emissions for the year 2020 if emissions remained at the average level of the first 7 months. All emissions quantities are measured in million metric tons of carbon dioxide equivalent (mmtco2e).
+
+```{r}
+source.totals %>% 
+  filter(Description == "Total Energy CO2 Emissions") %>% 
+  ggplot(aes(YYYYMM, Value)) + 
+  geom_point(aes(color = Description)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = est.co2$obs.1973, color = "blue", linetype = "dashed")  +
+  geom_hline(yintercept = est.co2$est.2020, color = "dark green", linetype = "dotdash", size = 1) +
+    labs(x = "Time", 
+       y = "Million Metric Tons CO2", 
+       title = "Total CO2 Emissions in US", 
+       subtitle = "Using Yearly Totals from All Energy Sources", 
+       caption = "Figure 1") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        legend.position = "none",
+        plot.caption = element_text(hjust = 0.5))
+```
+
+
+We notice the emissions line for our study year is below the normal (dashed) emissions line for the entirety of the study duration. Since the calculation for our study year only contains the first 7 months, this is only an estimate. However, if new monthly conditions were to remain at or near the average for the months of January through July of 2020 then average emissions could decrease from normal by approximately `r est.co2$dif` mmtco2e. That is a reduction in emissions of about `r reduction.2020*100`% from normal. 
+
+
+In furthering this scenario, we determine whether these variables have a strong correlation and if this reduction would be a significant deviation from natural variation. For this, we perform a Welch Two Sample t-test to compare the average monthly totals from the years 1973 through 2019 with observations of the monthly totals from 2020. We also conduct a Pearson's product-moment correlation on the observations of total emissions related to each year and use a linear model to evaluate the average monthly observations of 2020. Additionally, we compute 95% confidence intervals on the monthly observations for the study year and the data from what we considered the normal range. 
+
+
+```{r}
+t <- 1.96 # at 95% confidence 
+# source.yyyy indicates the start year
+x.source2020 <- mean(source.2020.totals$Value, na.rm = TRUE)
+sd.source2020 <-  sd(source.2020.totals$Value, na.rm = TRUE)
+n.source2020 <- source.2020.totals %>%
+  summarise(freq = table(Value)) %>%
+  summarise(n = sum(freq, na.rm = TRUE))
+upper.ci.2020 <- x.source2020 + t*(sd.source2020/sqrt(n.source2020$n))
+lower.ci.2020 <- x.source2020 - t*(sd.source2020/sqrt(n.source2020$n))
+# interval for 1973 to 2019
+x.source1973 <- mean(source.totals$avg_month, na.rm = TRUE)
+sd.source1973 <-  sd(source.totals$avg_month, na.rm = TRUE)
+n.source1973 <- source.totals %>%
+  summarise(freq = table(avg_month)) %>%
+  summarise(n = sum(freq, na.rm = TRUE))
+upper.ci.1973 <- x.source1973 + t*(sd.source1973/sqrt(n.source1973$n))
+lower.ci.1973 <- x.source1973 - t*(sd.source1973/sqrt(n.source1973$n))
+cor.test <- cor.test(source.totals$Value, source.totals$YYYYMM)
+co2.lm <- lm(source.totals$YYYYMM ~ source.totals$avg_month)
+co2.lm.res <- summary(co2.lm)
+t.test <- t.test(source.2020.totals$Value, source.totals$avg_month)
+```
+
+
+From the Welch Two Sample t-test we find the results are significant at an alpha level of 0.05 with a p-value of `r round(t.test$p.value, digits = 2)`. We should reject the null hypothesis in favor of our alternative that there is a significant difference in the mean of monthly carbon dioxide emissions in the year 2020. We are 95% confident that the true mean of emissions in the study year must be between `r round(lower.ci.2020, digits = 2)` and `r round(upper.ci.2020, digits = 2)`. We are also 95% confident that the true mean of emissions in the study duration is between `r round(lower.ci.1973, digits = 2)` and `r round(upper.ci.1973, digits = 2)` which favors the results of this hypothesis test. 
+
+Results from the Pearson's product-moment test indicate a moderately strong positive relationship of total emissions each year with a correlation value of `r signif(cor.test$estimate, digits = 3)`. We have great confidence in the year as a predictor of total emissions with a t-value of `r round(cor.test$statistic, digits=2)`. 
+
+Our linear regression model produced a slightly positive linear association and confirmed the results of the product-moment test producing a t-value of `r round(co2.lm.res$coefficients[2,3], digits = 2)`. This indicates strength in our coefficient, in this case measured in months, as a predictor of the total average emissions. We also confirmed the Welch Two Sample t-test conclusion that we should reject the null hypothesis in favor of the alternative given our p-value of `r round(co2.lm.res$coefficients[2,4], digits = 9)`. The variation in total carbon dioxide emission in 2020 is highly unlikely to have occurred by random chance. The formula for this model is as follows:
+
+$$ f(x) = 0.2368(x) + 1893.3383$$
+
+
+However, the coefficients of determination for this linear model were moderately weak with an r-squared of `r round(co2.lm.res$r.squared, digits = 3)` and an adjusted r-squared of `r round(co2.lm.res$adj.r.squared, digits = 3)`. These measure the proportion of variation in our average monthly emissions as a factor caused by the unit of time, months. Given that every month has a near perfect sequence and near zero variation, these results are surprising and reasonable. It indicates the total average monthly emissions from carbon dioxide have grown fairly steadily from 1973 to 2019 without much variation. But, there is likely a better model to fit this data. Note that these results do not include those of 2020 to support more robust statistics. 
+
+Extending this analysis, variation in emissions totals from all energy sources can be shown as a similar scatterplot to the one shown in figure 1. However, this takes the data and breaks it down further by month. Observe the trend in figure 2 below. Here again the dot-dash green line shows the average (mean) monthly emissions in 2020 and the dashed blue represents the average (mean) monthly emissions from 1973 through 2019.
+
+
+
+```{r}
+source %>% 
+  filter(Column_Order == 14) %>% 
+  ggplot(aes(YYYYMM, Value)) + 
+  geom_point(aes(color = Description)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = est.co2$obs.1973/12, color = "blue", linetype = "dashed")  +
+  geom_hline(yintercept = est.co2$est.2020/12, color = "dark green", linetype = "dotdash", size = 1) +
+    labs(x = "Time", 
+       y = "Million Metric Tons CO2", 
+       title = "Total CO2 Emissions in US", 
+       subtitle = "Using Monthly Totals from All Energy Sources", 
+       caption = "Figure 2") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        legend.position = "none",
+        plot.caption = element_text(hjust = 0.5))
+```
+
+The trend is nearly identical to that of the total emissions in figure 1 as its points have only been spread out to accommodate each month within the year. In this case, our study year of 2020 is on the far right of the figure. The spacing is small but there are seven points above this year with variation in how they lay. Importantly, the reduction in emissions from average is clearly visible as the points drop below the magnitude of any other values. These few points correspond to the peak in restrictions on travel and businesses. We can break the months out further, selecting only the year of 2020.
+
+
+```{r}
+source.2020 %>% 
+  filter(Column_Order == 14) %>% 
+  ggplot(aes(YYYYMM, Value)) + 
+  geom_point(aes(color = Description)) + 
+  geom_smooth() + 
+  geom_hline(yintercept = est.co2$obs.1973/12, color = "blue", linetype = "dashed")  +
+  geom_hline(yintercept = est.co2$est.2020/12, color = "dark green", linetype = "dotdash", size = 1) +
+    labs(x = "Time", 
+       y = "Million Metric Tons CO2", 
+       title = "Total CO2 Emissions in US in 2020", 
+       subtitle = "Using Monthly Totals from All Energy Sources", 
+       caption = "Figure 3") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        legend.position = "none",
+        plot.caption = element_text(hjust = 0.5))
+```
+
+From this point of view, it is much easier to see the drop in emissions below the normal, or blue line of average monthly emissions total from 1973 through 2019. Even if the upper bounding of the loess smoothing error range were the true values, the likelihood of the average monthly emissions meeting the average months from previous years (at least for these first 7 months) appears unlikely. The depth of the valley created by the dark blue trendline appears too deep to allow emissions to creep up and out of it as the points currently sit. This is good news for mitigation of climate change. 
+
+Unfortunately, there is a worrying pattern that might be cause for concern, from an emissions standpoint. The data appears to be rebounding towards higher emissions for June and July. This could be from the easing of restrictions and rebounding of individuals traveling. We have already proven with reasonable confidence that this decrease in emissions was not a natural variation. However, a large disease outbreak has only been known to occur around once every hundred years; for example, the Spanish flu epidemic in 1918. Given that our study covers a little less than half of a century, we would not be able to visibly see these changes because there are little to no comprehensive emissions records in the U.S. during that time. Instead, it is possible to review how energy is consumed and produced.   
+
+
+```{r}
+sector %>% 
+  filter(Column_Order == "11") %>%
+  filter(Value < 20000) %>% 
+  ggplot(aes (YYYYMM, Value)) + 
+  geom_point(aes(color = Description)) + 
+  geom_smooth(method = "lm", aes(color = "Linear Trend")) + 
+  geom_smooth() +
+   labs(x = "Time", 
+       y = "Trillion Btu", 
+       title = "Total Primary Energy Consumed in US", 
+       subtitle = "Using Monthly Totals from All Energy Sectors", 
+       caption = "Figure 4") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        legend.position = "top") 
+```
+
+The straight red line is a linear line of best fit for the monthly emission totals. The curvy blue line depicts the consumption of primary energy using a loess line. Although the red line is not the best fit, it is easier to see the positive increase in energy consumption over time which is still rooted in the data. The loess also shows this but it seems to indicate a slightly decreasing trend in energy consumption from 2000 until present. Notice also, energy consumption for 2020 is much lower than the surrounding points. Energy consumption appears it would be correlated with the emissions of carbon dioxide quite well in this chart. 
+
+
+```{r}
+producer %>% 
+  filter(Column_Order == "1") %>% 
+  filter(Value < 20) %>% 
+  ggplot(aes(YYYYMM, Value)) + 
+  geom_point(aes(color = Description)) +
+  geom_smooth() +
+   labs(x = "Time", 
+       y = "Quad Btu", 
+       title = "Total Fossil Fuel Production in US", 
+       subtitle = "Using Monthly Energy Totals from Burning Fossil Fuels", 
+       caption = "Figure 5") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        legend.position = "none") 
+```
+
+
+Perhaps the most clear pattern in this figure is the evidence of a rapid increase in fossil fuel production starting a little before 2010. The reason for this is unknown and upon closer inspection there has been a slightly increasing trend since the start of the study in 1973. 2020 remains an abnormality. From the perspective of fossil fuel burning for energy, there was another drop in production sometime between 2013 and 2018, and it does not follow the rapid upward production trend. A small decrease around 1998 and 1999 also seems tiny compared to the larger, much steeper slope of the multiple quadrillion British thermal units generated after 2010. A review of renewable energy data may help shed some light on the reason for this pattern.
+
+
+
+```{r}
+producer %>% 
+  filter(Column_Order == "3") %>% 
+  filter(Value < 2) %>% 
+  ggplot(aes(YYYYMM, Value)) + geom_point(aes(color = Description)) +
+   geom_smooth() +
+   labs(x = "Time", 
+       y = "Quad Btu", 
+       title = "Total Renewable Energy Production in US", 
+       subtitle = "Using Monthly Energy Totals from Renewable Sourcs", 
+       caption = "Figure 6") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        legend.position = "none") 
+```
+
+While there is greater variation within the points, the level of magnitude is four times smaller than fossil fuel production, though the trend is increasing rapidly as well. Interestingly, there is no evidence of a drop in 2020, as shown in previous figures on fossil fuel production, energy consumption, and carbon dioxide emissions. This factor is unique by comparison suggesting that renewable sources of energy might be more resilient in times of crisis, strictly with respect to disease outbreaks based on our current variables. 
+
+
+Determining the major sources of carbon dioxide emissions could also increase the evidence in support of the significance of our study year's variation from normal. Since this is primarily for visual inference as it has already been proven statistically significant, we review the top 4 largest emitters for the duration of the study. A line chart was chosen for this purpose in figure 7. 
+
+```{r}
+# Largest 4 sources of emission - everything else is below 1000 
+source %>% 
+  subset(Column_Order == c(1,2,13,9)) %>% 
+  ggplot(aes(YYYYMM, Value)) + 
+  geom_line(aes(color = MSN)) + 
+  geom_point(aes(color=MSN)) +
+    labs(x = "Time", 
+       y = "Million Metric Tons CO2", 
+       title = "Total CO2 Emissions in US", 
+       subtitle = "Using Yearly Totals from Each Energy Sources",
+       caption = "Figure 7") + 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5), 
+        legend.position = "top", 
+        plot.caption = element_text(hjust = 0.5)) 
+```
+
+
+Mnemonic series names are used for labeling and translate to the carbon dioxide emissions from coal (including coal coke net imports) in purple, natural gas (excluding supplemental gaseous fuels) in light blue, motor gasoline (excluding ethanol) in red, and petroleum (excluding biofuels) in green. There is a switch in leading emitting sources as coal (in red) has been decreasing quickly since about 2008. This made room for the growth of natural gas and the swap of leadership between the two occurred in the mid 2010's. In the following five years, going through the months of our 2020 study year, coal encountered a greater decline resulting in another brief change in leadership then reversal in 2020. This time, gasoline is narrowly behind in 2020 while it appears it would have sustained itself comfortably ahead based on prior patterns. 
+
+Current conditions imposed on emission sources appear to cause those emission sources to reshuffle. So too, is the production of energy. We review the current trends in a bar chart of each available producer type in this data set. Each color corresponds to a new production category and the energy they produce is measured in quadrillion British thermal units. 
+
+
+
+```{r}
+ggplot(producer, aes(Description, Value)) + 
+  geom_col(aes(fill = Description)) + 
+  labs(x = "Category", 
+       y = "Quad Btu", 
+       title = "Energy Production in US", 
+       subtitle = "Categorized by Types of Producers", 
+       caption = "Figure 8")+ 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        legend.position = "right", 
+        axis.text = element_blank()) 
+```
+
+
+By far, the dominant source of energy production in the U.S. is fossil fuels. These bars are shown in the center of the chart on figure 8 directly adjacent the total primary energy consumption and production bars. In terms of sheer size, they easily make up more than 75% of the total primary energy production and total primary energy consumption. We do produce less energy than demanded for consumption purposes relying on imports of energy to make up the difference of this energy gap. 
+
+
+```{r}
+producer %>% 
+  filter(Column_Order == c(1,9,3,11,2,10)) %>%
+ggplot(aes(Description, Value)) + 
+  geom_boxplot(aes(color = Description)) + 
+    labs(x = "Category", 
+       y = "Quad Btu", 
+       title = "Distribution of Energy Production in US", 
+       subtitle = "Categorized by Types of Producers", 
+       caption = "Figure 8")+ 
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5),
+        legend.position = "right", 
+        axis.text = element_blank()) + 
+  coord_flip()
+```
+
+Breaking down the production of energy from three main sources, we see the distribution of fossil fuel production and consumption is far greater in magnitude than either nuclear or renewable sources. Their distribution is also much more evenly spread and centered about its mean. The other sources, nuclear and renewable, have much smaller ranges, less uniformity, and do not appear centered about their means. Interestingly, fossil fuel production appears to make frequent attempts at much greater production capacities while nuclear and renewable sources remain stable in their production and consumption distribution. 
+
+## Conclusion
+
+In the time the United States was experiencing an unprecedented change in the behavior of society due to the SARS-CoV-2 pandemic, significant reductions in carbon dioxide emissions were made. Normal emissions were calculated to be 5,203.19 million metric tonnes of carbon dioxide equivalent and the difference of `r est.co2$dif` between the normal amount and the estimated total of 2020 was significant at an alpha level of 0.05 with a p-value of `r round(t.test$p.value, digits = 4)`. The estimated total carbon dioxide for 2020 if the average monthly emissions remained at or near the average for the last five months of August through December is `r est.co2$est.2020`. This would mean a reduction of about `r reduction.2020*100`. However, this is not likely to happen. 
+
+Given recent projections from the Energy Information Administration, it is likely that emissions for the last five months will be greater than the lowest points of the pandemic, regardless of travel or business restrictions. This does not mean that emissions will balance themselves out and suddenly result in average monthly emission standards. It is highly probable that the total emissions for 2020 will be significantly lower than the average of the previous two decades. This is good news for climate change mitigation. 
+
+Current emission levels as of 2019 would almost equate to those of 1996. A positive side-effect of this change in lifestyle would be a decrease in transportation-related energy emissions, especially from motor gasoline and similar petroleum products. This could lead to cleaner air, less vehicular accidents, near-zero minute commute times, and the associated health benefits that accompany reduction of vehicular traffic. Keep in mind, this is only one aspect of the decrease in emissions. 
+
+In addition to motor gasoline, we also noticed reductions in other fossil fuels such as coal, including its coke net imports, aviation fuel, and other petroleum products which make up 3 of the 4 largest sources of emissions from carbon dioxide. From an emissions perspective, these reductions are necessary to keep the average global temperatures below 1.5 degrees Celsius of warming. The Intergovernmental Panel on Climate Change (IPCC) predicts we need massive widespread changes in nearly all aspects of our society if we are to avoid the worst aspects of climate change.
+
+If we were to attempt to maintain accordance with the Paris Climate Agreement, we would need to maintain net-zero carbon emission by 2030. For us to meet that goal from the study year further reductions are necessary. Assuming the level in 2020 is estimated to be correct with a significant reduction in carbon dioxide to a level of `r est.co2$est.2020` mmtco2e and we can maintain it, then we would then need to cut emissions further by another `r est.co2$est.2020/9` mmtco2e per year for the remaining 9 years. This has not happened in any year from our study.  
+
+The lowest annual emission amount since 1973 was 4,371 mmtco2e and it occurred in 1983. For reference, the average monthly emissions then were about 364.22 mmtco2e. That is already `r round(meanco2.2020-source.totals[11,8], digits = 2)` mmtco2e lower than the average emissions while on travel restrictions or mandatory quarantine for portions of the year. Achieving the goals set by the Paris Climate Agreement to avoid the worst of climate change will require greater change in energy production, sector consumption, and further reduction of carbon dioxide emissions.  
+
+
+## References 
+
+Brown, S., Nicholls, R. J., Goodwin, P., Haigh, I. D., Lincke, D., Vafeidis, A. T., Hinkel, J. (2018). Quantifying Land and People Exposed to Sea-Level Rise with No Mitigation and 1.5°C and 2.0°C Rise in Global Temperatures to Year 2300. Earth's Future, 6(3), 583-600. doi:10.1002/2017ef000738
+
+Goodwin, P., Brown, S., Haigh, I. D., Nicholls, R. J., Matter, J. M. (2018). Adjusting Mitigation Pathways to Stabilize Climate at 1.5°C and 2.0°C Rise in Global Temperatures to Year 2300. Earth's Future, 6(3), 601-615. doi:10.1002/2017ef000732
+
+Hausfather, Z. (2013). Explaining and Understanding Declines in U.S. CO2 Emissions. Retrieved from https://static.berkeleyearth.org/memos/explaining-declines-in-us-carbon.pdf
+
+IPCC, 2018: Global Warming of 1.5°C.An IPCC Special Report on the impacts of global warming of 1.5°C above pre-industrial levels and related global greenhouse gas emission pathways, in the context of strengthening the global response to the threat of climate change, sustainable development, and efforts to eradicate poverty. [Masson-Delmotte, V., P. Zhai, H.-O. Pörtner, D. Roberts, J. Skea, P.R. Shukla, A. Pirani, W. Moufouma-Okia, C. Péan, R. Pidcock, S. Connors, J.B.R. Matthews, Y. Chen, X. Zhou, M.I. Gomis, E. Lonnoy, T. Maycock,
+M. Tignor, and T. Waterfield (eds.)] https://www.ipcc.ch/site/assets/uploads/sites/2/2019/06/SR15_Full_Report_High_Res.pdf
+
+Levin, K. (2018, October 10). 8 Things You Need to Know About the IPCC 1.5˚C Report. Retrieved December 05, 2020, from https://www.wri.org/blog/2018/10/8-things-you-need-know-about-ipcc-15-c-report
+
+Pielke, R. (2019, October 28). The World Is Not Going To Halve Carbon Emissions By 2030, So Now What? Retrieved from https://www.forbes.com/sites/rogerpielke/2019/10/27/the-world-is-not-going-to-reduce-carbon-dioxide-emissions-by-50-by-2030-now-what/?sh=218f62eb3794
+
+Tracy, S. (2020, May 15). Global Lockdown for All - Except Carbon Emissions. Retrieved December 05, 2020, from http://sitn.hms.harvard.edu/flash/2020/global-lockdown-for-all-except-carbon-emissions/
+
+USGS. (2018). How much carbon dioxide does the United States and the World emit each year from energy sources? Retrieved from https://www.usgs.gov/faqs/how-much-carbon-dioxide-does-united-states-and-world-emit-each-year-energy-sources?qt-news_science_products=0
+
+United Nations. (2015, December 12). Paris Climate Agreement: Framework Convention on Climate Change. Retrieved from https://assets.documentcloud.org/documents/2646274/Updated-l09r01.pdf
+
+
+
+

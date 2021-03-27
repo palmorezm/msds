@@ -1,0 +1,111 @@
+---
+title: "Project 2 - Uber "
+author: "Zachary Palmore"
+date: "9/21/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Objective
+
+In this part of project 2, I will be tidying and briefly analyzing data from Uber. It contains the quarterly earnings before interest, taxes, depreciation, and amortization (EBITDA). What we would like to know is;
+
+  * Max, min, and mean of temperatures for each station     
+  * Variance in temperature over the study area (SE Brazil) 
+  * Relationship between temperature and humidity  
+
+To get those answers, the data needs to be cleaned and tidied before we can make use of it. 
+
+```{r message=FALSE}
+require(tidyverse)
+require(magick)
+require(tesseract)
+require(reshape2)
+```
+
+
+
+### Importing Data
+
+The image provided contains all the information needed.  It appeared to be 
+
+
+```{r}
+# preprocessing
+uber <- image_read("uber.png") %>% 
+  image_negate() %>% 
+  image_transparent("transparent", fuzz=10) %>% 
+  image_background("white") %>%
+  image_morphology(method = "Thinning", kernel = "Rectangle") %>%
+  image_crop(geometry_area(-10, -40, -100, -20)) %>%
+  image_chop(geometry_area(
+    width = 14, 
+    height = 125, 
+    x_off = 1, 
+    y_off = 1.5))
+
+uber
+```
+
+```{r}
+uber <- uber %>% 
+  image_ocr()
+uber
+uber <- read_delim(uber, col_names = FALSE, " ", comment = "", escape_double = TRUE)
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
+```{r}
+uber <- readPNG("uber.png")
+# f <- system.file("uber.png", package="raster")
+ub <- system.file()
+rasterToPoints(uber)
+```
+
+
+```{r}
+r <- raster("/GitHub/msdsdata607/Projects/Project 2/uber.png")
+x <- rasterToPoints(r)
+extract(x,2)
+```
+
+
+
+```{r}
+f <- system.file("/GitHub/msdsdata607/Projects/Project 2/uber.png", package="raster")
+r <- raster(f)
+?raster
+x <- as.data.frame(r)
+
+
+f <- system.file("uber.png", package = "raster")
+raster(f)
+
+
+head(x)
+```
+
+
+
+
+```{python}
+print("hello")
+```
+
+
+
+

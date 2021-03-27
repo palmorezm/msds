@@ -1,0 +1,127 @@
+---
+title: "Problem3_1_5"
+author: "Zachary Palmore"
+date: "12/8/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(kableExtra)
+```
+
+## Question
+
+3.15 Global warming. A Pew Research poll asked 1,306 Americans “From what you’ve read and heard,
+is there solid evidence that the average temperature on earth has been getting warmer over the past few
+decades, or not?”. The table below shows the distribution of responses by party and ideology, where the
+counts have been replaced with relative frequencies.
+
+\begin{table}
+  \centering
+  \begin{tabular}{c|c|c|c|c|}
+    \cline{1-5}
+    & \multicolumn{2}{|c}{Response} \\
+    \hline 
+    \multicolumn{1}{|c|}{Party/Ideology} & Earth is Warming & Not Warming & Don't Know & Total \\
+    \hline
+    \multicolumn{1}{|r|}{Conservative Republican} & 0.11 & 0.20 & 0.02 & 0.33 \\
+    \multicolumn{1}{|r|}{Mod/Lib Republican} & 0.06 & 0.06 & 0.01 & 0.13 \\
+    \multicolumn{1}{|r|}{Mod/Con Democrat} & 0.25 & 0.07  & 0.02 & 0.34 \\
+    \multicolumn{1}{|r|}{Liberal Democrat} & 0.18 & 0.01 & 0.01 & 0.20 \\
+    \hline
+    \multicolumn{1}{|r|}{Total} & 0.60 & 0.34 & 0.06 & 1.00 \\
+    \hline 
+  \end{tabular}
+  \caption{4th Edition OpenIntro Statistics; Diez, Rundel, Barr}\label{tlc}
+\end{table}
+
+
+    ------------------------|-----------------|-------------|------------|------|
+    Party and Ideology      |Earth is Warming | Not warming | Don't Know | Total|              ------------------------|-----------------|-------------|------------|------|
+    Conservative Republican |     0.11        |     0.20    |    0.02    | 0.33 |
+    ------------------------|-----------------|-------------|------------|------|
+    Mod/Lib Republican      |     0.06        |     0.06    |    0.01    | 0.13 |
+    ------------------------|-----------------|-------------|------------|------|
+    Mod/Con Democrat        |     0.25        |     0.07    |    0.02    | 0.34 |
+    ------------------------|-----------------|-------------|------------|------|
+    Liberal Democrat        |     0.18        |     0.01    |    0.01    | 0.20 | 
+    ------------------------|-----------------|-------------|------------|------|
+    Total                   |     0.60        |     0.34    |    0.06    | 1.00 | 
+
+___
+
+\clearpage
+
+(a) Are believing that the earth is warming and being a liberal Democrat mutually exclusive?
+
+No, there are Conservative Republicans that believe the Earth is warming as well as Mod/Lib Republicans and Mod/Cons Democrats. Additionally, some Liberal Democrats do not believe the Earth is warming. Mutually exclusive results would mean no one who is not a Liberal Democrat would believe that the Earth is warming.  
+
+(b) What is the probability that a randomly chosen respondent believes the earth is warming or is a liberal
+Democrat?
+
+To find this we look at the frequency of someone being a believer (that the earth is warming) add the frequency of someone being a Liberal Democrat (LibDem) then subtract from it the proportion that someone is both a LibDem and believer. We can calculate that as follows:
+
+
+```{r}
+# 0.60 are believers
+# 0.20 are Liberal Democrats
+# 0.18 are Liberal Democrats that believe
+0.60 + 0.20 - 0.18
+```
+
+The probability that a randomly chosen respondent believes the earth is warming or is a liberal
+Democrat is 0.62 or 62%. 
+
+(c) What is the probability that a randomly chosen respondent believes the earth is warming given that he
+is a liberal Democrat?
+
+
+For this, we look at the individual frequencies then creation a proportion of those proportions. First, we find the probabilities that a respondent is a LibDem and that they believe the earth is warming. Then we find the probability that the respondent is a LibDem and compute. 
+
+```{r}
+# Givent the percent of respondents
+# 0.18 Liberal Democrat and believers
+# 0.20 Liberal Democrats as a whole
+0.18/0.20
+```
+
+The probability that an individual who is a Liberal Democrat believes that the Earth is warming is 0.90 or 90% based on this study. 
+
+(d) What is the probability that a randomly chosen respondent believes the earth is warming given that he
+is a conservative Republican?
+
+
+Based on the table, we know the frequency of respondents who are conservative Republicans. We also know the frequency of those who are conservative Republicans that also believe the Earth is warming. We use these frequencies to calculate the final probability as a proportion of the frequencies. 
+
+```{r}
+# Of respondents we have
+# 0.11 Conservative Republican believers
+# 0.33 total Conservative Republicans
+0.11/.33
+```
+
+Given that the individual is a Conservative Republican, the probability that the respondent believes the Earth is warming is 0.33 or about 33%.  
+
+(e) Does it appear that whether or not a respondent believes the earth is warming is independent of their
+party and ideology? Explain your reasoning.
+
+
+Evidence based on this frequency table shows that a respondent's probability of believing the Earth is warming is not independent of their party and ideology. An estimated 90% of respondents who are Liberal Democrats believe the Earth is warming whereas only 33% of Conservative Republicans.  
+
+
+(f) What is the probability that a randomly chosen respondent is a moderate/liberal Republican given that
+he does not believe that the earth is warming?
+
+Given that the frequency of moderate/liberal Republican respondents who do not believe that the Earth is warming at 0.06 and the total frequency of respondents that do not believe the Earth is warming at 0.34 we can find this probability by:
+
+```{r}
+# 0.06 Mod/Lib Republican nonbelievers
+# 0.34 Total that do not believe 
+0.06/0.34
+```
+
+
+The probability that a randomly chosen respondent is a moderate/liberal Republican given that
+they do not believe that the earth is warming is 0.1764 or about 18%. 
+

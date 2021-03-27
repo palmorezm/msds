@@ -1,0 +1,48 @@
+---
+title: "HW6 Solutions"
+author: "Zachary Palmore"
+date: "3/9/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# 1
+choose(5,0)*choose(7,5) +choose(5,1)*choose(7,4) #1
+
+# 2
+choose(13,4)*choose(14,1)+choose(13,5)*choose(14,0) #2
+
+# 3
+(2^5)*(6^2)*choose(52,3) #3
+
+# 4
+1-dhyper(0,4,48,3) #4
+
+# 5a
+choose(31,5) #5a
+
+# 5b
+choose(31,5)-choose(14,0)*choose(17,5) #5b
+
+# 6
+factorial(9)*choose(4,3)*choose(104,3)*choose(17,3) #6
+
+# 7a
+factorial(13)*(choose(24,13)-choose(5,5)*choose(19,8)) #7a
+
+# 7b
+factorial(13)* choose(18,7) #7b
+
+# 8
+choose(2,1)*choose(5,5)*choose(5,0)/choose(10,5) #8
+
+# 9a
+4*(44/52)-16*(8/52) #9a
+
+# 9b
+(4*(44/52)-16*(8/52))*833 #9b
