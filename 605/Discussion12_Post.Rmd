@@ -1,0 +1,26 @@
+---
+title: "Discussion 12"
+author: "Zachary Palmore"
+date: "4/5/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+
+```{r}
+hit_data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/605/baseball_battingdata.csv")
+hit_data <- data.frame(hit_data)
+head(hit_data)
+```
+
+
+
+```{r}
+plot(hit_data$ï..ExitVelocity.MPH., hit_data$HR)
+linear_model_EVtoHR <- lm(hit_data$ï..ExitVelocity.MPH. ~ hit_data$HR)
+plot(linear_model_EVtoHR)
+```
