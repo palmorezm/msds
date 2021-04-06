@@ -9,7 +9,10 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 
+## Prompt
+
+Using R, build a  regression model for data that interests you. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+
 
 ```{r}
 hit_data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/605/baseball_battingdata.csv")
