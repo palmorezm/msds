@@ -1,0 +1,43 @@
+---
+title: "Residual_Discussion"
+author: "Zachary Palmore"
+date: "4/6/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prompt
+
+Using R, build a  regression model for data that interests you. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+
+## Data 
+
+Upper air sounding of Minneapolis on January 1. Contains 
+
+
+```{r}
+data <- data.frame(read.delim("https://raw.githubusercontent.com/palmorezm/msds/main/605/upperair_72747_0100Z.txt", header=FALSE, sep = "\t"))
+colnames(data) <- c("Pressure", "Height", "Temperature")
+head(data)
+```
+
+
+```{r}
+summary(data)
+```
+
+
+
+```{r}
+plot(data$Pressure, data$Temperature)
+datalm <- lm(data$Pressure ~ data$Temperature)
+plot(datalm)
+```
+
+
+
+
+
