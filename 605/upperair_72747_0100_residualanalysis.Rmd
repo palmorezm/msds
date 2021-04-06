@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Prompt
 
-Using R, build a  regression model for data that interests you. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+Using R, build a regression model for data that interests you. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
 
 ## Data 
 
@@ -66,9 +66,16 @@ For the scale-Location plot, the residuals are reasonably equally spread along t
 
 Lastly, we review the Residuals vs Leverage Plot. In it, there are no residuals with enough leverage to be considered extreme or outliers. The data is clustered randomly between the leverage values of about 0.05 and 0.35. Cook's distance lines which guide the analyst are not shown at all because the values all have such a small similar amount of low leverage. No points have substantially greater influence over the others. 
 
+## Conclusion
+
+In this case, the linear model was appropriate, but I do have some reservations. The data did not deviate much at all from expectations with a normal linear data set. Our residuals did not appear to show any clear patterns that might indicate a better model choice. Rather, those residuals were randomly distributed when compared to fitted values and in standardized residuals in our Scale-Location plot. There were no outliers or overly influential points, and the data is approximately normal. However, a Box-Cox or similar transformation would improve the normality assumption as well. 
+
+My only reservation in fitting this data using linear regression is that there may be multiple levels to the sounding that do not fit a normal Q-Q plot. If the data were grouped by pressure levels, it would be reasonable to reduce it into two groups, one from 0 – 200hPa and the other 201+hPa. This grouping would likely change the entire assessment to one that contains two parabolas. This of course, could result in a better fit with other models.    
+
+
 ## Source
 
-
+University of Wyoming. Atmospheric Soundings. Retrieved April 06, 2021, http://weather.uwyo.edu/upperair/sounding.html
 
 
 
