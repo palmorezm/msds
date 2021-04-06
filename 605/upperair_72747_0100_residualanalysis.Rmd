@@ -15,7 +15,7 @@ Using R, build a  regression model for data that interests you. Conduct residual
 
 ## Data 
 
-Upper air sounding of Minneapolis on January 1. Contains 
+This data was collected from a radiosonde during an upper air sounding at MPX in Chanhassen, MN on January 1. The data has been reduced to display only the variables on interest: ambient air pressure in hectopascals (hPa), radisonde height in meters (m), and the temperature at each point recorded in degrees Celcius (C). A sample of the data is shown below. 
 
 
 ```{r}
@@ -25,17 +25,48 @@ head(data)
 ```
 
 
+A summary of the data shows that minimum height is 193. However, we know that the elevation of the local area is about 287m. Notice that there are no other observations at 193. This implies we could simply exclude it from data set since it is not a true measurement but perhaps a value that appeared during the instrument setup. This summary and the exclusion of the underground observation is shown below through the removal of the first row. 
+
+
 ```{r}
 summary(data)
+data <- data[-1,]
 ```
 
 
+## Variable Selection
+
+Now we plot the data to see which variables interest us most. The interaction of these three variables should demonstrate some physical constants. For example, there should be a decrease in pressure with height as the radiosonde move farther from earth and there should be a clear variation in the layering of temperature with height as well (to indicate layers of the atmosphere). Results are shown with all possible outcomes with the three variables plotted. 
+
+```{r}
+plot(data)
+```
+
+As expected, the results conform to the laws of physics, but we are not interested in the confirming their presence. From the chart, there are two variable combinations that are unique to this location around the twin cities of Minnesota. They are the plots of temperature and pressure which when plotted in either order describes the same atmospheric variation. For visual purposes, we will review what happens to temperature as pressure increases. Isolated from the matrix, that plot looks like:
 
 ```{r}
 plot(data$Pressure, data$Temperature)
+```
+
+## Analysis
+
+When we create a linear model using pressure modeled with temperature, we get the following diagnostic plots. 
+
+```{r}
 datalm <- lm(data$Pressure ~ data$Temperature)
+par(mfrow=c(2,2))
 plot(datalm)
 ```
+
+In the Residuals vs Fitted we notice that there does not appear to be a clear pattern emerging from the plot. Although there are two distinct portions of the trend line in red. The first beginning with a steady increase at a constant slope until a point where the data changes into a wide 'u' shape. In my opinion, this is a close enough fit to a linear model that I would only transform it and repeat the analysis. 
+
+From the Normal Q-Q plot we see that in the distribution of standardized residuals over theoretical quantiles there is some deviation from a perfectly normal distribution which may be cause for some concern. Here again, a Box-Cox or similar transformation might have the desired side-effect of straightening this Normal Q-Q plot and normalizing the distribution. Importantly, the only major issue with the plot occurs at the higher theoretical quanitiles of this plot. The lower quantiles bear no issue. 
+
+For the scale-Location plot, the residuals are reasonably equally spread along the predictors. In other words, the trendline of standardized residuals are near flat against the fitted values. If they were not, there might appear to be a trend line extending diagonally across the plot as shown in the Normal Q-Q. This does not occur and the variation in these residuals is fairly random.    
+
+Lastly, we review the Residuals vs Leverage Plot. In it, there are no residuals with enough leverage to be considered extreme or outliers. The data is clustered randomly between the leverage values of about 0.05 and 0.35. Cook's distance lines which guide the analyst are not shown at all because the values all have such a small similar amount of low leverage. No points have substantially greater influence over the others. 
+
+## Source
 
 
 
