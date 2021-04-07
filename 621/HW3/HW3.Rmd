@@ -35,6 +35,48 @@ c. Is the data correlated to the target variable (or to other variables?)
 d. Are any of the variables missing and need to be imputed “fixed”?
 
 
+```{r}
+cdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-training-data_modified.csv")
+cdata.eval <- read.csv("https://github.com/palmorezm/msds/blob/main/621/HW3/crime-evaluation-data_modified.csv")
+```
+
+
+
+```{r}
+sum(is.na(cdata))
+```
+
+
+
+```{r}
+missmap(cdata, main = "Missing vs Observed Values")
+```
+
+
+```{r}
+summary(cdata)
+```
+
+
+
+```{r}
+set.seed(72747)
+indecies <- createDataPartition(cdata$target, p = .7, list = FALSE, times = 1)
+train <- cdata[indecies,]
+test <- cdata[-indecies,]
+```
+
+
+```{r}
+train %>%
+  select(-target) %>%
+  summary() %>%
+  kable() %>%
+  kable_styling()
+```
+
+
+
 ## Data Preparation
 
 Describe how you have transformed the data by changing the original variables or creating new variables. If you 
