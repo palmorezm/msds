@@ -15,17 +15,19 @@ Using R, build a regression model for data that interests you. Conduct residual 
 
 ## Data 
 
-This data was collected from a radiosonde during an upper air sounding at MPX in Chanhassen, MN on January 1. The data has been reduced to display only the variables on interest: ambient air pressure in hectopascals (hPa), radisonde height in meters (m), and the temperature at each point recorded in degrees Celcius (C). A sample of the data is shown below. 
+This data was collected from a radiosonde during an upper air sounding at MPX in Chanhassen, MN on January 1. The data has been cleaned and reduced to display only the variables of interest: ambient air pressure in hectopascals (hPa), radiosonde height in meters (m), and the temperature at each of those points recorded in degrees Celsius (C). A sample of the data is shown below. 
 
 
 ```{r}
 data <- data.frame(read.delim("https://raw.githubusercontent.com/palmorezm/msds/main/605/upperair_72747_0100Z.txt", header=FALSE, sep = "\t"))
 colnames(data) <- c("Pressure", "Height", "Temperature")
 head(data)
+tbl <- rmarkdown::paged_table(head(data))
+write.table(tbl, file="C:/data/tbl.png")
 ```
 
 
-A summary of the data shows that minimum height is 193. However, we know that the elevation of the local area is about 287m. Notice that there are no other observations at 193. This implies we could simply exclude it from data set since it is not a true measurement but perhaps a value that appeared during the instrument setup. This summary and the exclusion of the underground observation is shown below through the removal of the first row. 
+A summary of the data shows that the minimum height is 193. However, we know that the elevation of the local area is about 287m. Notice that there are no other observations at 193. This implies we could simply exclude it from the data set since it is not a true measurement but perhaps a value that appeared during the instrument setup. This summary and the exclusion of the underground observation are shown below through the removal of the first row. 
 
 
 ```{r}
@@ -42,10 +44,13 @@ Now we plot the data to see which variables interest us most. The interaction of
 plot(data)
 ```
 
-As expected, the results conform to the laws of physics, but we are not interested in the confirming their presence. From the chart, there are two variable combinations that are unique to this location around the twin cities of Minnesota. They are the plots of temperature and pressure which when plotted in either order describes the same atmospheric variation. For visual purposes, we will review what happens to temperature as pressure increases. Isolated from the matrix, that plot looks like:
+As expected, the results conform to the laws of physics, but we are not interested in confirming their presence. From the chart, there are two variable combinations that are unique to this location around the twin cities of Minnesota. They are the plots of temperature and pressure which when plotted in either order describes the same atmospheric variation. For visual purposes, we will review what happens to temperature as pressure increases. Isolated from the matrix, that plot looks like:
 
 ```{r}
-plot(data$Pressure, data$Temperature)
+plot(data$Pressure, data$Temperature, 
+     xlab = "Pressure (hPa)", ylab = "Temperature (C)", 
+     main = "Upper Atomspheric Temperature Fluxuations", 
+     sub = "Station ID: 72747 on January 1, 2021")
 ```
 
 ## Analysis
