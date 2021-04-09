@@ -13,15 +13,40 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Overview 
 
-In this homework assignment, you will explore, analyze and model a data set containing information on crime 
-for various neighborhoods of a major city. Each record has a response variable indicating whether or not the crime 
-rate is above the median crime rate (1) or not (0).
+```{r}
+# Packages
+library(tidyverse)
+library(kableExtra)
+library(Amelia)
+library(caret)
+library(pROC)
+```
 
-Your objective is to build a binary logistic regression model on the training data set to predict whether the 
-neighborhood will be at risk for high crime levels. You will provide classifications and probabilities for the 
-evaluation data set using your binary logistic regression model. You can only use the variables given to you (or 
-variables that you derive from the variables provided). Below is a short description of the variables of interest in 
-the data set:
+
+In this homework assignment, we will explore, analyze and model a data set containing information on crime for various neighborhoods of a major city. Each record has a response variable indicating whether or not the crime rate is above the median crime rate (1) or not (0). 
+
+Our objective is to build a binary logistic regression model on the training data set to predict whether the neighborhood will be at risk for high crime levels. We will provide classifications and probabilities for the evaluation data set using our binary logistic regression model. We can only use the variables given to us (or variables that are derived from the variables provided).
+
+
+## Introduction 
+
+```{r}
+cdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-training-data_modified.csv")
+cdata.eval <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-evaluation-data_modified.csv")
+```
+
+
+There are 466 observations in this data set with 13 different variables. Each observation is a statistical summary that indicates an attribute associated with a particular neighborhood within the major city. For example the first variable 'zn' contains the proportion of residential land zoned for lots that are over 25000 square feet. The first five observations of each variable are shown. 
+
+```{r}
+first5.tbl <- cdata[1:5,]
+first5.tbl %>%
+  kbl() %>%
+  kable_styling()
+```
+
+
+
 
 ## Data Exploration
 
@@ -35,18 +60,15 @@ c. Is the data correlated to the target variable (or to other variables?)
 d. Are any of the variables missing and need to be imputed “fixed”?
 
 
-```{r}
-cdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-training-data_modified.csv")
-cdata.eval <- read.csv("https://github.com/palmorezm/msds/blob/main/621/HW3/crime-evaluation-data_modified.csv")
-```
-
-
+Checking to see if any of the data are missing. 
 
 ```{r}
 sum(is.na(cdata))
 ```
 
+None of the data are missing.
 
+We can also visualize this to blue where there is data and red where there is a 'NA' or missing value for each variable. 
 
 ```{r}
 missmap(cdata, main = "Missing vs Observed Values")
@@ -54,7 +76,10 @@ missmap(cdata, main = "Missing vs Observed Values")
 
 
 ```{r}
-summary(cdata)
+summary.tbl <- summary(cdata)
+summary.tbl %>% 
+  kable %>% 
+  kable_styling()
 ```
 
 
@@ -107,3 +132,8 @@ For the binary logistic regression model, will you use a metric such as log like
 the training data set, evaluate the binary logistic regression model based on (a) accuracy, (b) classification error
 rate, (c) precision, (d) sensitivity, (e) specificity, (f) F1 score, (g) AUC, and (h) confusion matrix. Make predictions 
 using the evaluation data set
+
+
+
+## Conclusion
+
