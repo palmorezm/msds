@@ -28,10 +28,13 @@ Our objective is to build a binary logistic regression model on the training dat
 # Packages
 library(tidyverse)
 library(reshape2)
+library(ggpubr)
+library(ggcorrplot)
 library(kableExtra)
 library(Amelia)
 library(caret)
 library(pROC)
+theme_set(theme_minimal())
 # Data
 cdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-training-data_modified.csv")
 cdata.eval <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-evaluation-data_modified.csv")
@@ -78,7 +81,7 @@ We will also look at this data set from
 Checking to see if any of the data are missing. 
 
 ```{r}
-sum(is.na(cdata))
+cdata.missingobservatons <- sum(is.na(cdata))
 missmap(cdata, main = "Missing and Complete Observations")
 ```
 
@@ -91,9 +94,7 @@ We can also visualize this to blue where there is data and red where there is a 
 
 ```{r}
 summary.tbl <- summary(cdata)
-summary.tbl %>% 
-  kable %>% 
-  kable_styling()
+summary.tbl 
 ```
 
 
@@ -109,10 +110,164 @@ test <- cdata[-indecies,]
 ```{r}
 train %>%
   select(-target) %>%
-  summary() %>%
-  kable() %>%
-  kable_styling()
+  summary() 
 ```
+
+
+
+```{r}
+train[1:12] %>%   
+  melt() %>% 
+  ggplot() +                      
+    geom_histogram(aes(value, alpha = 2, fill = variable)) +
+    facet_wrap(~ variable, scales = "free") + 
+    geom_freqpoly(aes(value), bins=15, lty = 3) +
+    labs(title = "Title", subtitle = "Subtitle") +
+    theme(axis.title = element_blank(), 
+          legend.position = "none", 
+          plot.title = element_text(hjust = 0.5), 
+          plot.title.position = "panel",
+          plot.subtitle = element_text(hjust = 0.5)) 
+```
+
+
+```{r}
+train[1:12] %>%   
+  melt() %>% 
+  ggplot() +                      
+    geom_density(aes(value, alpha=.50, fill = variable)) +
+    facet_wrap(~ variable, scales = "free") +
+    labs(title = "Title", subtitle = "Subtitle") +
+    theme(axis.title = element_blank(), 
+          legend.position = "none", 
+          plot.title = element_text(hjust = 0.5), 
+          plot.title.position = "panel",
+          plot.subtitle = element_text(hjust = 0.5)) 
+```
+
+
+```{r}
+train[c("rm", "medv", "nox", "lstat", "dis", "ptratio", "age")] %>% 
+  melt() %>% 
+  ggplot() +
+  geom_density(aes(value, color = variable))
+
+train %>% 
+  melt() %>% 
+  ggplot() + 
+  geom_density(aes(value, color = variable))
+```
+
+
+
+```{r}
+train[1:12] %>% 
+  melt() %>% 
+  ggplot(, aes(variable, value)) + geom_violin(aes(variable, value, fill=variable)) + 
+  geom_boxplot(aes(variable, value, color = variable)) + guides(color=FALSE, size=FALSE) +
+  ggtitle("Boxplot of Predictors") +
+  theme(axis.title = element_blank()) 
+```
+
+
+```{r}
+# seperate into groups 
+zimlp <- train[,c("zn", "indus", "medv", "lstat", "ptratio")]
+ta <- train[,c("tax", "age")]
+rdr <- train[,c("rad", "dis", "rm")]
+nc <- train[,c("nox", "chas")]
+```
+
+
+
+```{r}
+viobox.zimlp <- zimlp %>% 
+  melt() %>% 
+  ggplot() + 
+  geom_violin(aes(variable, value, fill=variable, fatten=2)) +
+  geom_boxplot(aes(variable, value, color = variable, alpha = .90)) +
+  xlab("Value") + ylab("Variable") + 
+  theme(legend.position = "none", axis.title = element_blank()) +
+  coord_flip()
+viobox.ta <- ta %>% 
+  melt() %>% 
+  ggplot() + 
+  geom_violin(aes(variable, value, fill=variable, fatten=2)) +
+  geom_boxplot(aes(variable, value, color = variable, alpha = .90)) +
+  xlab("Value") + ylab("Variable") + 
+  theme(legend.position = "none", axis.title = element_blank()) +
+  coord_flip()
+viobox.rdr <- rdr %>% 
+  melt() %>% 
+  ggplot() + 
+  geom_violin(aes(variable, value, fill=variable, fatten=2)) +
+  geom_boxplot(aes(variable, value, color = variable, alpha = .90)) +
+  xlab("Value") + ylab("Variable") + labs(title = "Predictor Summary Plots",
+                                          subtitle = "Using Mean, Density, & Spread") + 
+  theme(legend.position = "none", axis.title = element_blank()) +
+  coord_flip()
+viobox.nc <- nc %>% 
+  melt() %>% 
+  ggplot() + 
+  geom_violin(aes(variable, value, fill=variable, fatten=2)) +
+  geom_boxplot(aes(variable, value, color = variable, alpha = .90)) +
+  xlab("Value") + ylab("Variable") + 
+  theme(legend.position = "none", axis.title = element_blank()) +
+  coord_flip()
+ggarrange(viobox.rdr, viobox.zimlp, viobox.nc, viobox.ta) 
+```
+
+
+
+```{r}
+# Function to calculate and set pointrange
+xysdu <- function(x) {
+   m <- mean(x)
+   ymin <- m - sd(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymin = ymin, ymax = ymax))
+}
+
+colors <- c("Median" = "Red", "Mean" = "Black")
+ptrng.zimlp <- zimlp %>% 
+  melt() %>% 
+  ggplot(aes(variable, value)) + coord_flip() + 
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+ptrng.rdr <- rdr %>% 
+  melt() %>% 
+  ggplot(aes(variable, value)) + coord_flip() + 
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  labs(title = "Characteristic Outlier Analysis", 
+       subtitle = "By Preditor Mean & Median") + 
+  scale_color_manual(values = colors) +
+  theme(legend.position = "Bottom", axis.title.x = element_blank(), axis.title.y = element_blank())
+ptrng.ta <- ta %>% 
+  melt() %>% 
+  ggplot(aes(variable, value)) + coord_flip() + 
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+ptrng.nc <- nc %>% 
+  melt() %>% 
+  ggplot(aes(variable, value)) + coord_flip() + 
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+ggarrange(ptrng.rdr, ptrng.zimlp, ptrng.nc, ptrng.ta) 
+```
+
+
+
+
+```{r}
+train %>% 
+  cor() %>% 
+  ggcorrplot(method = "square", type="upper", ggtheme = ggplot2::theme_minimal, legend.title = "Influence") + coord_flip()
+```
+
 
 
 
@@ -125,6 +280,13 @@ b. Create flags to suggest if a variable was missing
 c. Transform data by putting it into buckets
 d. Mathematical transforms such as log or square root (or use Box-Cox)
 e. Combine variables (such as ratios or adding or multiplying) to create new variables
+
+
+```{r}
+baseline <- glm(target ~ nox, family = binomial(link = "logit"), train)
+summary(baseline)
+```
+
 
 ## Build Models
 
