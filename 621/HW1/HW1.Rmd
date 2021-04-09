@@ -48,8 +48,7 @@ theme_set(theme_minimal())
 ```{r message=FALSE, warning=FALSE}
 # Our training data
 tdata <- read.csv(
-"https://raw.githubusercontent.com/palmorezm/data621/main/moneyball-training-data.csv
-?token=AQYT6MZMRA4GRVITJM7BRUDAGVK7G")
+"https://raw.githubusercontent.com/palmorezm/msds/main/621/HW1/moneyball-training-data.csv")
 # Basic statistics from the set 
 total.obs <- count(tdata)
 avg.wins <- mean(tdata$TARGET_WINS) 
