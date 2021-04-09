@@ -1,10 +1,12 @@
 ---
 title: "HW3"
+subtitle: "Business Analytics and Data Mining"
 author: "Zachary Palmore"
 date: "3/26/2021"
 output:
-  pdf_document: default
-  html_document: default
+  rmdformats::html_clean:
+    highlight: "monochrome"
+    code_folding: "hide"
 ---
 
 ```{r setup, include=FALSE}
@@ -13,15 +15,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Overview 
 
-```{r}
-# Packages
-library(tidyverse)
-library(kableExtra)
-library(Amelia)
-library(caret)
-library(pROC)
-```
-
+___
 
 In this homework assignment, we will explore, analyze and model a data set containing information on crime for various neighborhoods of a major city. Each record has a response variable indicating whether or not the crime rate is above the median crime rate (1) or not (0). 
 
@@ -30,11 +24,18 @@ Our objective is to build a binary logistic regression model on the training dat
 
 ## Introduction 
 
-```{r}
+```{r message=FALSE}
+# Packages
+library(tidyverse)
+library(reshape2)
+library(kableExtra)
+library(Amelia)
+library(caret)
+library(pROC)
+# Data
 cdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-training-data_modified.csv")
 cdata.eval <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW3/crime-evaluation-data_modified.csv")
 ```
-
 
 There are 466 observations in this data set with 13 different variables. Each observation is a statistical summary that indicates an attribute associated with a particular neighborhood within the major city. For example the first variable 'zn' contains the proportion of residential land zoned for lots that are over 25000 square feet. The first five observations of each variable are shown. 
 
@@ -45,34 +46,47 @@ first5.tbl %>%
   kable_styling()
 ```
 
+Our target variable is labeled 'target' although it describes whether the neighborhood's crime rate is above the median or below it. Any or all of these variables could be used as our predictors. In the next section we will explore the relationships between these predictors and review their interaction with our target to see which of the variables make the best predictors of crime rate. A full list of variable descriptions is also provided for reference. 
 
-
+```{r}
+vardesc <- data.frame(matrix(c(
+'zn',	'proportion of residential land zoned for large lots (over 25000 square feet)',
+'indus',	'proportion of non-retail business acres per suburb',
+'chas',	'a dummy var. for whether the suburb borders the Charles River (1) or not (0)',
+'nox',	'nitrogen oxides concentration (parts per 10 million)',
+'rm',	'average number of rooms per dwelling',
+'age',	'proportion of owner-occupied units built prior to 1940',
+'dis',	'weighted mean of distances to five Boston employment centers',
+'rad', 'index of accessibility to radial highways',
+'tax',	'full-value property-tax rate per $10,000',
+'ptratio',	'pupil-teacher ratio by town',
+'lstat',	'lower status of the population (percent)',
+'medv',	'median value of owner-occupied homes in $1000s',
+'target',	'whether the crime rate is above the median crime rate (1) or not (0)'), byrow = TRUE, ncol = 2))
+colnames(vardesc) <- c('Variable', 'Description')
+kable(vardesc) %>% 
+  kable_styling()
+```
 
 ## Data Exploration
 
-Describe the size and the variables in the crime training data set. Consider that too much detail will cause a 
-manager to lose interest while too little detail will make the manager consider that you aren’t doing your job. Some 
-suggestions are given below. Please do NOT treat this as a check list of things to do to complete the assignment. 
-You should have your own thoughts on what to tell the boss. These are just ideas.
-a. Mean / Standard Deviation / Median
-b. Bar Chart or Box Plot of the data
-c. Is the data correlated to the target variable (or to other variables?)
-d. Are any of the variables missing and need to be imputed “fixed”?
+To determine which of the variables might make the best predictors we must first explore the data for potential sources of error. This includes, identifying and fixing missing values (if there are any), calculating and comparing averages, standard deviations, and other summary statistics.
+
+We will also look at this data set from 
 
 
 Checking to see if any of the data are missing. 
 
 ```{r}
 sum(is.na(cdata))
+missmap(cdata, main = "Missing and Complete Observations")
 ```
+
 
 None of the data are missing.
 
 We can also visualize this to blue where there is data and red where there is a 'NA' or missing value for each variable. 
 
-```{r}
-missmap(cdata, main = "Missing vs Observed Values")
-```
 
 
 ```{r}
