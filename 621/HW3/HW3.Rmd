@@ -13,9 +13,12 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Overview 
+
+# Assignment 3
 
 ___
+
+## Overview 
 
 In this homework assignment, we will explore, analyze and model a data set containing information on crime for various neighborhoods of a major city. Each record has a response variable indicating whether or not the crime rate is above the median crime rate (1) or not (0). 
 
@@ -49,7 +52,7 @@ first5.tbl %>%
   kable_styling()
 ```
 
-Our target variable is labeled 'target' although it describes whether the neighborhood's crime rate is above the median or below it. Any or all of these variables could be used as our predictors. In the next section we will explore the relationships between these predictors and review their interaction with our target to see which of the variables make the best predictors of crime rate. A full list of variable descriptions is also provided for reference. 
+Our target variable is labeled 'target' and it describes whether the neighborhood's crime rate is above the median or below it. Any or all of these variables could be used as our predictors except our target variable. In the next section we will explore the relationships between these predictors and review their interaction with our target to see which of the variables make the best predictors of crime rate. A full list of variable descriptions is also provided for reference. 
 
 ```{r}
 vardesc <- data.frame(matrix(c(
@@ -73,7 +76,7 @@ kable(vardesc) %>%
 
 ## Data Exploration
 
-To determine which of the variables might make the best predictors we must first explore the data for potential sources of error. This includes, identifying and fixing missing values (if there are any), calculating and comparing averages, standard deviations, and other summary statistics.
+To determine which of the variables might make the best predictors we must first explore the data for potential sources of error. This includes, identifying and fixing missing values (if there are any), calculating and comparing averages, standard deviations, and other summary statistics. It would also be useful to evaluate how 
 
 We will also look at this data set from 
 
@@ -147,15 +150,56 @@ train[1:12] %>%
 
 
 ```{r}
-train[c("rm", "medv", "nox", "lstat", "dis", "ptratio", "age")] %>% 
-  melt() %>% 
-  ggplot() +
-  geom_density(aes(value, color = variable))
-
 train %>% 
   melt() %>% 
   ggplot() + 
-  geom_density(aes(value, color = variable))
+  geom_density(aes(value))
+  
+  t.train <- data.frame(t(train))
+  t.train %>%
+    melt() %>% 
+    ggplot() +
+    geom_point(aes(value, variable, color = variable)) + 
+    theme(legend.position = "none",
+          axis.title.x = element_blank(), 
+          axis.text.y = element_blank()) 
+
+
+m.train <- train %>% 
+  melt()
+f.train <- cbind(m.train, t.train)
+
+f.train %>% 
+  rename("predictor" = variable, 
+         "m.vals" = value) %>% 
+  melt()  %>% 
+  ggplot() + 
+  geom_density(aes(value, color = variable, alpha=.1)) + theme(legend.position = "none",
+          axis.title.x = element_blank(), 
+          axis.text.y = element_blank()) +
+  geom_blank(aes(value), binwidth = 5)
+  
+f.train %>% 
+  rename("predictor" = variable, 
+         "m.vals" = value) %>% 
+  melt()  %>% 
+  group_by(predictor) %>%
+  mutate(predictor.med = median(value), 
+            predictor.mean = mean(value)) %>%
+  ggplot() + 
+  geom_point(aes(predictor.med, predictor, color = predictor)) 
+
+
+f.train %>% 
+  rename("predictor" = variable, 
+         "m.vals" = value) %>% 
+  melt()  %>% 
+  group_by(predictor) %>%
+  mutate(predictor.med = median(value), 
+            predictor.mean = mean(value)) %>%
+  ggplot() + 
+  geom_point(aes(predictor.mean, predictor, color = predictor)) 
+
 ```
 
 

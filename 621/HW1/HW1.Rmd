@@ -338,8 +338,7 @@ Based on this data set we have options to choose from when deciding how to best 
 # Take sample of tdata or 
 # Use evaluation data to predict wins 
 set.seed(0621)
-edata <- read.csv("https://raw.githubusercontent.com/palmorezm/data621/main/
-moneyball-evaluation-data.csv")
+edata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW1/moneyball-evaluation-data.csv")
 tsample_300 <- sample_n(tdata[2:17], 300, 
                         replace = FALSE, weight = NULL) # random
 # sample of 300 rows; no replacement
