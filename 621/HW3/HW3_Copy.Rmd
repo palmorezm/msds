@@ -91,7 +91,7 @@ cdata.missingobservations <- sum(is.na(cdata))
 missmap(cdata, main = "Missing and Complete Observations")
 ```
 
-This map appears to be a solid color of blue which indicates that none of the data are missing. We can also confirm this statistically where our calculations of any non-applicable value would be counted and tallied then take the sum of those tallies for a total value missing. Perhaps as expected, the total missing from statistical calculations is `r cdata.missingobservations`. This is wonderful news since it means we will not need to impute but exceedingly abnormal given this kind of model.
+This map appears to be a solid color of blue which indicates that none of the data are missing. We can also confirm this statistically where our calculations of any non-applicable value would be counted and tallied then take the sum of those tallies for a total value missing. Perhaps as expected, the total missing from statistical calculations is `r cdata.missingobservations`. This is wonderful news since it means we will not need to impute or estimate new data points but it should be noted that this is exceedingly abnormal given this kind of model.
 
 Next we calculate and compare the averages, standard deviations, and other summary statistics. These will be used to moderate our expectations of the variables in our model and inform us of the best ways to prepare the data if there are any changes that need to be made. Those statistics are shown below. 
 
@@ -104,13 +104,13 @@ kbl(desc.tbl, booktabs = T, caption = "Summary Statistics - Crime Data") %>%
 
 Since it is quite rare to have a fully filled data set, we further confirm the presence of each observation with the 'n' column. This column describes how many observations there are of each variable. Here again, we are reassured that this data is fairly clean already with the same number of observations for each variable. 
 
-To get a sense of scale, magnitude, and direction for these vectors we calculated the mean, median, and range for each variables. Notice that the potential predictors of 'tax' and 'age' seem to be on a different scale than the remaining variables. There is also a relatively large standard error for the the variables 'zn,' 'age,' and 'tax' when compared with the other potential predictors. Many of these variables have small deviations from their means or low variance with standard deviations less than 10. However, those same three predictors mentioned, do not. 
+To get a sense of scale, magnitude, and direction for these vectors we calculated the mean, median, and range for each variable. Notice that the potential predictors of 'tax' and 'age' seem to be on a different scale than the remaining variables. There is also a relatively large standard error for the the variables 'zn,' 'age,' and 'tax' when compared with the other potential predictors. Many of these variables have small deviations from their means or low variance with standard deviations less than 10. However, those same three predictors mentioned do not. 
 
-We recognize that any of these variables could confound existing relationships with our target; or may turn out to be complete outliers that could skew our model. But those three, 'zn,' 'age,' and 'tax' are enough cause for concern that we need a deeper look at all predictors. We should make every attempt to avoid spurious associations if we are to build an accurate model. 
+We recognize that any of these variables could confound existing relationships with our target or may turn out to be complete outliers that could skew our model. But those three, 'zn,' 'age,' and 'tax' are enough cause for concern that we need a deeper look at all predictors. We should make every attempt to avoid spurious associations if we are to build an accurate model. 
 
 Before delving into the nuances of these variables' distributions and spreads, we take a random sample of the complete table of crime data and divide it into training and evaluation data sets using a 70-30 split. Given that we had 466 observations within the complete crime data list we should expect about 327 observations in the resultant training data with the remaining 139 observations in the evaluation set. 
 
-After, we recalculate the same summary statistics on our training set called 'train.' Ideally, these identical calculations will produce values that preserve the essence of the orignial data. This helps ensure we make the best model for real-world scenarios. This process is documented below. 
+After, we recalculate the same summary statistics on our training set called 'train.' Ideally, these identical calculations will produce values that preserve the essence of the original data. This helps ensure we make the best model for real-world scenarios. This process is documented below. 
 
 ```{r}
 set.seed(72747)
@@ -128,9 +128,9 @@ kbl(t.desc.tbl, booktabs = T, caption = "Summary Statistics - Training Data") %>
 
 
 
-Results indicate that our random sample split worked properly with 327 observations of all potential predictors in the training set. Our calculated values also remain close to the original with the most variation occurring in those same three previously mentioned variables 'zn,' 'age,', and 'tax.' Thus, the essence of the crime data tables has been persevered. These predictors will likely need adjusting but for now, we continue exploring the data. 
+Results indicate that our random sample split worked properly with 327 observations of all potential predictors in the training set. Our calculated values also remain close to the original with the most variation occurring in those same three previously mentioned variables 'zn,' 'age,', and 'tax.' Thus, the essence of the crime data tables has been preserved. These predictors will likely need adjusting but for now, we continue exploring the data. 
 
-Now, we check for patterns in the distributions of the predictors. Finding those that might not fit within our model improves our precision. We can also being to check for conditional assumptions that must be made for us to be able perform a logistic regression. Keep a close look on how these variables differ in the histogram-frequency chart below. 
+Now, we check for patterns in the distributions of the predictors. Finding those that might not fit within our model improves our precision. We can also begin to check for conditional assumptions that must be validated in order for us to be able build a useful logistic regression model. Keep a close look on how these variables differ in the histogram-frequency chart below. 
 
 ```{r message=F, warning=F}
 train[1:12] %>%   
@@ -301,7 +301,7 @@ rdr <- train[,c("rad", "dis", "rm")]
 nc <- train[,c("nox", "chas")]
 ```
 
-With these predictor groups, we can create violin plots with those boxplots to describe the median and outliers of each predictor. It is another, more useful way to visualize the distribution while evaluating those conditional assumptions of logistic regression to guarantee model adheres to the rules of binary logistic modeling. Kernel density estimates are placed on here as the black lines that create the 'violin' shapes to gauge where in the distribution point are concentrated. This is shown relative to the predictor's own mean, IQR, range, deviations, and shows variation across the spread of other predictors in their clustered groups.   
+With these predictor groups, we can create violin plots with those boxplots to describe the median and outliers of each predictor. It is another, more useful way to visualize the distribution while evaluating those conditional assumptions of logistic regression to guarantee that the model adheres to the rules of binary logistic modeling. Kernel density estimates are placed on here as the black lines that create the 'violin' shapes to gauge where in the distribution points are concentrated. This is shown relative to the predictor's own mean, IQR, range, deviations, and shows variation across the spread of other predictors in their clustered groups.   
 
 ```{r message=F, warning=F}
 viobox.zimlp <- zimlp %>% 
@@ -340,7 +340,7 @@ viobox.nc <- nc %>%
 ggarrange(viobox.rdr, viobox.zimlp, viobox.nc, viobox.ta) 
 ```
 
-The predictors 'rm,' 'ptratio,' 'medv,' 'lstat,' and 'nox,' are the most likely choices to make an inference on at this moment. This is because they are suited to predict with; that is, they have an average near the center of their distribution, are more unimodal than other options, and contain a spread with minimal outliers. While this makes it easy to see which distributions' properties it is hard to discern exactly what the magnitude of influence outliers could play in each predictors' distribution. For that, we repeat the process with a new plot. 
+The predictors 'rm,' 'ptratio,' 'medv,' 'lstat,' and 'nox,' are the most likely choices to make an inference on at this moment. This is because they are suited to predict with; that is, they have an average near the center of their distribution, are more unimodal than other options, and contain a spread with minimal outliers. While this makes it easy to see which distributions' properties are most useful to us, it is hard to discern exactly what the magnitude of influence outliers could play in each predictors' distribution. For that, we repeat the process with a new plot. 
 
 
 ```{r message=F, warning=F}
@@ -493,7 +493,7 @@ Our first model will be one based on a single predictor to build on. It is inclu
 
 This idea considers the hypothesis that wealthier homeowners are able to buy their way out of higher crime neighborhoods or into lower crime areas. This could be through the selling of higher valued homes or alternatively excluding those who cannot afford homes that might be more likely to commit a crime. We test this here in our first model, 'mod1'.
 
-Generally speaking, when we consider criminal activity and the rate at which it occurs, we are not speaking of fraud, money laundering, or other high crimes and misdemeanors that typically are not associated with any specific location. We are only speaking of physical, reportable crimes that often have a discrete statistic with a specific victim or victims. Meanwhile, criminal activity with an broad, non-discrete victim and no physical location remain unreported. It is not something we can adjust for in this analysis, but it is worth discussing. 
+Generally speaking, when we consider criminal activity and the rate at which it occurs, we are not speaking of fraud, money laundering, or other high crimes and misdemeanors that typically are not associated with any specific location. We are only speaking of physical, reportable crimes that often have a discrete statistic with a specific victim or victims. Meanwhile, criminal activity with a broad, non-discrete victim and no physical location goes unreported. That is, no statistic is captured at least until the individual or individuals are caught. In which case there is no backwards tracking to collect the data and reapply it to past analyses, especially when data is tracked in near real-time. This lag and inequality between crime types create another host of issues. It is not something we can adjust for in this analysis, but it is worth discussing when building future models.  
 
 ```{r}
 mod1 <- glm(target ~ medv, family = binomial(link = "logit"), training)
@@ -531,9 +531,9 @@ This model's F1 score is `r F1.mod1` with an overall accuracy of about 0.46. Thi
 ___
 
 
-## Modeling Building
+## Model Building
 
-When building these it is imparative that we test the data so that we can comprehend how the model functioned with its features. With this analysis, we will place a focus on the F1 score calculation in testing for later evaluation during model selection. We begin by attempting to beat the scores of our prepared model. In this case, it means trying to include the most useful predictors that may increase our accuracy. This should not be too difficult since it was our intent to start at a low value. The same process documented in our data preparation model is utilized. 
+When building these it is imperative that we test the data so that we can comprehend how the model functioned with its features. With this analysis, we will place a focus on the F1 score calculation in testing for later evaluation during model selection. We begin by attempting to beat the scores of our prepared model. In this case, it means trying to include the most useful predictors that may increase our accuracy. This should not be too difficult since it was our intent to start at a low value. The same process documented in our data preparation model is utilized. 
 
 ```{r}
 mod1.all <- glm(target ~ ., family = binomial(link = "logit"), training)
@@ -581,7 +581,7 @@ cm
 F1.mod2 <- F1(cm)
 ```
 
-This model with minor changes and only a single predictor performs better than the full scale model with all predictors of the training set. We had an accuracy of approximately 0.69 and and F1 score of `r F1.mod2`. This is an improvement and so we move forward with this prepared data. Next we include all predictors for model 2. Recall that, this data set includes everything from the original crime data set which should give a better picture of what is happening with crime rate. 
+This model with minor changes and only a single predictor performs better than the full scale model with all predictors of the training set. We had an accuracy of approximately 0.69 and and F1 score of `r F1.mod2`. This is an improvement and so we move forward with this prepared data. Next we include all predictors for model 2. Recall that this data set includes everything from the original crime data set which should give a better picture of what is happening with crime rate. 
 
 ```{r}
 mod2.all <- glm(target ~ ., family = binomial(link = "logit"), train)
@@ -636,7 +636,7 @@ ___
 
 ## Model Selection
 
-Our criteria for selecting the best binary logistic regression model relies on predominantly on model accuracy, especially through its F1 score. This is based on the theory that in the real-world application of these models, the amount of false positives and false negatives in our prediction are critical for analysis. The F score also combines information from its formula on model sensitivity and precision. We also consider the number of predictors, with a preference for a lower number. Thinking in terms of applications of data collection, it might be more cost-effective if we did not need to collect as many predictors but were able to make the same predictions with minimal disturbance of our accuracy. As added measures, the coefficient of determination, deviance, and Akaike information criterion (AIC) are computed for each model. Should existing accuracy and predictors lead to narrow selection margin, a higher prediction accuracy in the form of a coefficient of determination, lower deviance, and better quality model as determined by AIC will be the ultimate decider. We arrange these statistics into a table:
+Our criteria for selecting the best binary logistic regression model relies predominantly on model accuracy, especially through its F1 score. This is based on the theory that in the real-world application of these models, the amount of false positives and false negatives in our prediction are critical for analysis. The F score also combines information from its formula on model sensitivity and precision. We also consider the number of predictors, with a preference for a lower number. Thinking in terms of applications of data collection, it might be more cost-effective if we did not need to collect as many predictors but were able to make the same predictions with minimal disturbance of our accuracy. As added measures, the coefficient of determination, deviance, and Akaike information criterion (AIC) are computed for each model. Should existing accuracy and predictors lead to narrow selection margin, a higher prediction accuracy in the form of a coefficient of determination, lower deviance, and better quality model as determined by AIC will be the ultimate decider. We arrange these statistics into a table:
 
 ```{r}
 res.tbl <- results
@@ -661,5 +661,5 @@ ___
 
 ## Conclusion
 
-Due to its improved performance statistics and use of fewer predictors to achieve the same or better levels of accuracy than other models, Model 3 is the best choice for making predictions with in a real-world setting. This model has minimal changes made to it, with minor adjustments in outlier quantity a subsequent reduction of overall observations and focusing of predictors on scale by clustering. If this analysis were to go further, it might be useful to identify other model types that could improve prediction accuracy while decreasing the predictors needed to make correct predictions. This might include an ensemble model that utilizes new predictors formed from the proportions of original predictors. However, for our purposes, an F1 score of `r F1.mod3` and accuracy of about 94.4% using only 9 raw predictors, will suffice for practical predictions. 
+Due to its improved performance statistics and use of fewer predictors to achieve the same or better levels of accuracy than other models, Model 3 is the best choice for making predictions within a real-world setting. This model has minimal changes made to it, with minor adjustments in outlier quantity a subsequent reduction of overall observations and focusing of predictors on scale by clustering. If this analysis were to go further, it might be useful to identify other model types that could improve prediction accuracy while decreasing the predictors needed to make correct predictions. This might include an ensemble model that utilizes new predictors formed from the proportions of original predictors. However, for our purposes, an F1 score of `r F1.mod3` and accuracy of about 94.4% using only 9 raw predictors, will suffice for practical predictions. 
 
