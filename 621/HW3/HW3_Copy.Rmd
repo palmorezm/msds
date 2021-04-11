@@ -1,21 +1,23 @@
 ---
 title: "HW3"
-subtitle: "Business Analytics and Data Mining"
 author: "Zachary Palmore"
-date: "3/26/2021"
-output:
-  rmdformats::html_clean:
-    highlight: "monochrome"
-    code_folding: "hide"
+date: "4/11/2021"
+output: pdf_document
+subtitle: "Business Analytics and Data Mining"
+header-includes: 
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+\bcenter
 
 # Assignment 3
 
+\ecenter
 ___
 
 ## Purpose
@@ -24,10 +26,11 @@ In this homework assignment, we will explore, analyze and model a data set conta
 
 Our purpose is to build a binary logistic regression model on the training data set to predict whether the neighborhood will be at risk for high crime levels. We will provide classifications and probabilities for the evaluation data set using our binary logistic regression model. We can only use the variables given to us (or variables that are derived from the variables provided).
 
+___
 
 ## Introduction 
 
-```{r message=FALSE}
+```{r message=FALSE, warning=FALSE}
 # Packages
 library(tidyverse)
 library(reshape2)
@@ -49,7 +52,9 @@ There are 466 observations in this data set with 13 different variables. Each ob
 
 ```{r}
 first5.tbl <- cdata[1:5,]
-first5.tbl 
+kbl(first5.tbl, booktabs = T, caption = "Initial Observations") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = T) %>% 
+  footnote(c("Only showing the first five observations of each variable"))
 ```
 
 Our target variable is labeled 'target' and it describes whether the neighborhood's crime rate is above the median or below it. Any or all of these variables could be used as our predictors except the dummy variable of 'chas' and our target variable. In the next section we will explore the relationships between these predictors and review their interaction with our target to see which of the variables make the best predictors of crime rate. A full list of variable descriptions is also provided for reference. 
@@ -70,15 +75,19 @@ vardesc <- data.frame(matrix(c(
 'medv',	'median value of owner-occupied homes in $1000s',
 'target',	'whether the crime rate is above the median crime rate (1) or not (0)'), byrow = TRUE, ncol = 2))
 colnames(vardesc) <- c('Variable', 'Description')
-vardesc
+kbl(vardesc, booktabs = T, caption = "Variable Descriptions") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F)
 ```
+
+___
+
 
 ## Data Exploration
 
 To determine which of the variables might make the best predictors we must first explore the data for potential sources of error. This includes, identifying and fixing missing values (if there are any), calculating and comparing averages, standard deviations, and other summary statistics. We begin this by checking to see if any of the data are missing. Instead of relying solely on numbers, we created a map of observations of each variable. Blue indicates the presence of an observation and light grey indicates an absence.
 
 ```{r}
-cdata.missingobservatons <- sum(is.na(cdata))
+cdata.missingobservations <- sum(is.na(cdata))
 missmap(cdata, main = "Missing and Complete Observations")
 ```
 
@@ -88,7 +97,9 @@ Next we calculate and compare the averages, standard deviations, and other summa
 
 ```{r}
 summary.tbl <- describe(cdata)
-summary.tbl[1:13,c(2:5, 8:10, 13)]
+desc.tbl <- summary.tbl[1:13,c(2:5, 8:10, 13)]
+kbl(desc.tbl, booktabs = T, caption = "Summary Statistics - Crime Data") %>%
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = T)
 ```
 
 Since it is quite rare to have a fully filled data set, we further confirm the presence of each observation with the 'n' column. This column describes how many observations there are of each variable. Here again, we are reassured that this data is fairly clean already with the same number of observations for each variable. 
@@ -109,14 +120,19 @@ eval <- cdata[-indecies,]
 train.summary.tbl <- train %>% 
   select(-target) %>% 
   describe()
-train.summary.tbl[1:12,c(2:5, 8:10, 13)]
+t.desc.tbl <- train.summary.tbl[1:12,c(2:5, 8:10, 13)]
+kbl(t.desc.tbl, booktabs = T, caption = "Summary Statistics - Training Data") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = T)
 ```
+
+
+
 
 Results indicate that our random sample split worked properly with 327 observations of all potential predictors in the training set. Our calculated values also remain close to the original with the most variation occurring in those same three previously mentioned variables 'zn,' 'age,', and 'tax.' Thus, the essence of the crime data tables has been persevered. These predictors will likely need adjusting but for now, we continue exploring the data. 
 
 Now, we check for patterns in the distributions of the predictors. Finding those that might not fit within our model improves our precision. We can also being to check for conditional assumptions that must be made for us to be able perform a logistic regression. Keep a close look on how these variables differ in the histogram-frequency chart below. 
 
-```{r}
+```{r message=F, warning=F}
 train[1:12] %>%   
   melt() %>% 
   ggplot() +                      
@@ -133,7 +149,7 @@ train[1:12] %>%
 
 One method to evaluate distribution is using the kernel density estimates of values present beneath each predictor. In doing so we can create another visual aid to show how the density of predictors changes over its respective distribution. This is shown below. 
 
-```{r}
+```{r message=F, warning=F}
 train[1:12] %>%   
   melt() %>% 
   ggplot() +                      
@@ -171,8 +187,8 @@ train %>%
 
 
 
-```{r}
-t.train <- data.frame(t(train))
+```{r message=F, warning=F}
+t.train <- data.frame(t(train)) # Transpose
 m.train <- train %>% 
   melt()
 f.train <- cbind(m.train, t.train)
@@ -264,7 +280,7 @@ f.train %>%
 
 
 
-```{r}
+```{r message=F, warning=F}
 train[1:12] %>% 
   melt() %>% 
   ggplot(, aes(variable, value)) + 
@@ -287,7 +303,7 @@ nc <- train[,c("nox", "chas")]
 
 With these predictor groups, we can create violin plots with those boxplots to describe the median and outliers of each predictor. It is another, more useful way to visualize the distribution while evaluating those conditional assumptions of logistic regression to guarantee model adheres to the rules of binary logistic modeling. Kernel density estimates are placed on here as the black lines that create the 'violin' shapes to gauge where in the distribution point are concentrated. This is shown relative to the predictor's own mean, IQR, range, deviations, and shows variation across the spread of other predictors in their clustered groups.   
 
-```{r}
+```{r message=F, warning=F}
 viobox.zimlp <- zimlp %>% 
   melt() %>% 
   ggplot() + 
@@ -327,7 +343,7 @@ ggarrange(viobox.rdr, viobox.zimlp, viobox.nc, viobox.ta)
 The predictors 'rm,' 'ptratio,' 'medv,' 'lstat,' and 'nox,' are the most likely choices to make an inference on at this moment. This is because they are suited to predict with; that is, they have an average near the center of their distribution, are more unimodal than other options, and contain a spread with minimal outliers. While this makes it easy to see which distributions' properties it is hard to discern exactly what the magnitude of influence outliers could play in each predictors' distribution. For that, we repeat the process with a new plot. 
 
 
-```{r}
+```{r message=F, warning=F}
 # Function to calculate and set pointrange
 xysdu <- function(x) {
    m <- mean(x)
@@ -375,7 +391,7 @@ When evaluating in this way, the predictors’ medians are plotted as red dots o
 This pattern emphasizes the difference within clusters to eliminate the potential for conflicts of size and scale. On a scale of similar values, we can tell just how much influence each predictor harbors compared to others in its group. In the upper left quadrant, the predictor 'rad' has the most skewness. In the upper right quadrant, 'zn.' The best predictors shown seem to be 'nox,' 'pratio,' 'lstat,' and 'rm,' with potential from 'medv,' 'age,' and 'dis.'. Although there is one more assumption we should consider, multicollinearity.  
 
 
-```{r}
+```{r message=F, warning=F}
 train %>% 
   cor() %>% 
   ggcorrplot(method = "square", type="upper", ggtheme = ggplot2::theme_minimal, legend.title = "Influence") + coord_flip()
@@ -384,6 +400,7 @@ train %>%
 There is a near perfect correlation in the positive direction between the predictors 'rad' and 'tax.' To avoid entanglement, these cannot be modeled simultaneously. A few other predictors, such as 'age' and 'dis' are closely related, but not close enough to exclude from the analysis. 
 
 ```{r}
+# Compute estimated Sample Size
 predictors <- (length(colnames(train))-1)
 Pexpected <- 1 # If we expect at least one neighborhood above median
 case.min <- 10 # from general rule and practice
@@ -393,6 +410,7 @@ est.samplesize <- (case.min*predictors)/Pexpected
 
 To review, the dependent variable is binary which makes it dichotomous. So this condition is satisfied. We also assume based on the evidence we have, including that these continuous variables are proportions of the whole for each neighborhood, that observations made are independent of one another. Linearity of log odds will be evaluated once the data is prepared. We could compute if the sample size is large enough through the total predictor variables and expected probability of the least frequent outcome, but the information in this data set comes from summarized proportions and averages (medians). For this reason, our best estimate of an accurate sample size for the study is about `r est.samplesize` if we also assume that the expected probability of our least frequent outcome is one. 
 
+___
 
 
 ## Data Preparation
@@ -451,7 +469,7 @@ bestNorms$medv$chosen_transform
 Based on the recommendations of the bestNormalize function, there are two main transformations, Box-Cox and log_x. Rather than perform their best respective transformations on each predictor, we will only perform them on three specific variables that we suspect will predict better than most others. The process is documented in the creation of our finalized data set called 'training.' 
 
 ```{r}
-# focus on specific predictors 
+# Focus on specific predictors 
 bxcx.medv <- boxcox(df$medv)
 bxcx.ptratio <- boxcox(df$ptratio)
 logx.lstat <- log_x(df$lstat)
@@ -484,7 +502,7 @@ summary(mod1)
 
 Our accuracy, precision, and other evaluation metrics can be calculated with a confusion matrix. We create this matrix by comparing our predicted values to the evaluation data set captured in the introduction. Importantly, we devised a function to compute F1 scores which will serve as the most useful guiding statistic in prediction evaluation. Results of this first model are shown below:
 
-```{r}
+```{r message=F, warning=F}
 pred.1 <- ifelse(predict.glm(mod1, evalu,"response") >= 0.5,1,0)
 cm <- confusionMatrix(factor(pred.1), 
                       factor(evalu$target),"1")
@@ -498,6 +516,7 @@ cm
 ```
 
 ```{r}
+# F1 score Function
 F1 <- function(c) {
   sensitivity <- c$byClass[[1]]
   precision <- c$byClass[[5]]
@@ -509,6 +528,8 @@ F1.mod1 <- F1(cm)
 
 This model's F1 score is `r F1.mod1` with an overall accuracy of about 0.46. This was expected. With the only predictor being medv and the transformation and reduction of this variable, this result is intentionally low. The goal is to be able to improve and this does exactly that. Now that we have the data prepared and the process tested, we can begin building other models to beat our prepared single predictor model. 
 
+___
+
 
 ## Modeling Building
 
@@ -519,7 +540,7 @@ mod1.all <- glm(target ~ ., family = binomial(link = "logit"), training)
 summary(mod1.all)
 ```
 
-```{r}
+```{r message=F, warning=F}
 pred.2 <- ifelse(predict.glm(mod1.all, evalu,"response") >= 0.5,1,0)
 cm <- confusionMatrix(factor(pred.2), 
                       factor(evalu$target),"1")
@@ -538,15 +559,12 @@ F1.mod1.all <- F1(cm)
 
 Including all predictor variables improved the model performance moderately from the first model maintaining our accuracy and raising the model's F1 score to `r F1.mod1.all`. However, this is still far from useful at prediction. At the moment we're not much better than random chance. To solve this, we review how the model would perform with minor alteration. We will call this 'mod2' for our second model using the second training data frame. Here again, we repeat the process with the same singular predictor selected previously.
 
-
-
-
 ```{r}
 mod2 <- glm(target ~ medv, family = binomial(link = "logit"), train)
 summary(mod2)
 ```
 
-```{r}
+```{r message=F, warning=F}
 pred.3 <- ifelse(predict.glm(mod2, eval,"response") >= 0.5,1,0)
 cm <- confusionMatrix(factor(pred.3), 
                       factor(eval$target),"1")
@@ -570,7 +588,7 @@ mod2.all <- glm(target ~ ., family = binomial(link = "logit"), train)
 summary(mod2.all)
 ```
 
-```{r}
+```{r message=F, warning=F}
 pred.4 <- ifelse(predict.glm(mod2.all, eval,"response") >= 0.5,1,0)
 cm <- confusionMatrix(factor(pred.4), 
                       factor(eval$target),"1")
@@ -590,7 +608,7 @@ F1.mod2.all <- F1(cm)
 This is our best model yet. Our accuracy has shot upwards to about 0.94 with an F1 score of `r F1.mod2.all`. However, there are still a few unexpected hickups. Several of these predictors are not significant predictors of our target crime rate. This combination of predictors also has enough false positive errors that we may be able to decrease our number of predictors to form another exquisite model with higher accuracy and precision yet again. To identify which predictors should be taken out of our final model we employ a backwards and forwards selection process to impliment only those predictors that improve our score when added. This results in our third model, 'mod3' by pulling the best parts of aforementioned models while eliminating the worst in an attempt to make a better prediction. 
 
 
-```{r}
+```{r message=F, warning=F}
 # eliminate variables as they improve accuracy and F1 score
 mod3 <- glm(target ~ . -chas -rm, family = binomial(link = "logit"), train)
 summary(mod3)
@@ -612,18 +630,23 @@ F1.mod3 <- F1(cm)
 Through this forward selection of predictors based on insignificance, backward and forward selection of the remaining signifcant values with a p-value greater than 0.1 we determined that the only predictors to control were 'chas' and 'rm'. Excluding 'chas' marginally increased model accuracy and F1 score while the exclusion of 'rm' exhibited no changes. For this reason the predictor 'rm' was ultimately exlcuded because it did not add value to the model. Our final accuracy measurement was 0.9424 with an F1 score of `r F1.mod3`. 
 
 
+___
 
-## Select Models
+
+
+## Model Selection
 
 Our criteria for selecting the best binary logistic regression model relies on predominantly on model accuracy, especially through its F1 score. This is based on the theory that in the real-world application of these models, the amount of false positives and false negatives in our prediction are critical for analysis. The F score also combines information from its formula on model sensitivity and precision. We also consider the number of predictors, with a preference for a lower number. Thinking in terms of applications of data collection, it might be more cost-effective if we did not need to collect as many predictors but were able to make the same predictions with minimal disturbance of our accuracy. As added measures, the coefficient of determination, deviance, and Akaike information criterion (AIC) are computed for each model. Should existing accuracy and predictors lead to narrow selection margin, a higher prediction accuracy in the form of a coefficient of determination, lower deviance, and better quality model as determined by AIC will be the ultimate decider. We arrange these statistics into a table:
 
 ```{r}
-results
+res.tbl <- results
+kbl(res.tbl, booktabs = T, caption = "Model Results") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = T)
 ```
 
 Model 2 with all predictors and Model 3 contain the best statistics. Final selection will be between those two. Keep in mind, the first  model, 'mod1' was intentionally made to produce poor results. If for some reason it had turned out to be one of the best predictors then we would know something was wrong. Thankfully, this is not the case. With slightly better F1 score, lower AIC, and lower deviance as well as fewer predictors required to make the prediction than the rest of the models, Model 3, appears to be the best selection possible. However, we will evaluate through their sensitivity and specificity in a receiver operating characteristic (ROC) plot with area under the curve (AUC) displayed for these two models.   
 
-```{r}
+```{r message=F, warning=F}
 par(mfrow=c(1,2))
 pROC::plot.roc(eval$target, pred.5, print.auc=TRUE, type="s", main="Model 3")
 pROC::plot.roc(eval$target, pred.4, print.auc=TRUE, type="s", main="Model 2 All")
@@ -632,7 +655,11 @@ pROC::plot.roc(eval$target, pred.4, print.auc=TRUE, type="s", main="Model 2 All"
 As anticipated, the Model 3 performed better in this ROC plot and has a slightly better AUC. Due to its very improved sensitivity this model contains the best performance numbers for us to go with. In addition, it uses fewer predictors to reach that level of accuracy, sensitivity, precision, and specificity. This model is the best of the available models we could select from in this analysis. 
 
 
+___
+
+
 
 ## Conclusion
 
 Due to its improved performance statistics and use of fewer predictors to achieve the same or better levels of accuracy than other models, Model 3 is the best choice for making predictions with in a real-world setting. This model has minimal changes made to it, with minor adjustments in outlier quantity a subsequent reduction of overall observations and focusing of predictors on scale by clustering. If this analysis were to go further, it might be useful to identify other model types that could improve prediction accuracy while decreasing the predictors needed to make correct predictions. This might include an ensemble model that utilizes new predictors formed from the proportions of original predictors. However, for our purposes, an F1 score of `r F1.mod3` and accuracy of about 94.4% using only 9 raw predictors, will suffice for practical predictions. 
+
