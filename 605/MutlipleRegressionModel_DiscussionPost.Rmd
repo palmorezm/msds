@@ -1,0 +1,32 @@
+---
+title: "Mutliple Regression Model"
+author: "Zachary Palmore"
+date: "4/12/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prompt
+	
+Using R, build a multiple regression model for data that interests you.  Include in this model at least one quadratic term, one dichotomous term, and one dichotomous vs. quantitative interaction term.  Interpret all coefficients. Conduct residual analysis.  Was the linear model appropriate? Why or why not?
+
+## Data
+
+Before I begin, it might be useful to define the terms required to gather data types for. This way we can evaluate whether the data fits the definitions as I understand them and attempt to conduct an analysis based on the same understanding of the requirements. Those terms given in the prompt are defined as follows;
+
+
+      *quadratic term - a varaible that appears in the form ax^2
+      
+      *dichotomous term - relating to a variable that contains only two parts 
+      
+      *dichotomous vs. quantitative interaction term - an interaction between a variable that splits into two parts and one that is discrete or continuous but numeric by nature 
+      
+
+
+## Analysis
+
+One interest of mine is __. Thankfully, there is plenty of data on this topic which is why I have decided to use [ ] data to use it. Our end goal it to predict [ ]. 
+
