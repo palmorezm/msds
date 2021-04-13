@@ -25,9 +25,8 @@ Before I begin, it might be useful to define the terms required to gather data t
       *dichotomous vs. quantitative interaction term - an interaction between a variable that splits into two parts and one that is discrete or continuous but numeric by nature 
       
 
-
-
 ```{r}
+# Packages
 library(tidyverse)
 library(ggpubr)
 library(kableExtra)
@@ -42,6 +41,18 @@ theme_set(theme_minimal())
 ```
 
 
+```{r}
+tdata <- read.csv(
+"https://raw.githubusercontent.com/palmorezm/msds/main/621/HW1/moneyball-training-data.csv")
+# Basic statistics from the set 
+total.obs <- count(tdata)
+avg.wins <- mean(tdata$TARGET_WINS) 
+max.wins <- max(tdata$TARGET_WINS)
+sd.wins <- sd(tdata$TARGET_WINS)
+colnames <- colnames(tdata)
+missing.values <- (sum(is.na(tdata)))
+```
+
 
 ## Analysis
 
@@ -50,6 +61,7 @@ One interest of mine is baseball. Thankfully, there is plenty of data on this to
 
 
 ```{r}
-
+tdata %>% 
+   mutate(Quad = )
 ```
 
