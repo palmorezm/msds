@@ -26,7 +26,30 @@ Before I begin, it might be useful to define the terms required to gather data t
       
 
 
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+library(kableExtra)
+library(reshape2)
+library(corrplot)
+library(ggstatsplot)
+library(MASS)
+library(bestNormalize)
+library(Metrics)
+library(VGAM)
+theme_set(theme_minimal())
+```
+
+
+
 ## Analysis
 
-One interest of mine is __. Thankfully, there is plenty of data on this topic which is why I have decided to use [ ] data to use it. Our end goal it to predict [ ]. 
+One interest of mine is baseball. Thankfully, there is plenty of data on this topic which is why I have decided to use this sports data for analysis. Our end goal it to predict. 
+
+
+
+```{r}
+
+```
 
