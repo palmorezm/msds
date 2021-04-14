@@ -163,14 +163,42 @@ bdata2[2:7] %>%
 ```{r}
 set.seed(42)
 angle <- sample(1:99, 500, replace = T)
-mph <- sample(0:119, 500, replace = T)
+ev <- sample(0:119, 500, replace = T)
 pheight <- runif(500, 5.8, 6.7)
-hits <- data.frame(cbind(angle, mph, pheight)) 
+hits <- data.frame(cbind(angle, ev, pheight)) 
+hits <- hits %>% 
+  mutate(rad = angle * (pi/180)) %>% 
+  mutate(ms = ev / 2.237) %>% 
+  mutate(m = pheight / 3.281 ) %>%
+  mutate(g = 9.81) %>% 
+  mutate(dist = ms * cos(rad) * (ms * sin(rad) + sqrt((ms * sin(rad))^2 + 2 * g * m)) / g) %>% 
+  mutate(xHR = as.numeric(dist > 99)) %>% 
+  mutate(HR = as.numeric(dist >= 99.06 & mph > 95) )
+hits[c(1:3, 8:10)]
+hits <- hits[c(1:3,8:10)] %>% 
+  filter(mph > 40) 
 hits %>% 
-  mutate(d = mph * cos(angle) * (mph * sin(angle)) + (sqrt(((((mph * sin(angle))^2)) + 2 * 9.81 * pheight)/9.81)))
-
-d = mph * cos(angle) * (mph * sin(angle)) + (sqrt(((((mph * sin(angle))^2)) + 2 * 9.81 * pheight)/9.81))
+  gather(variable, value, -(c(dist, xHR))) %>%
+  ggplot(., aes(value, dist)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "black",
+             size=1, 
+             shape=21, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotted", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme( axis.text.y = element_blank())
 ```
+
+
 
 ```{r}
 a <- 0.85521133347
@@ -178,8 +206,10 @@ v <- 6.7056
 h <- 1.877568
 g <- 9.81
 v * cos(a) * v * sin(a) 
-(sqrt((((v * sin(a))^2) + (2 * g * h))/ g))
+(sqrt(((v * sin(a))^2 + 2 * g * h)/ g))
 v * cos(a) * v * sin(a) + (sqrt((((v * sin(a))^2) + (2 * g * h)))/g)
+v * cos(a) * abs(v * sin(a) + (sqrt((((v * sin(a))^2) + (2 * g * h)))/g))
+v * cos(a) * (v * sin(a) + sqrt((v * sin(a))^2 + 2 * g * h)) / g # Correct
 ```
 
 
@@ -190,6 +220,8 @@ plot(mod.ks)
 hist(resid(mod.ks), main="Distribution of Residuals")
 ```
 
+
+
 ```{r}
 stats[5:12]
 stats.mod.ks <- lm(xba ~., stats[5:12])
@@ -198,6 +230,13 @@ plot(stats.mod.ks)
 hist(resid(stats.mod.ks), main="Distribution of Residuals")
 ```
 
+
+```{r}
+hits.mod.ks <- lm(dist ~. -xHR, hits)
+summary(hits.mod.ks)
+plot(hits.mod.ks) 
+hist(resid(hits.mod.ks), main = "Distribution of Residuals")
+```
 
 
 
