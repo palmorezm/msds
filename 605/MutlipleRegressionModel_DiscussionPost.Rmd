@@ -24,160 +24,25 @@ Before I begin, it might be useful to define the kind of variables required. Thi
 
 ```{r message=FALSE, warning=FALSE}
 # Packages
-library(tidyverse)
-library(ggpubr)
-library(kableExtra)
-library(reshape2)
-library(corrplot)
-library(ggstatsplot)
-library(MASS)
-library(bestNormalize)
-library(Metrics)
-library(VGAM)
+library(dplyr)
 theme_set(theme_minimal())
 ```
 
 Reading the data and gathering some statistics.
 
 ```{r}
-tdata <- read.csv(
-"https://raw.githubusercontent.com/palmorezm/msds/main/621/HW1/moneyball-training-data.csv")
+hits <- read.csv(
+"https://raw.githubusercontent.com/palmorezm/msds/main/605/hits.csv")
 # Basic statistics from the set 
-total.obs <- count(tdata)
-avg.wins <- mean(tdata$TARGET_WINS) 
-max.wins <- max(tdata$TARGET_WINS)
-sd.wins <- sd(tdata$TARGET_WINS)
-colnames <- colnames(tdata)
-missing.values <- (sum(is.na(tdata)))
-```
-
-Transforming some value into a quadratic form. 
-
-```{r}
-head(tdata, 3)
-tdata %>% 
-   mutate(CaughtStealing = TEAM_BASERUN_CS) %>% 
-   ggplot() + 
-   geom_point(aes(CaughtStealing, TARGET_WINS^2)) + geom_smooth(aes(CaughtStealing, TARGET_WINS^2))
+summary(hits[c(2:4, 9:11)])
 ```
 
 
 
 ```{r}
-stats <- read_csv("C:/data/stats.csv") 
-stats <- stats %>% 
-  mutate(sspt = as.numeric(launch_angle_avg > 10)) %>% 
-  mutate(fast = as.numeric(exit_velocity_avg > 90)) %>%
-  mutate(angle = rnorm(1:99)) %>% 
-  mutate(xiso8 = -log10((xiso^3)/10)^5)
-stats
-  
-
-
-stats[c(5:9, 11:21)] %>% 
-  gather(variable, value, -xba) %>%
-  ggplot(., aes(value, xba)) + 
-  ggtitle("Linearity of Values") + 
-  geom_point(fill = "white",
-             size=1, 
-             shape=1, 
-             color="light blue") + 
-  geom_smooth(formula = y~x, 
-              method = "lm", 
-              size=.1,
-              se = TRUE,
-              color = "black", 
-              linetype = "dotdash", 
-              alpha=0.25) + 
-  facet_wrap(~variable, 
-             scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
-
-numbers <- sample(1.0:10.0, 1000, replace = T)
-data.frame(numbers) %>% 
-  mutate(quad = numbers^2 + 2*numbers -4) %>% 
-  ggplot() + 
-  geom_point(aes(numbers, quad))
-
-numbers <- runif(100, 0.01, 0.99999)
-data.frame(numbers) %>% 
-  mutate(quad = numbers^2 + 0*numbers + 0) %>% 
-  mutate(log = -log(quad)) %>%
-  ggplot() + 
-  geom_point(aes(numbers, quad)) + 
-  geom_point(aes(numbers, log))
-
-```
-
-
-```{r}
-bdata <- readxl::read_xlsx("C:/data/baseball_data.xlsx")
-
-
-bdata2 <- sample_n(bdata, 5000, replace = TRUE)
-bdata2
-
-bdata[2:7] %>% 
-  gather(variable, value, -(c(Distance, Pitches))) %>%
-  ggplot(., aes(value, Distance)) + 
-  ggtitle("Linearity of Values") + 
-  geom_point(fill = "black",
-             size=1, 
-             shape=21, 
-             color="blue") + 
-  geom_smooth(formula = y~x, 
-              method = "lm", 
-              size=.1,
-              se = TRUE,
-              color = "black", 
-              linetype = "dotted", 
-              alpha=0.25) + 
-  facet_wrap(~variable, 
-             scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
-
-bdata2[2:7] %>% 
-  gather(variable, value, -(c(Distance, Pitches))) %>%
-  ggplot(., aes(value, Distance)) + 
-  ggtitle("Linearity of Values") + 
-  geom_point(fill = "black",
-             size=1, 
-             shape=21, 
-             color="blue") + 
-  geom_smooth(formula = y~x, 
-              method = "lm", 
-              size=.1,
-              se = TRUE,
-              color = "black", 
-              linetype = "dotted", 
-              alpha=0.25) + 
-  facet_wrap(~variable, 
-             scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
-```
-
-
-```{r}
-set.seed(42)
-angle <- sample(1:99, 500, replace = T)
-ev <- sample(0:119, 500, replace = T)
-pheight <- runif(500, 5.8, 6.7)
-hits <- data.frame(cbind(angle, ev, pheight)) 
-hits <- hits %>% 
-  mutate(rad = angle * (pi/180)) %>% 
-  mutate(ms = ev / 2.237) %>% 
-  mutate(m = pheight / 3.281 ) %>%
-  mutate(g = 9.81) %>% 
-  mutate(dist = ms * cos(rad) * (ms * sin(rad) + sqrt((ms * sin(rad))^2 + 2 * g * m)) / g) %>% 
-  mutate(xHR = as.numeric(dist > 99)) %>% 
-  mutate(HR = as.numeric(dist >= 99.06 & mph > 95) )
-hits[c(1:3, 8:10)]
-hits <- hits[c(1:3,8:10)] %>% 
+big_hits <- hits[c(2:4,9:11)] %>% 
   filter(mph > 40) 
-hits %>% 
+big_hits %>% 
   gather(variable, value, -(c(dist, xHR))) %>%
   ggplot(., aes(value, dist)) + 
   ggtitle("Linearity of Values") + 
@@ -196,38 +61,6 @@ hits %>%
              scales ="free",
              ncol = 4) +
   theme( axis.text.y = element_blank())
-```
-
-
-
-```{r}
-a <- 0.85521133347
-v <- 6.7056
-h <- 1.877568
-g <- 9.81
-v * cos(a) * v * sin(a) 
-(sqrt(((v * sin(a))^2 + 2 * g * h)/ g))
-v * cos(a) * v * sin(a) + (sqrt((((v * sin(a))^2) + (2 * g * h)))/g)
-v * cos(a) * abs(v * sin(a) + (sqrt((((v * sin(a))^2) + (2 * g * h)))/g))
-v * cos(a) * (v * sin(a) + sqrt((v * sin(a))^2 + 2 * g * h)) / g # Correct
-```
-
-
-```{r}
-mod.ks <- lm(Distance ~. -Pitches, bdata)
-summary(mod.ks)
-plot(mod.ks)
-hist(resid(mod.ks), main="Distribution of Residuals")
-```
-
-
-
-```{r}
-stats[5:12]
-stats.mod.ks <- lm(xba ~., stats[5:12])
-summary(stats.mod.ks)
-plot(stats.mod.ks)
-hist(resid(stats.mod.ks), main="Distribution of Residuals")
 ```
 
 
