@@ -162,14 +162,25 @@ bdata2[2:7] %>%
 
 ```{r}
 set.seed(42)
-angle <- sample(1:100, 500, replace = T)
+angle <- sample(1:99, 500, replace = T)
 mph <- sample(0:119, 500, replace = T)
 pheight <- runif(500, 5.8, 6.7)
 hits <- data.frame(cbind(angle, mph, pheight)) 
 hits %>% 
-  mutate()
+  mutate(d = mph * cos(angle) * (mph * sin(angle)) + (sqrt(((((mph * sin(angle))^2)) + 2 * 9.81 * pheight)/9.81)))
+
+d = mph * cos(angle) * (mph * sin(angle)) + (sqrt(((((mph * sin(angle))^2)) + 2 * 9.81 * pheight)/9.81))
 ```
 
+```{r}
+a <- 0.85521133347
+v <- 6.7056
+h <- 1.877568
+g <- 9.81
+v * cos(a) * v * sin(a) 
+(sqrt((((v * sin(a))^2) + (2 * g * h))/ g))
+v * cos(a) * v * sin(a) + (sqrt((((v * sin(a))^2) + (2 * g * h)))/g)
+```
 
 
 ```{r}
