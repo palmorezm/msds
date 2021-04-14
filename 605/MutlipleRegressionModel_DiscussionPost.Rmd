@@ -15,17 +15,14 @@ Using R, build a multiple regression model for data that interests you.  Include
 
 ## Data
 
-Before I begin, it might be useful to define the kind of variables required. This way we can evaluate whether the data fits the definitions as I understand them and attempt to conduct an analysis based on the same understanding of the requirements. Those terms given in the prompt are defined as follows;
+Before I begin, it might be useful to define the kind of variables required. This way we can evaluate whether the data fits the definitions as I understand them and attempt to conduct an analysis based on the same understanding of the requirements. Those terms given in the prompt are defined as follows:
 
-
-      * quadratic term - a varaible that appears in the form ax^2
-      
-      * dichotomous term - relating to a variable that contains only two parts 
-      
-      * dichotomous vs. quantitative interaction term - an interaction between a variable that splits into two parts and one that is discrete or continuous but numeric by nature 
+ * Quadratic term - a variable that appears in the form ax^2
+ * Dichotomous term - relating to a variable that contains only two parts 
+ * Dichotomous vs. quantitative interaction term - an interaction between a variable that splits into two parts and one that is discrete or continuous but numeric by nature 
       
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 # Packages
 library(tidyverse)
 library(ggpubr)
@@ -40,6 +37,7 @@ library(VGAM)
 theme_set(theme_minimal())
 ```
 
+Reading the data and gathering some statistics.
 
 ```{r}
 tdata <- read.csv(
@@ -53,11 +51,143 @@ colnames <- colnames(tdata)
 missing.values <- (sum(is.na(tdata)))
 ```
 
-Tranforming some value into a quadratic form. 
+Transforming some value into a quadratic form. 
 
 ```{r}
-tdata
+head(tdata, 3)
+tdata %>% 
+   mutate(CaughtStealing = TEAM_BASERUN_CS) %>% 
+   ggplot() + 
+   geom_point(aes(CaughtStealing, TARGET_WINS^2)) + geom_smooth(aes(CaughtStealing, TARGET_WINS^2))
 ```
+
+
+
+```{r}
+stats <- read_csv("C:/data/stats.csv") 
+stats <- stats %>% 
+  mutate(sspt = as.numeric(launch_angle_avg > 10)) %>% 
+  mutate(fast = as.numeric(exit_velocity_avg > 90)) %>%
+  mutate(angle = rnorm(1:99)) %>% 
+  mutate(xiso8 = -log10((xiso^3)/10)^5)
+stats
+  
+
+
+stats[c(5:9, 11:21)] %>% 
+  gather(variable, value, -xba) %>%
+  ggplot(., aes(value, xba)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+
+numbers <- sample(1.0:10.0, 1000, replace = T)
+data.frame(numbers) %>% 
+  mutate(quad = numbers^2 + 2*numbers -4) %>% 
+  ggplot() + 
+  geom_point(aes(numbers, quad))
+
+numbers <- runif(100, 0.01, 0.99999)
+data.frame(numbers) %>% 
+  mutate(quad = numbers^2 + 0*numbers + 0) %>% 
+  mutate(log = -log(quad)) %>%
+  ggplot() + 
+  geom_point(aes(numbers, quad)) + 
+  geom_point(aes(numbers, log))
+
+```
+
+
+```{r}
+bdata <- readxl::read_xlsx("C:/data/baseball_data.xlsx")
+
+
+bdata2 <- sample_n(bdata, 5000, replace = TRUE)
+bdata2
+
+bdata[2:7] %>% 
+  gather(variable, value, -(c(Distance, Pitches))) %>%
+  ggplot(., aes(value, Distance)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "black",
+             size=1, 
+             shape=21, 
+             color="blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotted", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+
+bdata2[2:7] %>% 
+  gather(variable, value, -(c(Distance, Pitches))) %>%
+  ggplot(., aes(value, Distance)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "black",
+             size=1, 
+             shape=21, 
+             color="blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotted", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+
+```{r}
+set.seed(42)
+angle <- sample(1:100, 500, replace = T)
+mph <- sample(0:119, 500, replace = T)
+pheight <- runif(500, 5.8, 6.7)
+hits <- data.frame(cbind(angle, mph, pheight)) 
+hits %>% 
+  mutate()
+```
+
+
+
+```{r}
+mod.ks <- lm(Distance ~. -Pitches, bdata)
+summary(mod.ks)
+plot(mod.ks)
+hist(resid(mod.ks), main="Distribution of Residuals")
+```
+
+```{r}
+stats[5:12]
+stats.mod.ks <- lm(xba ~., stats[5:12])
+summary(stats.mod.ks)
+plot(stats.mod.ks)
+hist(resid(stats.mod.ks), main="Distribution of Residuals")
+```
+
+
 
 
 
