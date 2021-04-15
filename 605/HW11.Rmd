@@ -1,0 +1,12 @@
+---
+title: "HW11"
+author: "Zachary Palmore"
+date: "4/15/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
