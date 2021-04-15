@@ -9,4 +9,52 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 
+## Prompt
+
+Using the “cars” dataset in R, build a linear model for stopping distance as a function of speed and replicate the analysis of your textbook chapter 3 (visualization, quality evaluation of the model, and residual analysis.)
+
+## Model 
+
+In the spirit of replication, before we begin with the model building we should take a look at the scatterplot of stopping distance as a function of speed. When we do, it should be examined for the presence or absence of linearity. This is shown below. 
+
+```{r}
+plot(cars$speed, cars$dist, main = "Stopping Distance by Speed", xlab = "Speed", ylab = "Stopping Distance")
+```
+
+There is a presence of linearity although it might not be ideal. Speaking generally, as speed increases the stopping distance also increases. However, there are many points that deviated from this trend. Because linearity is present, we can continue with modeling. Next, we build a linear model to test the fit. 
+
+```{r}
+lm.cars <- lm(cars$dist ~ cars$speed)
+plot(cars$speed, cars$dist, main = "Stopping Distance by Speed", xlab = "Speed", ylab = "Stopping Distance")
+abline(lm.cars)
+```
+
+
+It looks decent enough. There are still many points that stray from the diagonal line of best fit but their differences are small enough to say the model is linear. The question now is how well those points fit the line. We can evaluate this with a summary and some diagnostic plots. 
+
+```{r}
+summary(lm.cars)
+```
+
+From this summary we can see that we selected the correct model, stopping distance modeled by speed, and the residuals have a median distance of -2.272. The coefficients also provide the slope and intercept of our predictor speed along with the significance of the predictor for this model. There is a moderately strong positive correlation and about 65% of the variation in the data is explained by the model. 
+
+Our standard error in our residuals is 15.38 using 48 degrees of freedom which describes the total variation in our data. It is not the worst it could be and also indicates approximate normality given the first and third quantiles are about 1.5 times this standard error. However, we can confirm this with a Normal QQ plot and review the residuals vs fitted values. 
+
+```{r}
+plot(fitted(lm.cars), resid(lm.cars), main="Residuals vs Fitted")
+abline(h=0, lty=3)
+```
+
+In the residuals vs fitted plot we can see that there are no obvious patterns in the residuals. The points are randomly scattered around the dotted line in the middle. This is a good indication of an acceptable model based soley on the residuals vs fitted plot. Another option is evaluating normality with a QQ-plot. 
+
+```{r}
+qqnorm(resid(lm.cars))
+qqline(resid(lm.cars))
+```
+
+With the Normal Q-Q Plot we begin to distinguish that some points might not be normally distributed. This is shown in the deviation from the straight diagonal line. We can say that the plot is weighted towards the ends and is especially heavy towards the higher end of the distribution. Normality may not be present in this model which undermines its ability to predict with confidence. 
+
+Ultimately, there may be other factors to include in this model that could explain the relationship between the variables. This may include predictors like road condition, tire tred, brake pad wear, and others. If we wanted to improve this model, those factors might prove useful in predicting stopping distance. It also might be fruitful to try other model types to ensure the best possible model in prediction stopping distance. 
+
+
+
