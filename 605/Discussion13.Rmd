@@ -1,0 +1,51 @@
+---
+title: "SimpsonsPost"
+author: "Zachary Palmore"
+date: "4/19/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
+
+
+
+```{r}
+# Enter function
+fx <- function(x) {
+  return(x^2)
+}
+```
+
+
+
+```{r}
+simp <- function(f, a, b) {
+  if (is.function(f) == FALSE) {
+    stop('f of (x) must be a function with one parameter (variable)')
+  }
+  
+  h <- (b - a) / 2
+  x0 <- a
+  x1 <- a + h
+  x2 <- b
+  
+  s <- (h / 3) * (f(x0) + 4 * f(x1) + f(x2))
+  
+  return(s)
+}
+```
+
+
+
+```{r}
+simp(fx, 0, pi/1.91184)
+```
+
+
+
+
+
