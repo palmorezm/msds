@@ -98,10 +98,11 @@ composite.simpson(f3, 0, 2, 8)
 
 ```{r}
 library(Bolstad2)
-x <- seq(0,1, length.out = 100)
+x <- seq(0, 1, length.out = 10)
 fxnorm <- dnorm(x)
 fx <- (x^2)
-est <- sintegral(x, fx, n.pts = 4)
+est <- sintegral(x, fx, n.pts = 300)
+plot(est$x, est$y, lty = 1)
 ```
 
 
