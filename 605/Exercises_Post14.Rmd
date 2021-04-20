@@ -1,0 +1,77 @@
+---
+title: "Exercise7_Post14"
+author: "Zachary Palmore"
+date: "4/20/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Prompt: 
+
+Using R, provide the solution for any exercise in either Chapter 4 or Chapter 7 of the calculus textbook.  If you are unsure of your solution, post your concerns.
+
+Exercise 7  Page 173  
+Chapter 4.1
+
+Section 4.1, Page 163, Exercise #7
+
+Use 5 iterations of Newton’s Method with the given initial approximation to approximate the root. Compare it to the known value of the root.
+
+```{r}
+library(ggplot2)
+library(knitr)
+```
+
+\[
+f(x) = \ln(x), \ \ \ x_0 = 2
+\]
+
+Formula for Newton's Method: 
+
+\[
+x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
+\]
+
+
+```{r graph}
+ggplot(data.frame(x = c(0, 10)), aes(x)) + 
+  stat_function(fun = function(x) log(x)) +
+  scale_x_continuous(breaks = c(1:10)) +
+  geom_line(aes(y = 0))
+```
+
+\[ 
+\dfrac{\mathrm{d}}{\mathrm{d}x}  = \frac{1}{x}
+\]
+
+```{r newton}
+x0 <- 2
+iters <- 5
+newts <- c(0)
+for(iter in 1:5){
+  newt <- x0 - (log(x0)/(1/x0))
+  newts[iter] <- newt
+  x0 <- newt
+}
+kable(cbind(1:5, newts, 1, 1-newts), col.names = c("Iteration", "Newton Approximation", "Actual Value", "Difference"), align = "c")
+```
+
+
+
+```{r}
+x <- 1.5
+iter <- 5
+newts <- c(0)
+for(iter in 1:5){
+  newt <- x - cos(x)/(1/(cos(x)))
+  newts[iter] <- newt
+  x <- newt
+}
+kable(cbind(1:5, newts, 1, 1-newts), col.names = c("Iteration", "Newton Approximation", "Actual Value", "Difference"), align = "c")
+```
+
+
+

@@ -21,6 +21,13 @@ fx <- function(x) {
 ```
 
 
+```{r}
+fx2 <- function(x) {
+  return(1/x)
+}
+```
+
+
 
 ```{r}
 simp <- function(f, a, b) {
@@ -40,12 +47,62 @@ simp <- function(f, a, b) {
 ```
 
 
+```{r}
+simp(fx2, 1, 2)
+```
+
+
+
 
 ```{r}
 simp(fx, 0, pi/1.91184)
 ```
 
 
+# Composite
+
+
+```{r}
+f3 <- function(x) {
+  return(exp(2 * x) * sin(3 * x))
+}
+```
+
+
+
+```{r}
+composite.simpson <- function(f, a, b, n) {
+  if (is.function(f) == FALSE) {
+    stop('f must be a function with one parameter (variable)')
+  }
+  
+  h <- (b - a) / n
+  
+  xj <- seq.int(a, b, length.out = n + 1)
+  xj <- xj[-1]
+  xj <- xj[-length(xj)]
+
+  approx <- (h / 3) * (f(a) + 2 * sum(f(xj[seq.int(2, length(xj), 2)])) + 4 * sum(f(xj[seq.int(1, length(xj), 2)])) + f(b))
+  
+  return(approx)
+  
+}
+```
+
+
+
+```{r}
+composite.simpson(f3, 0, 2, 8)
+```
+
+
+```{r}
+library(Bolstad2)
+x <- seq(0,1, length.out = 100)
+fxnorm <- dnorm(x)
+fx <- (x^2)
+est <- sintegral(x, fx, n.pts = 4)
+```
 
 
 
