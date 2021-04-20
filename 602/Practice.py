@@ -799,3 +799,116 @@ def is_odd (x) : if x % 2 == 1: return True else: return False # False
 is_odd(x) 
 
 ( 1 < 15 ) and (15 <  25)
+
+## New Practice ## 
+
+
+
+# What is the ouput of this code?
+import numpy as np
+z = np.array([[4, 0, 5], 
+              [2, 8, 4]])
+print(z[0, 0])
+# 4
+
+# What will this return?
+complex(5,4)
+# Out[8]: (5+4j)
+
+# What is the output of this code?
+import numpy as np
+m = np.array([2, 6, 4])
+n = 2
+print(m * n)
+# [ 4 12  8]
+
+# Complete the code to return the output
+# 2.266911751455907
+import numpy as np
+np_2d = np.array([[5,6,1,2,3,4],[4,5,3,2,1,8],[9,10,3,7,6,5]])   
+print(np.std(np_2d[1,:]))
+
+# What will this return?
+np.array([4,5]) < 6
+# A boolean numpy array
+# specifically; 
+# Out[17]: array([ True,  True])
+
+# Which of the following creates a 2D numpy array?
+import numpy as np
+np.array([[4.5,3,1], [5,6,7]])
+
+# Which function is used to determine the data type of an object? 
+# type()
+
+# Select the code to return the output;
+# [1,2,3]
+
+x = [0,2,3]
+y = x
+y[0] = 1
+print(x)
+# [1,2,3]
+
+# Select the code to return the output 
+# 9 
+
+import numpy as np 
+p = np.array([9,19,13,16])
+print(p[0])
+# 9 
+
+# Select the code to return the output
+# [4 5 6]
+
+import numpy as np 
+m = np.array([2,4,6])
+n = np.array([2, True, False])
+print(m + n)
+# [4 5 6]
+
+# Which of the following statements is true for numpy arrays? 
+# Numpy arrays cannot contain elements with different data types.
+
+
+# Select the code to return the output 
+# 3.5
+
+import numpy as np 
+np_2d = np.array([[5,6,1,2,3,4],[4,5,3,2,1,8],[9,10,3,7,6,5]])
+print(np.median(np_2d[0,:]))
+# 3.5
+
+# Compelte the code to return the output
+# 6.5 
+
+x = 6.5 
+print(x)
+# 6.5 
+
+# Which one of these will return the same result when slicing?
+# x = ["a","b","c","d"]
+
+x = ["a","b","c","d"]
+
+x[1:] and x[:4]
+# Out[27]: ['a', 'b', 'c', 'd']
+x[:] and x[:-1]
+# Out[28]: ['a', 'b', 'c']
+x[-3] and x[1:] 
+# Out[26]: ['b', 'c', 'd']
+
+# which one of these will return the same result when slicing?
+# x[-3] and x[1:] index the same values in a list
+
+# Complete the code to return the output
+# [['i', 'x', 'y'], [0, 0, 3], [2.54, 9.2, 3.84]]
+
+a = [2.54, 9.2, 3.84]
+b = ['i', 'x', 'y']
+c = [0, 0, 3]
+print([b,c,a])
+# [['i', 'x', 'y'], [0, 0, 3], [2.54, 9.2, 3.84]]
+
+
+
