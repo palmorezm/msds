@@ -2,7 +2,9 @@
 title: "Exercise7_Post14"
 author: "Zachary Palmore"
 date: "4/20/2021"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
@@ -22,7 +24,7 @@ Use 5 iterations of Newton’s Method with the given initial approximation to ap
 The given initial approximation is:
 
 $$
-f(x) = \ln(x) \hspace{8pt} X_0 = 2
+f(x) = ln(x) \hspace{8pt} X_0 = 2
 $$
 
 Answer:
@@ -54,7 +56,6 @@ for(i in 1:5){
 # Create table to make comparisons
 run <- seq(1, length.out = 5)
 approximations <- data.frame(cbind(run, estimate))
-approximations
 tbl <- approximations %>% 
   mutate(diff = round((1 - estimate),3)) %>% 
   mutate(true = 1) 
