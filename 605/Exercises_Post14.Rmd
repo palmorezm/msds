@@ -13,65 +13,53 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Using R, provide the solution for any exercise in either Chapter 4 or Chapter 7 of the calculus textbook.  If you are unsure of your solution, post your concerns.
 
-Exercise 7  Page 173  
-Chapter 4.1
+Question:
 
-Section 4.1, Page 163, Exercise #7
+From - Exercise 7, Page 173, Chapter 4.1
 
 Use 5 iterations of Newton’s Method with the given initial approximation to approximate the root. Compare it to the known value of the root.
 
-```{r}
-library(ggplot2)
-library(knitr)
+The given initial approximation is:
+
+$$
+f(x) = \ln(x) \hspace{8pt} X_0 = 2
+$$
+
+Answer:
+
+```{r message=F, warning=F}
+library(dplyr)
 ```
 
-\[
-f(x) = \ln(x), \ \ \ x_0 = 2
-\]
 
-Formula for Newton's Method: 
+Using Newton's Method of:
 
-\[
+$$
 x_{n+1} = x_n - \frac{f(x_n)}{f'(x_n)}
-\]
+$$
 
-
-```{r graph}
-ggplot(data.frame(x = c(0, 10)), aes(x)) + 
-  stat_function(fun = function(x) log(x)) +
-  scale_x_continuous(breaks = c(1:10)) +
-  geom_line(aes(y = 0))
-```
-
-\[ 
-\dfrac{\mathrm{d}}{\mathrm{d}x}  = \frac{1}{x}
-\]
+We can cycle through the first five iterations from the initial value to the fifth iteraction as shown below. The results are stored in the table for comparison to the known values. 
 
 ```{r newton}
-x0 <- 2
-iters <- 5
-newts <- c(0)
-for(iter in 1:5){
-  newt <- x0 - (log(x0)/(1/x0))
-  newts[iter] <- newt
-  x0 <- newt
+# Initial Value
+x <- 2
+# Fillable variable
+estimate <- c(0)
+# Loop through 5 iterations 
+for(i in 1:5){
+  vec <- x - (log(x))/(1/x) # Function
+  x <- vec
+  estimate[i] <- round(vec, 3)
 }
-kable(cbind(1:5, newts, 1, 1-newts), col.names = c("Iteration", "Newton Approximation", "Actual Value", "Difference"), align = "c")
+# Create table to make comparisons
+run <- seq(1, length.out = 5)
+approximations <- data.frame(cbind(run, estimate))
+approximations
+tbl <- approximations %>% 
+  mutate(diff = round((1 - estimate),3)) %>% 
+  mutate(true = 1) 
+rmarkdown::paged_table(tbl)
 ```
 
-
-
-```{r}
-x <- 1.5
-iter <- 5
-newts <- c(0)
-for(iter in 1:5){
-  newt <- x - cos(x)/(1/(cos(x)))
-  newts[iter] <- newt
-  x <- newt
-}
-kable(cbind(1:5, newts, 1, 1-newts), col.names = c("Iteration", "Newton Approximation", "Actual Value", "Difference"), align = "c")
-```
-
-
+It appears as though it takes about 4 runs or iterations of this estimate using the Newton method to reach the true value of 1. However, this is rounded to the thousandths place. If we were to extend these estimates further, we would see that it take a full 5 runs to match the true value.  
 
