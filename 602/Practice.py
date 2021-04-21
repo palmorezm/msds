@@ -910,5 +910,32 @@ c = [0, 0, 3]
 print([b,c,a])
 # [['i', 'x', 'y'], [0, 0, 3], [2.54, 9.2, 3.84]]
 
+# What code was added to identify the point 1994, 35? 
+# plt.annotate('my point', xy = (1994, 35) xytext = (1980, 40) ) 
+
+# Which of the following lines of code will set the style to dark_background?
+# plt.style.use('dark_background')
+
+# What code was added to create the text 'a blue line'?
+# plt.plot(x, data, color = 'blue', label = 'a blue line')
+
+# Which of the following information is not shown in a boxplot? 
+# The mean
+# Options:
+    # the mean
+    # the outliers
+    # the median 
+    # the 25th and 75th percentiles
+
+
+
+
+
+
+
+
+
+
+
 
 
