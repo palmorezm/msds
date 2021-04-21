@@ -46,33 +46,47 @@ TotExp: sum of personal and government expenditures.
 
 ## Part 1
 
-
+First, the data is read and the first few rows are shown for reference. It should match our variables above. 
 
 ```{r}
 data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/605/who.csv")
+head(data)
 ```
+
+Next we create a scatter plot with the sum of personal and government expenditures (or total expenditures) on the x-axis and average life expectancy for each country in years on the y-axis. 
 
 
 ```{r}
-plot(data$LifeExp, data$TotExp)
+plot(data$TotExp, data$LifeExp)
 ```
 
+Our main takeaway is that the points do not follow a liner trend. There is a clear pattern that might be exponential or logistic but nothing about the relationship between the two indicates a steady increase or decrease as one changes. Regardless, we run a linear model to assess a few statistics. In it we ensure that life expectancy (LifeExp) is modeled by the total expenditures (TotExp). The steps and summary are provided below. 
 
 ```{r}
 lm.data <- lm(LifeExp~TotExp, data)
 summary(lm.data)
 ```
 
-Diagnostic plots
+This summary shows that the coefficient of determination, or $R^2$, is `r summary(lm.data)$r.squared` which describes how well the regression line explains the data. In this case, it specifically looks at how much variation in life expectancy is explained by the total personal and government expenditures. As expected, a linear trend on this data without transformation is poor, with the $R^2$ explaining only about 25% of the model fit. Many would consider this a weakly correlated value given that the range of possible correlation strength extends from 0 to 1 with one indicating a perfect fit for all points. 
 
-```{r}
-# Diagnostic plots
-plot(lm.data)
-```
+The p-value for total expenditures is `r summary(lm.data)$coefficients[1,"Pr(>|t|)"]` which is statistically significant beyond the alpha level of 0.001. If our null hypothesis is that adding our variable would result in no change in our model, then we could reject the null. In this case, the addition of total expenditures significantly changed the estimates. However, statistical significance alone, does not mean we can make accurate predictions from it. This p-value only shows that the probability of this change occurring by random chance is extremely low. 
+
+Results also show that the F statistic is `r summary(lm.data)$fstatistic["value"]`. The F statistic is in an indication of overall significance in the model. It tells us whether the regression plotted has a better fit than an intercept-only model. The further the value is from 1, the better the model. Our critical value is probably less than 2 with 188 degrees of freedom and this value is greater than that critical value. Thus, we could reject the null hypothesis to conclude that the addition of total expenditures is statistically significant and that there is a strong relationship between the variables (stronger than the null hypothesis). However, here again, significance does not equate to a perfect linear model nor its ability to be useful. 
+
+Going further, the standard error is `r summary(lm.data)$coefficients[1,"Std. Error"]`. The closer this value is to 0, the better, since it indicates how far the data is from the model expectations on average. Notice that this value is extremely low. Some consider this an indicator of the quality of the fit in a model. This low value indicates high quality, assuming the other assumptions of linear regression are met. Additionally, the total expenditure coefficient is `r summary(lm.data)$coefficients[1,"Estimate"]` +/- `r summary(lm.data)$coefficients[1,"Std. Error"] * 1.96` at 95% confidence. 
+
+Based on these statistics, the assumptions of simple linear regression are not met. Consider that the initial scatter plot displayed no signs of linearity, an important assumption in linear regression. For us to use linear regression, one must assume that there is a linear relationship in the data. In this case, there is not. Additionally, the normality of a plot such as the one shown, would also exhibit non-normal trends. These two failures in our assumptions would eliminate the option of using a linear regression model to make predictions or interpretations without transformations.  
+
+
+## Part 2
 
 
 
-## Scate
+
+## Part 3
+
+
+## Part 4
 
 
 
