@@ -137,7 +137,7 @@ Looking at the diagnostic plots, there is a clear pattern in the residuals and n
 
 ## Part 5
 
-Our final prediction with the new metrics of a .3
+Predicting using this new model and the setting the proportion of doctors to 0.03 with the total expenditures to 14, the results are not realistic. 
 
 ```{r}
 newdata.example <- data.frame(PropMD=0.03, TotExp=14)
@@ -145,9 +145,15 @@ predict(lm.example, newdata.example, interval="predict")
 ```
 
 
+Our prediction based on this model is that the average life expectancy would be higher than the age most people could live to be (given current behavior and technology) at about 108 years. From this model we can also be 95% confident that the true life expectancy lies between approximately 84 - 131 years. The highest average life expectancy that is attainable based on this data seems to be about 83 years with a standard deviation of about 10.85 years. The median is 70 years and mean is about 67 years. For this prediction, the average life expectancy is not likely to be three standard deviations higher than the mean as that would indicate increasing the proportion of doctors and total expenditures would boost life expectancy by almost 41 years. This is unrealistic. A full summary of the life expectancy is shown below. 
+
+```{r}
+library(psych)
+describe(data$LifeExp)
+```
 
 
-
+Furthermore, the link between life expectancy and expenditures in this model is far from perfect. There is a weak correlation at best and the data is likely not linear yet we are predicting as if it was linear. Based on the previous models, it is not likely that the life expectancy of humans can continuously increase as expenditures increase. The same applies for the other variables in this model. Increasing the proportion of doctors in the population might have a net positive effect on the average life expectancy for the country but it would require many countries each increasing this proportion simultaneously to see if there truly was as big of an impact as implied by this prediction. However, it is quite unlikely due to the nature of the human life. At some point, there are diminishing returns and this model does not take that into account. 
 
 
 
