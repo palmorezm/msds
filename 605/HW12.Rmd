@@ -60,7 +60,7 @@ Next we create a scatter plot with the sum of personal and government expenditur
 plot(data$TotExp, data$LifeExp)
 ```
 
-Our main takeaway is that the points do not follow a liner trend. There is a clear pattern that might be exponential or logistic but nothing about the relationship between the two indicates a steady increase or decrease as one changes. Regardless, we run a linear model to assess a few statistics. In it we ensure that life expectancy (LifeExp) is modeled by the total expenditures (TotExp). The steps and summary are provided below. 
+Our main takeaway is that the points do not follow a straight liner trend. There is a clear pattern that might be exponential or logistic but nothing about the relationship between the two indicates a steady increase or decrease as one changes. Regardless, we run a linear model to assess a few statistics. In it we ensure that life expectancy (LifeExp) is modeled by the total expenditures (TotExp). The steps and summary are provided below. 
 
 ```{r}
 lm.data <- lm(LifeExp~TotExp, data)
@@ -80,14 +80,69 @@ Based on these statistics, the assumptions of simple linear regression are not m
 
 ## Part 2
 
+To see if the data can appear more linear and normal it is transformed. The total expenditures values are raised to the power of 0.06 and the life expectancy values to the power of 4.6. The resultant scatterplot is shown below.  
+
+```{r}
+plot(data$TotExp^.06, data$LifeExp^4.6)
+```
+
+This shows a much more linear trend with greater potential to fulfill the assumptions of linear regression. We continue with a summary of the linear model to compare those statistics previously mentioned. 
+
+```{r}
+data$LifeExp4.6 <- data$LifeExp^4.6
+data$TotExp.06 <- data$TotExp^.06
+lm.data.t <- lm(LifeExp4.6~TotExp.06, data)
+summary(lm.data.t)
+```
+
+This summary shows that the coefficient of determination, or $R^2$, is `r summary(lm.data.t)$r.squared` which is much better than our previous model. With this statistic one might assume that the variation in life expectancy explains about 72% of the expenditures. This is a much strong correlation than our original model. 
+
+The p-value for total expenditures is `r summary(lm.data.t)$coefficients[1,"Pr(>|t|)"]` which is statistically significant beyond the alpha level of 0.001. Again, the null hypothesis assumes the addition of total expenditures is not significant and could be due to random chance. In this case, our probability of these changes occurring by chance is again, extremely low, but this p-value also happens to match that of the model without any independent variables. 
+
+These results show that the F statistic is `r summary(lm.data.t)$fstatistic["value"]` suggesting that this model is almost certainly significantly and we can reject the null hypothesis. This and the p-value means that the addition of total expenditure is statistically significant in our model and that there is a closer relationship between the variables than in our previous model. However, there is something else that must be considered. 
+
+The standard error of this transformed data set is `r summary(lm.data.t)$coefficients[1,"Std. Error"]`. Recall that, the closer this value is to 0, the better, since it indicates how far the data is from the model expectations on average. This error value is extremely high suggesting the data associated with this model are extremely far away from their fit in the model. As an indicator of model quality, this would be a very poor model. However, based on the information observed and how we were directed, this model is technically better because it allows us to satisfy the necessary assumptions for linear regression and create the model under more appropriate conditions. Although, it is practically useless for prediction due to its high error and these transformations. 
 
 
 
 ## Part 3
 
+To forecast life expectancy based on two values of total expenditures, located at 1.5 and 2.5, we create a new data frame using those values and predict with it. Confidence intervals accompany each prediction which is based on the transformed model. 
+
+```{r}
+newdata <- data.frame(TotExp.06=c(1.5,2.5))
+predict(lm.data.t, newdata, interval="predict")^(1/4.6)
+```
+
+Based on this output Life expectancy is about 63 years when total expenditures is at a value of about 1.5. Life expectancy then increases with increased expenditures to about 87 when the total expenditures value is at 2.5. The 95% confidence intervals are from approximately 36 - 73 years when total expenditures is at 1.5 and about 82 - 90 years when total expenditures is at 2.5. 
+
+
+
 
 ## Part 4
 
+```{r}
+lm.example <- lm(LifeExp ~ PropMD + TotExp + TotExp:PropMD, data)
+summary(lm.example)
+```
+
+Comparing the same statistics as previously mentioned, this model is generally worse than the second model created with the transformations. To start, the $R^2$ value is much lower, indicating that the model does not explain most of the variation between life expectancy and total expenditures. The F-statistic is also several times smaller than our transformed model. Results are still significant but to a lesser degree. The standard error is  also lower, much closer to zero but that may not be enough. If we were to examine more we might create some diagnostic plots to validate the conditional assumptions of linearity as shown:
+
+```{r}
+par(mfrow=c(2,2))
+plot(lm.example)
+```
+
+Looking at the diagnostic plots, there is a clear pattern in the residuals and normality is a little off. Thus, our assumptions are already invalid. However, there is also a problem with overly influential values and their leverage on the data, as well as residuals being unequally spread in the Scale-location plot. Nothing about this model indicates a good linear fit for this data. 
+
+## Part 5
+
+Our final prediction with the new metrics of a .3
+
+```{r}
+newdata.example <- data.frame(PropMD=0.03, TotExp=14)
+predict(lm.example, newdata.example, interval="predict")
+```
 
 
 
