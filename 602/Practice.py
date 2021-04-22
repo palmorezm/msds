@@ -927,14 +927,34 @@ print([b,c,a])
     # the median 
     # the 25th and 75th percentiles
 
+# Complete the code to return the output
+# y = df['diabetes'].values
+# X = df.drop('diabetes', 
+#              axis=1).values
 
+# X_test and y_test are available localled and y_pred=knn.predict(X_test) . Make sure to have columns by predicted labels, like the convention.
+# Complete the code to return the output
+# [[23  0  0]
+#  [ 0 19  0]
+#  [ 0  1 17]]
+# print(confusion_matrix(y_test, y_pred))
 
+# Fill in the function so the accuracy of a regularized model is printed
+# reg = ? (normalize = True)
+# cv_scores = cross_val_score(?, 
+#                 X, y, cv=5)
+# print(cv_scores)
 
+reg = Ridge(normalize = True)
+cv_scores = cross_val_score(reg, 
+                 X, y, cv=5)
+print(cv_scores)
 
-
-
-
-
+# When you print the shape method of your data you get the output below. 
+# (5, 3)
+# Which option correctly describe the format of the output?
+# knn.predict(your_data)
+# A 5 by 1 array: one prediction for each observation in your_data
 
 
 
