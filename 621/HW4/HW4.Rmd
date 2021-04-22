@@ -19,6 +19,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \ecenter
 
+```{r warning=F, message=F}
+# Packages
+library(tidyverse)
+library(kableExtra)
+```
+
+
 ## Purpose 
 
 In this homework assignment, we will explore, analyze and model a data set containing approximately 8000 
@@ -36,17 +43,61 @@ provided). Below is a short description of the variables of interest in the data
 
 ```{r}
 # short descriptions of variables as table from matrix
+vardesc <- data.frame(matrix(c(
+'INDEX',	'Identification variable',
+'TARGET_FLAG',	'Was car in a crash? 1 = Yes, 0 = No',
+'TARGET_AMT',	'Cost of car crash',
+'AGE',	'Age of driver',
+'BLUEBOOK',	'Value of vehicle',
+'CAR_AGE',	'Vehicle age',
+'CAR_TYPE',	'Type of car',
+'CAR_USE', 'Main purpose the vehicle is used for',
+'CLM_FREQ',	'Number of claims filed in past five years',
+'EDUCATION',	'Maximum education level',
+'HOMEKIDS',	'Number of children at home',
+'HOME_VAL',	'Value of driver\'s home',
+'INCOME',	'Annual income of the driver',
+'JOB',	'Type of job by standard collar categories',
+'KIDSDRIV',	'Number of children who drive',
+'MSTATUS',	'Marital status',
+'MVR_PTS',	'Motor vehicle inspection points',
+'OLDCLAIM',	'Total claims payout in past five years',
+'PARENT1',	'Single parent status',
+'RED_CAR',	'1 if car is red, 0 if not',
+'REVOKED',	'License revoked in past 7 years status',
+'SEX',	'Driver gender',
+'TIF',	'Time in force',
+'TRAVETIME',	'Distance to work in minutes',
+'URBANICITY',	'Category of how urban the area the driver lives is',
+'YOJ', 'Number of years on the job'
+),  byrow = TRUE, ncol = 2))
+colnames(vardesc) <- c('Variable', 'Description')
+kbl(vardesc, booktabs = T, caption = "Variable Descriptions") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F)
 ```
 
 
 
 ## Introduction
 
+
+
 ```{r}
 tdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance_training_data.csv")
 edata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance-evaluation-data.csv")
-head(tdata)
 ```
+
+
+
+```{r}
+initialobs <- tdata[1:4,]
+kbl(t(initialobs), booktabs = T, caption = "Initial Observations") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F) %>%
+  add_header_above(c(" ", " ", "Row Number", " ", " ")) %>%
+  footnote(c("Includes the first four observations of all variables in the data"))
+```
+
+
 
 ## Data Exploration
 
@@ -58,6 +109,56 @@ a. Mean / Standard Deviation / Median
 b. Bar Chart or Box Plot of the data
 c. Is the data correlated to the target variable (or to other variables?)
 d. Are any of the variables missing and need to be imputed “fixed”?
+
+
+```{r}
+# theoretical effects
+vareffects <- data.frame(matrix(c(
+'INDEX',	'None',
+'TARGET_FLAG',	'None',
+'TARGET_AMT',	'None',
+'AGE',	'Youngest and Oldest may have higher risk of accident',
+'BLUEBOOK',	'Unknown on probability of collision but correlated with payout',
+'CAR_AGE',	'Unknown on probability of collision but correlated with payout',
+'CAR_TYPE',	'Unknown on probability of collision but correlated with payout',
+'CAR_USE', 'Commerical vehicles might increase risk of accident',
+'CLM_FREQ',	'Higher claim frequency increases likelihood of future claims',
+'EDUCATION',	'Theoretically higher education levels lower risk',
+'HOMEKIDS',	'Unknown',
+'HOME_VAL',	'Theoretically home owners reduce risk due to more responsible driving',
+'INCOME',	'Theoretically wealthier drivers have fewer accidents',
+'JOB',	'Theoretically white collar+ jobs are safer',
+'KIDSDRIV',	'Increased risk of accident from inexperienced driver',
+'MSTATUS',	'Theoretically married people drive safer',
+'MVR_PTS',	'Increased risk of accident',
+'OLDCLAIM',	'Increased risk of higher payout with previous payout',
+'PARENT1',	'Unknown',
+'RED_CAR',	'Theoretically increased risk of accident based on urban legend',
+'REVOKED',	'Increased risk of accident if revoked',
+'SEX',	'Theoretically increased risk of accident for women based on urban legend',
+'TIF',	'Decreased risk for those who have greater loyalty',
+'TRAVETIME',	'Longer distances increase risk of accident',
+'URBANICITY',	'The more urban the area the greater the risk of accident',
+'YOJ', 'Decreased risk for those with greater longevity'
+),  byrow = TRUE, ncol = 2))
+colnames(vareffects) <- c('Variable', 'Effect')
+kbl(vareffects, booktabs = T, caption = "Theoretical Variable Effects") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F)
+```
+
+
+
+```{r}
+tdata.nas <- lapply(tdata, function(x) sum(is.na(x)))
+tdata.types <- lapply(tdata, function(x) class(x))
+tdata.firstob <- lapply(tdata, function(x) head(x, 1))
+tdata.uniques <- lapply(tdata, function(x) length(unique(factor(x))))
+tdata.tbl.natypes <- cbind(tdata.nas, tdata.types, tdata.firstob, tdata.uniques) 
+colnames(tdata.tbl.natypes) <- c("Quantity Missing", "Data Type", "First Observation", "Unique Factors")
+kbl(tdata.tbl.natypes, booktabs = T, caption = "Data Characteristics") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F)
+```
+
 
 
 ## Data Preparation
