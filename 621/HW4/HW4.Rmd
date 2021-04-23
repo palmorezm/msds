@@ -189,6 +189,14 @@ kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
 
 
 
+```{r}
+select_if(tdata, is.numeric())
+tdata %>% 
+  
+```
+
+
+
 
 
 
