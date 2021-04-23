@@ -19,12 +19,15 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \ecenter
 
+___
+
 ```{r warning=F, message=F}
 # Packages
 library(tidyverse)
 library(kableExtra)
 ```
 
+\newpage
 
 ## Purpose 
 
@@ -78,13 +81,21 @@ kbl(vardesc, booktabs = T, caption = "Variable Descriptions") %>%
 
 
 
+___
+
+
+\newpage
+
+
 ## Introduction
 
 
 
 ```{r}
-tdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance_training_data.csv")
-edata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance-evaluation-data.csv")
+tdata <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance_training_data.csv")
+edata <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/621/HW4/insurance-evaluation-data.csv")
 ```
 
 
@@ -96,6 +107,14 @@ kbl(t(initialobs), booktabs = T, caption = "Initial Observations") %>%
   add_header_above(c(" ", " ", "Row Number", " ", " ")) %>%
   footnote(c("Includes the first four observations of all variables in the data"))
 ```
+
+
+
+___
+
+
+
+\newpage
 
 
 
@@ -161,6 +180,41 @@ kbl(tdata.tbl.natypes, booktabs = T, caption = "Data Characteristics") %>%
 
 
 
+
+```{r}
+tdata.summary.tbl <- summary(tdata)
+kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
+  kable_styling(latex_options = c("striped", "scale_down", "hold_position"), full_width = F)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+___
+
+
+
+\newpage
+
+
+
 ## Data Preparation
 
 Describe how you have transformed the data by changing the original variables or creating new variables. If you
@@ -170,6 +224,14 @@ b. Create flags to suggest if a variable was missing
 c. Transform data by putting it into buckets
 d. Mathematical transforms such as log or square root (or use Box-Cox)
 e. Combine variables (such as ratios or adding or multiplying) to create new variables
+
+
+
+___
+
+
+\newpage
+
 
 ## Model Building
 
@@ -183,6 +245,13 @@ Discuss the coefficients in the models, do they make sense? For example, if a pe
 you would reasonably expect that person to have more car crashes. If the coefficient is negative (suggesting that 
 the person is a safer driver), then that needs to be discussed. Are you keeping the model even though it is counter 
 intuitive? Why? The boss needs to know.
+
+
+___
+
+
+\newpage
+
 
 ## Model Selection
 
