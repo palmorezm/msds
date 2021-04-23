@@ -956,6 +956,89 @@ print(cv_scores)
 # knn.predict(your_data)
 # A 5 by 1 array: one prediction for each observation in your_data
 
+# What code will return 
+# True and True
+True
 
+# Complete the code to return the output 
+# False 
+not(39 < 63)
 
+import numpy as np 
+import pandas as pd
+# Either create dictionary
+d = {'product':['A','A','A','B','B','B'], 'month':['Jan','Feb','Mar','Jan','Feb','Mar'], 'sold':[85,200,180,90,80,130]}
+# Or create array
+array = np.array([['A','Jan','85'], ['A','Feb','200'],['A','Mar','180'],['B','Jan','90'],['B','Feb','80'],['B','Mar','130']])
+sales = pd.DataFrame(d)
+sales2 = pd.DataFrame(array, columns = ['product', 'month', 'sold'])
+print(sales)
+print(sales2)
+# They are the same type
+type(sales) == type(sales2)
+# but do not have the same sold column as shown below
+sales == sales2
+# Why is this? 
+# taking a closer look we can see the data types
+sales['sold'] 
+sales2['sold'] 
+# this makes sense because of how we entered the data
+# if we create the array without marks around the numerical values then the type changes
+# For example, if we want the 'sold' column to be of int64 type then we change our array formating
+# Our dictionary stays the same 
+d = {'product':['A','A','A','B','B','B'], 'month':['Jan','Feb','Mar','Jan','Feb','Mar'], 'sold':[85,200,180,90,80,130]}
+# But the array changes to this
+array = np.array([['A','Jan',85], ['A','Feb',200],['A','Mar',180],['B','Jan',90],['B','Feb',80],['B','Mar',130]])
+# Then rerun the pd.DataFrame functions
+sales = pd.DataFrame(d)
+sales2 = pd.DataFrame(array, columns = ['product','month','sold'])
+# and print the results
+print(sales)
+print(sales2)
+# They should be identical now but we can check
+# First we look at their type which should both be pandas dataframes
+type(sales) == type(sales2)
+# Then use another boolean operator to show if all values are equal
+sales == sales2 
+# Interesting that the results are the same as above
+# Our change in formating did nothing different
+# Let's check the data types again to see
+sales['sold'] 
+# This dataframe from our dictionary remains the same with int64 
+sales2['sold'] 
+# But from our numpy array the result also remains an object data type
+# ?pd.DataFrame
+# From the documentation of pd.DataFrame we notice the inferred dtype is int64 when constructing a data frame from a dictionary
+# To solve this during creation, one might use a different tool from dataclass
+# Example of dataclass data frame creation
+from dataclasses import make_dataclass
+Point = make_dataclass("Point", [("col1", int), ("col2", int), ('col3', object)])
+example = pd.DataFrame([Point(0, 0, 'obj1'), Point(0, 3, 'obj2'), Point(2, 3, 'obj3')])
+print(example)
+# Now we can apply this to our data frame
+Point = make_dataclass("Point", [("product", object), ("month", object), ("sold", int)])
+sales3 = pd.DataFrame([Point("A", "Jan", 85), Point("A", "Feb", 200), Point("A", "Mar", 180), Point("B", "Jan", 90), Point("B", "Feb", 80), Point("B", "Mar", 130)])
+print(sales3)
+# That looks great
+# Lets repeat our boolean check of equality
+sales == sales3
+# Et voila! C'est magnifique et est exactement que nous voulons
+# All values are true as desired
+
+# Complete the code to return the output
+#  product month  sold
+# 1       A   Feb   200
+# 2       A   Mar   180
+import pandas as pd
+d = {'product':['A','A','A','B','B','B'], 'month':['Jan','Feb','Mar','Jan','Feb','Mar'], 'sold':[85,200,180,90,80,130]}
+sales = pd.DataFrame(d)
+import numpy as np 
+pick = np.logical_and(sales['product'] == 'A', sales['sold'] > 100)
+sales[pick]
+
+# Complete the code to return the output 
+# False
+x = 12
+y = 7 
+not(not(x < 6) and not(y > 20 or y > 10))
 
