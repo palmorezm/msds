@@ -1042,3 +1042,89 @@ x = 12
 y = 7 
 not(not(x < 6) and not(y > 20 or y > 10))
 
+# What does ndarray stand for? 
+# n dimensional aray
+
+# Which data types can a list hold? 
+# Any object
+
+# Given the following list x, what does x[0] return? 
+x = [2, 5, 4, 0, 7, 1]
+x[0]
+
+# What is a python list?
+# It is a compound data type
+
+# What is the output of this code? 
+x = 3 
+y = "Python"
+print([x,y])
+# [3, 'Python']
+
+# Select the code to return the output
+#    Month Count
+# 0    Jan    52
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Selection
+print(df.loc[df['Month'] == 'Jan'])
+
+# Which DataFrame method can you use to re-assign the index of a data frame?
+# .reindex()
+
+# Complete the code to return the output
+# 52
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Code to produce output
+print(df['Count'].max)
+
+# Complete the code to return the output 
+#    SepalLength     ...              Name
+# 0          5.1     ...       Iris-setosa
+# 1          4.9     ...       Iris-setosa
+# 2          4.7     ...       Iris-setosa
+# 3          4.6     ...       Iris-setosa
+# 4          5.0     ...       Iris-setosa
+# [5 rows x 5 columns]
+import pandas as pd 
+df = pd.read_csv(iris.csv)
+df.head()
+
+# Complete the code to return the output
+#    s_len     ...              name
+# 0    5.1     ...       Iris-setosa
+# 1    4.9     ...       Iris-setosa
+# 2    4.7     ...       Iris-setosa
+# 3    4.6     ...       Iris-setosa
+# 4    5.0     ...       Iris-setosa
+# [5 rows x 5 columns]
+new_names = ['s_len', 's_wid', 'p_len', 
+            'p_wid', 'name']
+df = pd.read_csv(iris_csv, 
+                 names =new_names, 
+                 header = 0 )
+print(df.head())
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
