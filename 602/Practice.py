@@ -1112,11 +1112,20 @@ df = pd.read_csv(iris_csv,
                  header = 0 )
 print(df.head())
 
+# Which of the following attributes would you use to get a DataFrame as a numpy array? 
+# .values 
 
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Complete the code to return the output
+# 52 
+print(df['Count'].max())
 
-
-
-
+# Which of the following is the correct way to specify the number of rows to plt.subplots()?
+# nrows=
 
 
 
