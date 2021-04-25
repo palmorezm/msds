@@ -25,6 +25,8 @@ ___
 # Packages
 library(tidyverse)
 library(kableExtra)
+library(ggcorrplot)
+library(bestNormalize)
 theme_set(theme_minimal())
 ```
 
@@ -81,36 +83,7 @@ kbl(vardesc, booktabs = T, caption = "Variable Descriptions") %>%
 ```
 
 
-```{r}
-rawvar.plt.density <- tdata %>% 
-  select(where(is.numeric)) %>% 
-  gather %>% 
-  ggplot() +
-  facet_wrap(~ key, scales = "free") +
-  geom_density(aes(value, color = key)) + theme(axis.text = element_blank(), axis.title = element_blank(), legend.position = "none") + ggtitle("Raw Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
-rawvar.plt.violin 
 
-tdata %>% 
-  select(where(is.numeric)) %>% 
-  gather %>% 
-  ggplot(aes(value, key)) +
-  facet_wrap(~ key, scales = "free") +
-  geom_violin(aes(color = key, alpha = 1)) + 
-  geom_boxplot(aes(fill = key, alpha = .5), notch = TRUE, size = .1, lty = 4) +  
-  stat_summary(fun.y = mean, geom = "point",
-               shape = 8, size = 1.5, color = "#000000") + 
-  theme(axis.text = element_blank(), 
-        axis.title = element_blank(), 
-        legend.position = "none") + 
-  ggtitle("Raw Numeric Variable Density & Distribution") + 
-  theme(plot.title = element_text(hjust = 0.5)) 
-```
-
-
-
-```{r}
-
-```
 
 
 
@@ -231,11 +204,66 @@ kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
 
 
 
+```{r}
+tdata %>% 
+  select(where(is.numeric)) %>% 
+  gather %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
+```
 
 
 
+```{r}
+tdata %>% 
+  select(where(is.numeric)) %>% 
+  gather %>% 
+  ggplot(aes(value, key)) +
+  facet_wrap(~ key, scales = "free") +
+  geom_violin(aes(color = key, alpha = 1)) + 
+  geom_boxplot(aes(fill = key, alpha = .5), notch = TRUE, size = .1, lty = 3) +  
+  stat_summary(fun.y = mean, geom = "point",
+               shape = 8, size = 1.5, color = "#000000") + 
+  theme(axis.text = element_blank(), 
+        axis.title = element_blank(), 
+        legend.position = "none") + 
+  ggtitle("Numeric Variable KDE & Distribution") + 
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
 
 
+
+```{r}
+tdata %>% 
+  select(where(is.integer)) %>%
+  gather() %>% 
+  filter(value == 0 | 1) %>% 
+  group_by(key) %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_bar(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Integer Frequencies") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+```{r}
+tdata %>% 
+  select("TARGET_FLAG", "MVR_PTS", "CLM_FREQ", "HOMEKIDS", "KIDSDRIV", "TIF") %>% 
+  gather() %>% 
+  ggplot(aes(value)) +
+  facet_wrap(~ key, scales = "free") + 
+  geom_bar(aes(value, color = key, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Select Integer Frequencies") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+```{r}
+tdata %>%
+  select(is.numeric) %>% 
+  cor() %>% 
+  ggcorrplot(method = "circle", type="upper", 
+             ggtheme = ggplot2::theme_minimal, legend.title = "Influence") + coord_flip() 
+```
 
 
 
@@ -269,6 +297,150 @@ b. Create flags to suggest if a variable was missing
 c. Transform data by putting it into buckets
 d. Mathematical transforms such as log or square root (or use Box-Cox)
 e. Combine variables (such as ratios or adding or multiplying) to create new variables
+
+
+
+```{r}
+# Select character variables
+chars <- select(tdata, where(is.character))
+# Use function to extract dollars
+to_num <- function(x){
+  x <- as.character(x)
+  x <- gsub(",", "", x)
+  x <- gsub("\\$", "", x)
+  as.numeric(x)
+}
+# Specify those dollar variables 
+income.values <- to_num(chars$INCOME)
+home.values <- to_num(chars$HOME_VAL)
+bluebook.values <- to_num(chars$BLUEBOOK)
+oldclaim.values <- to_num(chars$OLDCLAIM)
+as.data.frame(cbind(income.values, 
+                    home.values, 
+                    bluebook.values, 
+                    oldclaim.values))
+income.values.stat <- to_num(chars$INCOME)
+home.values.stat <- to_num(chars$HOME_VAL)
+bluebook.values.stat <- to_num(chars$BLUEBOOK)
+oldclaim.values.stat <- to_num(chars$OLDCLAIM)
+# impute median values for missing variables
+income.values[is.na(income.values)] <- 
+  median(income.values, na.rm = TRUE)
+home.values[is.na(home.values)] <- 
+  median(home.values, na.rm = TRUE)
+bluebook.values[is.na(bluebook.values)] <- 
+  median(bluebook.values, na.rm = TRUE)
+oldclaim.values[is.na(oldclaim.values)] <- 
+  median(oldclaim.values, na.rm = TRUE)
+# Recombine into data frame
+dollar.values <- 
+  data.frame(cbind(income.values, 
+                   home.values, 
+                   bluebook.values, 
+                   oldclaim.values))
+dollar.values.stats <- 
+  data.frame(cbind(income.values.stat, 
+                   home.values.stat, 
+                   bluebook.values.stat,
+                   oldclaim.values.stat))
+# Join with training data
+tdata <- data.frame(cbind(tdata, dollar.values))
+# Check the difference
+summary(dollar.values)
+summary(dollar.values.stats)
+```
+
+
+
+```{r}
+# Covert categorical variables to factors 
+factors <- tdata %>% 
+  select("PARENT1", 
+         "MSTATUS", 
+         "SEX", 
+         "EDUCATION", 
+         "JOB", 
+         "CAR_USE",
+         "CAR_TYPE",
+         "RED_CAR", 
+         "REVOKED", 
+         "URBANICITY") 
+factors <- data.frame(lapply(factors, function(x) as.factor(x)))
+factors <- factors %>% 
+  rename("parent1" = "PARENT1", 
+         "mstatus" = "MSTATUS", 
+         "sex" = "SEX", 
+         "education" = "EDUCATION", 
+         "job" = "JOB", 
+         "car_use" = "CAR_USE", 
+         "car_type" = "CAR_TYPE",
+         "red_car" = "RED_CAR", 
+         "revoked" = "REVOKED", 
+         "urbanicity" = "URBANICITY")
+tdata <- cbind(tdata, factors)
+```
+
+
+
+```{r}
+# Exclude unrealistic values
+tdata <- tdata %>% 
+  mutate(car_age = ifelse(CAR_AGE<0, NA, CAR_AGE))
+summary(tdata$car_age)
+summary(tdata$CAR_AGE)
+```
+
+
+```{r}
+full41 <- tdata
+full41
+full41[c(2:7, 15, 18, 22, 24, 27:41)]
+
+```
+
+
+```{r}
+# Drop INDEX and other unnecessary columns
+tdata <- tdata %>% 
+  select("TARGET_FLAG",
+         "TARGET_AMT",
+         "KIDSDRIV",
+         "AGE",
+         "HOMEKIDS",
+         "YOJ",
+         "TRAVTIME",
+         "TIF",
+         "CLM_FREQ",
+         "MVR_PTS",
+         "income.values", 
+         "home.values",
+         "bluebook.values",
+         "oldclaim.values",
+         "parent1", 
+         "mstatus",
+         "sex",
+         "education",
+         "job",
+         "car_use",
+         "car_age",
+         "car_type",
+         "red_car", 
+         "revoked",
+         "urbanicity")
+# Check total variables present
+length(colnames(tdata))
+```
+
+
+```{r}
+# More imputation
+
+```
+
+
+
+
+
 
 
 
