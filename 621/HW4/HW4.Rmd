@@ -25,6 +25,7 @@ ___
 # Packages
 library(tidyverse)
 library(kableExtra)
+theme_set(theme_minimal())
 ```
 
 \newpage
@@ -80,6 +81,39 @@ kbl(vardesc, booktabs = T, caption = "Variable Descriptions") %>%
 ```
 
 
+```{r}
+rawvar.plt.density <- tdata %>% 
+  select(where(is.numeric)) %>% 
+  gather %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_density(aes(value, color = key)) + theme(axis.text = element_blank(), axis.title = element_blank(), legend.position = "none") + ggtitle("Raw Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
+rawvar.plt.violin 
+
+tdata %>% 
+  select(where(is.numeric)) %>% 
+  gather %>% 
+  ggplot(aes(value, key)) +
+  facet_wrap(~ key, scales = "free") +
+  geom_violin(aes(color = key, alpha = 1)) + 
+  geom_boxplot(aes(fill = key, alpha = .5), notch = TRUE, size = .1, lty = 4) +  
+  stat_summary(fun.y = mean, geom = "point",
+               shape = 8, size = 1.5, color = "#000000") + 
+  theme(axis.text = element_blank(), 
+        axis.title = element_blank(), 
+        legend.position = "none") + 
+  ggtitle("Raw Numeric Variable Density & Distribution") + 
+  theme(plot.title = element_text(hjust = 0.5)) 
+```
+
+
+
+```{r}
+
+```
+
+
+
 
 ___
 
@@ -130,6 +164,8 @@ c. Is the data correlated to the target variable (or to other variables?)
 d. Are any of the variables missing and need to be imputed “fixed”?
 
 
+Before we delve into the nitty gritty of this data set, we should consider what effect each of these variables might exert on the outcome. Since there are two targets of different types, and thus two models (one logistic classifier and one regression) there could be an influence on either or both models. As we understand it, the theoretical effects of each variable are recorded in the table below. 
+
 ```{r}
 # theoretical effects
 vareffects <- data.frame(matrix(c(
@@ -166,14 +202,20 @@ kbl(vareffects, booktabs = T, caption = "Theoretical Variable Effects") %>%
 ```
 
 
+This table considers the effects of both models but they are only theoretical and may not necessarily reflect the true influence. We will evaluate these directly in the model selection process. For now, they will serve as general baseline expectations for exploration and preparation. We continue by exploring the data to determine where munging may be necessary. 
+
+
+
 
 ```{r}
 tdata.nas <- lapply(tdata, function(x) sum(is.na(x)))
+tdata.len <- lapply(tdata, function(x) length(x))
+tdata.permis <- lapply(tdata, function(x) round(sum(is.na(x))/length(x)*100, 1))
 tdata.types <- lapply(tdata, function(x) class(x))
 tdata.firstob <- lapply(tdata, function(x) head(x, 1))
 tdata.uniques <- lapply(tdata, function(x) length(unique(factor(x))))
-tdata.tbl.natypes <- cbind(tdata.nas, tdata.types, tdata.firstob, tdata.uniques) 
-colnames(tdata.tbl.natypes) <- c("Quantity Missing", "Data Type", "First Observation", "Unique Factors")
+tdata.tbl.natypes <- cbind(tdata.nas, tdata.len, tdata.permis, tdata.types, tdata.firstob, tdata.uniques) 
+colnames(tdata.tbl.natypes) <- c("Missing", "Total", "%", "Data Type", "Example", "Factors")
 kbl(tdata.tbl.natypes, booktabs = T, caption = "Data Characteristics") %>%
   kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F)
 ```
@@ -189,11 +231,6 @@ kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
 
 
 
-```{r}
-select_if(tdata, is.numeric())
-tdata %>% 
-  
-```
 
 
 

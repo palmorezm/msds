@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.18)  23 APR 2021 19:27
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.18)  24 APR 2021 19:20
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -779,7 +779,7 @@ l.326 \newpage
 er (name{table.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.477 
+l.493 
       ]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
@@ -788,12 +788,12 @@ LaTeX Warning: `!h' float specifier changed to `!ht'.
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.532 \newpage
+l.548 \newpage
               ] [8pdfTeX warning (ext4): destination with the same identifier (
 name{table.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.548 \newpage
+l.564 \newpage
               ] [9] [10] (./HW4.aux)
 Package rerunfilecheck Info: File `HW4.out' has not changed.
 (rerunfilecheck)             Checksum: 286F893E405AAF975F385E1C1949BCCC;843.
@@ -801,11 +801,11 @@ Package rerunfilecheck Info: File `HW4.out' has not changed.
 Here is how much of TeX's memory you used:
  12267 strings out of 480962
  180914 string characters out of 5905114
- 526890 words of memory out of 5000000
+ 531353 words of memory out of 5000000
  29214 multiletter control sequences out of 15000+600000
  451045 words of font info for 69 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,10n,74p,304b,360s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,10n,74p,372b,360s stack positions out of 5000i,500n,10000p,200000b,80000s
 {c:/Users/Zachary Palmore/AppData/Roaming/TinyTeX/texmf-dist/fonts/enc/dvips/
 lm/lm-ec.enc}<c:/Users/Zachary Palmore/AppData/Roaming/TinyTeX/texmf-dist/fonts
 /type1/public/lm/lmbx12.pfb><c:/Users/Zachary Palmore/AppData/Roaming/TinyTeX/t
@@ -817,7 +817,7 @@ re/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users
 public/lm/lmtk10.pfb><c:/Users/Zachary Palmore/AppData/Roaming/TinyTeX/texmf-di
 st/fonts/type1/public/lm/lmtt10.pfb><c:/Users/Zachary Palmore/AppData/Roaming/T
 inyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on HW4.pdf (10 pages, 211053 bytes).
+Output written on HW4.pdf (10 pages, 213066 bytes).
 PDF statistics:
  131 PDF objects out of 1000 (max. 8388607)
  109 compressed objects within 2 object streams
