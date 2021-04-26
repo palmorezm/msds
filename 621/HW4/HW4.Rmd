@@ -26,7 +26,9 @@ ___
 library(tidyverse)
 library(kableExtra)
 library(ggcorrplot)
+library(reshape2)
 library(bestNormalize)
+library(caret)
 theme_set(theme_minimal())
 ```
 
@@ -432,15 +434,175 @@ length(colnames(tdata))
 ```
 
 
+
+
+
+
 ```{r}
 # More imputation
+tdata$AGE[is.na(tdata$AGE)] <-
+  median(tdata$AGE, na.rm = T)
+tdata$YOJ[is.na(tdata$YOJ)] <-
+  median(tdata$YOJ, na.rm = T)
+tdata$car_age[is.na(tdata$car_age)] <- 
+  median(tdata$car_age, na.rm = T)
+sum(is.na(tdata))
+```
 
+
+```{r}
+tdata %>% 
+  select(is.factor) %>%
+  select("car_type", "education", "job") %>% 
+  gather() %>% 
+  ggplot(aes(value)) + 
+  facet_wrap(~ key, nrow = 3, scales = "free") + 
+  geom_bar(aes(, fill = key )) + theme(axis.title = element_blank(), axis.text.x = element_blank(), legend.position = "none") + coord_flip() + ggtitle("Nonbinary Classifiers") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+tdata %>% 
+  select(is.factor) %>%
+  select("car_use", 
+         "mstatus", 
+         "parent1", 
+         "red_car",
+         "revoked",
+         "sex",
+         "urbanicity") %>% 
+  gather() %>% 
+  ggplot(aes(value)) + 
+  facet_wrap(~ key, scales = "free") + 
+  geom_bar(aes(, fill = key )) + theme(axis.title = element_blank(), axis.text.x = element_blank(), legend.position = "none") + coord_flip() + ggtitle("Binary Classifiers Counts") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
 
 
 
+```{r}
+tdata %>% 
+  select(is.numeric) %>%
+  gather() %>% 
+  ggplot(aes(key)) + 
+  facet_wrap(~ key, scales = "free") + 
+  geom_boxplot(aes(key, value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), axis.text.x = element_blank(), legend.position = "none") + ggtitle("Numeric Distributions") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+```{r}
+# New features
+tdata <- tdata %>% 
+  mutate(city = ifelse(urbanicity == "Highly Urban/ Urban", 0, 1)) %>% 
+  mutate(young = ifelse(AGE < 25, 1, 0)) %>% 
+  mutate(clean_rec = ifelse(MVR_PTS == 0, 1, 0)) %>%
+  mutate(previous_accident = ifelse(CLM_FREQ == 0 & oldclaim.values == 0, 0, 1)) %>% 
+  mutate(educated = ifelse(education %in% c("Bachelors", "Masters", "PhD"), 1, 0)) %>% 
+  mutate(avg_claim = ifelse(CLM_FREQ > 0, oldclaim.values/CLM_FREQ, 0))
+```
+
+
+
+```{r}
+# Convert to factors 
+tdata$city <- as.factor(tdata$city)
+tdata$young <- as.factor(tdata$young)
+tdata$clean_rec <- as.factor(tdata$clean_rec)
+tdata$previous_accident <- as.factor(tdata$previous_accident)
+tdata$educated <- as.factor(tdata$educated)
+```
+
+
+
+```{r}
+tdata[26:31] %>% 
+  select(is.factor) %>% 
+  gather() %>% 
+  ggplot(aes(value)) + 
+  facet_wrap(~key, scales = "free") + 
+  geom_bar(aes(fill = key, alpha = .5)) + theme(legend.position = "none", axis.title = element_blank()) + ggtitle("New Features") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+
+```{r}
+# Produce recommended transformations
+df <- tdata %>% 
+  select(is.numeric)
+for (i in colnames(df)) {
+  bestNorms[[i]] <- bestNormalize(df[[i]],
+                                  allow_orderNorm = FALSE,
+                                  out_of_sample =FALSE)
+}
+```
+
+
+```{r}
+# Continue focusing on realistic values
+accident_costs <- tdata$TARGET_AMT[tdata$TARGET_AMT>.0]
+```
+
+
+
+```{r}
+# Focus on selected variables 
+bestNorms$TARGET_AMT$chosen_transform
+tdata$target_amt <- scale(log(tdata$TARGET_AMT + 1))
+tdata %>% 
+  select(where(is.numeric)) %>%
+  select("TARGET_AMT","target_amt") %>%
+  gather %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
+tdata %>% 
+  select(where(is.numeric)) %>%
+  gather %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+```{r}
+# Split 70-30 training test
+set.seed(1102)
+tindex <- createDataPartition(tdata$TARGET_FLAG, p = .7, list = FALSE, times = 1)
+train <- tdata[tindex,]
+test <- tdata[-tindex,]
+rindex <- tdata %>%
+  filter(TARGET_FLAG == 1)
+reg.tindex <- createDataPartition(rindex$TARGET_AMT, p = .7, list = FALSE, times = 1)
+reg.train <- rindex[reg.tindex,]
+reg.test <- rindex[-reg.tindex,]
+```
+
+
+
+
+```{r}
+plot_vars <- c("TARGET_FLAG", names(keep(reg.train, is.numeric)))
+
+reg.train[plot_vars] %>%
+  select(-TARGET_AMT) %>%
+  gather(variable, value, -TARGET_FLAG) %>%
+  ggplot(., aes(TARGET_FLAG, value, color=TARGET_FLAG)) + 
+  geom_boxplot() +
+  scale_color_brewer(palette="Set1") +
+  theme_light() +
+  theme(legend.position = "none") +
+  facet_wrap(~variable, scales ="free", ncol = 4) +
+  labs(x = element_blank(), y = element_blank())
+
+reg.train %>% 
+  select(is.numeric) %>% 
+  select(-TARGET_AMT) %>%
+  gather(varable, value, -TARGET_FLAG) %>%  
+  ggplot(aes(TARGET_FLAG, value, color=TARGET_FLAG)) + 
+  geom_boxplot() + 
+  facet_wrap(~variable, scales = "free") 
+```
 
 
 
@@ -462,6 +624,36 @@ Discuss the coefficients in the models, do they make sense? For example, if a pe
 you would reasonably expect that person to have more car crashes. If the coefficient is negative (suggesting that 
 the person is a safer driver), then that needs to be discussed. Are you keeping the model even though it is counter 
 intuitive? Why? The boss needs to know.
+
+
+```{r}
+model1 <- glm(TARGET_FLAG ~ previous_accident, family = binomial(link = "logit"), train)
+summary(model1)
+```
+
+
+```{r}
+model2 <- glm(TARGET_FLAG ~ previous_accident + city + young + clean_rec + educated, family = binomial(link = "logit"), train)
+summary(model2)
+```
+
+
+```{r}
+model3 <- glm(TARGET_FLAG ~ previous_accident + city + mstatus + income.values + sex + car_use + educated + KIDSDRIV + revoked, family = binomial(link = "logit"), train)
+summary(model3)
+```
+
+
+```{r}
+model4 <- lm(target_amt ~ ., train) 
+summary(model4)
+```
+
+
+```{r}
+model5 <- lm(target_amt ~ income.values + home.values + bluebook.values + oldclaim.values + avg_claim, train) 
+summary(model5)
+```
 
 
 ___
@@ -486,14 +678,51 @@ regression model based on (a) accuracy, (b) classification error rate, (c) preci
 F1 score, (g) AUC, and (h) confusion matrix. Make predictions using the evaluation data set.
 
 
+```{r}
+mod_stats <- function(model, test_df, target = "TARGET_FLAG", threshold = 0.5){
+  test_df$yhat <- ifelse(predict.glm(model, test_df, "response") >= threshold, 1, 0)
+  cm <- confusionMatrix(factor(test_df$yhat), factor(test_df[[target]]), "1")
+  deviance <- model$deviance
+  r2 <- 1 - model$deviance / model$null.deviance
+  
+  cat("F1 =", cm$byClass[7],"\nR2 =", r2, "\n\n")
+  print(cm)
+  
+  eval <- data.frame(actual = test_df$TARGET_FLAG, 
+                     predicted = test_df$yhat, 
+                     prob = predict(model, test_df))
+
+
+  pred <- prediction(eval$prob, eval$actual)
+  auc <- performance(pred, measure = "auc")@y.values[[1]]
+  perf <- performance(pred, "tpr", "fpr")
+  plot(perf,main="ROC Curve", sub = paste0("AUC: ", round(auc, 3)))
+  
+  return(cm)
+}
+```
+
+
+```{r}
+mod_stats(model1, test)
+```
+
+
+```{r}
+mod_stats(model2, test)
+```
 
 
 
 
+```{r}
+mod_stats(model3, test)
+```
 
 
-
-
+```{r}
+mod_stats(model4, test)
+```
 
 
 
