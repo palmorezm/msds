@@ -528,6 +528,7 @@ tdata[26:31] %>%
 
 ```{r}
 # Produce recommended transformations
+bestNorms <- tdata[1:11,1:16]
 df <- tdata %>% 
   select(is.numeric)
 for (i in colnames(df)) {
@@ -547,15 +548,8 @@ accident_costs <- tdata$TARGET_AMT[tdata$TARGET_AMT>.0]
 
 ```{r}
 # Focus on selected variables 
-bestNorms$TARGET_AMT$chosen_transform
+bestNorms$target_amt$chosen_transform
 tdata$target_amt <- scale(log(tdata$TARGET_AMT + 1))
-tdata %>% 
-  select(where(is.numeric)) %>%
-  select("TARGET_AMT","target_amt") %>%
-  gather %>% 
-  ggplot() +
-  facet_wrap(~ key, scales = "free") +
-  geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
 tdata %>% 
   select(where(is.numeric)) %>%
   gather %>% 
@@ -563,6 +557,18 @@ tdata %>%
   facet_wrap(~ key, scales = "free") +
   geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
+```{r}
+tdata %>% 
+  select(where(is.numeric)) %>%
+  select("TARGET_AMT","target_amt") %>%
+  gather %>% 
+  ggplot() +
+  facet_wrap(~ key, scales = "free") +
+  geom_density(aes(value, color = value, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Numeric Variable Density") + theme(plot.title = element_text(hjust = 0.5))
+```
+
 
 
 ```{r}
@@ -580,29 +586,6 @@ reg.test <- rindex[-reg.tindex,]
 
 
 
-
-```{r}
-plot_vars <- c("TARGET_FLAG", names(keep(reg.train, is.numeric)))
-
-reg.train[plot_vars] %>%
-  select(-TARGET_AMT) %>%
-  gather(variable, value, -TARGET_FLAG) %>%
-  ggplot(., aes(TARGET_FLAG, value, color=TARGET_FLAG)) + 
-  geom_boxplot() +
-  scale_color_brewer(palette="Set1") +
-  theme_light() +
-  theme(legend.position = "none") +
-  facet_wrap(~variable, scales ="free", ncol = 4) +
-  labs(x = element_blank(), y = element_blank())
-
-reg.train %>% 
-  select(is.numeric) %>% 
-  select(-TARGET_AMT) %>%
-  gather(varable, value, -TARGET_FLAG) %>%  
-  ggplot(aes(TARGET_FLAG, value, color=TARGET_FLAG)) + 
-  geom_boxplot() + 
-  facet_wrap(~variable, scales = "free") 
-```
 
 
 
@@ -679,52 +662,39 @@ F1 score, (g) AUC, and (h) confusion matrix. Make predictions using the evaluati
 
 
 ```{r}
-mod_stats <- function(model, test_df, target = "TARGET_FLAG", threshold = 0.5){
-  test_df$yhat <- ifelse(predict.glm(model, test_df, "response") >= threshold, 1, 0)
-  cm <- confusionMatrix(factor(test_df$yhat), factor(test_df[[target]]), "1")
-  deviance <- model$deviance
-  r2 <- 1 - model$deviance / model$null.deviance
-  
-  cat("F1 =", cm$byClass[7],"\nR2 =", r2, "\n\n")
-  print(cm)
-  
-  eval <- data.frame(actual = test_df$TARGET_FLAG, 
-                     predicted = test_df$yhat, 
-                     prob = predict(model, test_df))
-
-
-  pred <- prediction(eval$prob, eval$actual)
-  auc <- performance(pred, measure = "auc")@y.values[[1]]
-  perf <- performance(pred, "tpr", "fpr")
-  plot(perf,main="ROC Curve", sub = paste0("AUC: ", round(auc, 3)))
-  
+CM <- function(model, test, target, threshold = 0.5){
+  test$yhat <- ifelse(predict.glm(model, test, "response") >= threshold, 1, 0)
+  cm <- confusionMatrix(factor(test$yhat), factor(test[[target]]), "1")
   return(cm)
 }
 ```
 
 
 ```{r}
-mod_stats(model1, test)
+# CM(model1, test, "TARGET_FLAG")
 ```
 
 
 ```{r}
-mod_stats(model2, test)
+# mod_stats(model2, test)
 ```
 
 
 
 
 ```{r}
-mod_stats(model3, test)
+# mod_stats(model3, test)
 ```
 
 
 ```{r}
-mod_stats(model4, test)
+# mod_stats(model4, test)
 ```
 
 
+```{r}
+# mod_stats(model5, test)
+```
 
 
 
