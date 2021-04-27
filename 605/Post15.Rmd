@@ -1,0 +1,43 @@
+---
+title: "Post15"
+author: "Zachary Palmore"
+date: "4/27/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 
+
+In Exercises 7 – 14, give the domain and range of the multi-variable function.
+
+
+
+## Answer 
+
+```{r}
+library(plotrix)
+
+plot(0,xlim=c(-5,5),ylim=c(-5,5),
+    xlab="x",ylab="y",pch='',
+    xaxp=c(-5,5,10),yaxp = c(-5,5,10),
+    asp=1)
+
+abline(h=-5:5,v=-5:5, col="gray", lty=3)
+abline(h=0,v=0)
+
+draw.circle(x=0,y=0,radius=3,angle=45,border="red",col="red",density=5)
+
+draw.circle(x=0,y=0,radius=sqrt(10), border="black")
+draw.circle(x=0,y=0,radius=5, border="blue")
+
+legend("topright",
+    legend=c("x^2 + y^2 = 9","x^2 + y^2 = 10","x^2 + y^2 = 25"),
+    col=c("red","black","blue"),
+    lwd=3,bty="n",cex=0.7)
+```
+
+

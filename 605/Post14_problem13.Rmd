@@ -1,0 +1,38 @@
+---
+title: "Post14"
+author: "Zachary Palmore"
+date: "4/27/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question
+
+In Exercises 13 – 16, show that the Taylor series for $f(x)$, as
+given in Key Idea 8.8.1, is equal to $f(x)$ by applying Theorem
+8.8.1; that is, show $\lim\limits_{n\to\infty} R_n(x)=0$.
+
+In this case, we have $f(x) = e^x$.
+
+## Answer
+
+From 8.8.1, we have 
+
+$$f(x) = e^x \hspace{4pt} and \hspace{4pt} f'(x) = e^x$$
+
+And since;
+
+$$d/dx(e^x) = (e^x)$$
+$$|R_n(x)| \le \frac{max|f^{n+1}(z)|}{(n+1)!} |x^{n+1}|$$
+
+$$|R_n(x)| \le \frac{e^z}{(n+1)!} |x^{n+1}|$$
+$$\lim\limits_{n\to\infty} \frac{e^z x^{n+1}}{(n+1)!} = 0$$
+$$\lim\limits_{n\to\infty} R_n(x) = 0$$
+Set to 0 we get;
+
+$$f(x) = \sum\limits_{n=0}^{\infty} \frac{f^{(n)}(c)}{n!} (x-c)^n$$
+$$f(x) = \sum\limits_{n=0}^{\infty} \frac{e^0}{n!} (x-0)^n = \sum\limits_{n=0}^{\infty} \frac{x^n}{n!} = e^x$$
