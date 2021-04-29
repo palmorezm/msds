@@ -1,0 +1,93 @@
+---
+title: "HW13"
+author: "Zachary Palmore"
+date: "4/29/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+Use integration by substitution to solve the integral below.
+
+$$\int{4e^{-7x}dx}$$
+
+## Answer 1 
+
+
+$$-\frac{4}{7} e^{-7x} + C$$
+Steps using substitution:
+
+$U = -7x$, $dU = -7dx$, $dx = \frac{dU}{-7}$ so, 
+
+$4\int e^U\frac{dU}{-7}$ = $\frac{4}{-7}\int e^UdU$ = $-\frac{4}{7} e^U + C$ thus, $-\frac{4}{7} e^{-7x} + C$
+
+## Question 2
+
+Biologists are treating a pond contaminated with bacteria. The level of contamination is changing at a rate of $\frac{dN}{dt} = -\frac{3150}{t^4}-220$ bacteria per cubic centimeter per day, where $t$ is the number of days since treatment began. Find a function $N(t)$ to estimate the level of contamination if the level after $1$ day was $6530$ bacteria per cubic centimeter.
+
+
+## Answer 2
+
+
+
+
+
+## Question 3
+
+Find the total area of the red rectangles in the figure below, where the equation of the line is $f(x)=2x-9$
+
+## Answer 3 
+
+
+
+## Question 4 
+
+Find the area of the region bounded by the graphs of the given equations $y_1 = x_1^2 - 2x_1-2$ and $y_2 = x_2 + 2$.
+
+Enter your answer below.
+
+## Answer 4
+
+
+
+## Question 5 
+
+A beauty supply store expects to sell 110 flat irons during the next year. It costs $3.75 to store one flat iron for one year. 
+There is a fixed cost of $8.25 for each order. Find the lot size and the number of orders per year that will minimize 
+inventory costs.
+
+
+## Answer 5
+
+
+
+
+
+## Question 6 
+
+Use integration by parts to solve the integral below.
+
+$$\int{ln(9x) \times x^6 dx}$$
+
+## Answer 6 
+
+
+
+## Question 7 
+
+Determine whether $f(x)$ is a probability density function on the interval $[1, e^6]$. If not, determine the value of the definite integral. $$f(x) = \frac{1}{6x}$$
+
+
+
+## Answer 7 
+
+
+
+
+
+
+
