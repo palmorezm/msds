@@ -1147,8 +1147,41 @@ plt.pcolor
 # violinplot() is single variable
 # stripplot() is single variable
 
+# Build a pipline that imputes with imp and then uses logistic regression with logreg
+# no output
+steps = [('impute',imp), ('logistic_reg',logreg)]
+pipline = Pipline(steps)
+
+# A colleague asks you to do an analysis on a dataset, df, full of missing data. You want to get rid of all rows with missing data before you start analyzing, which line of code do you start with?
+df = df.dropna()
+
+# Import the correct function/package for k-Nearest Neighbors Classification
+# there is no output for this exercise
+from sklearn.neighbors import KNeighborsClassifier
+
+# Choose the correct import statement to use a scaler within a pipline. 
+from sklearn.preprocessing import scale
+
+# Other than calling the method drop on a column after using pd.get_dummies, which code below shows an equivalent way of deleting the redundant column?
+pd.get_dummies(drop_first=True)
+
+# Instantiate the regressor for linear regression
+reg = LinearRegression()
+
+# Which is NOT true about the format of data to be used in classification functions of scikit-learn?
+# Features must have discrete values
+
+# Which of the following statements about k-Nearest Neighbors classification is correct?
+# A larger k leads to a less complex model, while a smaller k leads to a more complex model
+
+# Import the correct function/package for accuracy analysis with a training and test data set
+from sklearn.model_selection import train_test_split
 
 
+# Fill in the code to get rid of the redundant column
+df_party = pd.get_dummies(df)
+df_party = df_party.drop('party_rep', axis = 1)
+print(df_party.head())
 
 
 
