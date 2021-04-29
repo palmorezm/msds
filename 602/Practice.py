@@ -1127,6 +1127,26 @@ print(df['Count'].max())
 # Which of the following is the correct way to specify the number of rows to plt.subplots()?
 # nrows=
 
+# Which of the following lines of code matches the plot shown? 
+plt.xticks(rotation=60) 
+# x axis 'ticks' are rotated almost to the point of being perpedicular to the axis
+
+# What code was added to place the legend 'a blue line'
+plt.legend(loc='center right')
+
+# What is the objective of image equalization?
+# To reassign pixel intensitites to the image, so that the CDF of pixel intensities becomes a straight line
+
+# Which function was used to generate the following image? 
+# Image of pixelated colors
+plt.pcolor
+
+# Which plot can NOT be used to display a single variable? 
+# lmplot()
+# hist() is single variable
+# violinplot() is single variable
+# stripplot() is single variable
+
 
 
 
