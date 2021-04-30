@@ -152,15 +152,15 @@ $$8.25 \times \frac{110}{x} \hspace{8pt} or\ simply \hspace{8pt} \frac{907.5}{x}
 $$f(x) =1.875 * x + \frac{907.5}{x}$$
 Calculate the minimized value by setting to zero and solving: 
 
-$$f'(x) &= 1.875-\frac{907.5}{x^2}$$
-$$f'(x) &= 0$$
-$$1.875-\frac{907.5}{x^2} &= 0$$
-$$1.875&= \frac{907.5}{x^2}$$
+$$f'(x) = 1.875-\frac{907.5}{x^2}$$
+$$f'(x) = 0$$
+$$1.875-\frac{907.5}{x^2} = 0$$
+$$1.875 = \frac{907.5}{x^2}$$
 $$1.875x^2 = 907.5$$
-$$x^2&= \frac{907.5}{1.875}$$
-$$x&= \sqrt{\frac{907.5}{1.875}}$$
-$$x&=\sqrt{484}$$
-$$x&=22$$
+$$x^2 = \frac{907.5}{1.875}$$
+$$x= \sqrt{\frac{907.5}{1.875}}$$
+$$x=\sqrt{484}$$
+$$x =22$$
 $$quantity\ of\ irons\ = 22$$
 $$110/22$$
 $$quantity\ of\ orders\ = 5$$
@@ -176,7 +176,7 @@ $$\int{ln(9x) * x^6 dx}$$
 
 ## Answer 6 
 
-Formula: $uv-\int vdu \\u=ln(9x)\\du=\frac{1}{x}dx\\dv=x^{6}\\v=\frac{1}{7}x^{7}$
+Formula: $uv-\int vdu, u=ln(9x), du=\frac{1}{x}dx, dv=x^{6}, v=\frac{1}{7}x^{7}$
 
 $$\frac{x^{7}ln(9x)}{7}-\int \frac{1}{7}x^{7}\frac{1}{x}dx$$
 $$\frac{x^{7}ln(9x)}{7}-\frac{1}{7} \int \frac{x^{7}}{x}dx$$
@@ -194,7 +194,7 @@ $$f(x) = \frac{1}{6x}$$
 
 ## Answer 7 
 
-$$\int_1^{e^6}\frac{1}{6x} dx &= \frac{1}{6} ln(x)|_1^{e^6}$$
+$$\int_1^{e^6}\frac{1}{6x} dx = \frac{1}{6} ln(x)|_1^{e^6}$$
 $$= \frac{1}{6} ln(e^6) - \frac{1}{6} ln(1)$$
 $$= \frac{1}{6} \times 6 - \frac{1}{6} \times 0$$
 $$= 1$$
