@@ -1183,9 +1183,39 @@ df_party = pd.get_dummies(df)
 df_party = df_party.drop('party_rep', axis = 1)
 print(df_party.head())
 
+# You have the following data frame
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3], ' ':['zero','one','two','three']}
+df = pd.DataFrame(d)
+# Set index
+df = df.set_index([' '])
+print(df)
+# Complete the code to return the output
+#      Month  Count                  
+# one     Apr     29
+# two     Mar     46
+# three   Feb      3
+print(df.loc['one':'three'])
+
+# Assume you have run import matplotlib.pyplot as plt. Which method will display a pandas plot?
+import matplotlib.pyplot as plt
+plt.show()
+
+# Select the code to return the output
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+print(df.loc[df['Count'] == 3])
 
 
+# Which of the following is the correct way to specify the number of rows to plt.subplots()?
+# nrows= 
 
+# Complete the code to return the output
+import pandas as pd
+df = pd.read_csv(iris_csv)
+df.head()
 
 
 
