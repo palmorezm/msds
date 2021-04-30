@@ -13,7 +13,6 @@ curve(7800-1050/x^3-220*x, 0.5,35)
 
 # However there is a time to make 3d plots
 # Consider this example:
-
 heart <- function(x, y){
   x^2 + y^2 + 2
 }
