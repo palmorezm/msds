@@ -56,8 +56,6 @@ $$
 N(t)=  \frac{1050}{t^{3}}-220t+5700
 $$
 
-If we wanted to check that out visually:
-
 
 
 ## Question 3
@@ -66,7 +64,16 @@ Find the total area of the red rectangles in the figure below, where the equatio
 
 ## Answer 3 
 
+Using the equation of the line and reading from the graph we estimate that the lower bound is 4.5 and upper is 8.5. Thus,
 
+```{r}
+library(stats) 
+# If start and end points are truly 4.5 and 8.5 then
+f <-function(x)(2*x-9)
+integrate(f, lower = 4.5, upper = 8.5)
+```
+
+The area is 16. This is validated by counting the squares of the image which we assume has an area of 1 and width of 1.
 
 ## Question 4 
 
@@ -76,40 +83,123 @@ Enter your answer below.
 
 ## Answer 4
 
+Given:
 
+$$y=x^{2}-2x-2$$
+$$y=x+2$$
+
+Solve for x to find the bounds:
+
+$$x^{2}-2x-2=x+2$$
+$$x^{2}-3x-4=0$$
+$$(x-4)(x+1)=0$$
+Thus, $x = -1$ and $x = 4$.
+
+Using this equation we find the top and bottoms with integration. 
+
+$$
+\int _{ a }^{ b }{ (top-bottom) } dx
+$$
+So far we have $\int _{ -1 }^{ 4 }{ (x+2)-(x^{2}-2x-2) } dx$ which simplified becomes $\int _{- 1 }^{ 4 } {(-x^{2}+3x+4)dx}$. 
+
+```{r}
+## define the integrated function
+integrand <- function(x)
+  {
+  -x^{2}+3*x+4
+  }
+## integrate the function from 0 to infinity
+integrate(integrand, lower = -1, upper = 4)
+```
+
+Which we can use to calculate the area:
+
+```{r}
+area_fun <- function(x) {
+  -x^2 + 3 * x + 4
+}
+integrate(area_fun, -1, 4)
+```
+
+The area is about 20.83.
 
 ## Question 5 
 
-A beauty supply store expects to sell 110 flat irons during the next year. It costs $3.75 to store one flat iron for one year. 
-There is a fixed cost of $8.25 for each order. Find the lot size and the number of orders per year that will minimize 
+A beauty supply store expects to sell 110 flat irons during the next year. It costs $3.75 to store one flat iron for one year.There is a fixed cost of \$8.25 for each order. Find the lot size and the number of orders per year that will minimize 
 inventory costs.
 
 
 ## Answer 5
 
+Consider that $x$ is the number of irons to order and we have the following variables:
 
+$$C_{order} -\ Cost\ per\ order$$
+$$C_{year} -\ Yearly\ cost\ of\ ordering$$
+$$R_{year} -\ Yearly\ cost\ of\ storage$$
+$$R_{iron} - Storage\ rate\ of\ one\ flat\ iron\ for\ one\ year$$
+$$n_{expected} -\ Expected\ number\ of\ orders\ in\ year$$
+$$\bar{x}_{iron} - Average\ number\ of\ irons$$
+$$I_{cost} =\ Cost\ of\ inventory$$
 
+Our equations:
+$$R_{year} = R_{iron} * \bar{x}_{iron}$$
+$$C_{year} = C_{order}\frac{n_{expected}}{x}$$
+$$I_{cost} = R_{year} + C_{order}$$
+
+Which, when we enter what we have becomes:
+$$3.75* \frac{x}{2} \hspace{8pt} or\ simply \hspace{8pt} 1.875*x$$
+$$8.25 \times \frac{110}{x} \hspace{8pt} or\ simply \hspace{8pt} \frac{907.5}{x}$$
+$$f(x) =1.875 * x + \frac{907.5}{x}$$
+Calculate the minimized value by setting to zero and solving: 
+
+$$f'(x) &= 1.875-\frac{907.5}{x^2}$$
+$$f'(x) &= 0$$
+$$1.875-\frac{907.5}{x^2} &= 0$$
+$$1.875&= \frac{907.5}{x^2}$$
+$$1.875x^2 = 907.5$$
+$$x^2&= \frac{907.5}{1.875}$$
+$$x&= \sqrt{\frac{907.5}{1.875}}$$
+$$x&=\sqrt{484}$$
+$$x&=22$$
+$$quantity\ of\ irons\ = 22$$
+$$110/22$$
+$$quantity\ of\ orders\ = 5$$
+
+The order should have 22 irons with a total of 5 orders. 
 
 
 ## Question 6 
 
 Use integration by parts to solve the integral below.
 
-$$\int{ln(9x) \times x^6 dx}$$
+$$\int{ln(9x) * x^6 dx}$$
 
 ## Answer 6 
 
+Formula: $uv-\int vdu \\u=ln(9x)\\du=\frac{1}{x}dx\\dv=x^{6}\\v=\frac{1}{7}x^{7}$
 
+$$\frac{x^{7}ln(9x)}{7}-\int \frac{1}{7}x^{7}\frac{1}{x}dx$$
+$$\frac{x^{7}ln(9x)}{7}-\frac{1}{7} \int \frac{x^{7}}{x}dx$$
+$$\frac{x^{7}ln(9x)}{7}-\frac{1}{7}\int x^{6}dx$$
+$$\frac{x^{7}ln(9x)}{7}-\frac{1}{7}(\frac{x^{7}}{7})+C$$
+$$\frac{x^{7}ln(9x)}{7}-\frac{x^{7}}{49}+C$$
 
 ## Question 7 
 
-Determine whether $f(x)$ is a probability density function on the interval $[1, e^6]$. If not, determine the value of the definite integral. $$f(x) = \frac{1}{6x}$$
+Determine whether $f(x)$ is a probability density function on the interval $[1, e^6]$. If not, determine the value of the definite integral. 
+
+$$f(x) = \frac{1}{6x}$$
 
 
 
 ## Answer 7 
 
+$$\int_1^{e^6}\frac{1}{6x} dx &= \frac{1}{6} ln(x)|_1^{e^6}$$
+$$= \frac{1}{6} ln(e^6) - \frac{1}{6} ln(1)$$
+$$= \frac{1}{6} \times 6 - \frac{1}{6} \times 0$$
+$$= 1$$
 
+The definite integral is 1 on the interval $[1, e^6]$.
 
 
 
