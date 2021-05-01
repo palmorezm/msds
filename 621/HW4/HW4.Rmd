@@ -29,6 +29,10 @@ library(ggcorrplot)
 library(reshape2)
 library(bestNormalize)
 library(caret)
+library(MASS)
+library(pROC)
+library(stats)
+library(ROCR)
 theme_set(theme_minimal())
 ```
 
@@ -36,16 +40,10 @@ theme_set(theme_minimal())
 
 ## Purpose 
 
-In this homework assignment, we will explore, analyze and model a data set containing approximately 8000 
-records representing a customer at an auto insurance company. Each record has two response variables. The 
-first response variable, TARGET_FLAG, is a 1 or a 0. A “1” means that the person was in a car crash. A zero 
-means that the person was not in a car crash. The second response variable is TARGET_AMT. This value is zero 
-if the person did not crash their car. But if they did crash their car, this number will be a value greater than zero.
+In this homework assignment, we will explore, analyze and model a data set containing approximately 8000 records representing a customer at an auto insurance company. Each record has two response variables. The first response variable, TARGET_FLAG, is a 1 or a 0. A “1” means that the person was in a car crash. A zero means that the person was not in a car crash. The second response variable is TARGET_AMT. This value is zero if the person did not crash their car. But if they did crash their car, this number will be a value greater than zero.
 
-Our objective is to build multiple linear regression and binary logistic regression models on the training data 
-to predict the probability that a person will crash their car and also the amount of money it will cost if the person 
-does crash their car. We can only use the variables given (or variables derived from the variables 
-provided). Below is a short description of the variables of interest in the data set:
+Our objective is to build multiple linear regression and binary logistic regression models on the training data to predict the probability that a person will crash their car and also the amount of money it will cost if the person does crash their car. We can only use the variables given (or variables derived from the variables provided). Below is a short description of the variables of interest in the data set:
+
 
 
 
@@ -98,6 +96,7 @@ ___
 
 ## Introduction
 
+There are [ ] observations of [ ] variables in this data set.  
 
 
 ```{r}
@@ -139,7 +138,7 @@ c. Is the data correlated to the target variable (or to other variables?)
 d. Are any of the variables missing and need to be imputed “fixed”?
 
 
-Before we delve into the nitty gritty of this data set, we should consider what effect each of these variables might exert on the outcome. Since there are two targets of different types, and thus two models (one logistic classifier and one regression) there could be an influence on either or both models. As we understand it, the theoretical effects of each variable are recorded in the table below. 
+Before we delve into the nitty gritty of this data set, we should consider what effect each of these variables might exert on the outcome. Since there are two targets of different types, and thus two models (one logistic classifier and one regression) there could be an influence on either or both models. As we understand it, the theoretical effects of each variable are recorded in the table below.
 
 ```{r}
 # theoretical effects
@@ -177,8 +176,10 @@ kbl(vareffects, booktabs = T, caption = "Theoretical Variable Effects") %>%
 ```
 
 
+
 This table considers the effects of both models but they are only theoretical and may not necessarily reflect the true influence. We will evaluate these directly in the model selection process. For now, they will serve as general baseline expectations for exploration and preparation. We continue by exploring the data to determine where munging may be necessary. 
 
+Unfortunately, this data needs work before we are able to make visualizations and contemplate improvements to the model. We consider the amount of missing values in relative proportions to each variable, followed by their respective data types, an example observation of each type, and the quantity of unique factors to each variable. This will help narrow down what is needed to prepare the data for modeling. Results are shown in the table:
 
 
 
@@ -197,6 +198,11 @@ kbl(tdata.tbl.natypes, booktabs = T, caption = "Data Characteristics") %>%
 
 
 
+Three variables contain incomplete records including ‘AGE’, ‘YOJ’,  and ‘CAR_AGE’ with 0.1%, 5.6%, and 6.2% of their data missing. Theoretically each variable would have 8161 total observations as noted in the table. The data types are either integer or numeric and the examples display what the type looks like for easy referencing. A calculation of the unique factors for each variable is included to gauge whether converting to a factor data type would be right for the variable and count the number of unique values to each. These are major concerns. 
+
+Minima, quartiles, averages, and maximums were computed to compare the numeric integer variables. Although the order of the variables remains the same as in the previous table, we added a missing values column with the row identifier ‘NA’ to count the number missing for tracking purposes. We put this together in a table called Data Characteristics. Of course, several of the variables will need to be altered before we can evaluate if the data makes sense in a real-life scenario. These are shown as NA in the table. 
+
+
 
 ```{r}
 tdata.summary.tbl <- summary(tdata)
@@ -206,9 +212,13 @@ kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
 
 
 
+
+
+
+
 ```{r}
 tdata %>% 
-  select(where(is.numeric)) %>% 
+  select_if(is.numeric) %>% 
   gather %>% 
   ggplot() +
   facet_wrap(~ key, scales = "free") +
@@ -219,7 +229,7 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select(where(is.numeric)) %>% 
+  select_if(is.numeric) %>% 
   gather %>% 
   ggplot(aes(value, key)) +
   facet_wrap(~ key, scales = "free") +
@@ -238,7 +248,7 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select(where(is.integer)) %>%
+  select_if(is.integer) %>%
   gather() %>% 
   filter(value == 0 | 1) %>% 
   group_by(key) %>% 
@@ -250,7 +260,7 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select("TARGET_FLAG", "MVR_PTS", "CLM_FREQ", "HOMEKIDS", "KIDSDRIV", "TIF") %>% 
+  dplyr::select(TARGET_FLAG, MVR_PTS, CLM_FREQ, HOMEKIDS, KIDSDRIV, TIF) %>% 
   gather() %>% 
   ggplot(aes(value)) +
   facet_wrap(~ key, scales = "free") + 
@@ -261,7 +271,7 @@ tdata %>%
 
 ```{r}
 tdata %>%
-  select(is.numeric) %>% 
+  select_if(is.numeric) %>% 
   cor() %>% 
   ggcorrplot(method = "circle", type="upper", 
              ggtheme = ggplot2::theme_minimal, legend.title = "Influence") + coord_flip() 
@@ -304,7 +314,7 @@ e. Combine variables (such as ratios or adding or multiplying) to create new var
 
 ```{r}
 # Select character variables
-chars <- select(tdata, where(is.character))
+chars <- dplyr::select(tdata, where(is.character))
 # Use function to extract dollars
 to_num <- function(x){
   x <- as.character(x)
@@ -317,7 +327,7 @@ income.values <- to_num(chars$INCOME)
 home.values <- to_num(chars$HOME_VAL)
 bluebook.values <- to_num(chars$BLUEBOOK)
 oldclaim.values <- to_num(chars$OLDCLAIM)
-as.data.frame(cbind(income.values, 
+concept_df <- as.data.frame(cbind(income.values, 
                     home.values, 
                     bluebook.values, 
                     oldclaim.values))
@@ -348,8 +358,16 @@ dollar.values.stats <-
 # Join with training data
 tdata <- data.frame(cbind(tdata, dollar.values))
 # Check the difference
-summary(dollar.values)
-summary(dollar.values.stats)
+dollar.values.tbl <- summary(dollar.values)
+dollar.values.stats.tbl <- summary(dollar.values.stats)
+kbl(dollar.values.tbl, booktabs = T, caption = "Imputed Summary Statistics") %>%
+kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
+```
+
+
+```{r}
+kbl(dollar.values.stats.tbl, booktabs = T, caption = "Original Summary Statistics") %>%
+kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
 
@@ -357,7 +375,7 @@ summary(dollar.values.stats)
 ```{r}
 # Covert categorical variables to factors 
 factors <- tdata %>% 
-  select("PARENT1", 
+  dplyr::select("PARENT1", 
          "MSTATUS", 
          "SEX", 
          "EDUCATION", 
@@ -393,18 +411,17 @@ summary(tdata$CAR_AGE)
 ```
 
 
-```{r}
+```{r include=F}
 full41 <- tdata
 full41
 full41[c(2:7, 15, 18, 22, 24, 27:41)]
-
 ```
 
 
 ```{r}
 # Drop INDEX and other unnecessary columns
 tdata <- tdata %>% 
-  select("TARGET_FLAG",
+  dplyr::select("TARGET_FLAG",
          "TARGET_AMT",
          "KIDSDRIV",
          "AGE",
@@ -452,8 +469,8 @@ sum(is.na(tdata))
 
 ```{r}
 tdata %>% 
-  select(is.factor) %>%
-  select("car_type", "education", "job") %>% 
+  dplyr::select(is.factor) %>%
+  dplyr::select("car_type", "education", "job") %>% 
   gather() %>% 
   ggplot(aes(value)) + 
   facet_wrap(~ key, nrow = 3, scales = "free") + 
@@ -462,8 +479,8 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select(is.factor) %>%
-  select("car_use", 
+  dplyr::select(is.factor) %>%
+  dplyr::select("car_use", 
          "mstatus", 
          "parent1", 
          "red_car",
@@ -482,7 +499,7 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select(is.numeric) %>%
+  select_if(is.numeric) %>%
   gather() %>% 
   ggplot(aes(key)) + 
   facet_wrap(~ key, scales = "free") + 
@@ -516,7 +533,7 @@ tdata$educated <- as.factor(tdata$educated)
 
 ```{r}
 tdata[26:31] %>% 
-  select(is.factor) %>% 
+  select_if(is.factor) %>% 
   gather() %>% 
   ggplot(aes(value)) + 
   facet_wrap(~key, scales = "free") + 
@@ -530,7 +547,7 @@ tdata[26:31] %>%
 # Produce recommended transformations
 bestNorms <- tdata[1:11,1:16]
 df <- tdata %>% 
-  select(is.numeric)
+  select_if(is.numeric)
 for (i in colnames(df)) {
   bestNorms[[i]] <- bestNormalize(df[[i]],
                                   allow_orderNorm = FALSE,
@@ -551,7 +568,7 @@ accident_costs <- tdata$TARGET_AMT[tdata$TARGET_AMT>.0]
 bestNorms$target_amt$chosen_transform
 tdata$target_amt <- scale(log(tdata$TARGET_AMT + 1))
 tdata %>% 
-  select(where(is.numeric)) %>%
+  dplyr::select(where(is.numeric)) %>%
   gather %>% 
   ggplot() +
   facet_wrap(~ key, scales = "free") +
@@ -561,8 +578,8 @@ tdata %>%
 
 ```{r}
 tdata %>% 
-  select(where(is.numeric)) %>%
-  select("TARGET_AMT","target_amt") %>%
+  dplyr::select(where(is.numeric)) %>%
+  dplyr::select("TARGET_AMT","target_amt") %>%
   gather %>% 
   ggplot() +
   facet_wrap(~ key, scales = "free") +
@@ -610,19 +627,26 @@ intuitive? Why? The boss needs to know.
 
 
 ```{r}
-model1 <- glm(TARGET_FLAG ~ previous_accident, family = binomial(link = "logit"), train)
+model1 <- glm(TARGET_FLAG ~ previous_accident, 
+              family = binomial(link = "logit"), train)
 summary(model1)
 ```
 
 
 ```{r}
-model2 <- glm(TARGET_FLAG ~ previous_accident + city + young + clean_rec + educated, family = binomial(link = "logit"), train)
+model2 <- glm(TARGET_FLAG ~ previous_accident + 
+                city + young + clean_rec + 
+                educated, family = binomial(link = "logit"), train)
 summary(model2)
 ```
 
 
 ```{r}
-model3 <- glm(TARGET_FLAG ~ previous_accident + city + mstatus + income.values + sex + car_use + educated + KIDSDRIV + revoked, family = binomial(link = "logit"), train)
+model3 <- glm(TARGET_FLAG ~ previous_accident + 
+                city + mstatus + income.values + 
+                sex + car_use + educated + KIDSDRIV + 
+                revoked, family = binomial(link = "logit"), 
+              train)
 summary(model3)
 ```
 
@@ -634,9 +658,50 @@ summary(model4)
 
 
 ```{r}
-model5 <- lm(target_amt ~ income.values + home.values + bluebook.values + oldclaim.values + avg_claim, train) 
+model5 <- lm(target_amt ~ income.values +
+               home.values + bluebook.values + 
+               oldclaim.values + avg_claim, 
+             train) 
 summary(model5)
 ```
+
+
+
+```{r include=F, eval=F}
+model7 <- lm(target_amt ~ 
+               income.values + 
+               home.values + 
+               bluebook.values + 
+               oldclaim.values + 
+               # 2nd Degree
+               ident(avg_claim, train^2) + 
+               I(income.values^2) + 
+               I(home.values^2) + 
+               I(bluebook.values^2) + 
+               I(oldclaim.values^2) + 
+               I(avg_claim, train^2) + 
+               # 3rd Degree
+               I(avg_claim, train^3) + 
+               I(income.values^3) + 
+               I(home.values^3) + 
+               I(bluebook.values^3) + 
+               I(oldclaim.values^3) + 
+               I(avg_claim, train^3), train
+             ) 
+pm <- stepAIC(model7, trace = F, direction = "both")
+p <- summary(pm)$call
+pm <- lm(p[2], df)
+summary(pm)
+```
+
+
+
+```{r}
+model6 <- lm(target_amt ~ . -TARGET_AMT -TARGET_FLAG, train) 
+pm <- stepAIC(model6, trace = F, direction = "both")
+summary(pm)
+```
+
 
 
 ___
@@ -661,40 +726,78 @@ regression model based on (a) accuracy, (b) classification error rate, (c) preci
 F1 score, (g) AUC, and (h) confusion matrix. Make predictions using the evaluation data set.
 
 
+
 ```{r}
-CM <- function(model, test, target, threshold = 0.5){
-  test$yhat <- ifelse(predict.glm(model, test, "response") >= threshold, 1, 0)
-  cm <- confusionMatrix(factor(test$yhat), factor(test[[target]]), "1")
-  return(cm)
+# Calculate predicted values
+# Classifier Model
+mod1.pred <- predict.glm(model1, test)
+mod2.pred <- predict.glm(model2, test)
+mod3.pred <- predict.glm(model3, test)
+# Regression Model
+mod4.pred <- predict(model4, test, interval = "prediction")
+mod5.pred <- predict(model5, test, interval = "prediction")
+mod6.pred <- predict(model6, test, interval = "prediction")
+```
+
+
+
+```{r}
+modstat <- function(model, test, target = "TARGET_FLAG", threshold = 0.5){
+  test$new <- ifelse(predict.glm(model, test, "response") >= threshold, 1, 0)
+  cm <- confusionMatrix(factor(test$new), factor(test[[target]]), "1")
+  df <- data.frame(obs = test$TARGET_FLAG, predicted = test$new, probs = predict(model, test))
+  Pscores <- prediction(df$probs, df$obs)
+  AUC <- performance(Pscores, measure = "auc")@y.values[[1]]
+  pscores <- performance(Pscores, "tpr", "fpr")
+  plot(pscores,main="ROC Curve", sub = paste0("AUC: ", round(AUC, 3)))
+  results <- paste(cat("F1 = ", cm$byClass[7], " "), cm)
+  return(results)
 }
 ```
 
 
-```{r}
-# CM(model1, test, "TARGET_FLAG")
-```
 
 
 ```{r}
-# mod_stats(model2, test)
+modstat(model1, test)
 ```
+
+
+
 
 
 
 
 ```{r}
-# mod_stats(model3, test)
+modstat(model2, test)
 ```
+
 
 
 ```{r}
-# mod_stats(model4, test)
+modstat(model3, test)
 ```
+
 
 
 ```{r}
-# mod_stats(model5, test)
+modstat(model4, test)
 ```
 
+
+
+```{r}
+modstat(model5, test)
+```
+
+
+
+```{r}
+modstat(model6, test)
+```
+
+
+
+## Conclusion
 
 
