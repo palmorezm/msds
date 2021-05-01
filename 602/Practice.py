@@ -1217,6 +1217,29 @@ import pandas as pd
 df = pd.read_csv(iris_csv)
 df.head()
 
+# Read this data set of purchases into python
+import pandas as pd
+exp2019 = pd.read_csv('C:/Users/Zachary Palmore/Desktop/2019.csv')
+print(exp2019) 
 
+# What is the total number of unique locations?
+n = len(pd.unique(exp2019['Location']))
+print("No.of.unique values :", n)
+
+# How many unique values for each column/field?
+n = exp2019.nunique(axis=0)
+print("No.of.unique values in each column :\n", n)
+
+# What are the unique values for the location column/field? 
+quant = 0
+unique_vals = []
+for i in range(0, len(exp2019['Location'])):
+    if exp2019['Location'][i] not in unique_vals: 
+        unique_vals.append(exp2019['Location'][i])
+        quant += 1
+print("No.of.unique values :",
+      quant)
+print("unique values :",
+      unique_vals)
 
 
