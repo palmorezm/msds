@@ -46,7 +46,6 @@ Our objective is to build multiple linear regression and binary logistic regress
 
 
 
-
 ```{r}
 # short descriptions of variables as table from matrix
 vardesc <- data.frame(matrix(c(
@@ -96,7 +95,7 @@ ___
 
 ## Introduction
 
-There are [ ] observations of [ ] variables in this data set.  
+There are 8161 observations of 26 variables in this data set. Each variable is a statistic describing the behavior of an individual driver. Presumably, they are connected to the presence or absence of an accident and contain enough information to estimate the cost of a claim for the accident. To begin, we read in two data sets, one for model training appropriately named, 'tdata,' and one for evaluation named 'edata.' 
 
 
 ```{r}
@@ -108,6 +107,10 @@ edata <- read.csv(
 
 
 
+We capture the first four initial observations of driver behavior. In this case, we are looking for any immediate or glaring problems with the first few rows. For example, we check that the data type matches the intended variable, that the observation makes logical sense for its intended column header, and that the data is organized appropriately into rows and columns among other big picture things. Those observations are displayed in table 2 titled "Initial Observations."
+
+
+
 ```{r}
 initialobs <- tdata[1:4,]
 kbl(t(initialobs), booktabs = T, caption = "Initial Observations") %>%
@@ -115,6 +118,10 @@ kbl(t(initialobs), booktabs = T, caption = "Initial Observations") %>%
   add_header_above(c(" ", " ", "Row Number", " ", " ")) %>%
   footnote(c("Includes the first four observations of all variables in the data"))
 ```
+
+
+As a positive, each row does seem to contain the proper corresponding variable. There is no blatant mixing. However, there are noticeable issues. The variables 'INCOME' and 'HOME_VAL' contain '\$' character symbols which are completely irrelevant and will cause major problems if we were to interpret or analyze with the data as is. Interestingly, there is also a 'z_' present in some categories and not in others. To understand how these variables may affect the analysis as is and to learn exactly what must be done to prepare the data, we must explore further. 
+
 
 
 
