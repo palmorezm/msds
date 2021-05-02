@@ -135,17 +135,7 @@ ___
 
 ## Data Exploration
 
-Describe the size and the variables in the insurance training data set. Consider that too much detail will cause a 
-manager to lose interest while too little detail will make the manager consider that you aren’t doing your job. Some 
-suggestions are given below. Please do NOT treat this as a check list of things to do to complete the assignment. 
-You should have your own thoughts on what to tell the boss. These are just ideas.
-a. Mean / Standard Deviation / Median
-b. Bar Chart or Box Plot of the data
-c. Is the data correlated to the target variable (or to other variables?)
-d. Are any of the variables missing and need to be imputed “fixed”?
-
-
-Before we delve into the nitty gritty of this data set, we should consider what effect each of these variables might exert on the outcome. Since there are two targets of different types, and thus two models (one logistic classifier and one regression) there could be an influence on either or both models. As we understand it, the theoretical effects of each variable are recorded in the table below.
+Before we delve into the nitty gritty of this data set, we should consider what effect each of these variables might exert on the outcome. Since there are two targets of different types, and thus two models (one binary logistic classifier and one multiple linear regression) there could be an influence on either or both models. As we understand it, the theoretical effects of each variable are recorded in the table below.
 
 ```{r}
 # theoretical effects
@@ -186,7 +176,7 @@ kbl(vareffects, booktabs = T, caption = "Theoretical Variable Effects") %>%
 
 This table considers the effects of both models but they are only theoretical and may not necessarily reflect the true influence. We will evaluate these directly in the model selection process. For now, they will serve as general baseline expectations for exploration and preparation. We continue by exploring the data to determine where munging may be necessary. 
 
-Unfortunately, this data needs work before we are able to make visualizations and contemplate improvements to the model. We consider the amount of missing values in relative proportions to each variable, followed by their respective data types, an example observation of each type, and the quantity of unique factors to each variable. This will help narrow down what is needed to prepare the data for modeling. Results are shown in the table:
+Unfortunately, this data needs work even before we are able to make visualizations and contemplate improvements to the model. We consider the amount of missing values in relative proportions to each variable, followed by their respective data types, an example observation of each type, and the quantity of unique factors to each variable. We already know that some major work needs to be done in readjusting data types but we do not know the extent to which each variable needs improvement. This will help narrow down what is needed to prepare the data for modeling. Results are shown in the table:
 
 
 
@@ -205,22 +195,23 @@ kbl(tdata.tbl.natypes, booktabs = T, caption = "Data Characteristics") %>%
 
 
 
-Three variables contain incomplete records including ‘AGE’, ‘YOJ’,  and ‘CAR_AGE’ with 0.1%, 5.6%, and 6.2% of their data missing. Theoretically each variable would have 8161 total observations as noted in the table. The data types are either integer or numeric and the examples display what the type looks like for easy referencing. A calculation of the unique factors for each variable is included to gauge whether converting to a factor data type would be right for the variable and count the number of unique values to each. These are major concerns. 
+Three variables contain incomplete records including ‘AGE’, ‘YOJ’,  and ‘CAR_AGE’ with 0.1%, 5.6%, and 6.2% of their data missing respectively. Theoretically each variable would have 8161 total observations as noted in the table. The data types are either integer or numeric and the examples display what the type looks like for easy referencing. A calculation of the unique factors for each variable is included to gauge whether converting to a factor data type would be right for the variable and count the number of unique values to each. These are major concerns. 
 
-Minima, quartiles, averages, and maximums were computed to compare the numeric integer variables. Although the order of the variables remains the same as in the previous table, we added a missing values column with the row identifier ‘NA’ to count the number missing for tracking purposes. We put this together in a table called Data Characteristics. Of course, several of the variables will need to be altered before we can evaluate if the data makes sense in a real-life scenario. These are shown as NA in the table. 
+Minima, quartiles, averages, and maximums were computed to compare the numeric integer variables. Although the order of the variables remains the same as in the previous table, we added a missing values column with the row identifier ‘NA’ to count the number missing for tracking purposes. We put this together in a table called Summary Characteristics. Of course, several of the variables will need to be altered before we can evaluate if the data makes sense in a real-life scenario. These are shown as NA in the table. 
 
 
 
 ```{r}
 tdata.summary.tbl <- summary(tdata)
-kbl(t(tdata.summary.tbl), booktabs = T, caption = "Data Characteristics") %>%
+kbl(t(tdata.summary.tbl), booktabs = T, caption = "Summary Characteristics") %>%
   kable_styling(latex_options = c("striped", "scale_down", "hold_position"), full_width = F)
 ```
 
+Notice, there are quite a few NA values and our binary outcomes such as 'KIDSDRIV',and even our 'TARGET_FLAG' appear to be skewed heavily. It will require a closer at their distributions look to be sure of this but regardless, they will need to be dealt with if we plan to use them in our models. Factors like the single parent indicator, 'PARENT1', the individuals binary gender 'SEX', whether a driver's license was revoked 'REVOKED' and others like 'MSTATUS,''URBANICITY,' and 'CAR_USE,' take on a character data types that are not useful in modeling. For practical purposes, they should be made factors so that their categories may be understood fully.  
 
+Several of these variables also have statistics that do not make logical sense. For example, 'CAR_AGE' has a minimum value of -3. This is not possible. Other numeric variables are clearly sets of dollar values but show as character strings. These will need to converted to numeric data types and the quantitative value portion of the string extracted. This and the factorization of cateogircal variables without  a necessary order should help eliminate the many missing or 'NA' calculations performed above. 
 
-
-
+Generally, it is best to avoid reviewing the distribution of variables prior to munging the full data set to visualize all variables simultaneously.However, we have enough variables that are already of the numeric type that plotting them each together might overcrowd the chart. A new strategy should be considered. In this effort, we review the density of the numeric variables as they exist now to evaluate agreement with the assumptions of linearity. 
 
 
 ```{r}
@@ -233,6 +224,14 @@ tdata %>%
 ```
 
 
+Variables 'CLM_FREQ,' 'HOMEKIDS,' and 'KIDSDRIV' show integer values for a discrete distribution. These will be treated differently in the preparation process because their non-conformity with a linearity will not effect their ability to predict in the binary logistic classification model. Results in that model to examine the probability of 'TARGET_FLAG' will remain stable. However, the multiple linear regression model suffers a loss of potential predictors due to their inability to meet the assumptions of linear regression. 
+
+
+Our continuous variables, 'AGE,' 'CAR_AGE,' 'TRAVTIME,' 'MVR_PTS,' and 'YOJ' are much better suited to predict 'TARGET_AMT.' To our benefit, age is normally distributed with the bulk of the driver ages' falling between 30 and 60. Given the theoretical effect of younger drivers on the likelihood of an accident this variable could be useful in our logistic regression model especially when converted to a binary outcome of young or not. But there are now reasons to doubt their agreement with the assumptions. 
+
+Consider the assumption of normality where only the 'AGE' variable satisfies. All other non-discrete and non-integer values, including 'CAR_AGE,' 'YOJ,' 'MVR_PTS,' 'TIF,' and 'TRAVTIME' are poorly classified as normal, if at all. There are at least two distinct peaks in the distribution of 'YOJ,' 'TIF,' and 'CAR_AGE.' Our 'MVR_PTS' is too dense at the front of the distribution but still manages to have less skewness than our 'TARGET_AMT.' The variable closest to satisfying this assumption is perhaps 'TRAVTIME' which has an unproven theoretical effect to increase the chance of an accident as the time increases and may also be bimodal. 
+
+Given the problematic nature of a major assumption of linear regression it would be tough to say modeling with any of these could make useful predictions. Without intense transformations we risk guessing wildly at the resultant amount. However, the degree to which transformations must be performed to cause this data to appear normal would grossly misrepresent the data and greatly increase our error rate in both models if we chose to use assign them places in each. However, we must continue knowing this and attempt to improve upon the expectation. In this endevaour, we also check a few other assumptions with violin plots and a boxplot estimation. 
 
 ```{r}
 tdata %>% 
@@ -252,6 +251,11 @@ tdata %>%
 ```
 
 
+While the good news is our discrete integer values (that will be partially reorganized into unordered factors) continue to give us hope that model accuracy will be reasonable for our binary model, the existence of numerous outliers, high levels of variation in some distributions, and little to no normality, reduce the ability of our multiple linear regression model to produce accurate results. In this visual we can clearly note the presence of outliers for our 'TARGET_AMT' variable. Unfortunately, it appears nearly all of our useful data (where the amount is greater than zero) are considered outliers. A selection of all values greater than zero might be useful but it eliminates the option of the multiple linear regression model to predict a value of zero when there is no claim made. This is an interesting conundrum and one we should consider of the utmost importance when preparing the data and building models. 
+
+
+While some other numeric variables appear to confirm our density plots, others show new issues. The normally distributed 'AGE' variable contains many outliers above and below its distribution with a slightly larger number of older drivers stretching the distribution upwards. The outliers for our discrete integer values shown as black dots would be much better suited to a bar chart. This might also let any other variables that exhibit a discrete pattern with categorical values show through a bit better. 
+
 
 ```{r}
 tdata %>% 
@@ -265,6 +269,10 @@ tdata %>%
 ```
 
 
+Outliers contained in the 'TRAVTIME' variable in the violin plot were mainly commute times of the 'greater than' kind. However, in this we notice there are more drivers with a zero minute commute time than at the average of all commuters. A similar spike in the years on job or 'YOJ' variable indicates that there are just as many drivers with near zero year on the job as there are drivers with 10 years on the job. We select a few of these to take a closer look at their categories and how they fall into equally weighted bars. 
+
+
+
 ```{r}
 tdata %>% 
   dplyr::select(TARGET_FLAG, MVR_PTS, CLM_FREQ, HOMEKIDS, KIDSDRIV, TIF) %>% 
@@ -274,6 +282,11 @@ tdata %>%
   geom_bar(aes(value, color = key, fill = key, alpha = .5)) + theme(axis.title = element_blank(), legend.position = "none") + ggtitle("Select Integer Frequencies") + theme(plot.title = element_text(hjust = 0.5))
 ```
 
+The quantity of drivers who do not have kids that drive is much larger than any driver that has kids. The same applies to the number of kids at home and the claim frequencies. The magnitude of difference in these categories is severe and may cause issues when trying to predict the probability of an accident. If the claim frequency is majority zero, along with the number of kids at home and almost every other variable follows the same pattern, then predicting the minority class becomes more difficult. We should expect a noise-filled model with faint signal. This issue in the binary logistic classifier makes it even worse for the multiple linear regression model. 
+
+Building on these insights, this infant minority class must be focused on to improve the accuracy and precision of both model types. Some might consider it productive to oversample the minority class, however, if we cannot reasonably assume the majority class fits the assumptions of linear regression nor that either case is particularly well-cleaned (transformed, prepared, and error-controled) enough to base real predictions on than the purpose of oversampling is moot. Otherwise, we would be trying to build a model off of incorrect assumptions and inevitably come to the wrong conclusions. Not to mention, these conclusions would be far from the reality on which the data is supposed to be representative. 
+
+To get a better sense of where these data may overlap and the strength of their relationships we consider the correlations of the numeric variables. This includes the discrete integer values with categories and the continuous numeric variables that have not undergone data type changes. There is less of a need to consider the other non-numeric variables at this time since the binary logistic classification model does not rely on the same rules as multiple linear regression to interpret the data.
 
 
 ```{r}
@@ -285,12 +298,13 @@ tdata %>%
 ```
 
 
+Again, since this is prior to the data preparation stage, we include the index of each observation. This is a good base indicator of variables with little to no correlation with our target variables 'TARGET_FLAG' and 'TARGET_AMT.' The directional vector of the influence in each variable is color coded from -1 to 1 with the most positive correlations being closest to 1. The size of each circle represents the strength in magnitude of the relationship between the variables. 
 
+Of course, our two target variables, 'TARGET_FLAG' and 'TARGET_AMT' are quite strongly positively correlated. The same applies for the variables 'KIDSDRIV' and 'HOMEKIDS' given that one driver should not be able to have a kid driving without having at least one kid at home. These stronger correlations pass the sanity check. 
 
+Alternatively, the weaker, but perhaps more interesting variables, include mostly positive correlations. It seems it is much easier to increase your chances of an accident than it is to reduce them. Our only negatively correlated (blue) relationship comes from 'TIF' and our targets. Looking at this variable with 'TARGET_FLAG' you can reduce your chance of getting into an accident increasing the time you spend at the same insurance company. This is likely a result of people who stick around because they have not had an accident and their rate has remained steady. Otherwise, the driver would probably search for new insurance. 
 
-
-
-
+These correlations elucidate the relationship of our 'TARGET_FLAG' or the chance of an accident better than the relationship of the variables with the 'TARGET_AMT.' Keep in mind that all of these variables are numeric types that could be used model with multiple linear regression. They are not going to be, since several of them are categorical factors and not continuous distributions, but recall that all but one fails at least one assumption of linear regression. As mentioned, the accuracy of this linear regression model will be affected by these poorly correlated data. 
 
 
 
@@ -309,19 +323,15 @@ ___
 
 ## Data Preparation
 
-Describe how you have transformed the data by changing the original variables or creating new variables. If you
-did transform the data or create new variables, discuss why you did this. Here are some possible transformations.
-a. Fix missing values (maybe with a Mean or Median value)
-b. Create flags to suggest if a variable was missing
-c. Transform data by putting it into buckets
-d. Mathematical transforms such as log or square root (or use Box-Cox)
-e. Combine variables (such as ratios or adding or multiplying) to create new variables
+This section will implement the changes necessary to build models with the data. Since we have two model types, we must separate the data into groups. One group will have data specialized for the binary logistic classification model and the other for the multiple linear regression. We have already determined that we will have a limited pool of data to model with for the multiple linear regression. With that said, we still attempt to scrape together some resemblance of a realistic linear regression model ignoring the fact that the data is not in accordance with the assumptions of linear regression.
 
 
+To begin, we extract the numeric variables present in 'INCOME,' 'HOME_VAL,' and others like it. In doing so we drop the '\$' sign but retain the value. Then we impute the median value for those that had missing values and evaluate the changes with summary statistics. These are recorded and calculated separately. Once the differences are checked to ensure that the variables are not drastically far off from the original values we recombine them with the training data. This process is shown below along with the first table of summary statistics from the numeric imputed variables. 
 
 ```{r}
 # Select character variables
-chars <- dplyr::select(tdata, where(is.character))
+chars <- tdata %>% 
+  dplyr::select_if(is.character)
 # Use function to extract dollars
 to_num <- function(x){
   x <- as.character(x)
@@ -371,13 +381,16 @@ kbl(dollar.values.tbl, booktabs = T, caption = "Imputed Summary Statistics") %>%
 kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
+We compare this to the second table and observe the changes. If the differences between these is small, we can add the imputed variables to our original training data rather than eliminating the rows with missing variables altogether. The second table is shown here:
 
 ```{r}
 kbl(dollar.values.stats.tbl, booktabs = T, caption = "Original Summary Statistics") %>%
 kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
+Since the differences between these variables is small and the values that were missing are no longer missing, we recombine the imputed data with the training data for later use. It turns out, it was reasonable to make these imputations, even though the data sets are skewed and do not contain total linearity or normality. 
 
+Next, we convert the categorical variables to factors rather than the integer or characters they were. Although the analysis will still interpret these factors as integers to perform computations, we will be able to recognize the various levels associated with each variable rather than a non-descriptive number. As a special note, we are going to interpret each of these factors as an unordered set. 
 
 ```{r}
 # Covert categorical variables to factors 
@@ -407,6 +420,7 @@ factors <- factors %>%
 tdata <- cbind(tdata, factors)
 ```
 
+There was a highly unrealistic value for the variable 'CAR_AGE.' This should be excluded from the data set to avoid further damage to the modeling process. We simply find where the value is less than zero and set that value to NA. A summary of both is run to see how this changes the data. 
 
 
 ```{r}
@@ -417,6 +431,8 @@ summary(tdata$car_age)
 summary(tdata$CAR_AGE)
 ```
 
+
+As we can see there was only one value in the 'CAR_AGE' variable that contained a negative number. For our purposes, we will consider the rest realistic. Another variable that we do not need as it provide not value to the model is the 'INDEX' variable. We remove this and other unnecessary variables from the training data by selecting the variables that we suspect we may need. The total number of variables present after this selection process is shown. 
 
 ```{r include=F}
 full41 <- tdata
@@ -457,8 +473,7 @@ tdata <- tdata %>%
 length(colnames(tdata))
 ```
 
-
-
+Because these variables still have missing values, further imputation is needed. The variables of 'AGE,' 'YOJ,' and 'CAR_AGE' are filled with the median value from each of their respective distributions. Of course, we created the missing value for 'CAR_AGE' but this one value does not effect the overall variable distribution but by 0.01% or about one in our total observations. This difference is negligible. 
 
 
 
@@ -472,6 +487,8 @@ tdata$car_age[is.na(tdata$car_age)] <-
   median(tdata$car_age, na.rm = T)
 sum(is.na(tdata))
 ```
+
+
 
 
 ```{r}
