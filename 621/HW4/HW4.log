@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.18)  1 MAY 2021 18:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020/W32TeX) (preloaded format=pdflatex 2021.3.18)  2 MAY 2021 19:49
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -766,144 +766,138 @@ LaTeX Font Info:    External font `lmex10' loaded for size
                                                   
 l.262 \newpage
               ]
-Overfull \hbox (50.88245pt too wide) in paragraph at lines 292--333
+Overfull \hbox (50.88245pt too wide) in paragraph at lines 305--346
  [][] 
  []
 
-[4pdfTeX warning (ext4): destination with the same identifier (name{table.2}) h
-as been already used, duplicate ignored
+[4] [5pdfTeX warning (ext4): destination with the same identifier (name{table.2
+}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.337 \newpage
-              ] [5]
-Overfull \vbox (1.36693pt too high) detected at line 468
- []
-
-[6pdfTeX warning (ext4): destination with the same identifier (name{table.3}) h
-as been already used, duplicate ignored
+l.360 \newpage
+              ] [6] [7pdfTeX warning (ext4): destination with the same identifi
+er (name{table.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.468 \end{Shaded}
+l.482 \end{Shaded}
                   ]
 
 LaTeX Warning: `!h' float specifier changed to `!ht'.
 
-[7pdfTeX warning (ext4): destination with the same identifier (name{table.4}) h
+[8pdfTeX warning (ext4): destination with the same identifier (name{table.4}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.583 \begin{Shaded}
-                    ]
-<HW4_files/figure-latex/unnamed-chunk-8-1.pdf, id=82, 469.755pt x 325.215pt>
+l.608 
+      ]
+<HW4_files/figure-latex/unnamed-chunk-8-1.pdf, id=86, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-8-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-8-1.pdf  used on 
-input line 598.
+input line 637.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[8pdfTeX warning (ext4): destination with the same identifier (name{table.5}) h
+[9pdfTeX warning (ext4): destination with the same identifier (name{table.5}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.600 \begin{Shaded}
-                    ] [9 <./HW4_files/figure-latex/unnamed-chunk-8-1.pdf>]
-<HW4_files/figure-latex/unnamed-chunk-9-1.pdf, id=100, 469.755pt x 325.215pt>
+l.639 V
+       ariables `CLM\_FREQ,' `HOMEKIDS,' and `KIDSDRIV' show integer values] [1
+0 <./HW4_files/figure-latex/unnamed-chunk-8-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-9-1.pdf, id=104, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-9-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-9-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-9-1.pdf  used on 
-input line 642.
+input line 705.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<HW4_files/figure-latex/unnamed-chunk-10-1.pdf, id=101, 469.755pt x 325.215pt>
+[11 <./HW4_files/figure-latex/unnamed-chunk-9-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-10-1.pdf, id=118, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-10-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-10-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-10-1.pdf  used on
- input line 661.
+ input line 744.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[10 <./HW4_files/figure-latex/unnamed-chunk-9-1.pdf>]
-<HW4_files/figure-latex/unnamed-chunk-11-1.pdf, id=115, 469.755pt x 325.215pt>
+[12 <./HW4_files/figure-latex/unnamed-chunk-10-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-11-1.pdf, id=131, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-11-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-11-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-11-1.pdf  used on
- input line 674.
+ input line 766.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[11 <./HW4_files/figure-latex/unnamed-chunk-10-1.pdf>]
-Overfull \hbox (76.2434pt too wide) in paragraph at lines 688--688
+[13 <./HW4_files/figure-latex/unnamed-chunk-11-1.pdf>]
+Overfull \hbox (76.2434pt too wide) in paragraph at lines 812--812
 []\T1/lmtt/m/n/10 ## Coordinate system already present. Adding new coordinate s
 ystem, which will replace the existing one.[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-12-1.pdf, id=128, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-12-1.pdf, id=145, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-12-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-12-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-12-1.pdf  used on
- input line 690.
+ input line 814.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[12 <./HW4_files/figure-latex/unnamed-chunk-11-1.pdf>] [13 <./HW4_files/figure-
-latex/unnamed-chunk-12-1.pdf>] [14] [15pdfTeX warning (ext4): destination with 
-the same identifier (name{table.6}) has been already used, duplicate ignored
+[14 <./HW4_files/figure-latex/unnamed-chunk-12-1.pdf>] [15] [16] [17pdfTeX warn
+ing (ext4): destination with the same identifier (name{table.6}) has been alrea
+dy used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.836 \end{Shaded}
-                  pdfTeX warning (ext4): destination with the same identifier (
-name{table.7}) has been already used, duplicate ignored
+l.996 \begin{Shaded}
+                    pdfTeX warning (ext4): destination with the same identifier
+ (name{table.7}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.836 \end{Shaded}
-                  ] [16]
-<HW4_files/figure-latex/unnamed-chunk-20-1.pdf, id=168, 469.755pt x 325.215pt>
+l.996 \begin{Shaded}
+                    ] [18] [19]
+<HW4_files/figure-latex/unnamed-chunk-20-1.pdf, id=181, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-20-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-20-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-20-1.pdf  used on
- input line 948.
+ input line 1151.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[17]
-<HW4_files/figure-latex/unnamed-chunk-21-1.pdf, id=173, 469.755pt x 325.215pt>
+[20 <./HW4_files/figure-latex/unnamed-chunk-20-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-21-1.pdf, id=191, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-21-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-21-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-21-1.pdf  used on
- input line 973.
+ input line 1185.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[18 <./HW4_files/figure-latex/unnamed-chunk-20-1.pdf>]
-<HW4_files/figure-latex/unnamed-chunk-22-1.pdf, id=183, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-22-1.pdf, id=192, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-22-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-22-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-22-1.pdf  used on
- input line 986.
+ input line 1217.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[19 <./HW4_files/figure-latex/unnamed-chunk-21-1.pdf>]
-<HW4_files/figure-latex/unnamed-chunk-25-1.pdf, id=194, 469.755pt x 325.215pt>
+[21 <./HW4_files/figure-latex/unnamed-chunk-21-1.pdf>] [22 <./HW4_files/figure-
+latex/unnamed-chunk-22-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-25-1.pdf, id=215, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-25-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-25-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-25-1.pdf  used on
- input line 1023.
+ input line 1302.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[20 <./HW4_files/figure-latex/unnamed-chunk-22-1.pdf>] [21 <./HW4_files/figure-
-latex/unnamed-chunk-25-1.pdf>]
-<HW4_files/figure-latex/unnamed-chunk-28-1.pdf, id=220, 469.755pt x 325.215pt>
+[23] [24 <./HW4_files/figure-latex/unnamed-chunk-25-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-28-1.pdf, id=232, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-28-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-28-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-28-1.pdf  used on
- input line 1074.
+ input line 1374.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<HW4_files/figure-latex/unnamed-chunk-29-1.pdf, id=221, 469.755pt x 325.215pt>
+[25 <./HW4_files/figure-latex/unnamed-chunk-28-1.pdf>]
+<HW4_files/figure-latex/unnamed-chunk-29-1.pdf, id=246, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-29-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-29-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-29-1.pdf  used on
- input line 1093.
+ input line 1403.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[22 <./HW4_files/figure-latex/unnamed-chunk-28-1.pdf>] [23 <./HW4_files/figure-
-latex/unnamed-chunk-29-1.pdf>] [24] [25] [26]
-Overfull \vbox (1.04668pt too high) detected at line 1367
- []
-
-[27] [28] [29]
-<HW4_files/figure-latex/unnamed-chunk-40-1.pdf, id=272, 469.755pt x 325.215pt>
+[26 <./HW4_files/figure-latex/unnamed-chunk-29-1.pdf>] [27] [28] [29] [30] [31]
+[32]
+<HW4_files/figure-latex/unnamed-chunk-40-1.pdf, id=286, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-40-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-40-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-40-1.pdf  used on
- input line 1507.
+ input line 1850.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[30]
-Overfull \hbox (742.99146pt too wide) in paragraph at lines 1520--1520
+[33]
+Overfull \hbox (742.99146pt too wide) in paragraph at lines 1863--1863
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 0.740196078431373, Kappa = 0, AccuracyL
 ower = 0.722339505019352, AccuracyUpper = 0.757476211499172, AccuracyNull = 0.7
 40196078431373, AccuracyPValue = 0.510663460015723, McnemarPValue = 6.737835118
@@ -911,21 +905,21 @@ ower = 0.722339505019352, AccuracyUpper = 0.757476211499172, AccuracyNull = 0.7
  []
 
 
-Overfull \hbox (858.49112pt too wide) in paragraph at lines 1520--1520
+Overfull \hbox (858.49112pt too wide) in paragraph at lines 1863--1863
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 0, Specificity = 1, `Pos Pred Value`
  = NaN, `Neg Pred Value` = 0.740196078431373, Precision = NA, Recall = 0, F1 = 
 NA, Prevalence = 0.259803921568627, `Detection Rate` = 0, `Detection Prevalence
 ` = 0, `Balanced Accuracy` = 0.5)"[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-41-1.pdf, id=278, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-41-1.pdf, id=292, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-41-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-41-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-41-1.pdf  used on
- input line 1528.
+ input line 1880.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[31 <./HW4_files/figure-latex/unnamed-chunk-40-1.pdf>]
-Overfull \hbox (816.49124pt too wide) in paragraph at lines 1541--1541
+[34 <./HW4_files/figure-latex/unnamed-chunk-40-1.pdf>]
+Overfull \hbox (816.49124pt too wide) in paragraph at lines 1893--1893
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 0.749591503267974, Kappa = 0.2059081268
 49465, AccuracyLower = 0.731932472926179, AccuracyUpper = 0.766651434862648, Ac
 curacyNull = 0.740196078431373, AccuracyPValue = 0.149795966537248, McnemarPVal
@@ -933,7 +927,7 @@ ue = 7.1718601338409e-46)"[]
  []
 
 
-Overfull \hbox (1525.23918pt too wide) in paragraph at lines 1541--1541
+Overfull \hbox (1525.23918pt too wide) in paragraph at lines 1893--1893
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 0.240566037735849, Specificity = 0.9
 28256070640177, `Pos Pred Value` = 0.540636042402827, `Neg Pred Value` = 0.7769
 05311778291, Precision = 0.540636042402827, Recall = 0.240566037735849, F1 = 0.
@@ -942,14 +936,14 @@ tection Prevalence` = 0.115604575163399, `Balanced Accuracy` = 0.58441105418801
 3)"[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-42-1.pdf, id=291, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-42-1.pdf, id=303, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-42-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-42-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-42-1.pdf  used on
- input line 1549.
+ input line 1908.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[32 <./HW4_files/figure-latex/unnamed-chunk-41-1.pdf>]
-Overfull \hbox (826.99121pt too wide) in paragraph at lines 1562--1562
+[35 <./HW4_files/figure-latex/unnamed-chunk-41-1.pdf>]
+Overfull \hbox (826.99121pt too wide) in paragraph at lines 1921--1921
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 0.771650326797386, Kappa = 0.2968640169
 68591, AccuracyLower = 0.754498018991632, AccuracyUpper = 0.78815026677293, Acc
 uracyNull = 0.740196078431373, AccuracyPValue = 0.000177805889320295, McnemarPV
@@ -957,7 +951,7 @@ alue = 7.7728204234706e-38)"[]
  []
 
 
-Overfull \hbox (1577.73903pt too wide) in paragraph at lines 1562--1562
+Overfull \hbox (1577.73903pt too wide) in paragraph at lines 1921--1921
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 0.320754716981132, Specificity = 0.9
 29911699779249, `Pos Pred Value` = 0.61631419939577, `Neg Pred Value` = 0.79593
 7647614549, Precision = 0.61631419939577, Recall = 0.320754716981132, F1 = 0.42
@@ -966,35 +960,35 @@ Overfull \hbox (1577.73903pt too wide) in paragraph at lines 1562--1562
 33208380191)"[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-43-1.pdf, id=302, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-43-1.pdf, id=314, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-43-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-43-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-43-1.pdf  used on
- input line 1580.
+ input line 1935.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[33 <./HW4_files/figure-latex/unnamed-chunk-42-1.pdf>]
-Overfull \hbox (501.49216pt too wide) in paragraph at lines 1593--1593
+[36 <./HW4_files/figure-latex/unnamed-chunk-42-1.pdf>]
+Overfull \hbox (501.49216pt too wide) in paragraph at lines 1948--1948
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 1, Kappa = 1, AccuracyLower = 0.9984942
 39594653, AccuracyUpper = 1, AccuracyNull = 0.740196078431373, AccuracyPValue =
  1.44860047360653e-320, McnemarPValue = NaN)"[] 
  []
 
 
-Overfull \hbox (910.99097pt too wide) in paragraph at lines 1593--1593
+Overfull \hbox (910.99097pt too wide) in paragraph at lines 1948--1948
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 1, Specificity = 1, `Pos Pred Value`
  = 1, `Neg Pred Value` = 1, Precision = 1, Recall = 1, F1 = 1, Prevalence = 0.2
 59803921568627, `Detection Rate` = 0.259803921568627, `Detection Prevalence` = 
 0.259803921568627, `Balanced Accuracy` = 1)"[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-44-1.pdf, id=313, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-44-1.pdf, id=325, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-44-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-44-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-44-1.pdf  used on
- input line 1601.
+ input line 1968.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[34 <./HW4_files/figure-latex/unnamed-chunk-43-1.pdf>]
-Overfull \hbox (832.2412pt too wide) in paragraph at lines 1614--1614
+[37 <./HW4_files/figure-latex/unnamed-chunk-43-1.pdf>]
+Overfull \hbox (832.2412pt too wide) in paragraph at lines 1981--1981
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 0.736111111111111, Kappa = 0.0380449064
 206253, AccuracyLower = 0.718171898328195, AccuracyUpper = 0.753483730064816, A
 ccuracyNull = 0.740196078431373, AccuracyPValue = 0.686781135942465, McnemarPVa
@@ -1002,7 +996,7 @@ lue = 5.84116398896621e-108)"[]
  []
 
 
-Overfull \hbox (1593.48898pt too wide) in paragraph at lines 1614--1614
+Overfull \hbox (1593.48898pt too wide) in paragraph at lines 1981--1981
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 0.050314465408805, Specificity = 0.9
 7682119205298, `Pos Pred Value` = 0.432432432432432, `Neg Pred Value` = 0.74557
 7085088458, Precision = 0.432432432432432, Recall = 0.050314465408805, F1 = 0.0
@@ -1011,14 +1005,14 @@ Overfull \hbox (1593.48898pt too wide) in paragraph at lines 1614--1614
 13567828730893)"[] 
  []
 
-<HW4_files/figure-latex/unnamed-chunk-45-1.pdf, id=324, 469.755pt x 325.215pt>
+<HW4_files/figure-latex/unnamed-chunk-45-1.pdf, id=337, 469.755pt x 325.215pt>
 File: HW4_files/figure-latex/unnamed-chunk-45-1.pdf Graphic file (type pdf)
 <use HW4_files/figure-latex/unnamed-chunk-45-1.pdf>
 Package pdftex.def Info: HW4_files/figure-latex/unnamed-chunk-45-1.pdf  used on
- input line 1632.
+ input line 1998.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-[35 <./HW4_files/figure-latex/unnamed-chunk-44-1.pdf>]
-Overfull \hbox (832.2412pt too wide) in paragraph at lines 1645--1645
+[38 <./HW4_files/figure-latex/unnamed-chunk-44-1.pdf>]
+Overfull \hbox (832.2412pt too wide) in paragraph at lines 2011--2011
 []\T1/lmtt/m/n/10 ## [3] " c(Accuracy = 0.791666666666667, Kappa = 0.3665367754
 5056, AccuracyLower = 0.775030346732191, AccuracyUpper = 0.807602177444679, Acc
 uracyNull = 0.740196078431373, AccuracyPValue = 1.62575683811825e-09, McnemarPV
@@ -1026,7 +1020,7 @@ alue = 5.02353275353732e-36)"[]
  []
 
 
-Overfull \hbox (1588.239pt too wide) in paragraph at lines 1645--1645
+Overfull \hbox (1588.239pt too wide) in paragraph at lines 2011--2011
 []\T1/lmtt/m/n/10 ## [4] " c(Sensitivity = 0.375786163522013, Specificity = 0.9
 37637969094923, `Pos Pred Value` = 0.678977272727273, `Neg Pred Value` = 0.8105
 91603053435, Precision = 0.678977272727273, Recall = 0.375786163522013, F1 = 0.
@@ -1035,14 +1029,14 @@ Overfull \hbox (1588.239pt too wide) in paragraph at lines 1645--1645
 6712066308468)"[] 
  []
 
-[36 <./HW4_files/figure-latex/unnamed-chunk-45-1.pdf>] (./HW4.aux)
+[39 <./HW4_files/figure-latex/unnamed-chunk-45-1.pdf>] [40] (./HW4.aux)
 Package rerunfilecheck Info: File `HW4.out' has not changed.
 (rerunfilecheck)             Checksum: 457338A1F84ED5A8F68DF16472419B24;947.
  ) 
 Here is how much of TeX's memory you used:
- 12404 strings out of 480962
- 186139 string characters out of 5905114
- 535542 words of memory out of 5000000
+ 12408 strings out of 480962
+ 186167 string characters out of 5905114
+ 537144 words of memory out of 5000000
  29303 multiletter control sequences out of 15000+600000
  451045 words of font info for 69 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -1058,10 +1052,10 @@ re/AppData/Roaming/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr17.pfb><c:/Users
 public/lm/lmtk10.pfb><c:/Users/Zachary Palmore/AppData/Roaming/TinyTeX/texmf-di
 st/fonts/type1/public/lm/lmtt10.pfb><c:/Users/Zachary Palmore/AppData/Roaming/T
 inyTeX/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on HW4.pdf (36 pages, 714820 bytes).
+Output written on HW4.pdf (40 pages, 741226 bytes).
 PDF statistics:
- 390 PDF objects out of 1000 (max. 8388607)
- 305 compressed objects within 4 object streams
- 60 named destinations out of 1000 (max. 500000)
+ 410 PDF objects out of 1000 (max. 8388607)
+ 321 compressed objects within 4 object streams
+ 64 named destinations out of 1000 (max. 500000)
  150 words of extra memory for PDF output out of 10000 (max. 10000000)
 
