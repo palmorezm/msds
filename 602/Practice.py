@@ -1242,4 +1242,39 @@ print("No.of.unique values :",
 print("unique values :",
       unique_vals)
 
+# Which of the following is used to install numpy on a local system? 
+pip3 install numpy
+
+# Which command invokes the method x() of p? 
+p.x()
+
+# Complete the code to return the output
+# 1.56 
+import numpy as np
+np_heights = np.array([[1.75,1.65,1.8,1.5],[1.56,1.70,1.4,1.29],[1.49,1.68,1.3,1.8]])
+np.sort(np_heights[0])
+print(np.median(np_heights[:,0]))
+
+# Other options are incorrect because
+import numpy as np
+np_heights = np.array([[1.75,1.65,1.8,1.5],[1.56,1.70,1.4,1.29],[1.49,1.68,1.3,1.8]])
+np.sort(np_heights[0])
+print(np.mean(np_heights[:,0]))
+# result; 1.59999999
+
+# And the rest produce this error 
+import numpy as np
+np_heights = np.array([[1.75,1.65,1.8,1.5],[1.56,1.70,1.4,1.29],[1.49,1.68,1.3,1.8]])
+np.sort(np_heights[0])
+print(center(np_heights[:,0]))
+# result; NameError: name 'center' is not defined
+
+# Which command opens up the documentation from inside the IPython Shell for the len() function? 
+help(len)
+
+# Complete the code to return the output
+# array([1, 2, 3])
+import numpy as np 
+data = [1,2,3]
+np.array(data)
 
