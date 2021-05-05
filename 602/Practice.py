@@ -1278,3 +1278,113 @@ import numpy as np
 data = [1,2,3]
 np.array(data)
 
+# Complete the code to return the output
+# Instantiate the regressor for linear regression. 
+# no output for this exercise
+reg = LinearRegression()
+
+# Fill in the function that gives the area under the roc curve
+# Complete the code to return the output
+print(roc_auc_score(y_test, y_pred_prob))
+
+# A colleague asks you to do an analysis on a dataset, df, full of missing data.
+# You want to get rid of all rows with missing data before you start analyzing. 
+# Which line of code to you start with? 
+df = df.dropna()
+
+# For which of the following example of target variables can regression not be used? 
+# The neighborhood where a house is located
+
+# Other than calling the method drop on a column after using pd.get_dummies
+# which code below shows an equivalent way of deleting the redundant column? 
+pd.get_dummies(drop_first=True)
+
+# You have the following data frame: 
+import pandas as pd 
+d = {'animal':["dog","cat","horse"]}
+df = pd.DataFrame(d)
+print(df)
+# Select the code to return the output
+#   animal
+# 0     dog
+# 10    NaN
+# 20    NaN
+# 30    NaN
+# 40    NaN
+
+new_index = [0, 10, 20, 30, 40]
+df.reindex(new_index)
+
+
+
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Select the code to return the output 
+#   Month  Count
+# 1   Feb      3
+# 2   Mar     46
+print(df.iloc[1:3])
+
+# Which of the following is the correct way to specify the number of rows to plt.subplots()? 
+nrows=
+
+# Complete the code to return the output
+# DatetimeIndex(['2013-01-01 09:12:34', '2013-01-01 09:12:34'], dtype='datetime64[ns]', freq=None)
+l = ['2013-01-01 091234','2013-01-01 091234']
+print((pd.to_datetime(l)))
+
+# Which method is used to peek at the top of a DataFrame? 
+.head()
+
+# Complete the code to return the output
+# {'name': 'Helen', 'age': '20', 'city': 'New York'}
+dict = { 'name' : 'Helen', 'age':'20', 'city':'New York' }
+print(dict)
+
+# Complete the code to return the output
+# l
+# a
+# z
+# y
+x = 'lazy'
+for letter in x:
+    print(letter)
+
+# Here's the dictionary datacamp:
+datacamp = { 'course':'python', 'level':'intermediate', 'lesson': {'dictionaries':'python', 'lists':'r' } }
+# Complete the code to return the output
+# {'course': 'python', 'level': 'intermediate', 'lesson': {'dictionaries': 'python', 'lists': 'sql'}}
+datacamp['lesson']['lists'] = 'sql'
+print(datacamp)
+
+# Complete the code to return the output
+# 2
+# 3
+# 4
+i = 1
+while i < 4:
+    i = i + 1
+    print(i)
+
+# What is the main purpose of customizing a plot?
+# To make the correct plot that makes the message very clear.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
