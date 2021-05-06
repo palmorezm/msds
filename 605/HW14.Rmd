@@ -1,0 +1,52 @@
+---
+title: "HW14"
+author: "Zachary Palmore"
+date: "5/6/2021"
+output: pdf_document
+subtitle: "FUNDAMENTALS OF COMPUTATIONAL MATHEMATICS"
+header-includes: 
+- \newcommand{\bcenter}{\begin{center}}
+- \newcommand{\ecenter}{\end{center}}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\bcenter 
+
+## Prompt 
+
+\ecenter
+
+This week, we'll work out some Taylor Series expansions of popular functions. For each function, only consider its valid ranges as indicated in the notes when you are computing the Taylor Series expansion. Please submit your assignment as a R-Markdown document.
+
+The functions include: 
+
+
+$$^{1} \hspace{8pt} f(x) = \frac{1}{(1-x)}$$
+
+
+$$^{2} \hspace{8pt} f(x) = e^x$$
+
+
+$$^{3} \hspace{8pt} f(x) = \ln(1+x)$$
+
+
+
+\bcenter 
+
+## Response 
+
+\ecenter
+
+
+
+## Function 1
+
+## Function 2
+
+## Function 3 
+
+
+
