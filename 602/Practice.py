@@ -1373,16 +1373,55 @@ while i < 4:
 # To make the correct plot that makes the message very clear.
 
 
+# Which line of code below will generate the same image as teh following:
+# plt.imshow(img, extent=(-0.5,0.5,-1,1), aspect=1)
+plt.imshow(img, extent=(-1,1,-1,1), aspect=2)
+
+# Pick the pair of functions from matplotlin.pyplot that will allow you to load in an image then view it. 
+imread, imshow
+
+# Fill in the code to ensure that the strip plot shown below has small non-overlappin points
+sns.stripplot(x='cyl', y='hp', data=auto, Jitter = True, size=2)
+
+# The second figure is a zoomed in view of the first one. What was the code added to the plot? 
+plt.xlim(1985, 1995) and plt.ylim(25,35)
+
+# Print two plots, one on top of the other. Make sure they don't overlap!
+plt.subplot(2,1,1)
+plt.plot(v1, dataframe, color='blue')
+
+plt.subplot(2,1,2)
+plt.plot(v2, dataframe, color='red')
+
+plt.tight_layout()
+plt.show()
 
 
+# Complete the code to return the output
+# 'datacamp'
+"datascience".replace("science","camp")
 
+# Which command explicity imports the function sort() from the package numpy?
+from numpy import sort
 
+# Select the code to return the output
+# 
+# (For reference the output is empty/blank)
+x = int(False)
+y = 1
+print(x * str(y))
 
+# Complete the code to return the output
+# 15 
+import math
+print(int(math.pi * 5))
 
-
-
-
-
+# Complete the code to return the output
+import numpy as np
+store = np.array(["X", "Z", "Z", "Z"])
+cost  = np.array([7, 1, 9, 4])
+select_cost = cost[store == "X"]
+print(select_cost)
 
 
 
