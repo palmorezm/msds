@@ -1423,7 +1423,35 @@ cost  = np.array([7, 1, 9, 4])
 select_cost = cost[store == "X"]
 print(select_cost)
 
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Complete the code to return the output 
+# 21.946905628508695
+# get the standard devation of 'Count'
+print(df['Count'].std())
 
+# Which DataFrame method can you use to re-assign the index of a DataFrame? 
+.reindex()
+
+# You have the following DataFrame df: 
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Complete the code to return the output
+# 0.1    10.8
+# 0.9    50.2
+# Name: Count, dtype: float64
+print(df['Count'].quantile([0.10,0.90]))
+
+# Which of the following is the correct way to specify the numbder of rows to plt.subplots()
+plt.subplots(nrows=)
+
+# Which method is used to peek at the top of a DataFrame? 
+.head()
 
 
 
