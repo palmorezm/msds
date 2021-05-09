@@ -1452,6 +1452,44 @@ plt.subplots(nrows=)
 
 # Which method is used to peek at the top of a DataFrame? 
 .head()
+# Select the code to return the output
+#   s_len     ...              name
+#0    5.1     ...       Iris-setosa
+#1    4.9     ...       Iris-setosa
+#2    4.7     ...       Iris-setosa
+#3    4.6     ...       Iris-setosa
+#4    5.0     ...       Iris-setosa
+#
+#[5 rows x 5 columns]
 
+new_names = ['s_len', 's_wid', 'p_len', 'p_wid', 'name'] 
+df = pd.read_csv(iris_csv,    
+names=new_names, 
+header=0)
+print(df.head())
 
+# Which data frame method could you use to reassign the index of a data frame? 
+.reindex()
+
+# When plotting a scatter plot with DataFrame.plot() 
+# which keyword argument is used to set the radius of each circle to plot? 
+DataFrame.plot(s = )
+
+# Complete the code to return the output
+# 52 
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# get the max of 'Count'
+print(df['Count'].max())
+
+# Complete the code to return the output 
+#   Month  Count
+# 2   Mar     46
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+print(df.iloc[2:3])
 
