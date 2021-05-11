@@ -1493,3 +1493,23 @@ df = pd.DataFrame(d)
 print(df)
 print(df.iloc[2:3])
 
+
+# Fill in the code to generate the plot
+sns.lmplot('accel', 'hp', data = auto, col='origin')
+
+# which seaborn function should you use if you want to show the variation of a multivariate (more than 2 variables) dataset? 
+sns.pairplot()
+
+# What dates are included if you slice the time series using the following code fragment: 
+# time_series['2018-05-22':'2018-05-24']
+# May 22nd, May 23rd, and May 24th
+
+# What code is used to display a plot? 
+plt.show()
+
+
+
+
+
+
+
