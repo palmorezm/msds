@@ -1507,9 +1507,63 @@ sns.pairplot()
 # What code is used to display a plot? 
 plt.show()
 
+# You have the following DataFrame df: 
+# Complete the code to return the output
+# 52 
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# get the max of 'Count'
+print(df['Count'].max())
 
+# You have the following DataFrame df: 
+# Complete the code to return the output
+#   Month Count
+# 3   Feb     3
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Solution
+print(df.loc[df['Count'] == 3])
 
+# You have the following DataFrame df: 
+# Complete the code to return the output
+# 0.1    10.8
+# 0.9    50.2
+# Name: Count, dtype: float64 
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Solution
+print(df['Count'].quantile([0.10, 0.90]))
 
+# You have the following DataFrame df: 
+# Complete the code to return the output
+#  Month  Count
+#1   Feb      3
+#2   Mar     46
+import pandas as pd 
+d = {'Month':["Jan","Feb","Mar","Apr"], 'Count':[52,3,46,29]}
+df = pd.DataFrame(d)
+print(df)
+# Solution
+print(df.iloc[1:3])
 
-
+# You have the following DataFrame: 
+import pandas as pd
+d = {'animal':["dog","cat","horse"]}
+df = pd.DataFrame(d)
+print(df)
+# Complete the code to return the output
+#    animal
+# 0     dog
+# 10    NaN
+# 20    NaN
+# 30    NaN
+# 40    NaN
+new_index = [0, 10, 20, 30, 40]
+df.reindex(new_index)
 
