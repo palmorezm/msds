@@ -1567,3 +1567,25 @@ print(df)
 new_index = [0, 10, 20, 30, 40]
 df.reindex(new_index)
 
+# Import the correct package for confusion_matrix and classification_report 
+# Complete the code to return the output
+# there is no output for this exercise
+from sklearn.metrics import confusion_matrix, classification_report
+
+# choose the correct import statement to use cross validation
+from sklearn.model_selection import cross_val_score
+
+# Make a parameter dictionary for use within a pipeline that adjusts the number of neighbors in k-Nearest Neighbors classification
+parameters = {'knn_n_neighbors' = np.arrange(1,50)}
+
+# What statement about the difference between RandomizedSearchCV and GridSearchCV is correct? 
+# GridSearchCV tried out all different parameter values while RandomizedSearchCV does not. 
+
+# Complete the code to return the output
+# Fill in the code to get rid of the redundant column
+df_party = pd.get_dummies(df)
+df_party = df_party.drop('party_rep', axis = 1)
+print(df_party.head())
+
+
+
