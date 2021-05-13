@@ -18,12 +18,144 @@ Your objective is to build a count regression model to predict the number of cas
 
 ## Introduction
 
+```{r}
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(caret)
+```
+
+
+
+
+```{r}
+tdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-training-data.csv")
+edata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-evaluation-data.csv")
+```
+
+
+
+```{r}
+tdata[1:5,] %>% 
+  t() %>%
+  kbl(booktabs = T, caption = "Raw Data") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F) %>%
+  footnote(c("Includes the initial observations of all variables in the data"))
+```
+
 
 
 
 ## Exploration
 
+```{r}
+tdata %>% 
+  describe() %>%
+  round(digits = 1) %>% 
+  mutate(missing = 12975 - n) %>%
+  select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
+  kbl(booktabs = T, caption = "Raw Summary") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
+  column_spec(1, width = "8em") %>%
+  footnote(c("Missing variables calculated based on the assumption of 12795 observations for each"))
+```
+
+
+
+
+
+
+
 ## Preparation
+
+
+
+```{r}
+# Consider realistic values and adjust accordingly
+tdata <- abs(tdata)
+tdata %>% 
+  describe() %>%
+  round(digits = 1) %>% 
+  mutate(missing = 12975 - n) %>%
+  select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
+  kbl(booktabs = T, caption = "Updated Summary") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
+  column_spec(1, width = "8em") %>%
+  footnote(c("Minimum values were adjusted where applicable to describe the data realisticly"))
+```
+
+
+
+```{r}
+# Impute missing values
+tdata <- tdata %>%
+  mutate(
+  ResidualSugar = ifelse(is.na(ResidualSugar), median(ResidualSugar, na.rm = T), ResidualSugar),
+  Chlorides = ifelse(is.na(Chlorides), median(Chlorides, na.rm = T), Chlorides),
+  FreeSulfurDioxide = ifelse(is.na(FreeSulfurDioxide), median(FreeSulfurDioxide, na.rm = T), FreeSulfurDioxide),
+  TotalSulfurDioxide = ifelse(is.na(TotalSulfurDioxide), median(TotalSulfurDioxide, na.rm = T), TotalSulfurDioxide),
+  pH = ifelse(is.na(pH), median(pH, na.rm = T), pH),
+  Sulphates = ifelse(is.na(Sulphates), median(Sulphates, na.rm = T), Sulphates),
+  Alcohol = ifelse(is.na(Alcohol), median(Alcohol, na.rm = T), Alcohol),
+  STARS_imputed = ifelse(is.na(STARS), 1, 0),
+  STARS = ifelse(is.na(STARS), 1, STARS))
+```
+
+
+```{r}
+set.seed(1225)
+train_index <- createDataPartition(tdata$TARGET, p = .7, list = FALSE, times = 1)
+train <- tdata[train_index,]
+eval <- tdata[-train_index,]
+```
+
+
+```{r}
+train[1:5,] %>% 
+  t() %>%
+  kbl(booktabs = T, caption = "Training Data") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F) %>%
+  footnote(c("Includes the initial observations of all variables in the data"))
+```
+
+
+
+```{r}
+eval[1:5,] %>% 
+  t() %>%
+  kbl(booktabs = T, caption = "Evaluation Data") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position"), full_width = F) %>%
+  footnote(c("Includes the initial observations of all variables in the data"))
+```
+
+
+
+```{r}
+train %>% 
+  describe() %>%
+  round(digits = 1) %>% 
+  mutate(missing = 8958 - n) %>%
+  select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
+  kbl(booktabs = T, caption = "Raw Summary") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
+  column_spec(1, width = "8em") %>%
+  footnote(c("Missing variables calculated based on the assumption of 8958 observations for each"))
+```
+
+
+
+```{r}
+eval %>% 
+  describe() %>%
+  round(digits = 1) %>% 
+  mutate(missing = 3837 - n) %>%
+  select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
+  kbl(booktabs = T, caption = "Raw Summary") %>%
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
+  column_spec(1, width = "8em") %>%
+  footnote(c("Missing variables calculated based on the assumption of 3837 observations for each"))
+```
+
 
 ## Model Building
 
