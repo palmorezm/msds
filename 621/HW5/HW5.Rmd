@@ -18,7 +18,7 @@ Your objective is to build a count regression model to predict the number of cas
 
 ## Introduction
 
-```{r}
+```{r warning=F}
 library(tidyverse)
 library(psych)
 library(kableExtra)
@@ -159,11 +159,97 @@ eval %>%
 
 ## Model Building
 
+```{r}
+model2 <- glm(TARGET ~ FixedAcidity + VolatileAcidity + Alcohol, family = quasipoisson, train)
+summary(model2)
+```
+
+
+
+```{r}
+train1 <- train %>%
+  select(-LabelAppeal, -AcidIndex, -STARS, -STARS_imputed)
+model2 <- glm(TARGET ~ ., family = quasipoisson, train1)
+summary(model2)
+```
+
+
+
+```{r}
+model3 <- glm(TARGET ~ LabelAppeal + STARS + AcidIndex + STARS_imputed, family = quasipoisson, train)
+summary(model3)
+```
+
+
+
 ## Model Selection 
+
+
+```{r}
+evaluate_model <- function(model, test_df, yhat = FALSE){
+  temp <- data.frame(yhat=c(0:8), TARGET = c(0:8), n=c(0))
+  
+  if(yhat){
+    test_df$yhat <- yhat
+  } else {
+    test_df$yhat <- round(predict.glm(model, newdata=test_df, type="response"), 0)
+  }
+  
+  test_df <- test_df %>%
+    group_by(yhat, TARGET) %>%
+    tally() %>%
+    mutate(accuracy = ifelse(yhat > TARGET, "Over", ifelse(yhat < TARGET, "Under", "Accurate"))) %>%
+    mutate(cases_sold = ifelse(yhat > TARGET, TARGET, yhat) * n,
+           glut = ifelse(yhat > TARGET, yhat - TARGET, 0) * n,
+           missed_opportunity = ifelse(yhat < TARGET, TARGET - yhat, 0) * n) %>%
+    mutate(net_cases_sold = cases_sold - glut,
+           adj_net_cases_sold = cases_sold - glut - missed_opportunity)
+  
+  results <- test_df %>%
+    group_by(accuracy) %>%
+    summarise(n = sum(n)) %>%
+    spread(accuracy, n)
+  
+  accurate <- results$Accurate
+  over <- results$Over
+  under <- results$Under
+  
+  cases_sold <- sum(test_df$cases_sold)
+  net_cases_sold <- sum(test_df$net_cases_sold)
+  adj_net_cases_sold <- sum(test_df$adj_net_cases_sold)
+  missed_opportunity <- sum(test_df$missed_opportunity)
+  glut <- sum(test_df$glut)
+  
+  confusion_matrix <- test_df %>%
+    bind_rows(temp) %>%
+    group_by(yhat, TARGET) %>%
+    summarise(n = sum(n)) %>%
+    spread(TARGET, n, fill = 0)
+  
+  return(list("confusion_matrix" = confusion_matrix, "results" = results, "df" = test_df, "accurate" = accurate, "over" = over, "under" = under, "cases_sold" = cases_sold, "net_cases_sold" = net_cases_sold, "adj_net_cases_sold" = adj_net_cases_sold, "glut" = glut, "missed_opportunity" = missed_opportunity))
+}
+```
+
+
+```{r}
+evaluate_model(model1, eval)
+```
+
+
+```{r}
+evaluate_model(model2, eval)
+```
+
+
+```{r}
+evaluate_model(model3, eval)
+```
+
+
 
 ## Conclusion
 
-
+When basing the assumption soley on how many cases are sold, it looks like model 3 is best. This model also has the greatest accuracy and was the best estimate of total cases for the business. If choosing a model based only the number of cases sold, this model should take priority.  
 
 
 
