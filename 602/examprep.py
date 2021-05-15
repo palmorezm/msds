@@ -1672,3 +1672,147 @@ from pandas import DataFrame
 # Which of the following attributes can be used to set the title on a plot? 
 .title
 
+# thresholds should contain the decision boundary for logistic regression, 
+# tpr should be the true positive rate and fpr should be the false positive rate
+# Complete the code to return the output 
+# [1.75145843 0.75145843 0.42624483 0.32940197 0.2283596 ]
+fpr, tpr, thresholds = roc_curve(
+    y_test, y_pred_prob)
+print(thresholds)
+
+# Instantiate a logistic regression model. 
+# Complete the code to return the output
+# No output for this exercise
+logreg = LogisticRegression()
+
+# The following is the dataframe df. Choose the correct imputing strategy. 
+#   col1 col2 
+# 0    1    4   
+# 1    0    5   
+# 2    3    0   
+# 3    3    7
+# What is the output of this code? 
+imp = Imputer(missing_values = 0, 
+    strategy = 'median', 
+    axis = 0)
+imp.fit(df)
+print(imp.transform(df))
+# [[1. 4.]
+#  [3. 5.]
+#  [3. 5.]
+#  [3. 7.]]
+
+# Which keyword allows you to specify the which row of a CSV contains column names? 
+header
+
+# You have the following data frame
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3], ' ':['zero','one','two','three']}
+df = pd.DataFrame(d)
+# Set index
+df = df.set_index([' '])
+print(df)
+# Complete the code to return the output
+#      Month  Count                  
+# three   Feb      3
+print(df.loc['three':])
+
+# The following is a dataframe df. Change all 0 to the mean of the column they are in. 
+#   col1 col2 col3
+# 0    1    4    7
+# 1    0    5    0
+# 2    3    6    9
+# Complete the code to return the output
+# [[1. 4. 7.]
+#  [2. 5. 8.]
+#  [3. 6. 9.]]
+imp = Imputer(missing_values = 0, 
+    strategy = 'mean',    
+    axis=0)
+imp.fit(df)
+print(imp.transform(df))
+
+# The following contains the precision and recall columns of the classification report output. 
+# Which conclusion can you draw from this? 
+#  precision recall
+# 0   1.00    1.00
+# 1   0.95    1.00
+# 2   1.00    0.94
+# avg 0.98    0.98
+# Class 1 has the highest false positive rate, while class 2 has the least number predicted correctly
+
+# Fill in the function so the accuracy of the a regularized model is printed.
+# Complete the code to return the output
+# [0.88690835 0.75924731 0.815345   0.79675134 0.81716869]
+reg = Ridge(normalize = True)
+cv_scores = cross_val_score(reg, 
+                X, y, cv=5)
+print(cv_scores)
+
+# The column party from the votes dataset is categorical and has democrats as dem and republicans as rep. 
+# This needs to be encoded numerically.
+# Complete the code to return the output
+#    budget  party_dem  party_rep
+# 0       0          0          1
+# 1       0          0          1
+# 2       1          1          0
+# 3       1          1          0
+# 4       1          1          0
+df_party = pd.get_dummies(df)
+print(df_party.head())
+
+
+## Stuff for exam
+
+def concatA(a,b):
+     return a + b
+print(concatA([9, 2, 1], [4, 8, 7]))
+
+x = input(3)
+y = int(input(6))
+print(x * y)
+
+x = 3
+y = int(6)
+print(x * y)
+
+x = int(2)
+y = int(4)
+print(x+y)
+
+x = int(input(2))
+y = int(input(4))
+print(x+y)
+
+x = 7
+# True
+x % 2 == 1
+def is_odd (x) : 
+    if x % 2 == 1: 
+        return True else: 
+            return False
+
+# False
+x / 2 == 1 
+
+fruits = { 
+ 'apples':{'cost':3, 'units':100}, 
+ 'bananas':{'cost':1, 'units':80},
+ 'grapes':{'cost':5, 'units':500}
+}
+print(fruits['bananas']['cost'])
+output: 1
+
+x = 5
+if x % 2 == 0:
+   print("x is even")
+else:
+   print("x is odd")
+
+[1, 0, 1] + [2, 4, 6]
+
+
+for index, i in enumerate([1,2,3,4,5]):
+    print(index, i)
+
+
