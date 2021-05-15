@@ -1587,5 +1587,32 @@ df_party = pd.get_dummies(df)
 df_party = df_party.drop('party_rep', axis = 1)
 print(df_party.head())
 
+# When you print the shape method of your data you get the output below
+# (5, 3) 
+# Which option correctly describes the format of the output of knn.predict(your_data)?
+
+# A 5 by 1 array: one prediction for each observatoin in your_data
+
+# The make_logreg function initializes your clasifier. Print the probabilities that the predicted target is 0. 
+# Complete the code to return the output
+# [0.24854157 0.61361035 0.50724571 0.43195002 0.43309789 0.57375517
+#  0.51326504 0.34523781 0.7716404  0.67059803]
+logreg, X_test = make_logreg(X,y)
+prob = logreg.predict_proba(X_test)[:,0]
+print(prob)
+
+# What is the range for the area under the curve when analyzing an ROC curve? 
+# 0.5 to 1
+
+# When plotting the output of the function roc_curve, 
+# which output variable should be plotted on which axis if the following line of code assigns the variables? 
+fpr,tpr,thresholds = roc_curve(y_test,y_pred_prob)
+ 
+# fpr on the x axis, tpr on the y axis 
+
+# What is the correct interpretation of the following confusion matrix for the diabetes dataset with classes either having or not having diabetes? 
+# [[9 3]
+#  [3 5]]
+# 14 points are correctly classified, 3 are false positive and 3 are false negative
 
 
