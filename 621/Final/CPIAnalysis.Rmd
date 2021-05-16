@@ -11,7 +11,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
-# Data
+## Data
 
 Have CPI decreased at all in history? If so, how much? 
+
+
+```{r}
+library(tesseract)
+library(magick)
+```
+
+
+
+```{r}
+cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG")
+
+```
+
 
