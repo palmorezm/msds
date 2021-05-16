@@ -1,0 +1,17 @@
+---
+title: "CPI Analysis"
+author: "Zachary Palmore"
+date: "5/16/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction 
+
+# Data
+
+Have CPI decreased at all in history? If so, how much? 
+
