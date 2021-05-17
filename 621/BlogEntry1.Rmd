@@ -1,0 +1,24 @@
+---
+title: "BlogEntry1"
+author: "Zachary Palmore"
+date: "5/17/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## The Normality Assumption
+
+In linear regression we often attempt to predict based on some data that represents reality. For this week's post, we will take a look at how to assess an important assumption that must be made to predict accurately using linear regression. To understand how to assess normality we use data from an irrigation experiment in which a sprayer nozzle delivers a certain amount of water per spray. Our goal is to estimate the amount of water delivered per spray and predict how much will be delivered at a 20, 50, and 100 sprays. 
+
+
+```{r data}
+sprays <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vQVaaUdUL1IOLL9FLuloyLBed_zyaZJZU1P-tn_mSZtnOr_xynI-AudRL84BmUWtQdcaVm53TIbIZty/pub?output=csv")
+vol <- sprays[,1:4]
+time <- sprays[,c(1, 5:8)]
+```
+
+
+Normality, along with three other assumptions of independent observations, linearity, and homoscedasticity, allows us to take advatange some statistical principles to better intepret future data points. 
