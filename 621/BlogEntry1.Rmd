@@ -2,52 +2,109 @@
 title: "BlogEntry1"
 author: "Zachary Palmore"
 date: "5/17/2021"
-output: pdf_document
+output:
+  html_document:
+    df_print: paged
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning =FALSE, message = F)
 ```
+
+
+```{r}
+library(tidyverse)
+theme_set(theme_minimal())
+```
+
 
 ## The Normality Assumption
 
-In linear regression we often attempt to predict based on some data that represents reality. For this week's post, we will take a look at how to assess an important assumption that must be made to predict accurately using linear regression. To understand how to assess normality we use data from an irrigation experiment in which a sprayer nozzle delivers a certain amount of water per trial. Our goal is to estimate the amount of water delivered per trial and predict how much will be delivered at a 20, 50, and 100 trials of this sprayer nozzle. A sample of this data is provided below. 
+In linear regression we often attempt to predict based on some data that represents reality. For this week's post, we will take a look at how to assess an important assumption that must be made to predict accurately using linear regression. To understand how to assess normality we use data from an irrigation experiment in which a sprayer nozzle delivers a certain amount of water per spray. Our goal is to estimate the amount of water delivered per spray and predict how much will be delivered at 20, 50, and 100 sprays. The sample data we are working with is shown in the data frame, ‘df.’ 
 
 ```{r data}
 sprays <- read.csv("https://raw.githubusercontent.com/palmorezm/misc/master/Sprays.csv")
-library(tidyverse)
-vol <- sample_n(sprays, 400, replace = T)
-colnames(vol) <- c("Trial","Sprays","Diameter","Height")
-vol <- vol %>% 
-  mutate(volume = pi*(Diameter)*Height) %>% 
-  mutate(deliver = volume/1000)
+set.seed(41)
+df <- sample_n(sprays, 100, replace = T)
+colnames(df) <- c("Trial","Sprays","Diameter","Height")
+head(df)
 ```
 
-Now, this experiment was set up such that, each trial contains certain number of sprays. In this case, 
+Now, this experiment was set up such that each trial contains a certain number of sprays. In this case, each trial is an independent event as the delivery of water from one nozzle does not affect the delivery of water from another. Based on this sample, we do not know which nozzle is spraying but remember our goal is to find an average for all the nozzles and predict how much water will be delivered in various intervals over the area the nozzles cover. This area is held constant for each nozzle at 8.5 centimeters in diameter. To get the volume of water, we use a formula for the volume of a cylinder substituting the constant diameter measure for the radius squared since they are one in the same. This formula and chunk are provided for reference as well as the resultant data frame.  
+
+$$Volume = \pi \times r^2 \times h$$ 
 
 
+```{r}
+df <- df %>% 
+  mutate(vol = pi*(Diameter)*Height) %>% 
+  mutate(Liters = vol/1000)
+head(df)
+```
+
+Notice that, in the calculation a new column with the volume measurement conversion from milliliters (mL) to liters (L) was computed. This should help us make sense of trends when plotting the number of sprays with the volume of water delivered. We visualize that plot with a few lines and check for linearity, that is, whether the data appears to follow some linear pattern. This is an essential step prior to considering normality. If the data is not linear, we cannot use linear regression to make accurate predictions. 
+
+```{r}
+df %>% 
+  ggplot(aes(Sprays, Liters)) + 
+  geom_point(aes(color=Trial)) + 
+  ggtitle("Water Delivered by Spray & Trial") + 
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+Wonderful! There is a clear linear relationship from this perspective. If you were to draw a straight line from one end of the plot to the other while trying to connect as many points as possible with this straight line, we could get a close estimate of all of them. At this point, we can run the linear model and assess its normality. 
 
 
-Normality, along with three other assumptions of independent observations, linearity, and homoscedasticity, allows us to take advatange some statistical principles to better intepret future data points. 
+```{r}
+df.lm <- lm(Sprays ~ Liters, df)
+summary(df.lm)
+```
+
+
+From this we take the coefficients and apply them to our trend line later. We also note that this shows promise for prediction with a linear model with high R-squared values and statistically useful results. We keep this in mind as we run the diagnostic plots to assess normality of this model. 
+
+
+```{r}
+plot(df.lm)
+```
+
+
+Running the base pot function on this regression produces multiple plots that we are not going to consider in this post. Our focus is on the normal quantile-quantile, or Q-Q plot. Here we are looking to see if all of the standardized residuals in this model fall on the straight diagonal line. It is isolated to show clear detail.
+
+The beginning and end of this data’s distribution does not fall on the line. Even the middle portion of its distribution seems to wiggle below the dotted line. For these reasons we would say that this data is not normal even though it appears to be useful in predicting the number of sprays. There are few ways to solve this. 
+
+With a violation of the normality assumption, we must first verify that there are not any large outliers or influential data points within the distribution. If there are, we should remove them. We could also apply transformations to the independent or dependent variables to cause the distribution to appear normal if it follows a nonlinear pattern. However, this might not help us since the data clearly follows a linear pattern and there are little to no outliers. We can demonstrate this with a boxplot. 
 
 
 
 ```{r}
-# Expectation
-vol %>% 
-  ggplot(aes(Sprays, deliver)) + geom_point()
-# Nonlinear, not normal?
-vol %>% 
-  ggplot(aes(Sprays, log(deliver))) + geom_point()
+boxplot(df$Sprays, df$Liters)
+```
 
-vol %>% 
-  ggplot(aes(Sprays, deliver^9)) + geom_point()
+In our case, we also took a sample of size 100, with replacement. This opens the possibility for duplication of data points which can cause the sample’s statistics to appear skewed from reality. Another solution then, could be to increase the sample size since we may have unintentionally taken a sample that is not representative. 
+
+No matter the manner in which this normality is attempted to be corrected it often becomes easier to interpret once we have a visual. In this last plot we are looking to see how the trend line fits with the other points. We should also take notice of the quantity and locations that points differ from this trend and we should see that our normality results are in agreement with prediction for this model. 
+
+
+
+```{r}
+lm.summary <- summary(df.lm)
+yeq <- paste0("y = ", round(df.lm$coefficients[[2]],1), "(x) + ", round(df.lm$coefficients[[1]],1))
+r2 <- paste("R^2 =",format(summary(df.lm)$r.squared, digits = 2))
+df %>% 
+  ggplot(aes(Sprays, Liters)) + 
+  geom_point(aes(color=Trial)) + 
+  geom_smooth(method="lm", se=FALSE) +
+  ggtitle("Water Delivered by Spray & Trial") + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  geom_text(x = 27, y = 25, label = yeq) +
+  geom_text(x = 23, y = 22, label = r2)
 ```
 
 
+Our equation of the regression line is shown on the plot. We managed to have a good coefficient of determination or $R^2$ value, but our data are not normally distributed. It is evident in the fit of the regression to the data that nearly all of the points are missed with this trend. However, this regression does capture the greater trends in the data, even though our normality assumption was not. 
 
-
-
+Situations such as this should be considered carefully before coming to general conclusions. Although our equation of coefficients captures the big picture, it fails to pass the normality assumption. This will cause any predictions to deviate from observations, especially on spray estimates beyond the range of our data (100). Of course, in this case, we are only looking at a sample of the data and having a larger sample size would likely improve our results due to the central limit theorem. If we were to make a prediction of those intervals at 20, 50 , and 100 sprays, we could pick out exactly where they would occur in the graph (approximately 5L, 12L, and 26L). 
 
 
 
