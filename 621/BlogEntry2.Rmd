@@ -1,0 +1,113 @@
+---
+title: "BlogEntry2"
+author: "Zachary Palmore"
+date: "5/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+## Homoscedasticity
+
+What is homoscedasticity? To me, it is a fancy word to describe how data has the same variance over its residuals. In other words, it is the state of relatively constant variance over the data’s distribution. In this week’s post we are going to take a look at what exactly that means and what it might look like. As usual, we start with our data.
+
+This set is collected on several plants of different species grown under lab conditions with differing growth cycles. There are 11 variables tracked but our focus will only be on 4 of them: day, hours, plant width, and plant height. We keep the PlantID’s for later use in future analyses. The first five observations in each row are shown. 
+
+
+```{r source}
+library(dplyr)
+plants <- read.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vRVUsZrUEFrV0_2OQSCIn_JHCgs-ylPlFyowhr63XTCyAebIpVp7Dzq4Os_ARfm0yeEsrkenL_he4K4/pub?gid=0&single=true&output=csv", header = TRUE, sep = ",")
+# Select the columns we want
+grow <- plants %>% 
+  select(PlantID, Day, Hours, PlantWidth, PlantHeight)
+grow$PlantWidth <- as.numeric(grow$PlantWidth)
+grow$PlantHeight <- as.numeric(grow$PlantHeight)
+grow$PlantID <- as.factor(grow$PlantID)
+grow[is.na(grow)] <- .5
+head(grow)
+```
+
+
+The initial observations for all of the plant heights and plant widths are 0.5 cm. This is because missing values that were indicated to be less than or equal to the value were imputed as simply equal to the value. This will make a difference in the analysis by bringing the minimum value up, decreasing the average, and removing the potential for any missing values to wreak havoc on the distribution. It is not something we will be concerned about but it is worth noting for when we start looking at diagnostic plots. From here, we plot the plant height and width to consider our  model. 
+
+
+```{r}
+plot(grow$PlantWidth, grow$PlantHeight)
+```
+
+
+For each plant, the data seems to spread about in their own direction. This makes sense, since, as we mentioned, they are completely different species and growth cycles. Picking the model then becomes difficult since none seem to follow the same pattern. The closest patterns might be linear so we apply linear regression. 
+
+
+```{r}
+grow.lm <- lm(grow$PlantHeight ~ grow$PlantWidth)
+summary(grow.lm)
+```
+
+
+Perhaps surprisingly, this works moderately well, based solely on the $r^2$ and $p$ values provided in the summary. But to assess homoscedasticity we need to look at a diagnostic plot. We plot all the model’s diagnostic plots for reference. The one we are most interested in is the plot of Residuals vs fitted values. 
+
+
+```{r}
+plot(grow.lm)
+```
+
+
+Ideal conditions would show the red line as flat against the dotted line with the points scattered evenly on both above and below the line. In this case, our residuals are concentrated towards the lower end of our fitted values and as they increase, so too does the variance. For our purposes, this minor deviation from the dotted line should not cause much of an issue. We are already aware that there are multiple species all clustered together within this data. 
+
+In general, a plot such as this, would be enough to conclude that homoscedasticity is present. But, to get a deeper perspective of how this could change, we continue with a few more examples. Next, we consider how the plant height variable changes by the day. We then repeat the modeling and diagnostic plotting steps to produce the same visuals with these new variables. 
+
+
+
+```{r}
+plot(grow$Day, grow$PlantHeight)
+grow.lm <- lm(grow$Day ~ grow$PlantWidth)
+summary(grow.lm)
+plot(grow.lm)
+```
+
+
+With these variables we get a different result. As the number of days increases the general trend is that the plant height also increases but each at a different rate. This is consistent with our previous findings with plant height and plant width. This time, our residuals vs fitted plot is a bit off. 
+
+As we travel from left to right on the plot of residuals vs fitted values the red line first increases sharply, tapers itself slowly, and drops steadily until it is well below the dotted line at zero. This zero line indicates zero variance and in this case, the variance is too great to be considered homoscedastic. Instead, we would say this data exhibits heteroscedasticity. 
+
+Another example might be the most interesting yet since it is rarely seen in linear regression. We have two variables that we know to be equivalent but that contain different units. They are the day and hours variables. If we were to create a diagnostic plot of these two, what do you think would happen? We repeat the process to find out. 
+
+
+
+```{r}
+plot(grow$Day, grow$Hours)
+grow.lm <- lm(grow$Day ~ grow$Hours)
+summary(grow.lm)
+plot(grow.lm)
+```
+
+
+
+The result is a flat line of points across the zero variance line. This seems to tell us there is constant variance in the residuals over the fitted values because there is no variance in the variables. If we think about this in terms of unit conversion, the plot makes sense. The number of days can be used to find the number of hours by simply multiplying the day by 24, since there are 24 hours in a day. They are said to be completely co-dependent. 
+
+Lastly, we practice applying this to new data. We will estimate if homoscedasticity is present without the zero residual dotted line or the red trend. To change our perspective, this example will be considered using another, similar data set on irises. Let us take a best guess on how well it fits before we show those guiding lines once again to see how much we have learned. 
+
+
+
+```{r}
+plot(iris$Sepal.Length, iris$Sepal.Width)
+iris.lm <- lm(iris$Sepal.Length ~ iris$Sepal.Width)
+plot(iris.lm$fitted.values, iris.lm$residuals)
+```
+
+
+There is a small cluster of residuals towards the right side of the distribution. The axis also has a range from -1 to 2 indicating that there is a greater range of positive residuals than negative. Most of the data seems to shift to the right, but excluding those few points on top, we should expect that relative homoscedasticity is present. What did you think? Results are shown below. 
+
+
+```{r}
+plot(iris.lm)
+```
+
+
+With these guiding lines in the Residual vs fitted values plot, the variance is seemingly randomly scattered throughout the plot. Although there is a small amount of deviation from the zero variance line, the deviation is small enough in magnitude and changes in value are constant enough that this model does appear to exhibit homoscedasticity. 
+
+
+
