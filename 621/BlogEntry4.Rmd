@@ -1,0 +1,34 @@
+---
+title: "BlogEntry4"
+author: "Zachary Palmore"
+date: "5/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Binomial Probability 
+
+During this viral pandemonium while we all contemplate how and when we could receive our vaccine shots, I have decided to take the time to consider another kind of shot and offer my mind some relief from the troubles of this pandemic. The shot I am talking about is that of a basketball threw a hoop suspended over the court. We are going to push thoughts of disease aside and consider the free throw percentage and the probability that one of the NBA’s most famous players to date, will keep his best ever free throw percentage. That’s right, we are going to discuss Stephen Curry.  
+
+Thus far in his twelve-year career, Stephen Curry is shooting and making 90.7% of his free throws. He currently holds the highest free throw percentage in NBA history. He also broke the record for highest free throw percentage in the first seven games of the season with 98.2% of shots made. For reference, the average free throw percentage across the entire NBA is about 73%. To add some depth to that, another well-known player, Michael Jordan, sits at 83.5%. 
+
+Now, free throws are not everything and sharing these statistics are not to say he is the best player, or even the best all-around shooter. Rather we are going to use these metrics and a little statistical probability to predict the likelihood of Curry making another free throw. So just push those player status arguments aside; at least for now. 
+
+When calculating the probability of an event, we first need to consider our approach. In the case of free throw percentage, there are only two outcomes. Either Curry will make the shot or miss. For purposes of simplification, we also assume that the results of each shot taken are completely independent of the other shots. Given these assumptions, our event should follow a binomial probability distribution.  
+
+Since there are only two potential outcomes, the events will In this case, it would be greatly beneficial to know the frequency of prior shots taken and shots made. Thankfully, these are collected each game. Here is a quick look at the data we’ll be working with.  
+
+```{r}
+curry <- read.delim("https://raw.githubusercontent.com/palmorezm/misc/master/CurryStats.txt", header = T, sep = ",")
+head(curry)
+```
+
+
+Of course, we should remember, basketball, like most sports, is dynamic. The variables that we use to predict the probability of a shot are not inherently stable. In fact, many would argue that these statistics are constantly in motion. This mean, we can only predict with the most recent data. Otherwise, the probability might be wildly off.   
+
+
+
+
