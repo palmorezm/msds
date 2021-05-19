@@ -6,8 +6,14 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, wwarning = F, message = F)
 ```
+
+
+```{r}
+library(dplyr)
+```
+
 
 ## Binomial Probability 
 
@@ -15,19 +21,100 @@ During this viral pandemonium while we all contemplate how and when we could rec
 
 Thus far in his twelve-year career, Stephen Curry is shooting and making 90.7% of his free throws. He currently holds the highest free throw percentage in NBA history. He also broke the record for highest free throw percentage in the first seven games of the season with 98.2% of shots made. For reference, the average free throw percentage across the entire NBA is about 73%. To add some depth to that, another well-known player, Michael Jordan, sits at 83.5%. 
 
-Now, free throws are not everything and sharing these statistics are not to say he is the best player, or even the best all-around shooter. Rather we are going to use these metrics and a little statistical probability to predict the likelihood of Curry making another free throw. So just push those player status arguments aside; at least for now. 
+Now, free throws are not everything and sharing these statistics are not to say he is the best player, or even the best all-around shooter. Rather we are going to use these metrics and a little statistical probability to predict the likelihood of Curry maintaining his free throw percentage in the next season based solely on his previous seasons. So, just push those player status arguments aside; at least for now. 
 
-When calculating the probability of an event, we first need to consider our approach. In the case of free throw percentage, there are only two outcomes. Either Curry will make the shot or miss. For purposes of simplification, we also assume that the results of each shot taken are completely independent of the other shots. Given these assumptions, our event should follow a binomial probability distribution.  
+When calculating the probability of an event, we first need to consider our approach. In the case of free throw percentage, there are only two outcomes. Either Curry will make the shots or miss. For purposes of simplification, we also assume that the results of each shot taken are completely independent of the other shots. Given these assumptions, our event should follow a binomial probability distribution.  
 
-Since there are only two potential outcomes, the events will In this case, it would be greatly beneficial to know the frequency of prior shots taken and shots made. Thankfully, these are collected each game. Here is a quick look at the data we’ll be working with.  
+Since there are only two potential outcomes in singular shots, the resultant average will also be binomial. In this case, it would be greatly beneficial to know the frequency of prior shots taken and shots made. Thankfully, these are collected each game and compiled. Here is a quick look at the data we’ll be working with.
 
 ```{r}
 curry <- read.delim("https://raw.githubusercontent.com/palmorezm/misc/master/CurryStats.txt", header = T, sep = ",")
 head(curry)
 ```
 
+There is no need for the extraneous stuff unrelated to our objective on free throw percentage. For that reason, we select the variables that are most likely to be useful to us. Then, we run a quick calculation on our free throw percentage column labeled ‘FT.’ to validate what we have been told as well as how to compute the average properly.  
 
-Of course, we should remember, basketball, like most sports, is dynamic. The variables that we use to predict the probability of a shot are not inherently stable. In fact, many would argue that these statistics are constantly in motion. This mean, we can only predict with the most recent data. Otherwise, the probability might be wildly off.   
+```{r}
+ft <- curry %>% 
+  select(Season, FT, FTA, FT.)
+```
+
+
+```{r}
+mean(ft$FT.)
+```
+
+Curry’s average free throw percentage of 90.7% is calculated using the arithmetic mean and is shown above for reference. Of course, we should remember, basketball, like most sports, is dynamic. The variables that we use to predict the probability of a shot are not inherently stable. In fact, many would argue that these statistics are constantly in motion. This means we can only predict with the most recent data. Otherwise, the probability might be wildly off. Nevertheless, we give our best efforts. 
+
+To find the correct probability of the event, we first must set a goal. We want to know what the probability of Curry maintaining his current free throw percentage is based only on his seasonal data. Since we know his percentage (90.7%) we can evaluate every event in at or above this value as a success, while averages below this are failures. This binomial probability event is represented by this equation: 
+
+$$P_{x}=(\frac{n}{x})\times p^{x} \times q^{n - x}$$
+
+Where $P$ is the probability of exactly $x$ successes with $n$ events and the probability of a single event is $p$ while failure is $q$. If this seems like gibberish, hang in there. This equation is broken into constituent parts making it quite intuitive. In other words, we only use this equation for a reference as we end up using it just by thinking through the problem logically. 
+
+This method is perhaps the most straightforward and useful way to quickly grasp the concept of binomial probability. Once we are finished, it is all the more useful too, as it can be applied to any event where there are only two outcomes. Think about how many of those exist in the world (the answer; a lot).
+
+For example, consider how we might find the probability of a successful event. That is, when our free throw percentage is greater than or equal to 0.907. Well to start, we count how many events there are. In R, we use a function for that. 
+
+
+
+
+```{r}
+# Total possible events
+events <- length(ft$Season)
+events <- (events - 1)
+events
+```
+
+
+With this function we now know there are 13 total events, including the career average. Technically, this career average is not a seasonal statistic. Because of this, we drop it from the total otherwise our result would be skewed. The total true events with seasonal averages becomes 12. 
+
+Expressing this as a fraction, we would want to know how many events have a success to find the proportion of success over the true events. As mentioned, we find the successes by observing where the seasonal free throw average is greater than or equal 0.907 and count their occurrences. 
+
+
+
+```{r}
+# Total successes
+success <- ft %>% 
+  filter(FT. >= .907) 
+# Exclude career average 
+success <- (length(success$FT.) - 1)
+# Total failures 
+fail <- events - success
+fail
+success
+```
+
+
+While we were counting the occurrences of success, we simultaneously were able to find the number of failures. Recall that there are only two outcomes possible. If our total events are held constant and we have $x$ events, then the number of failures must always make up the remaining difference. This is an extremely useful trick for binomials and one that should be remembered! 
+
+Lastly, we crunch the final numbers. We find the probability of success given a certain number of events. In this case, Curry has played for 12 seasons and has a seasonal average for each of them. Following the same principle of proportions, we create another fraction to find the probability of success. Of course, we could easily compute the failure of the events by finding the difference, but here we take the long route and compute failures from the total events as well. 
+
+
+```{r}
+# Probability of success 
+success/events
+# Probability of failure 
+fail/events
+```
+
+
+And there we have it! Our is that the probability of Curry maintaining his average free throw percentage at 90.7% is approximately 58.3% based solely on his historical records. We know that the unfortunate reality for all basketball players in 2020 is that the year was unprecedented and created a whole host of statistical anomalies. For this reason and many others, (like comparable free throw percentages for other players - for example) the actual probability is likely lower than this. However, this does offer a great example to learn about binomial probabilities! 
+
+As a final word on the subject, consider this scenario in which the number of events is held constant. We had 12 events possible corresponding to twelve total seasons. If we sum the probability of successful events and failed events what number should we expect? We crunch those numbers to find out. 
+
+
+
+```{r}
+# Sum of binomial probability
+(success/events) + (fail/events)
+```
+
+The answer is one and it turns out that binomial probabilities will always sum to one! We could throw more math at you to prove it, but when we think about this logically, as we have for this entire free throw scenario, the probability of failure and success for a binomial probability must always sum to one because there are only two outcomes possible. Anything else is simply not a binomial!  
+
+
+
+
 
 
 
