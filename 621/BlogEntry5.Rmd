@@ -1,0 +1,113 @@
+---
+title: "BlogEntry5"
+author: "Zachary Palmore"
+date: "5/19/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+
+## KS Models
+
+In this week’s post, we discuss one of the most frequently used modeling techniques in linear regression, kitchen sink, or KS, models. To the analyst, a kitchen sink model is one of the best ways of finding patterns early on in a data set, especially when they are unsure of what to look for. Models of this type, take most (if not all) of the independent variables from a data set and run it through a regression to see which variables interact best with the dependent variable. We evaluate this model type’s effectiveness through an example and consider a general scenario involving ichthyological data based on NY state’s chain pickerel population. This set is provided for reference below. Our goal is to predict the weight of the fish. 
+
+
+```{r}
+cp <- read.csv("https://raw.githubusercontent.com/palmorezm/misc/master/Pickerel.csv")
+colnames(cp) <- c("SampleID", "Length", "Weight", "Minutes", "Hook","Tissue","Strength","Depth","O2", "PPM","Species")
+head(cp)
+```
+
+
+Since we are aware that this data set contains information on specifically chain pickerel, we do not need the species column. However, the rest may prove useful once they are of the right data type. For ease of modeling, we select the remaining variables we may need and convert them to a numeric type to begin. 
+
+
+```{r}
+cp <- cp %>% 
+  select(SampleID, Minutes, Hook, Length, Weight, Tissue, Strength, Depth, O2, PPM)
+cp <- data.frame(lapply(cp, as.numeric))
+```
+
+
+
+Now, before we build the model, we should evaluate the basic assumption of linearity with a scatterplot. This is helpful in finding the most useful information for the linear regression model and can help eliminate noise prior to building the KS model. This scatterplot is shown. Be on the lookout for nonlinear patterns. 
+
+
+
+```{r}
+cp %>%
+  gather(variable, value, -Weight) %>% 
+  ggplot(., aes(value, Weight)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+
+Immediately, several variables appear categorical and not at all useful in the prediction of fish. The variable ‘Hook’ is not continuous and PPM appears segmented as though it would be best modeled by a step function that repeated increments across a range. Because we do not understand exactly how this pattern in PPM interacts with the fish weight we leave it. But the variable Hook is removed and we build a model on the remaining variables. We are left with 8 independent variables and their relationships. 
+
+
+```{r}
+cp %>%
+  gather(variable, value, -Weight, -Hook) %>% 
+  ggplot(., aes(value, Weight)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+Colloquially, we would say that analysts who use this model are throwing ‘everything but the kitchen sink’ at the dependent variable to see what sticks. This is partly true given that we are about to input all our remaining independent variables into this model regardless of their poor linearity or lack of a clear relationship with the weight variable.Although, we did reduce the overall size of inputs (or independent variables) prior to model formation. However you prefer to see it does not matter, so long as the model is built using most of the variables. The model building process and its summarizing are displayed here: 
+
+```{r}
+lm.cp <- lm(Weight~., cp)
+summary(lm.cp)
+```
+
+
+Interpreting this as an analyst we can pick out which independent variables are significant and that prove useful in some way to predicting weight. In this example we might select the variables for fish length, tissue, and depth as statistically significant indicators of fish weight. At which point, we might build another model using those independent variables to further reduce the number of inputs needed to produce accurate results. Although this model explains approximately 99.7% of the variation in the data, running this kitchen sink model gave us the exact independent variables we would want to try for future models to improve the results. 
+
+Keep in mind, we are analyzing this with only one dependent variable and thus, interactions between independent variables can be cause for concern. For example, the results of this model returned the statement “1 not defined because of singularities” along with the coefficients. This was expected since it was our dummy variable but without knowing this in advance we might have no clue as to why these two variables have such a near perfect correlation. And if we had an additional dependent to look for, this collinear singularity, this is not to say there can only be one dependent variable for this model type as there are many variations to this kitchen sink model. The main principle is that many independent variables are all tried at once to see patterns. 
+
+
+
+
+
+
+
+
