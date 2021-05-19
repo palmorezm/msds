@@ -1,0 +1,109 @@
+---
+title: "BlogEntry3"
+author: "Zachary Palmore"
+date: "5/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+```
+
+
+## Multivariate Linearity for Multiple Linear Regression
+
+When building a multiple linear regression model there are four main assumptions that we make in order to make accurate predictions. They are the independence of events, presence of homoscedasticity, normality, and linearity. For this week’s post we are going to focus on that last assumption we listed, linearity. For linear regression, it is imperative that we understand the kind of patterns the data fits to explain or predict with, otherwise we may be assuming the data is linear when in fact they are not! 
+
+To begin, we consider a scenario in which a state government wants to ascertain the conditions of its living fish stock. Their game and wildlife management departments would like to know what size fish would be suitable for public consumption since there is a known containment present in species of chain pickerel. At this time, they are unable to classify it as harmful to humans but would like to assess the population before any issues arise. This data is based on New York State’s chain pickerel measurements caught by conservationists working with the department. 
+
+
+
+
+```{r}
+cp <- read.csv("https://raw.githubusercontent.com/palmorezm/misc/master/Pickerel.csv")
+colnames(cp) <- c("SampleID", "Length", "Weight", "Minutes", "Hook","Tissue","Strength","Depth","O2", "PPM","Species")
+head(cp)
+```
+
+
+With 10 variables and 1517 observations, there is more data here than we need. Our focus is going to be on the numeric variables since those are the best candidates for linear regression, however, none of these appear numeric. We fix this rather easily and pick the variables that are useful to us in finding concentration in their tissues and fish size as shown. Other variables are character strings or placeholder values as in the case of ‘hook’.
+
+
+
+```{r}
+sel <- cp %>% 
+  select(SampleID, Length, Weight, Tissue, Strength, Depth, O2, PPM)
+sel <- data.frame(lapply(sel, as.numeric))
+```
+
+
+To determine which of these variables follow a linear pattern and could be used in linear regression, we simply plot them as scatterplot and format them in a matrix. The variable names are listed in the boxes in the center of the matrix. Scatterplots to the right and left of these labels are mirror images of one another. 
+
+
+```{r}
+plot(sel)
+```
+
+
+It is a little crowded and difficult to interpret in this way. We need to find at least one variable to exclude to improve this matrix. Based on the almost entirely darkly covered scatterplots for each SampleID and selected variable, it is clear there is little to no relationship at all. The data is randomly distributed throughout their respective plots and this is to be expected. The SampleID is a randomly assigned value to record the observation as a unique case. Thus, we remove it. 
+
+
+```{r}
+plot(sel[2:8])
+```
+
+
+With this clearer view we now have a better idea of the relationships between the variables. However, there are only three seemingly distinct linear patterns. When we identify linearity, we look for a steady, stable, increase or decrease in the dependent variable as the independent increases. Weight appears to have a steady increase as  length increases, but it is not a perfectly straight line. We consider other variables as well. 
+
+Perhaps the best examples of an ideal linear pattern in this data set is from PPM and Tissue, as well as O2 and Length. They exhibit a positive linear trend with the length of the fish increasing as O2 increases. The same applies to PPM and Tissue. These may also be mutlicolliner or highly dependent on another. To fully understand which variables are linear we can isolate them and overlay a linear trendline. 
+
+
+
+```{r}
+sel  %>%
+  gather(variable, value, -Tissue) %>% 
+  ggplot(., aes(value, Tissue)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="cornflowerblue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+With this plot we simply confirm that points above and below the line are randomly scattered and follow the line. We could also add the values above and below this line to determine linearity. When performing this cumulative sum, the values should be roughly equal on both sides and relatively small. As a general rule, none of the cumulative sums of the values should be greater than 75% of the total sum for that particular variable. 
+
+Alternatively, if visual aids are not preferred, a Kolmogorov-Smirnov test can assess the linearity of the values relative to the target. In it, the null hypothesis concludes that the data is linear. If it is not linear, then the null hypothesis must be rejected by a statistically significant p-value. We calculate these using the variable Tissue as our target for reference. 
+
+
+```{r}
+# Kolmogorov-Smirnov Tests
+ks.test(sel$PPM, sel$Tissue)
+ks.test(sel$Weight, sel$Tissue)
+ks.test(sel$Strength, sel$Tissue)
+ks.test(sel$Length, sel$Tissue)
+ks.test(sel$O2, sel$Tissue)
+ks.test(sel$Depth, sel$Tissue)
+```
+
+
+There we have it! All of the variables we selected follow closely enough to a linear pattern that we may rightfully assume they successfully satisfy the linearity assumption, even if they need a little work to be useful. When we apply these principles and overlay a linear trendline on the data with the target variable we can pick out which fits best and adjust or transform the rest as necessary. Since several of these variables seem to at first decrease then increase rapidly, they might initially seem to be nonlinear. However, they are close enough to linear that their use in a multivariate linear regression model should not be much of an issue. The only variable with clear issues is SampleID. It does not offer any indication of linearity and is again seemingly random in its distribution. This is expected given the purpose of the SampleID in the analysis. 
+
