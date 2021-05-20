@@ -6,17 +6,18 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning=F, message=F)
 ```
 
 ## Overview
 
-In this homework assignment, you will explore, analyze and model a data set containing information on approximately 12,000 commercially available wines. The variables are mostly related to the chemical properties of 
-the wine being sold. The response variable is the number of sample cases of wine that were purchased by wine distribution companies after sampling a wine. These cases would be used to provide tasting samples to restaurants and wine stores around the United States. The more sample cases purchased, the more likely is a wine to be sold at a high end restaurant. A large wine manufacturer is studying the data in order to predict the number of wine cases ordered based upon the wine characteristics. If the wine manufacturer can predict the number of cases, then that manufacturer will be able to adjust their wine offering to maximize sales.
+In this homework assignment, you will explore, analyze and model a data set containing information on approximately 12,000 commercially available wines. The variables are mostly related to the chemical properties of the wine being sold. The response variable is the number of sample cases of wine that were purchased by wine distribution companies after sampling a wine. These cases would be used to provide tasting samples to restaurants and wine stores around the United States. The more sample cases purchased, the more likely is a wine to be sold at a high end restaurant. A large wine manufacturer is studying the data in order to predict the number of wine cases ordered based upon the wine characteristics. If the wine manufacturer can predict the number of cases, then that manufacturer will be able to adjust their wine offering to maximize sales.
 
-Your objective is to build a count regression model to predict the number of cases of wine that will be sold given certain properties of the wine. HINT: Sometimes, the fact that a variable is missing is actually predictive of the target. You can only use the variables given to you (or variables that you derive from the variables provided).Below is a short description of the variables of interest in the data set:
+Your objective is to build a count regression model to predict the number of cases of wine that will be sold given certain properties of the wine. HINT: Sometimes, the fact that a variable is missing is actually predictive of the target. You can only use the variables given to you (or variables that you derive from the variables provided).
 
 ## Introduction
+
+
 
 ```{r warning=F}
 library(tidyverse)
@@ -160,8 +161,8 @@ eval %>%
 ## Model Building
 
 ```{r}
-model2 <- glm(TARGET ~ FixedAcidity + VolatileAcidity + Alcohol, family = quasipoisson, train)
-summary(model2)
+model1 <- glm(TARGET ~ FixedAcidity + VolatileAcidity + Alcohol, family = quasipoisson, train)
+summary(model1)
 ```
 
 
@@ -186,16 +187,14 @@ summary(model3)
 
 
 ```{r}
-evaluate_model <- function(model, test_df, yhat = FALSE){
-  temp <- data.frame(yhat=c(0:8), TARGET = c(0:8), n=c(0))
-  
+modstats <- function(model, df, yhat = FALSE){
+  y <- data.frame(yhat=c(0:8), TARGET = c(0:8), n=c(0))
   if(yhat){
-    test_df$yhat <- yhat
+    df$yhat <- yhat
   } else {
-    test_df$yhat <- round(predict.glm(model, newdata=test_df, type="response"), 0)
+    df$yhat <- round(predict.glm(model, newdata=df, type="response"), 0)
   }
-  
-  test_df <- test_df %>%
+  df <- df %>%
     group_by(yhat, TARGET) %>%
     tally() %>%
     mutate(accuracy = ifelse(yhat > TARGET, "Over", ifelse(yhat < TARGET, "Under", "Accurate"))) %>%
@@ -204,45 +203,51 @@ evaluate_model <- function(model, test_df, yhat = FALSE){
            missed_opportunity = ifelse(yhat < TARGET, TARGET - yhat, 0) * n) %>%
     mutate(net_cases_sold = cases_sold - glut,
            adj_net_cases_sold = cases_sold - glut - missed_opportunity)
-  
-  results <- test_df %>%
+  results <- df %>%
     group_by(accuracy) %>%
     summarise(n = sum(n)) %>%
     spread(accuracy, n)
-  
-  accurate <- results$Accurate
+  Ac <- results$Accurate
   over <- results$Over
   under <- results$Under
-  
-  cases_sold <- sum(test_df$cases_sold)
-  net_cases_sold <- sum(test_df$net_cases_sold)
-  adj_net_cases_sold <- sum(test_df$adj_net_cases_sold)
-  missed_opportunity <- sum(test_df$missed_opportunity)
-  glut <- sum(test_df$glut)
-  
-  confusion_matrix <- test_df %>%
-    bind_rows(temp) %>%
+  cases_sold <- sum(df$cases_sold)
+  net_cases_sold <- sum(df$net_cases_sold)
+  adj_net_cases_sold <- sum(df$adj_net_cases_sold)
+  missed_opportunity <- sum(df$missed_opportunity)
+  glut <- sum(df$glut)
+  cm <- df %>%
+    bind_rows(y) %>%
     group_by(yhat, TARGET) %>%
     summarise(n = sum(n)) %>%
     spread(TARGET, n, fill = 0)
-  
-  return(list("confusion_matrix" = confusion_matrix, "results" = results, "df" = test_df, "accurate" = accurate, "over" = over, "under" = under, "cases_sold" = cases_sold, "net_cases_sold" = net_cases_sold, "adj_net_cases_sold" = adj_net_cases_sold, "glut" = glut, "missed_opportunity" = missed_opportunity))
+  return(
+    list("confusion_matrix" = cm, 
+         "results" = results, 
+         "df" = df, 
+         "accuracy" = Ac, 
+         "over" = over, 
+         "under" = under, 
+         "cases_sold" = cases_sold, 
+         "net_cases_sold" = net_cases_sold, 
+         "adj_net_cases_sold" = adj_net_cases_sold, 
+         "glut" = glut, 
+         "missed_opportunity" = missed_opportunity))
 }
 ```
 
 
 ```{r}
-evaluate_model(model1, eval)
+modstats(model1, eval)
 ```
 
 
 ```{r}
-evaluate_model(model2, eval)
+modstats(model2, eval)
 ```
 
 
 ```{r}
-evaluate_model(model3, eval)
+modstats(model3, eval)
 ```
 
 
