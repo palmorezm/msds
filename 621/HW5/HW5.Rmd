@@ -11,6 +11,16 @@ knitr::opts_chunk$set(echo = TRUE, warning=F, message=F)
 
 ## Overview
 
+```{r warning=F}
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(caret)
+library(reshape2)
+library(ggpubr)
+theme_set(theme_minimal())
+```
+
 In this homework assignment, you will explore, analyze and model a data set containing information on approximately 12,000 commercially available wines. The variables are mostly related to the chemical properties of the wine being sold. The response variable is the number of sample cases of wine that were purchased by wine distribution companies after sampling a wine. These cases would be used to provide tasting samples to restaurants and wine stores around the United States. The more sample cases purchased, the more likely is a wine to be sold at a high end restaurant. A large wine manufacturer is studying the data in order to predict the number of wine cases ordered based upon the wine characteristics. If the wine manufacturer can predict the number of cases, then that manufacturer will be able to adjust their wine offering to maximize sales.
 
 Your objective is to build a count regression model to predict the number of cases of wine that will be sold given certain properties of the wine. HINT: Sometimes, the fact that a variable is missing is actually predictive of the target. You can only use the variables given to you (or variables that you derive from the variables provided).
@@ -19,19 +29,12 @@ Your objective is to build a count regression model to predict the number of cas
 
 
 
-```{r warning=F}
-library(tidyverse)
-library(psych)
-library(kableExtra)
-library(caret)
-```
-
-
-
 
 ```{r}
-tdata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-training-data.csv")
-edata <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-evaluation-data.csv")
+tdata <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-training-data.csv")
+edata <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/621/HW5/wine-evaluation-data.csv")
 ```
 
 
@@ -62,7 +65,83 @@ tdata %>%
 ```
 
 
+```{r}
+# Remove index variable
+tdata <- tdata[-1]
+```
 
+
+
+```{r}
+tdata %>% 
+  melt() %>%
+  ggplot(aes(variable, value, color = variable)) + 
+  geom_tile(aes()) + coord_flip() + ggtitle("Data Value Exploration", subtitle = "Grouping Wines by their Characteristics") + 
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.45), plot.subtitle = element_text(hjust = 0.45))
+```
+
+
+
+
+```{r}
+spread.misc <- tdata %>%
+  select(-TotalSulfurDioxide, -FreeSulfurDioxide, -ResidualSugar, -FixedAcidity, -Alcohol, -AcidIndex) %>%
+  melt() %>% 
+  ggplot() +
+  geom_boxplot(aes(variable, value, alpha = .15, color=variable)) +
+  coord_flip() + 
+  ggtitle("Spread of Data Properties", subtitle = "Comparison of Similar Contents in Wine") + 
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.25), plot.subtitle = element_text(hjust=0.20))
+spread.misc
+```
+
+
+```{r}
+spread.ferments <- tdata %>%
+  select(ResidualSugar, FixedAcidity, Alcohol, AcidIndex) %>% 
+  melt() %>% 
+  ggplot() +
+  geom_boxplot(aes(variable, value, alpha = .15, color=variable)) +
+  coord_flip() + 
+  ggtitle("Spread of Data Properties", subtitle = "Comparison of Similar Contents in Wine") + 
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.25), plot.subtitle = element_text(hjust=0.20))
+spread.ferments
+```
+
+
+
+```{r}
+spread.dixoides <- tdata %>%
+  select(FreeSulfurDioxide,
+         TotalSulfurDioxide) %>% 
+  melt() %>% 
+  ggplot(aes(variable, value)) + 
+  geom_violin(aes(variable, value, 
+                  color = variable, alpha = 1)) +
+  geom_boxplot(aes(alpha = .15,
+                   color = variable, notch = TRUE)) +  
+  stat_summary(fun.y = mean, geom = "point",
+               shape = 8, size = 1.5, color = "#000000") +
+  coord_flip() + 
+  ggtitle("Spread of Sulfur Dioxides", subtitle = "Comparison of Free and Total Contents in Wine") + 
+  theme(legend.position = "none", plot.title = element_text(hjust = 0.25), plot.subtitle = element_text(hjust=0.20))
+spread.dixoides
+```
+
+
+
+```{r}
+corrplot::corrplot.mixed(cor(tdata, method = "pearson", use="pairwise.complete.obs"), 
+    bg = "light blue", 
+    addgrid.col = "black", 
+    diag = c("l"), 
+    lower.col = NULL, 
+    mar = c(0, 1, 0, 1), 
+    tl.pos = c("lt"), 
+    lower = "square", 
+    upper = "color", 
+    plotCI = "n")
+```
 
 
 
@@ -137,7 +216,7 @@ train %>%
   round(digits = 1) %>% 
   mutate(missing = 8958 - n) %>%
   select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
-  kbl(booktabs = T, caption = "Raw Summary") %>%
+  kbl(booktabs = T, caption = "Summary of Training Data") %>%
   kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
   column_spec(1, width = "8em") %>%
   footnote(c("Missing variables calculated based on the assumption of 8958 observations for each"))
@@ -151,7 +230,7 @@ eval %>%
   round(digits = 1) %>% 
   mutate(missing = 3837 - n) %>%
   select(n, missing, median, mean, sd, min, max, range, skew, se) %>% 
-  kbl(booktabs = T, caption = "Raw Summary") %>%
+  kbl(booktabs = T, caption = "Summary of Evaluation Data") %>%
   kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
   column_spec(1, width = "8em") %>%
   footnote(c("Missing variables calculated based on the assumption of 3837 observations for each"))
@@ -161,7 +240,7 @@ eval %>%
 ## Model Building
 
 ```{r}
-model1 <- glm(TARGET ~ FixedAcidity + VolatileAcidity + Alcohol, family = quasipoisson, train)
+model1 <- glm(TARGET ~ Chlorides + FreeSulfurDioxide + FixedAcidity + TotalSulfurDioxide + VolatileAcidity + Alcohol + Sulphates, family = quasipoisson, train)
 summary(model1)
 ```
 
@@ -250,7 +329,6 @@ modstats(model2, eval)
 modstats(model3, eval)
 ```
 
-Stuff to delete
 
 ## Conclusion
 
