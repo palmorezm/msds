@@ -1,0 +1,114 @@
+---
+title: "Final"
+author: "Zachary Palmore"
+date: "5/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
+```
+
+```{r}
+library(tidyverse)
+library(kableExtra)
+```
+
+
+## Problem 1
+
+Using R, generate a random variable X that has 10,000 random uniform numbers from 1 to N, where N can be any number of your choosing greater than or equal to 6.  Then generate a random variable Y that has 10,000 random normal numbers with a mean of $\mu=\sigma=(N+1)/2.$
+
+
+```{r}
+set.seed(41)
+N <- 41 # Random number greater than or equal to 6
+n <- 10000 # Quantity of random normal numbers to generate
+sigma <- (N + 1)/2 # Sigma
+mu <- sigma # Mu = Sigma
+# Generate random number
+df <- data.frame(X = runif(n, min = 1, max = N), 
+                 Y = rnorm(n, mean = mu, sd = sigma))
+# Display random numbers
+head(df, 10)
+hist(df$Y)
+```
+
+
+Probability. Calculate as a minimum the below probabilities a through c.  Assume the small letter "x" is estimated as the median of the X variable, and the small letter "y" is estimated as the 1st quartile of the Y variable.  Interpret the meaning of all probabilities.
+
+$$A. \ P(X>x | X>y) \hspace{8pt} B. \ P(X>x, Y>y) \hspace{8pt} C. P(X<x | X>y)$$
+
+If we assume the small letter $x$ is estimated as the median of X variable, and the small letter $y$ is estimated as the 1st quartile of the Y variable then we have the following values of $x$ and $y$ and can calculate the minimum as such:
+
+```{r}
+x = median(df$X) # median of X
+y = quantile(df$Y, 0.25) # 1st quartile of Y
+# A. P(X>x | X>y)
+PXxXy <- df %>% 
+  filter(X>x, X>y) %>% 
+  nrow() / n
+PXy <- df %>% 
+  filter(X>y) %>% 
+  nrow() / n 
+A <- signif((PXxXy / PXy), 3)
+# B. P(X>x, Y>y)
+PXxXy <- df %>% 
+  filter(X>x, Y>y) %>% 
+  nrow() / n
+B <- signif(PXxXy, 3)
+# C. P(X<x | X>y)
+PXxXy <- df %>% 
+  filter(X < x, 
+         X > y) %>% 
+  nrow() / n
+PXy <- df %>% 
+  filter(X > y) %>% 
+  nrow() / n 
+C <- PXxXy/PXy
+print(paste("A.:",A,"B.:",B,"C.:",C))
+```
+
+We can interpret the meaning of $P(X>x | X>y)$ as approximately `r A`. That is to say (in words), the probability of X>x given X>y is `r A`. For B, where $P(X>x, Y>y)$ we have `r B` and would state verbally that the probability X is greater than x and Y is greater than y is `r B`. Lastly, for C, where P(X>x | X>y), we have `r C` and simply say that the probability of Xy is `r C`. 
+
+Investigate whether $P(X>x and Y>y)=P(X>x)P(Y>y)$ by building a table and evaluating the marginal and joint probabilities. 
+
+```{r}
+# Joint P
+JAB <- df %>% 
+  mutate(A = ifelse(X > x, "X > x", "X < x")) %>% 
+  mutate(B = ifelse(Y > y, " Y > y", " Y < y")) %>% 
+  group_by(A, B) %>% 
+  summarise(total = n()) %>% 
+  mutate(P = total / n)
+# Marginal P
+MA <- JAB %>% 
+  ungroup() %>% 
+  group_by(A) %>% 
+  summarise(sum = sum(total), P = sum(P))
+MB <- JAB %>% 
+  ungroup() %>% 
+  group_by(B) %>% 
+  summarise(sum = sum(total), P = sum(P))
+# build a table
+tbl <- bind_rows(JAB, MA, MB) %>% 
+  select(-total) %>% 
+  spread(A, P) 
+colnames(tbl) <- c("Condition", "sum", "X<x", "X>x", "Total")
+kable(tbl)
+```
+
+
+They are the approximately the same. Close enough that we can state $P(X>x and Y>y)=P(X>x)P(Y>y)$. 
+
+
+Check to see if independence holds by using Fisher’s Exact Test and the Chi Square Test.  What is the difference between the two? Which is most appropriate?
+
+
+
+
+
+## Problem 2 
+
+
+
