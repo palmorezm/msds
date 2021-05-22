@@ -6,7 +6,7 @@ output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 ```
 
 ## Introduction 
@@ -19,13 +19,52 @@ Have CPI decreased at all in history? If so, how much?
 ```{r}
 library(tesseract)
 library(magick)
+library(tidyverse)
 ```
 
 
 
 ```{r}
 cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG")
-
+cpi1 <- download.file("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG", "C:/Users/Owner/Documents/Data")
+getwd()
+setwd("C:/Users/Owner/Documents/GitHub/msds/621/Final")
+getwd()
+cpi1 <- image_read("C:/General/cpi1.jpg")
+cpi2 <- image_read("C:/General/cpi2.jpg")
+ocr1 <- cpi1 %>% 
+  image_resize("1200") %>% 
+  image_trim() %>% 
+  ocr()
+str_extract(ocr1, "")
 ```
 
+
+
+
+```{r}
+cpi <- read_delim(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
+cpi
+```
+
+
+
+```{r}
+plot(cpi)
+```
+
+
+
+```{r}
+plot(cpi$Date, cpi$Index)
+```
+
+
+```{r}
+head(cpi)
+cpi %>% 
+  filter(Date >= "2000-01-01") %>% 
+  ggplot(aes(Date, Index)) + geom_point()
+```
 
