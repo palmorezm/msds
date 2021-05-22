@@ -9,62 +9,253 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 ```
 
+## Abstract
+
+## Key Words
+
 ## Introduction 
 
-## Data
+There are a plethora of entities dedicated, at least in part, to interpreting or predicting the Consumer Price Index (CPI) and rightfully so. An accurate understanding of these statistics offers private and public businesses and governing bodies alike the opportunity to make better fiscal decisions such as when and how much to adjust interest rates, allocate funds, control investments, and raise wages to name a few. Inflation, another highly valued metric for all lending institutions and consumers with credit investments, is found directly from the change in CPI further increasing its value. As stated in the Journal of Economic Perspectives, “Accurately measuring prices and their rate of change, inflation, is central to almost every economic issue.” 
 
-Have CPI decreased at all in history? If so, how much? 
+The Economic Research Service of the United States Department of Agriculture and National Academy of Sciences have written since at least 2006 that reevaluating how the government measures poverty using a new cost of living estimate that utilizes aspects of CPI would elucidate the true nature of impoverished areas and would change who our algorithms consider poor. This study highlights the necessity for new measures in identifying groups of people who need the aid most which thereby reduces currently undetected systemic injustices, reduces waste, and helps to eliminate poverty. In short, use of the CPI in conjunction with other metrics would make each dollar spent on programs like medicare, medicaid, and other welfare assistance programs stretch farther. 
+
+Due to the Bureau of Labor Statistics collection of consumer prices, officials can accurately estimate the price of goods and in some regards, it may also serve as a reasonable estimation of the cost of living for individuals. Although, caution should be heeded for those who use the CPI in this manner as its functionality plummets when applied broadly and vastly as a discrete inflation measure. Of course, this is entirely reliant on the validity of the CPI. 
+
+One study by an Advisory committee established by the Senate Finance Committee pursuant to a Senate Resolution and documented in the Journal of Economic Perspectives, found that “Over a dozen years, the cumulative additional national debt from overindexing the budget would amount to more than $1 trillion.” In the same paper, they found the true CPI value was only 1.1 percentage points over on average per year with a range of 0.8 to 1.6 average percentage points per year. A minor difference that in essence meant a CPI reported to be 3 percent, was actually closer to 2 percent. However, this is not to say that the CPI is any less valuable.
+
+When measuring geographic variations in the cost of living to cross-examine with the academic performance of children, the effects of CPI when used as an indicator for the cost of living (COL) have suggested higher costs were associated with lower achievement. Simultaneously, investments in resources for those same children resulted in better outcomes (often through academic scores) for children in lower-income families. This relationship between the CPI and COL thus has significant implications for assessing and improving the academic performance of those in lower-income brackets, but the reasons to understand and predict CPI do not stop there. 
+
+Regular updates of the CPI offers invaluable information that is central to controlling for economic stability and enacting policies that benefit society. Whether the entities are considering interest rates, monetary accountability, or even education, the CPI has an integral role to play and its accuracy is imperative to support wise decision making. For these reasons, we attempt to build a model that captures the bulk of information crucial in these efforts with a different approach during model development. 
 
 
-```{r}
+## Literature Review
+
+Previous research has shown that difficulties in modeling the CPI mostly stem from the inherently unpredictable nature of inflation and consumer prices. This phenomenon is also known as volatility. The agglomeration of changes in prices of consumer goods and services across the US contains an immense diversity of factors influencing those prices. Consider, for example, the cost of water utilities between desert climates such as in Arizona, New Mexico, and Nevada, with the relatively water rich humid subtropical areas of Mississippi, Alabama, and Lousianna. Holding relative demand constant, the cost in utilities to collect or extract, maintain and deliver the supply of this resource will vary considerably and thus, their prices fluctuate according to largely separate variables. Keep in mind this is merely one fluctuating consumer good in a basket of over 80,000 items. 
+
+According to the Bureau of Labor Statistics and several other nongovernmental agencies, over the lifetime of the Federal Reserve System (Fed) there has been a concerted effort to keep the inflation rate low. Recall that this inflation rate is determined by finding the change in CPI over time and recorded as an increase or decrease in each calculation based only on the previous value. In this endeavour, the system tends to focus on nonvolatile components which they call the core inflation rate. Studies based on this core inflation rate (which generally excludes food and energy utilities, though not exclusively) have shown that modeling both goods and services “have not fared well in general.” One justifiable reason that aggregation of this kind tends to reflect poorly on model testing is that the core inflation measure used by the Fed does not downselect the consumer goods or services well enough to observe separate inflationary expectations. Doing so, may also result in another conundrum, that further reduction is necessary until isolated groups all share distinctly similar volatility in their CPI. Thus, an alternative modeling technique has been proposed. 
+
+As published in the Journal of Current Issues in Economics and Finance, several researchers split the data into two groups, one that models the CPI for goods, and one model for services with a critical success; more accurate predictions. With this novel modeling process they captured reality better than traditional core inflation models and were able to discover the behavior of each group and its dependencies in more detail. The observed CPI of goods depended on short-term expectations and import prices while services depended on long-term expectation and leeway of the domestic labor market. Moreover, composite CPI models like this improved the prediction without the use of additional external factors when measured through inflationary reactions. 
+
+Today, the Phillips Inflation Curve Forecast remains the most useful macroeconomic model when interpreting or predicting inflation with this univariate model outperforming multivariate counterparts. However, their performance is episodic, limiting its ability to perform well continuously. Some also refer to these more novel models as New Keynesian Phillips Curves (NKPC) models and broadly speaking they employ the use of an activity variable, which often simply means they consider historical CPI values. 
+
+Evidence to characterize the backward-looking Phillips Inflation Curve has shown that hawkish monetary policy approaches tend to “ trigger an endogenous anchoring of agents’ subjective inflation forecasts” and offer “a coherent explanation for all of the observed changes in U.S. inflation behavior.” The literature also indicates that volatility in CPI has decreased since the 1980’s along with the persistence of US inflation to increase. Those familiar with the relation of inflation rates with the output gap have noted that stability in the Philips Inflation Curve Forecasts have resurfaced from U.S. data since 1980. Additionally, studies done with this backward-looking Phillips model that improve their choice of anchoring (or benchmark) years have been shown to produce statistically significant “estimated structural slope parameter in the NKPC” for the range of years 1960-2019. 
+
+
+## Methodology
+
+In accordance with studies based on NKPC models, we intend to develop an univariate simple linear regression model for the CPI. This model will differ from others in its segmentation. As previously stated, two stabilized periods of years seem to extend from about 1913 to 1960 and 1980 onwards. We intend to divulge the relationship of these two segmented periods as their own separate models. 
+
+Data is sourced from the BLS and contains monthly CPI estimates for each year over the range 1913-2014. Data collection did not begin until 1913 via authorization from Congress. Monthly estimates are given on the first of each month and start with January 1, 1913. The final monthly estimate ends on January 1, 2014. Inflation is calculated alongside CPI as a new variable but remember, this is only a representative estimate of the change in CPI values from one month to the next. 
+
+## Experimentation and Results
+
+
+
+```{r echo=FALSE}
 library(tesseract)
 library(magick)
 library(tidyverse)
+library(viridis)
+library(caret)
+library(pROC)
+library(bestNormalize)
+library(ggpubr)
+theme_set(theme_minimal())
 ```
 
 
 
-```{r}
-cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG")
-cpi1 <- download.file("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG", "C:/Users/Owner/Documents/Data")
-getwd()
-setwd("C:/Users/Owner/Documents/GitHub/msds/621/Final")
-getwd()
+```{r echo=FALSE, eval=FALSE}
+# remove notes to download files individually from Git
+# specify correct file path otherwise it will not function properly 
+# cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG", "C:/Users/Owner/Documents/Data/cpi1.jpg")
+# cpi2 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1971to2021.JPG", "C:/Users/Owner/Documents/Data/cpi1.jpg")
+# Image recognition
 cpi1 <- image_read("C:/General/cpi1.jpg")
 cpi2 <- image_read("C:/General/cpi2.jpg")
+# Cleanup and combine
 ocr1 <- cpi1 %>% 
   image_resize("1200") %>% 
   image_trim() %>% 
   ocr()
+ocr2 <- cpi2 %>% 
+  image_resize("1200") %>% 
+  image_trim() %>% 
+  ocr()
 str_extract(ocr1, "")
+# remove notes to export
+# export as txt delimited by comma for ease of access
+# write.lines(ocr_export, "C:/insert/file/path/here/for/local/machine)
 ```
 
 
 
 
-```{r}
+```{r echo=FALSE}
 cpi <- read_delim(
   "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
-cpi
-```
-
-
-
-```{r}
-plot(cpi)
-```
-
-
-
-```{r}
-plot(cpi$Date, cpi$Index)
-```
-
-
-```{r}
 head(cpi)
-cpi %>% 
-  filter(Date >= "2000-01-01") %>% 
-  ggplot(aes(Date, Index)) + geom_point()
 ```
+
+
+
+```{r}
+cpi %>% 
+  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
+  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
+  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+```
+
+
+
+
+```{r echo=FALSE}
+cpi %>% 
+  filter(Date < "1960-01-01") %>% 
+  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
+  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
+  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
+  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+```
+
+
+
+```{r echo=FALSE}
+cpi %>% 
+  filter(Date > "1980-01-01") %>% 
+  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
+  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
+  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
+  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+```
+
+
+```{r}
+g1 <- cpi %>% 
+  filter(Date < "1960-01-01")
+g1.lm <- lm(Index ~ Date, g1)
+summary(g1.lm)
+plot(g1.lm)
+```
+
+
+
+
+```{r}
+g2 <- cpi %>% 
+  filter(Date > "1980-01-01")  
+g2.lm <- lm(Index ~ Date, g2)
+summary(g2.lm)
+plot(g2.lm)
+```
+
+
+
+```{r}
+# Split 70-30 
+set.seed(41)
+tindex <- createDataPartition(g2$Index, p = .7, list = FALSE, times = 1)
+train <- g2[tindex,]
+test <- g2[-tindex,]
+# Determine best transformation
+bestNormalize(train$Index)
+```
+
+
+
+```{r}
+train$Index <- scale(train$Index)
+scaled.mod <- lm(Index ~ Date,train)
+summary(scaled.mod)
+plot(scaled.mod)
+```
+
+
+
+
+
+```{r}
+# Calculate prediction values
+scaled.predicted <- predict(scaled.mod, train)
+# Add them to the data frame
+train$scaled.predicted <- scaled.predicted
+# Calculate errors, magnitude, rmse
+train <- train %>%
+  mutate(scaled.error = Index - scaled.predicted) %>% 
+  mutate(scaled.mag = scaled.error^2) %>% 
+  mutate(scaled.eravg = mean(scaled.mag)) %>%
+  mutate(scaled.rmse = sqrt(scaled.eravg)) 
+```
+
+
+```{r echo=FALSE}
+scaled.sct <- train %>% 
+  ggplot(aes(Date, scaled.predicted)) + geom_point(aes(color=Inflation)) + 
+  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
+  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
+  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+original.sct <- cpi %>% 
+  filter(Date > "1980-01-01") %>% 
+  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
+  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
+  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
+  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+ggarrange(original.sct, scaled.sct)
+```
+
+
+```{r}
+# Visualize error type
+scaled.mag.dense <- train %>% 
+  ggplot(aes(scaled.mag)) + 
+  geom_density(aes()) +
+  labs(subtitle = "sub") + 
+  xlab("xlab") +
+  ylab("ylab") +
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+scaled.mag.hist <- train %>% 
+  ggplot(aes(scaled.mag)) + 
+  geom_histogram(aes()) +
+  labs(subtitle = "sub") + 
+  xlab("xlab") +
+  ylab("ylab") +
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+scaled.error.hist <- train %>% 
+  ggplot(aes(scaled.error)) + 
+  geom_histogram(aes()) +
+  labs(subtitle = "sub") + 
+  xlab("xlab") +
+  ylab("ylab") +
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+scaled.error.dense <- train %>% 
+  ggplot(aes(scaled.error)) + 
+  geom_density(aes()) +
+  labs(subtitle = "sub") + 
+  xlab("xlab") +
+  ylab("ylab") +
+  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+ggarrange(scaled.error.dense, scaled.mag.dense, scaled.error.hist, scaled.mag.hist)
+```
+
+
+```{r}
+train
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
