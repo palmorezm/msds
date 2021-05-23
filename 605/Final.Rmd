@@ -104,6 +104,14 @@ They are the approximately the same. Close enough that we can state $P(X>x and Y
 
 Check to see if independence holds by using Fisher’s Exact Test and the Chi Square Test.  What is the difference between the two? Which is most appropriate?
 
+```{r}
+fisher.test(matrix,simulate.p.value=TRUE)
+```
+
+
+```{r}
+chisq.test(matrix, correct=TRUE)
+```
 
 
 
