@@ -209,7 +209,7 @@ Perhaps ironically based on this classifier, centering and scaling the data is o
 ![](CPIAnalysis_files/figure-latex/unnamed-chunk-10-1.pdf)<!-- --> 
 
 
-Normality does not change, but the distance of our red trendlines and axis values appear to have shrunk in size, which we suspect benefits the linearity of Residuals vs Fitted as well as our Scale-Location and Residuals vs Leverage plots. At the expense of .1% of our $R^2$ value, we have successfully reduced the standard error in this model to near 0.05 down from 2.7. We add these statistics to our table and calculate the errors in every prediction, its magnitude, the average error of every prediction, and compute the root mean squared error in subsequent steps. 
+Normality does not change, but the distance of our red trend lines and axis values appear to have shrunk in size, which we suspect benefits the linearity of Residuals vs Fitted as well as our Scale-Location and Residuals vs Leverage plots. At the expense of .1% of our $R^2$ value, we have successfully reduced the standard error in this model to near 0.05 down from 2.7. We add these statistics to our table and calculate the errors in every prediction, its magnitude, the average error of every prediction, and compute the root mean squared error in subsequent steps. 
 
 
 \begin{table}[!h]
