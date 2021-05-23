@@ -103,7 +103,7 @@ cpi <- read_delim(
   "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
 initial.obs.cpi <- head(cpi)
 kbl(initial.obs.cpi, booktabs = T, caption = "CPI Raw Data Initial Observations") %>%
-kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
+  kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
 Our first step in this experiment is the separation of the data into two distinct segments, and to do so we first justify the need and approximate the periods with which to draw from. This is merely a check on the literature but we can see the results as a scatterplot. To assist in the attempted segmentation based on mathematical behavior, we do not add a trend to the plot at this time. Inflation is highlighted on a continuous scale for each month within the range. 
