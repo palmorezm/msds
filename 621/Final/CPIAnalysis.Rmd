@@ -32,9 +32,9 @@ Regular updates of the CPI offer invaluable information that is central to contr
 
 ## Literature Review
 
-Previous research has shown that difficulties in modeling the CPI mostly stem from the inherently unpredictable nature of inflation and consumer prices. This phenomenon is also known as volatility. The agglomeration of changes in prices of consumer goods and services across the US contains an immense diversity of factors influencing those prices. Consider, for example, the cost of water utilities between desert climates such as in Arizona, New Mexico, and Nevada, with the relatively water rich humid subtropical areas of Mississippi, Alabama, and Lousianna. Holding relative demand constant, the cost in utilities to collect or extract, maintain and deliver the supply of this resource will vary considerably and thus, their prices fluctuate according to largely separate variables. Keep in mind this is merely one fluctuating consumer good in a basket of over 80,000 items. 
+Previous research has shown that difficulties in modeling the CPI mostly stem from the inherently unpredictable nature of inflation and consumer prices. This phenomenon is also known as volatility. The agglomeration of changes in prices of consumer goods and services across the US contains an immense diversity of factors influencing those prices. Consider, for example, the cost of water utilities between desert climates such as in Arizona, New Mexico, and Nevada, with the relatively water rich humid subtropical areas of Mississippi, Alabama, and Louisiana. Holding relative demand constant, the cost in utilities to collect or extract, maintain and deliver the supply of this resource will vary considerably and thus, their prices fluctuate according to largely separate variables. Keep in mind this is merely one fluctuating consumer good in a basket of over 80,000 items. 
 
-According to the Bureau of Labor Statistics and several other nongovernmental agencies, over the lifetime of the Federal Reserve System (Fed) there has been a concerted effort to keep the inflation rate low. Recall that this inflation rate is determined by finding the change in CPI over time and recorded as an increase or decrease in each calculation based only on the previous value. In this endeavour, the system tends to focus on nonvolatile components which they call the core inflation rate. Studies based on this core inflation rate (which generally excludes food and energy utilities, though not exclusively) have shown that modeling both goods and services “have not fared well in general.” One justifiable reason that aggregation of this kind tends to reflect poorly on model testing is that the core inflation measure used by the Fed does not downselect the consumer goods or services well enough to observe separate inflationary expectations. Doing so may also result in another conundrum, that further reduction is necessary until isolated groups all share distinctly similar volatility in their CPI. Thus, an alternative modeling technique has been proposed. 
+According to the Bureau of Labor Statistics and several other nongovernmental agencies, over the lifetime of the Federal Reserve System (Fed) there has been a concerted effort to keep the inflation rate low. Recall that this inflation rate is determined by finding the change in CPI over time and recorded as an increase or decrease in each calculation based only on the previous value. In this endeavor, the system tends to focus on nonvolatile components which they call the core inflation rate. Studies based on this core inflation rate (which generally excludes food and energy utilities, though not exclusively) have shown that modeling both goods and services “have not fared well in general.” One justifiable reason that aggregation of this kind tends to reflect poorly on model testing is that the core inflation measure used by the Fed does not downselect the consumer goods or services well enough to observe separate inflationary expectations. Doing so may also result in another conundrum, that further reduction is necessary until isolated groups all share distinctly similar volatility in their CPI. Thus, an alternative modeling technique has been proposed. 
 
 As published in the Journal of Current Issues in Economics and Finance, several researchers split the data into two groups, one that models the CPI for goods, and one model for services with a critical success: more accurate predictions. With this novel modeling process they captured reality better than traditional core inflation models and were able to discover the behavior of each group and its dependencies in more detail. The observed CPI of goods depended on short-term expectations and import prices, while services depended on long-term expectation and leeway of the domestic labor market. Moreover, composite CPI models like this improved the prediction without the use of additional external factors when measured through inflationary reactions. 
 
@@ -101,7 +101,8 @@ str_extract(ocr1, "")
 ```{r echo=FALSE}
 cpi <- read_delim(
   "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
-kbl(head(cpi), booktabs = T, caption = "CPI Raw Data Initial Observations") %>%
+initial.obs.cpi <- head(cpi)
+kbl(initial.obs.cpi, booktabs = T, caption = "CPI Raw Data Initial Observations") %>%
 kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
@@ -210,7 +211,9 @@ train <- train %>%
   mutate(scaled.mag = scaled.error^2) %>% 
   mutate(scaled.eravg = mean(scaled.mag)) %>%
   mutate(scaled.rmse = sqrt(scaled.eravg)) 
-kbl(t(head(train)), booktabs = T, caption = "Scaled Contemporary Model Test Statistics") %>%
+train.head <- head(train)
+t.train.head <- t(train.head)
+kbl(t.train.head, booktabs = T, caption = "Scaled Contemporary Model Test Statistics") %>%
 kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
 ```
 
