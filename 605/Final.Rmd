@@ -152,7 +152,6 @@ describe(train)
 
 ```{r}
 # Focus on preferred predictors
-SalePrice, OverallCond, OverallQual, LotArea
 train %>% 
   ggplot() + 
   geom_point(aes(LotArea, SalePrice)) 
