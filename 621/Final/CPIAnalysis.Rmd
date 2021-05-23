@@ -1,7 +1,7 @@
 ---
-title: "CPI Analysis"
+title: "A Contemporary Approach to Consumer Price Index Modeling"
 author: "Zachary Palmore"
-date: "5/16/2021"
+date: "16 May 2021"
 output: pdf_document
 latex_engine: xelatex
 ---
@@ -12,36 +12,39 @@ knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 
 ## Abstract
 
-Businesses, governments, and consumers in the United States all rely on some aspect of the consumer price index (CPI) when making financial decisions. There is evidence to suggest that improperly measuring this statistic by margins as small as 1.1% could result in trillions of dollars lost through government spending. This notion ties into the economic behavior of businesses and consumers quite intuitively and yet, we rely on models that predict using data on business and consumer behavior that largely differs in our society today. Furthermore, recent studies have identified a stabilization in the rate of inflation (which is found through the CPI) since about 1980. This phenomenon has created a dichotomy in the rate of change in prices of consumer goods and services in which CPI estimates earlier than 1960 follow one pattern and the estimates after 1980 follow another separate pattern. Through univariate simple linear regression techniques we developed a contemporary model that exploits the dichotomous nature of these statistics and we attempt to prove that the holistic use of historical data does not accurately capture the behavior of modern society nor does it aid in its prediction. 
+Businesses, governments, and consumers in the United States all rely on some aspect of the consumer price index (CPI) when making financial decisions.$^{6}$ There is evidence to suggest that improperly measuring this statistic by margins as small as 1.1% could result in trillions of dollars lost through government spending.$^{3}$ This notion ties into the economic behavior of businesses and consumers quite intuitively and yet, we rely on models that predict using data on business and consumer behavior that largely differs in our society today.$^{19}$ Furthermore, recent studies have identified a stabilization in the rate of inflation (which is found through the CPI) since about 1980.$^{17}$ This phenomenon has created a dichotomy in the rate of change in prices of consumer goods and services in which CPI estimates earlier than 1960 follow one pattern and the estimates after 1980 follow another separate pattern. Through univariate simple linear regression techniques we developed a contemporary model that exploits the dichotomous nature of these statistics and we attempt to prove that the holistic use of historical data does not accurately capture the behavior of modern society nor does it aid in its prediction. 
 
 
 ## Key Words
 
+Contemporary CPI modeling, Historical Inflation, Consumer Price Index
+
 ## Introduction 
 
-There are a plethora of entities dedicated, at least in part, to interpreting or predicting the Consumer Price Index (CPI) and rightfully so. An accurate understanding of these statistics offers private and public businesses and governing bodies alike the opportunity to make better fiscal decisions such as when and how much to adjust interest rates, allocate funds, control investments, and raise wages to name a few. Inflation, another highly valued metric for all lending institutions and consumers with credit investments, is found directly from the change in CPI, further increasing its value. As stated in the Journal of Economic Perspectives, “Accurately measuring prices and their rate of change, inflation, is central to almost every economic issue.” 
+There are a plethora of entities dedicated, at least in part, to interpreting or predicting the Consumer Price Index (CPI) and rightfully so. An accurate understanding of these statistics offers private and public businesses and governing bodies alike the opportunity to make better fiscal decisions such as when and how much to adjust interest rates, allocate funds, control investments, and raise wages to name a few.$^{4}$ Inflation, another highly valued metric for all lending institutions and consumers with credit investments, is found directly from the change in CPI, further increasing its value. As stated in the Journal of Economic Perspectives, “Accurately measuring prices and their rate of change, inflation, is central to almost every economic issue.”$^{3}$ 
 
-The Economic Research Service of the United States Department of Agriculture and National Academy of Sciences has written since at least 2006 that reevaluating how the government measures poverty using a new cost of living estimate that utilizes aspects of CPI would elucidate the true nature of impoverished areas and would change who our algorithms consider poor. This study highlights the necessity for new measures in identifying groups of people who need the aid most which thereby reduces currently undetected systemic injustices, reduces waste, and helps to eliminate poverty. In short, use of the CPI in conjunction with other metrics would make each dollar spent on programs like medicare, medicaid, and other welfare assistance programs stretch farther. 
-Due to the Bureau of Labor Statistics’ collection of consumer prices, officials can accurately estimate the price of goods and in some regards, it may also serve as a reasonable estimation of the cost of living for individuals. Although, caution should be heeded for those who use the CPI in this manner as its functionality plummets when applied broadly and vastly as a discrete inflation measure. Of course, this is entirely reliant on the validity of the CPI. 
+The Economic Research Service of the United States Department of Agriculture and National Academy of Sciences have written since at least 2006 that reevaluating how the government measures poverty using a new cost of living estimate that utilizes aspects of CPI would elucidate the true nature of impoverished areas and would change who our algorithms consider poor.$^{13}$ This study highlights the necessity for new measures in identifying groups of people who need the aid most which thereby reduces currently undetected systemic injustices, reduces waste, and helps to eliminate poverty. In short, use of the CPI in conjunction with other metrics would make each dollar spent on programs like medicare, medicaid, and other welfare assistance programs stretch farther. 
 
-One study by an advisory committee established by the Senate Finance Committee pursuant to a Senate Resolution and documented in the Journal of Economic Perspectives found that “Over a dozen years, the cumulative additional national debt from overindexing the budget would amount to more than $1 trillion.” In the same paper, they found the true CPI value was only 1.1 percentage points over on average per year with a range of 0.8 to 1.6 average percentage points per year. A minor difference that in essence meant a CPI reported to be 3 percent, was actually closer to 2 percent. However, this is not to say that the CPI is any less valuable.
+Due to the Bureau of Labor Statistics’ collection of consumer prices, officials can accurately estimate the price of goods and in some regards, it may also serve as a reasonable estimation of the cost of living for individuals.$^{3}$ Although, caution should be heeded for those who use the CPI in this manner as its functionality plummets when applied broadly and vastly as a discrete inflation measure. Of course, this is entirely reliant on the validity of the CPI.$^{12}$ 
 
-When measuring geographic variations in the cost of living to cross-examine with the academic performance of children, the effects of CPI when used as an indicator for the cost of living (COL) have suggested higher costs were associated with lower achievement. Simultaneously, investments in resources for those same children resulted in better outcomes (often through academic scores) for children in lower-income families. This relationship between the CPI and COL thus has significant implications for assessing and improving the academic performance of those in lower-income brackets, but the reasons to understand and predict CPI do not stop there. 
+One study by an advisory committee established by the Senate Finance Committee pursuant to a Senate Resolution and documented in the Journal of Economic Perspectives found that “Over a dozen years, the cumulative additional national debt from overindexing the budget would amount to more than \$1 trillion.”$^{3}$ In the same paper, they found the true CPI value was only 1.1 percentage points over on average per year with a range of 0.8 to 1.6 average percentage points per year. A minor difference that in essence meant a CPI reported to be 3 percent, was actually closer to 2 percent. However, this is not to say that the CPI is any less valuable.
 
-Regular updates of the CPI offer invaluable information that is central to controlling for economic stability and enacting policies that benefit society. Whether the entities are considering interest rates, monetary accountability, or even education, the CPI has an integral role to play and its accuracy is imperative to support wise decision making. For these reasons, we attempt to build a model that captures the bulk of information crucial in these efforts in today’s economic environment with a different approach during model development. 
+When measuring geographic variations in the cost of living to cross-examine with the academic performance of children, the effects of CPI when used as an indicator for the cost of living (COL) have suggested higher costs were associated with lower achievement. Simultaneously, investments in resources for those same children resulted in better outcomes (often through academic scores) for children in lower-income families.$^{7}$ This relationship between the CPI and COL thus has significant implications for assessing and improving the academic performance of those in lower-income brackets, but the reasons to understand and predict CPI do not stop there. 
+
+Regular updates of the CPI offer invaluable information that is central to controlling for economic stability and enacting policies that benefit society.$^{2} \hspace{4pt} ^{19}$ Whether the entities are considering interest rates, monetary accountability, or even education, the CPI has an integral role to play and its accuracy is imperative to support wise decision making. For these reasons, we attempt to build a model that captures the bulk of information crucial in these efforts in today’s economic environment with a different approach during model development. 
 
 
 ## Literature Review
 
-Previous research has shown that difficulties in modeling the CPI mostly stem from the inherently unpredictable nature of inflation and consumer prices. This phenomenon is also known as volatility. The agglomeration of changes in prices of consumer goods and services across the US contains an immense diversity of factors influencing those prices. Consider, for example, the cost of water utilities between desert climates such as in Arizona, New Mexico, and Nevada, with the relatively water rich humid subtropical areas of Mississippi, Alabama, and Louisiana. Holding relative demand constant, the cost in utilities to collect or extract, maintain and deliver the supply of this resource will vary considerably and thus, their prices fluctuate according to largely separate variables. Keep in mind this is merely one fluctuating consumer good in a basket of over 80,000 items. 
+Previous research has shown that difficulties in modeling the CPI mostly stem from the inherently unpredictable nature of inflation and consumer prices.$^{19}$ This phenomenon is also known as volatility. The agglomeration of changes in prices of consumer goods and services across the U.S. contains an immense diversity of factors influencing those prices. Consider, for example, the cost of water utilities between desert climates such as in Arizona, New Mexico, and Nevada, with the relatively water rich humid subtropical areas of Mississippi, Alabama, and Louisiana. Holding relative demand constant, the cost in utilities to collect or extract, maintain and deliver the supply of this resource will vary considerably and thus, their prices fluctuate according to largely separate variables. Keep in mind this is merely one fluctuating consumer good in a basket of over 80,000 items.$^{5}$ 
 
-According to the Bureau of Labor Statistics and several other nongovernmental agencies, over the lifetime of the Federal Reserve System (Fed) there has been a concerted effort to keep the inflation rate low. Recall that this inflation rate is determined by finding the change in CPI over time and recorded as an increase or decrease in each calculation based only on the previous value. In this endeavor, the system tends to focus on nonvolatile components which they call the core inflation rate. Studies based on this core inflation rate (which generally excludes food and energy utilities, though not exclusively) have shown that modeling both goods and services “have not fared well in general.” One justifiable reason that aggregation of this kind tends to reflect poorly on model testing is that the core inflation measure used by the Fed does not downselect the consumer goods or services well enough to observe separate inflationary expectations. Doing so may also result in another conundrum, that further reduction is necessary until isolated groups all share distinctly similar volatility in their CPI. Thus, an alternative modeling technique has been proposed. 
+According to the Bureau of Labor Statistics and several other nongovernmental agencies, over the lifetime of the Federal Reserve System (Fed) there has been a concerted effort to keep the inflation rate low.$^{1}$ Recall that this inflation rate is determined by finding the change in CPI over time and recorded as an increase or decrease in each calculation based only on the previous value.$^{18}$ In this endeavor, the system tends to focus on nonvolatile components which they call the core inflation rate. Studies based on this core inflation rate (which generally excludes food and energy utilities, though not exclusively) have shown that modeling both goods and services “have not fared well in general.”$^{1}$ One justifiable reason that aggregation of this kind tends to reflect poorly on model testing is that the core inflation measure used by the Fed does not downselect the consumer goods or services well enough to observe separate inflationary expectations. Doing so may also result in another conundrum, that further reduction is necessary until isolated groups all share distinctly similar volatility in their CPI. Thus, an alternative modeling technique has been proposed. 
 
-As published in the Journal of Current Issues in Economics and Finance, several researchers split the data into two groups, one that models the CPI for goods, and one model for services with a critical success: more accurate predictions. With this novel modeling process they captured reality better than traditional core inflation models and were able to discover the behavior of each group and its dependencies in more detail. The observed CPI of goods depended on short-term expectations and import prices, while services depended on long-term expectation and leeway of the domestic labor market. Moreover, composite CPI models like this improved the prediction without the use of additional external factors when measured through inflationary reactions. 
+As published in the Journal of Current Issues in Economics and Finance, several researchers split the data into two groups, one that models the CPI for goods, and one model for services with a critical success: more accurate predictions.$^{17}$ With this novel modeling process they captured reality better than traditional core inflation models and were able to discover the behavior of each group and its dependencies in more detail. The observed CPI of goods depended on short-term expectations and import prices, while services depended on long-term expectation and leeway of the domestic labor market. Moreover, composite CPI models like this improved the prediction without the use of additional external factors when measured through inflationary reactions.$^{17} \hspace{4pt} ^{19}$ 
 
-Today, the Phillips Inflation Curve Forecast remains the most useful macroeconomic model when interpreting or predicting inflation with this univariate model outperforming multivariate counterparts. However, their performance is episodic, limiting their ability to perform well continuously. Some also refer to these more novel models as New Keynesian Phillips Curves (NKPC) models, and broadly speaking they employ the use of an activity variable, which often simply means they consider historical CPI values. 
+Today, the Phillips Inflation Curve Forecast remains the most useful macroeconomic model when interpreting or predicting inflation with this univariate model outperforming multivariate counterparts.$^{4}$ However, their performance is episodic, limiting their ability to perform well continuously.$^{20}$ Some also refer to these more novel models as New Keynesian Phillips Curves (NKPC) models, and broadly speaking they employ the use of an activity variable, which often simply means they consider historical CPI values. 
 
-Evidence to characterize the backward-looking Phillips Inflation Curve has shown that hawkish monetary policy approaches tend to “ trigger an endogenous anchoring of agents’ subjective inflation forecasts” and offer “a coherent explanation for all of the observed changes in U.S. inflation behavior.” The literature also indicates that volatility in CPI has decreased since the 1980’s along with the persistence of US inflation to increase. Those familiar with the relation of inflation rates with the output gap have noted that stability in the Philips Inflation Curve Forecasts has resurfaced from U.S. data since 1980. Additionally, studies done with this backward-looking Phillips model that improve their choice of anchoring (or benchmark) years have been shown to produce statistically significant “estimated structural slope parameter in the NKPC” for the range of years 1960-2019. 
+Evidence to characterize the backward-looking Phillips Inflation Curve has shown that hawkish monetary policy approaches tend to “trigger an endogenous anchoring of agents’ subjective inflation forecasts” and offer “a coherent explanation for all of the observed changes in U.S. inflation behavior.”$^{19}$ The literature also indicates that volatility in CPI has decreased since the 1980’s along with the persistence of US inflation to increase.$^{12}$ Those familiar with the relation of inflation rates with the output gap have noted that stability in the Philips Inflation Curve Forecasts has resurfaced from U.S. data since 1980. Additionally, studies done with this backward-looking Phillips model that improve their choice of anchoring (or benchmark) years have been shown to produce statistically significant “estimated structural slope parameter in the NKPC” for the range of years 1960-2019.$^{20}$
 
 
 ## Methodology
@@ -128,7 +131,7 @@ cpi %>%
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "CPI Behavior 1913-1960", subtitle = "Change in CPI Highlighted as Inflation", xlab="xlab", ylab="ylab") + 
+  labs(title = "Old-Fashioned CPI Model", subtitle = "Change in Inflation Behavior Highlighted from 1980-2014", xlab="xlab", ylab="ylab") + 
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
 ```
 
@@ -142,7 +145,7 @@ cpi %>%
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "CPI Behavior 1980-2014", subtitle = "Change in CPI Highlighted as Inflation", xlab="xlab", ylab="ylab") + 
+  labs(title = "Contemporary CPI Model", subtitle = "Change in Inflation Behavior Highlighted from 1980-2014", xlab="xlab", ylab="ylab") + 
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
 ```
 
@@ -224,18 +227,22 @@ Our resultant model produces values that fall almost exactly on the regression l
 
 ```{r echo=FALSE}
 scaled.sct <- train %>% 
-  ggplot(aes(Date, scaled.predicted)) + geom_point(aes(color=Inflation)) + 
+  ggplot(aes(Date, scaled.predicted)) + 
+  geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
+  labs(title = "Scaled Contemporary Model", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5))
 original.sct <- cpi %>% 
   filter(Date > "1980-01-01") %>% 
-  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
+  ggplot(aes(Date, Index)) +
+  geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
+  labs(title = "Observed Contemporary Model", xlab="xlab", ylab="ylab") + 
+  theme(plot.title = element_text(hjust = .5),
+        plot.subtitle = element_text(hjust = .5), legend.position = "none")
 ggarrange(original.sct, scaled.sct)
 ```
 
@@ -246,30 +253,30 @@ As a final check, we review the standard errors of each prediction and its magni
 scaled.mag.dense <- train %>% 
   ggplot(aes(scaled.mag)) + 
   geom_density(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
+  labs(subtitle = "Scaled Error Magnitude Density") + 
+  xlab("Error") +
+  ylab("Frequency of Error Squared") +
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
 scaled.mag.hist <- train %>% 
   ggplot(aes(scaled.mag)) + 
   geom_histogram(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
+  labs(subtitle = "Scaled Error Magnitude Distribution") + 
+  xlab("Error") +
+  ylab("Frequency of Error Squared") +
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
 scaled.error.hist <- train %>% 
   ggplot(aes(scaled.error)) + 
   geom_histogram(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
+  labs(subtitle = "Scaled Error Distribution") + 
+  xlab("Error") +
+  ylab("Frequency") +
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
 scaled.error.dense <- train %>% 
   ggplot(aes(scaled.error)) + 
   geom_density(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
+  labs(subtitle = "Scaled Error Density") + 
+  xlab("Error") +
+  ylab("Frequency") +
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
 ggarrange(scaled.error.dense, scaled.mag.dense, scaled.error.hist, scaled.mag.hist)
 ```
@@ -296,39 +303,41 @@ $^{1}$Baker, E. S. (2014, May). Modeling core inflation: Considering goods and s
 
 $^{2}$Board of Governors, F. (2021, May 03). Effective federal funds rate. Retrieved from https://fred.stlouisfed.org/series/FEDFUNDS
 
-$^{3}$Brissimis, S. N., Economic Research Department, Bank of Greece, & Magginas, N. S., Department of Economics, University of Piraeus. (2008). Inflation Forecasts and the New Keynesian Phillips Curve. International Journal of Central Banking, (13). doi:https://www.ijcb.org/journal/ijcb08q2a1.pdf
+$^{3}$Boskin, M. J., Dulberger, E. L., Gordon, R. J., Griliches, Z., & Jorgenson, D. W. (1998). Consumer Prices, the Consumer Price Index, and the Cost of Living. Journal of Economic Perspectives, 12(1), 3-26. doi:10.1257
 
-$^{4}$Bureau of Labor Statistics. (2021, May 12). Archived consumer price index supplemental files. Retrieved from https://www.bls.gov/cpi/tables/supplemental-files/home.htm
+$^{4}$Brissimis, S. N., Economic Research Department, Bank of Greece, & Magginas, N. S., Department of Economics, University of Piraeus. (2008). Inflation Forecasts and the New Keynesian Phillips Curve. International Journal of Central Banking, (13). doi:https://www.ijcb.org/journal/ijcb08q2a1.pdf
 
-$^{5}$Chao, E. L., U.S. Department of Labor, & Utgoff, K. P., U.S. Bureau of Labor Statistics. (2006, May). 100 Years of U.S. Consumer Spending: Data for the Nation, New York City, and Boston. Retrieved from https://www.bls.gov/opub/100-years-of-u-s-consumer-spending.pdf
+$^{5}$Bureau of Labor Statistics. (2021, May 12). Archived consumer price index supplemental files. Retrieved from https://www.bls.gov/cpi/tables/supplemental-files/home.htm
 
-$^{6}$Chien, N., & Mistry, R. (2013). Geographic variations in cost of living: Associations with family and child well-being. Retrieved May 22, 2021, from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3509251/
+$^{6}$Chao, E. L., U.S. Department of Labor, & Utgoff, K. P., U.S. Bureau of Labor Statistics. (2006, May). 100 Years of U.S. Consumer Spending: Data for the Nation, New York City, and Boston. Retrieved from https://www.bls.gov/opub/100-years-of-u-s-consumer-spending.pdf
 
-$^{7}$Consumer price index frequently asked questions. (2021). Retrieved from https://www.bls.gov/cpi/questions-and-answers.htm
+$^{7}$Chien, N., & Mistry, R. (2013). Geographic variations in cost of living: Associations with family and child well-being. Retrieved May 22, 2021, from https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3509251/
 
-$^{8}$Data source from data.io: Consumer Price Index for All Urban Consumers (CPI-U) from U.S. Department Of Labor Bureau of Labor Statistics. Retrieved from using online link: https://pkgstore.datahub.io/core/cpi-us/8/datapackage.json
+$^{8}$Consumer price index frequently asked questions. (2021). Retrieved from https://www.bls.gov/cpi/questions-and-answers.htm
 
-$^{9}$DeSilver, D. (2020, May 30). How America's diet has changed over time. Retrieved from https://www.pewresearch.org/fact-tank/2016/12/13/whats-on-your-table-how-americas-diet-has-changed-over-the-decades/
+$^{9}$Data source from data.io: Consumer Price Index for All Urban Consumers (CPI-U) from U.S. Department Of Labor Bureau of Labor Statistics. Retrieved from using online link: https://pkgstore.datahub.io/core/cpi-us/8/datapackage.json
 
-$^{10}$Fernando, J. (2021, May 20). Consumer price index (cpi) definition. Retrieved from https://www.investopedia.com/terms/c/consumerpriceindex.asp#:~:text=The%20CPI%20measures%20the%20average,services%2C%20commonly%20known%20as%20inflation.&text=The%20quoted%20inflation%20rate%20is,is%20monthly%2C%20quarterly%20or%20yearly.
+$^{10}$DeSilver, D. (2020, May 30). How America's diet has changed over time. Retrieved from https://www.pewresearch.org/fact-tank/2016/12/13/whats-on-your-table-how-americas-diet-has-changed-over-the-decades/
 
-$^{11}$James H. Stock & Mark W. Watson, 2008. "Phillips curve inflation forecasts," Conference Series ; [Proceedings], Federal Reserve Bank of Boston, vol. 53.
+$^{11}$Fernando, J. (2021, May 20). Consumer price index (cpi) definition. Retrieved from https://www.investopedia.com/terms/c/consumerpriceindex.asp#:~:text=The%20CPI%20measures%20the%20average,services%2C%20commonly%20known%20as%20inflation.&text=The%20quoted%20inflation%20rate%20is,is%20monthly%2C%20quarterly%20or%20yearly.
 
-$^{12}$Jolliffe, D. (2006, November 01). Adjusting for living costs can change who is considered poor. Retrieved from https://www.ers.usda.gov/amber-waves/2006/november/adjusting-for-living-costs-can-change-who-is-considered-poor/
+$^{12}$James H. Stock & Mark W. Watson, 2008. "Phillips curve inflation forecasts," Conference Series ; [Proceedings], Federal Reserve Bank of Boston, vol. 53.
 
-$^{13}$Jolliffe, D. (2006, November 01). Adjusting for Living Costs Can Change Who Is Considered Poor. Retrieved May 21, 2021, from https://www.ers.usda.gov/amber-waves/2006/november/adjusting-for-living-costs-can-change-who-is-considered-poor/
+$^{13}$Jolliffe, D. (2006, November 01). Adjusting for living costs can change who is considered poor. Retrieved from https://www.ers.usda.gov/amber-waves/2006/november/adjusting-for-living-costs-can-change-who-is-considered-poor/
 
-$^{14}$Jørgensen, Peter Lihn, Kevin J. Lansing. 2021. “Anchored Inflation Expectations and the Flatter Phillips Curve,” Federal Reserve Bank of San Francisco Working Paper 2019-27. https://doi.org/10.24148/wp2019-27
+$^{14}$Jolliffe, D. (2006, November 01). Adjusting for Living Costs Can Change Who Is Considered Poor. Retrieved May 21, 2021, from https://www.ers.usda.gov/amber-waves/2006/november/adjusting-for-living-costs-can-change-who-is-considered-poor/
 
-$^{15}$Koba, M. (2013, May 01). Consumer price Index: CNBC Explains. Retrieved from https://www.cnbc.com/id/43769766
+$^{15}$Jørgensen, Peter Lihn, Kevin J. Lansing. 2021. “Anchored Inflation Expectations and the Flatter Phillips Curve,” Federal Reserve Bank of San Francisco Working Paper 2019-27. https://doi.org/10.24148/wp2019-27
 
-$^{16}$Peach, R., Rich, R., & Linder, M. H. (2013). The Parts Are More Than the Whole: Separating Goods and Services to Predict Core Inflation. Current Issues in Economics and Finance, 19(7). doi:https://www.newyorkfed.org/medialibrary/media/research/current_issues/ci19-7.pdf
+$^{16}$Koba, M. (2013, May 01). Consumer price Index: CNBC Explains. Retrieved from https://www.cnbc.com/id/43769766
 
-$^{17}$Staff. Bureau of Labor Statistics. (2021, May 19). Consumer price index up 4.2 percent from April 2020 to April 2021. Retrieved from https://www.bls.gov/opub/ted/2021/consumer-price-index-up-4-2-percent-from-april-2020-to-april-2021.htm
+$^{17}$Peach, R., Rich, R., & Linder, M. H. (2013). The Parts Are More Than the Whole: Separating Goods and Services to Predict Core Inflation. Current Issues in Economics and Finance, 19(7). doi:https://www.newyorkfed.org/medialibrary/media/research/current_issues/ci19-7.pdf
 
-$^{18}$Stock, J. H., & Watson, M. W. (2008). Phillips curve inflation forecasts. National Bureau of Economic Research, 53, 14322nd ser. doi:10.3386/w14322
+$^{18}$Staff. Bureau of Labor Statistics. (2021, May 19). Consumer price index up 4.2 percent from April 2020 to April 2021. Retrieved from https://www.bls.gov/opub/ted/2021/consumer-price-index-up-4-2-percent-from-april-2020-to-april-2021.htm
 
-$^{19}$Stock, J. H., & Watson, M. W. (2019). Forecasting Inflation. Retrieved from https://scholar.harvard.edu/files/stock/files/forecastinginflation.pdf
+$^{19}$Stock, J. H., & Watson, M. W. (2008). Phillips curve inflation forecasts. National Bureau of Economic Research, 53, 14322nd ser. doi:10.3386/w14322
+
+$^{20}$Stock, J. H., & Watson, M. W. (2019). Forecasting Inflation. Retrieved from https://scholar.harvard.edu/files/stock/files/forecastinginflation.pdf
 
 
 ## Appendecies
