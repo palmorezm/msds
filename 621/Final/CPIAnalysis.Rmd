@@ -114,7 +114,7 @@ Our first step in this experiment is the separation of the data into two distinc
 cpi %>% 
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  labs(title = "CPI Behavior 1913-2014", subtitle = "Change in CPI Highlighted as Inflation", xlab="xlab", ylab="ylab") + 
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
 ```
 
@@ -128,7 +128,7 @@ cpi %>%
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  labs(title = "CPI Behavior 1913-1960", subtitle = "Change in CPI Highlighted as Inflation", xlab="xlab", ylab="ylab") + 
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
 ```
 
@@ -142,7 +142,7 @@ cpi %>%
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
+  labs(title = "CPI Behavior 1980-2014", subtitle = "Change in CPI Highlighted as Inflation", xlab="xlab", ylab="ylab") + 
   theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
 ```
 
