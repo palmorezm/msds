@@ -5,9 +5,7 @@ date: "5/16/2021"
 output: pdf_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
-```
+
 
 ## Abstract
 
@@ -55,219 +53,192 @@ Data is sourced from the BLS and contains monthly CPI estimates for each year ov
 
 
 
-```{r echo=FALSE}
-library(tesseract)
-library(magick)
-library(tidyverse)
-library(viridis)
-library(caret)
-library(pROC)
-library(bestNormalize)
-library(ggpubr)
-library(kableExtra)
-theme_set(theme_minimal())
-```
+
 
 
 Newer portions of the data were stored in reports released by the BLS corresponding to the timespan between the first of May in 2014 to the first of March in 2021. This data would only be used in evaluation of the model performance statistics. All preceding data from the first of May in 2014 backwards, was made available in a comma delimited format and was extracted from the open source API by data.io for hosting purposes and reproducibility. See the appendix for further descriptions of exactly how this data was extracted. The first few observations are shown. 
 
 
-```{r echo=FALSE, eval=FALSE}
-# remove notes to download files individually from Git
-# specify correct file path otherwise it will not function properly 
-# cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG", "C:/Users/Owner/Documents/Data/cpi1.jpg")
-# cpi2 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1971to2021.JPG", "C:/Users/Owner/Documents/Data/cpi1.jpg")
-# Image recognition
-cpi1 <- image_read("C:/General/cpi1.jpg")
-cpi2 <- image_read("C:/General/cpi2.jpg")
-# Cleanup and combine
-ocr1 <- cpi1 %>% 
-  image_resize("1200") %>% 
-  image_trim() %>% 
-  ocr()
-ocr2 <- cpi2 %>% 
-  image_resize("1200") %>% 
-  image_trim() %>% 
-  ocr()
-str_extract(ocr1, "")
-# remove notes to export
-# export as txt delimited by comma for ease of access
-# write.lines(ocr_export, "C:/insert/file/path/here/for/local/machine)
-```
 
 
 
 
-```{r echo=FALSE}
-cpi <- read_delim(
-  "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
-kbl(head(cpi), booktabs = T, caption = "CPI Raw Data Initial Observations") %>%
-kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
-```
+
+\begin{table}[!h]
+
+\caption{\label{tab:unnamed-chunk-3}CPI Raw Data Initial Observations}
+\centering
+\begin{tabular}[t]{lrr}
+\toprule
+Date & Index & Inflation\\
+\midrule
+\cellcolor{gray!6}{1913-01-01} & \cellcolor{gray!6}{9.8} & \cellcolor{gray!6}{NA}\\
+1913-02-01 & 9.8 & 0.00\\
+\cellcolor{gray!6}{1913-03-01} & \cellcolor{gray!6}{9.8} & \cellcolor{gray!6}{0.00}\\
+1913-04-01 & 9.8 & 0.00\\
+\cellcolor{gray!6}{1913-05-01} & \cellcolor{gray!6}{9.7} & \cellcolor{gray!6}{-1.02}\\
+\addlinespace
+1913-06-01 & 9.8 & 1.03\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Our first step in this experiment is the separation of the data into two distinct segments, and to do so we first justify the need and approximate the periods with which to draw from. This is merely a check on the literature but we can see the results as a scatterplot. To assist in the attempted segmentation based on mathematical behavior, we do not add a trend to the plot at this time. Inflation is highlighted on a continuous scale for each month within the range. 
 
-```{r echo=FALSE}
-cpi %>% 
-  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
-  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
-```
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-4-1.pdf)<!-- --> 
 
 
 Showing the distribution of CPI from 1913 to 2014 gives us insight into the two groups, because prior to the late 1960’s the data appear to fall in line with steady slope of some caliber while the data after the late 1970's follows a much steeper incline. This is our basis for segmentation. Meanwhile, the inflation colored at this scale is practically constant except for a jump in the 1920’s and a rapid exponentiation of inflation for the late 1960’s to the early 1980’s. We examine this further at two closer scales. 
 
 
-```{r echo=FALSE}
-cpi %>% 
-  filter(Date < "1960-01-01") %>% 
-  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
-  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
-  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
-```
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-5-1.pdf)<!-- --> 
 
 
 By filtering the data to include only those CPI values that were less than the first of January in 1960, a new story emerges. It is clear that the slope is not constant. There is a substantial amount of variation in the CPI and inflation throughout the 1913 - 1960 range. Presumably, this is due to differences in fiscal policy that occurred before 1920 and thereafter when the Great Depression hit the United States. Needless to say, prediction based on a model of this data would result in less than ideal conditions for understanding future CPI and inflation rates. 
 
 
-```{r echo=FALSE}
-cpi %>% 
-  filter(Date > "1980-01-01") %>% 
-  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
-  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
-  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
-```
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-6-1.pdf)<!-- --> 
 
 Filtering from the first of January in 1980 until the upper limit of our data range on the first of January in 2014, we get a near constant slope. There is only one minor ‘blip’ or divergence from this expected trend around 2008. Arguably, this is a better segment to make predictions and draw recent conclusions from. A major cause of the resultant blip is likely the Great Recession which certainly resulted in an intense fluctuation of many consumer goods. 
 
 Model development is straightforward using the segmentation date ranges as selection, or specifically filtering criteria for our first pre-seventies date range to run through our simple linear regression. We then run diagnostic plots to evaluate our assumptions. Given the somewhat poor linearity we should expect a poorly fitted residual vs fitted plot, if there is a well enough presence at all. Judging from the previous scatterplot and linear regression overlay, we know very few CPI values were solid hits on the trend. A valid normality may also be a concern. 
 
 
-```{r echo=FALSE}
-g1 <- cpi %>% 
-  filter(Date < "1960-01-01")
-g1.lm <- lm(Index ~ Date, g1)
-summary(g1.lm)
-par(mfrow=c(2,2))
-plot(g1.lm)
+
 ```
+## 
+## Call:
+## lm(formula = Index ~ Date, data = g1)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -5.739 -3.305  1.050  2.773  7.729 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 2.912e+01  3.687e-01   78.98   <2e-16 ***
+## Date        8.808e-04  2.790e-05   31.57   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.284 on 562 degrees of freedom
+## Multiple R-squared:  0.6394,	Adjusted R-squared:  0.6388 
+## F-statistic: 996.6 on 1 and 562 DF,  p-value: < 2.2e-16
+```
+
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-7-1.pdf)<!-- --> 
 
 
 As expected, linearity is poor and normality is not present. While we could attempt to overlook the normality of the plot through various transformations, such efforts would be wasted as there is likely no reasonable transformation that would not completely change the meaning of the data. When even the Scale-Location and Residual vs Leverage plot indicates the presence of highly influential values, there is little hope to piecemeal the variations from this range into something practical. Instead, we should make note of this pattern as it confirms our thoughts that data prior to the first of January in 1960 does indeed behave differently than any expectations of linearity. We repeat this preliminary modeling process on the data from 1980 onward.  
 
 
-```{r echo=FALSE}
-g2 <- cpi %>% 
-  filter(Date > "1980-01-01")  
-g2.lm <- lm(Index ~ Date, g2)
-summary(g2.lm)
-par(mfrow=c(2,2))
-plot(g2.lm)
+
 ```
+## 
+## Call:
+## lm(formula = Index ~ Date, data = g2)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -5.2504 -1.8410  0.2805  1.5275  9.9303 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 3.798e+01  3.293e-01   115.3   <2e-16 ***
+## Date        1.224e-02  3.134e-05   390.4   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.269 on 406 degrees of freedom
+## Multiple R-squared:  0.9973,	Adjusted R-squared:  0.9973 
+## F-statistic: 1.524e+05 on 1 and 406 DF,  p-value: < 2.2e-16
+```
+
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-8-1.pdf)<!-- --> 
 
 
 While the normality of the distribution is still questionable and there are a few CPI values that diverge from expectations in our Residuals vs Leverage plot, this data set gives us something we can work with. We recognize that this data is inherently variable and as such may never be truly Bayesian in its distribution. Transformations may be beneficial, in this case, when trying to explain the relationship of CPI over time. To better assess this relationship in an attempt to predict its behavior more accurately, we should split this data into training and testing data sets for model development. We also use a Bayesian classifier to determine the most appropriate transformation on this training data. 
 
 
-```{r echo=FALSE}
-# Split 70-30 
-set.seed(41)
-tindex <- createDataPartition(g2$Index, p = .7, list = FALSE, times = 1)
-train <- g2[tindex,]
-test <- g2[-tindex,]
-# Determine best transformation
-bestNormalize(train$Index)
+
+```
+## Best Normalizing transformation with 288 Observations
+##  Estimated Normality Statistics (Pearson P / df, lower => more normal):
+##  - arcsinh(x): 1.3294
+##  - Box-Cox: 1.2658
+##  - Center+scale: 1.1924
+##  - Exp(x): 34.7778
+##  - Log_b(x+a): 1.3294
+##  - orderNorm (ORQ): 1.2422
+##  - sqrt(x + a): 1.2394
+##  - Yeo-Johnson: 1.268
+## Estimation method: Out-of-sample via CV with 10 folds and 5 repeats
+##  
+## Based off these, bestNormalize chose:
+## center_scale(x) Transformation with 288 nonmissing obs.
+##  Estimated statistics:
+##  - mean (before standardization) = 158.5135 
+##  - sd (before standardization) = 43.79097
 ```
 
 Perhaps ironically based on this classifier, centering and scaling the data is our best option from a host of statistical operations even though it will not adjust normality of residuals. These operations include but are not limited to Box-Cox, Yeo-Johnson, orderNorm, and sqrt which were each close runner-up transformations. We perform these on our newest training data with 70% of the original CPI dates and values. The results are shown:
 
 
-```{r echo=FALSE}
-train$Index <- scale(train$Index)
-scaled.mod <- lm(Index ~ Date,train)
-summary(scaled.mod)
-par(mfrow=c(2,2))
-plot(scaled.mod)
+
 ```
+## 
+## Call:
+## lm(formula = Index ~ Date, data = train)
+## 
+## Residuals:
+##       Min        1Q    Median        3Q       Max 
+## -0.118151 -0.043081  0.005851  0.036281  0.229216 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -2.749e+00  9.113e-03  -301.7   <2e-16 ***
+## Date         2.790e-04  8.695e-07   320.9   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.05272 on 286 degrees of freedom
+## Multiple R-squared:  0.9972,	Adjusted R-squared:  0.9972 
+## F-statistic: 1.03e+05 on 1 and 286 DF,  p-value: < 2.2e-16
+```
+
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-10-1.pdf)<!-- --> 
 
 
 Normality does not change, but the distance of our red trendlines and axis values appear to have shrunk in size, which we suspect benefits the linearity of Residuals vs Fitted as well as our Scale-Location and Residuals vs Leverage plots. At the expense of .1% of our $R^2$ value, we have successfully reduced the standard error in this model to near 0.05 down from 2.7. We add these statistics to our table and calculate the errors in every prediction, its magnitude, the average error of every prediction, and compute the root mean squared error in subsequent steps. 
 
 
-```{r echo=FALSE}
-# Calculate prediction values
-scaled.predicted <- predict(scaled.mod, train)
-# Add them to the data frame
-train$scaled.predicted <- scaled.predicted
-# Calculate errors, magnitude, rmse
-train <- train %>%
-  mutate(scaled.error = Index - scaled.predicted) %>% 
-  mutate(scaled.mag = scaled.error^2) %>% 
-  mutate(scaled.eravg = mean(scaled.mag)) %>%
-  mutate(scaled.rmse = sqrt(scaled.eravg)) 
-kbl(t(head(train)), booktabs = T, caption = "Scaled Contemporary Model Test Statistics") %>%
-kable_styling(latex_options = c("striped", "hold_position"), full_width = F)
-```
+\begin{table}[!h]
+
+\caption{\label{tab:unnamed-chunk-11}Scaled Contemporary Model Test Statistics}
+\centering
+\begin{tabular}[t]{lllllll}
+\toprule
+\cellcolor{gray!6}{Date} & \cellcolor{gray!6}{1980-02-01} & \cellcolor{gray!6}{1980-04-01} & \cellcolor{gray!6}{1980-05-01} & \cellcolor{gray!6}{1980-06-01} & \cellcolor{gray!6}{1980-09-01} & \cellcolor{gray!6}{1980-10-01}\\
+Index & -1.818035 & -1.770080 & -1.751811 & -1.731259 & -1.701573 & -1.683304\\
+\cellcolor{gray!6}{Inflation} & \cellcolor{gray!6}{1.41} & \cellcolor{gray!6}{1.12} & \cellcolor{gray!6}{0.99} & \cellcolor{gray!6}{1.10} & \cellcolor{gray!6}{0.84} & \cellcolor{gray!6}{0.95}\\
+scaled.predicted & -1.721413 & -1.704673 & -1.696303 & -1.687654 & -1.661986 & -1.653616\\
+\cellcolor{gray!6}{scaled.error} & \cellcolor{gray!6}{-0.09662188} & \cellcolor{gray!6}{-0.06540681} & \cellcolor{gray!6}{-0.05550821} & \cellcolor{gray!6}{-0.04360504} & \cellcolor{gray!6}{-0.03958658} & \cellcolor{gray!6}{-0.02968798}\\
+\addlinespace
+scaled.mag & 0.0093357882 & 0.0042780508 & 0.0030811617 & 0.0019013995 & 0.0015670974 & 0.0008813764\\
+\cellcolor{gray!6}{scaled.eravg} & \cellcolor{gray!6}{0.002760148} & \cellcolor{gray!6}{0.002760148} & \cellcolor{gray!6}{0.002760148} & \cellcolor{gray!6}{0.002760148} & \cellcolor{gray!6}{0.002760148} & \cellcolor{gray!6}{0.002760148}\\
+scaled.rmse & 0.05253711 & 0.05253711 & 0.05253711 & 0.05253711 & 0.05253711 & 0.05253711\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Our resultant model produces values that fall almost exactly on the regression line, indicating a near perfect fit for an imperfect data set. Inflation values are again highlighted for reference on a continuous scale. Notice how the points of change in inflation did not change, only the location of points on the plot and the scale of the axes. Over the same time frame, our scaled prediction values perform marginally better than the original contemporary model. 
 
 
-```{r echo=FALSE}
-scaled.sct <- train %>% 
-  ggplot(aes(Date, scaled.predicted)) + geom_point(aes(color=Inflation)) + 
-  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
-  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5))
-original.sct <- cpi %>% 
-  filter(Date > "1980-01-01") %>% 
-  ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
-  geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
-  scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
-  labs(title = "Title", subtitle = "sub", xlab="xlab", ylab="ylab") + 
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
-ggarrange(original.sct, scaled.sct)
-```
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-12-1.pdf)<!-- --> 
 
 As a final check, we review the standard errors of each prediction and its magnitude as both density plots and histograms. At this scale, nearly all errors occur between -0.1 and 0.1 with the magnitude of those errors rarely ever having an occurrence greater than .01. This is good news for the contemporary model hypothesis. 
 
-```{r echo=FALSE}
-# Visualize error type
-scaled.mag.dense <- train %>% 
-  ggplot(aes(scaled.mag)) + 
-  geom_density(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
-scaled.mag.hist <- train %>% 
-  ggplot(aes(scaled.mag)) + 
-  geom_histogram(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
-scaled.error.hist <- train %>% 
-  ggplot(aes(scaled.error)) + 
-  geom_histogram(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
-scaled.error.dense <- train %>% 
-  ggplot(aes(scaled.error)) + 
-  geom_density(aes()) +
-  labs(subtitle = "sub") + 
-  xlab("xlab") +
-  ylab("ylab") +
-  theme(plot.title = element_text(hjust = .5), plot.subtitle = element_text(hjust = .5), legend.position = "none")
-ggarrange(scaled.error.dense, scaled.mag.dense, scaled.error.hist, scaled.mag.hist)
-```
+![](CPIAnalysis_files/figure-latex/unnamed-chunk-13-1.pdf)<!-- --> 
 
 
 
@@ -276,10 +247,7 @@ ggarrange(scaled.error.dense, scaled.mag.dense, scaled.error.hist, scaled.mag.hi
 
 
 
-```{r echo=FALSE, message=FALSE, include=FALSE}
-t.test(g1$Index)
-t.test(g2$Index)
-```
+
 
 
 Given recent citations in literature about the significant level of new stability in inflation measures we hypothesized that CPI data from the first of January in 1980 through the latest adjusted points we could find in 2014 would show that a contemporary model is justified for predicting CPI and its related affiliate statistics. In our experiment the old-fashioned model failed all but one of the assumptions of linear regression (leverage remained) and was only able to explain about 63.8% of the data with a t-statistic of 79.69 on 563 degrees of freedom (DF) and was statistically significant beyond an alpha level of 0.001. Meanwhile, our contemporary model explained 99.7% of the data, with a p-value less than 0.001 and a t-statistic of 72.95 with 407 DF. Lastly, after the data underwent a 70-30 split with a center-scale transformation, our scaled contemporary model improved upon these scores by reducing the standard error of the contemporary model to 0.053 on 286 degrees of freedom while all other test statistics remained nearly unchanged. Our final root mean squared error for this scaled contemporary model was 0.0525, with an mean error of 0.0028, and no error larger than 0.229. Based on this experiment modeling the segmented time periods, there is evidence to support making predictions on the basis that data prior to 1980 is impractical for prediction in modern times. 
@@ -329,7 +297,8 @@ $^{19}$Stock, J. H., & Watson, M. W. (2019). Forecasting Inflation. Retrieved fr
 ## Appendecies
 
 
-```{r eval=F}
+
+```r
 library(tesseract)
 library(magick)
 library(tidyverse)
@@ -342,7 +311,8 @@ theme_set(theme_minimal())
 ```
 
 
-```{r eval=FALSE}
+
+```r
 # remove notes to download files individually from Git
 # specify correct file path otherwise it will not function properly 
 # cpi1 <- tesseract_download("https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi_1913to1970.JPG", "C:/Users/Owner/Documents/Data/cpi1.jpg")
@@ -366,14 +336,16 @@ str_extract(ocr1, "")
 ```
 
 
-```{r eval=F}
+
+```r
 cpi <- read_delim(
   "https://raw.githubusercontent.com/palmorezm/msds/main/621/Final/cpi1_1913_present.txt", ",")
 head(cpi)
 ```
 
 
-```{r eval=F}
+
+```r
 cpi %>% 
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
   scale_color_viridis_c(aesthetics = c("colour", "fill"), option = "D", alpha = .5) + 
@@ -382,7 +354,8 @@ cpi %>%
 ```
 
 
-```{r eval=F}
+
+```r
 cpi %>% 
   filter(Date < "1960-01-01") %>% 
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
@@ -393,7 +366,8 @@ cpi %>%
 ```
 
 
-```{r eval=F}
+
+```r
 cpi %>% 
   filter(Date > "1980-01-01") %>% 
   ggplot(aes(Date, Index)) + geom_point(aes(color=Inflation)) + 
@@ -404,7 +378,8 @@ cpi %>%
 ```
 
 
-```{r eval=F}
+
+```r
 g1 <- cpi %>% 
   filter(Date < "1960-01-01")
 g1.lm <- lm(Index ~ Date, g1)
@@ -413,7 +388,8 @@ plot(g1.lm)
 ```
 
 
-```{r eval=F}
+
+```r
 g2 <- cpi %>% 
   filter(Date > "1980-01-01")  
 g2.lm <- lm(Index ~ Date, g2)
@@ -422,7 +398,8 @@ plot(g2.lm)
 ```
 
 
-```{r eeval=F}
+
+```r
 # Split 70-30 
 set.seed(41)
 tindex <- createDataPartition(g2$Index, p = .7, list = FALSE, times = 1)
@@ -432,8 +409,29 @@ test <- g2[-tindex,]
 bestNormalize(train$Index)
 ```
 
+```
+## Best Normalizing transformation with 288 Observations
+##  Estimated Normality Statistics (Pearson P / df, lower => more normal):
+##  - arcsinh(x): 1.3294
+##  - Box-Cox: 1.2658
+##  - Center+scale: 1.1924
+##  - Exp(x): 34.7778
+##  - Log_b(x+a): 1.3294
+##  - orderNorm (ORQ): 1.2422
+##  - sqrt(x + a): 1.2394
+##  - Yeo-Johnson: 1.268
+## Estimation method: Out-of-sample via CV with 10 folds and 5 repeats
+##  
+## Based off these, bestNormalize chose:
+## center_scale(x) Transformation with 288 nonmissing obs.
+##  Estimated statistics:
+##  - mean (before standardization) = 158.5135 
+##  - sd (before standardization) = 43.79097
+```
 
-```{r eval=F}
+
+
+```r
 train$Index <- scale(train$Index)
 scaled.mod <- lm(Index ~ Date,train)
 summary(scaled.mod)
@@ -441,7 +439,8 @@ plot(scaled.mod)
 ```
 
 
-```{r eval=F}
+
+```r
 # Calculate prediction values
 scaled.predicted <- predict(scaled.mod, train)
 # Add them to the data frame
@@ -456,7 +455,8 @@ train
 ```
 
 
-```{r eval=F}
+
+```r
 scaled.sct <- train %>% 
   ggplot(aes(Date, scaled.predicted)) + geom_point(aes(color=Inflation)) + 
   geom_smooth(method = "lm", color="cadetblue", stat = "smooth", se=TRUE) +
@@ -474,7 +474,8 @@ ggarrange(original.sct, scaled.sct)
 ```
 
 
-```{r eval=F}
+
+```r
 # Visualize error type
 scaled.mag.dense <- train %>% 
   ggplot(aes(scaled.mag)) + 
@@ -508,12 +509,14 @@ ggarrange(scaled.error.dense, scaled.mag.dense, scaled.error.hist, scaled.mag.hi
 ```
 
 
-```{r eval=F}
+
+```r
 max(train$scaled.error)
 ```
 
 
-```{r eval=F}
+
+```r
 t.test(g1$Index)
 t.test(g2$Index)
 ```
