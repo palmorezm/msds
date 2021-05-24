@@ -2,7 +2,7 @@
 title: "Final"
 author: "Zachary Palmore"
 date: "5/20/2021"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -403,6 +403,7 @@ mod2.both <- stepAIC(mod2.lm, trace = F, direction = "both")
 mod2.call <- summary(mod2.both)$call
 mod2 <- lm(mod2.call[2], train)
 summary(mod2)
+par(mfrow=c(2,2))
 plot(mod2)
 ```
 
