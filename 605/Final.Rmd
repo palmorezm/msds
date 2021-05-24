@@ -2,12 +2,14 @@
 title: "Final"
 author: "Zachary Palmore"
 date: "5/20/2021"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = F, message = F)
 ```
+
+
 
 ```{r}
 library(tidyverse)
@@ -119,20 +121,29 @@ Chi-squared is most appropriate due to sample size and independence holds with l
 
 You are to register for Kaggle.com (free) and compete in the House Prices: Advanced Regression Techniques competition. https://www.kaggle.com/c/house-prices-advanced-regression-techniques . I want you to do the following.
 
-5 points. Descriptive and Inferential Statistics. Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
+$^{1}$5 points. Descriptive and Inferential Statistics. Provide univariate descriptive statistics and appropriate plots for the training data set.  Provide a scatterplot matrix for at least two of the independent variables and the dependent variable. Derive a correlation matrix for any three quantitative variables in the dataset.  Test the hypotheses that the correlations between each pairwise set of variables is 0 and provide an 80% confidence interval.  Discuss the meaning of your analysis.  Would you be worried about familywise error? Why or why not?
 
-5 points. Linear Algebra and Correlation.  Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
+$^{2}$5 points. Linear Algebra and Correlation.  Invert your correlation matrix from above. (This is known as the precision matrix and contains variance inflation factors on the diagonal.) Multiply the correlation matrix by the precision matrix, and then multiply the precision matrix by the correlation matrix. Conduct LU decomposition on the matrix.  
 
-5 points.  Calculus-Based Probability & Statistics.  Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run fitdistr to fit an exponential probability density function.  (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of  for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, )).  Plot a histogram and compare it with a histogram of your original variable.   Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).   Also generate a 95% confidence interval from the empirical data, assuming normality.  Finally, provide the empirical 5th percentile and 95th percentile of the data.  Discuss.
+$^{3}$5 points.  Calculus-Based Probability & Statistics.  Many times, it makes sense to fit a closed form distribution to data.  Select a variable in the Kaggle.com training dataset that is skewed to the right, shift it so that the minimum value is absolutely above zero if necessary.  Then load the MASS package and run fitdistr to fit an exponential probability density function.  (See  https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/fitdistr.html ).  Find the optimal value of  for this distribution, and then take 1000 samples from this exponential distribution using this value (e.g., rexp(1000, )).  Plot a histogram and compare it with a histogram of your original variable.   Using the exponential pdf, find the 5th and 95th percentiles using the cumulative distribution function (CDF).   Also generate a 95% confidence interval from the empirical data, assuming normality.  Finally, provide the empirical 5th percentile and 95th percentile of the data.  Discuss.
 
-10 points.  Modeling.  Build some type of multiple regression  model and submit your model to the competition board.  Provide your complete model summary and results with analysis.  Report your Kaggle.com user name and score.
+$^{4}$10 points.  Modeling.  Build some type of multiple regression  model and submit your model to the competition board.  Provide your complete model summary and results with analysis.  Report your Kaggle.com user name and score.
+
 
 
 ```{r}
 # Packages
-library(tidyverse)
 library(psych)
+library(corrplot)
+library(matrixcalc)
+library(MASS)
+theme_set(theme_minimal())
 ```
+
+
+### Section 1: Descriptive and Inferential Statistics
+
+
 
 
 
@@ -144,26 +155,332 @@ test <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/605/test
 
 
 ```{r}
-# Observe statistics of each variable
+# univariate descriptive statistics for training set
 describe(train)
+```
+
+
+```{r}
+train  %>%
+  mutate(SalePrice.Adj = SalePrice / 10000, 
+         GrLivArea.Adj = GrLivArea / 100, 
+         LotArea.Adj = LotArea / 100) %>% 
+  dplyr::select(SalePrice.Adj, OverallQual, OverallCond, Neighborhood, BedroomAbvGr, FullBath, HalfBath, 
+         LotArea.Adj, LotFrontage, GrLivArea.Adj, TotalBsmtSF) %>%
+  gather(variable, value, -SalePrice.Adj) %>% 
+  ggplot(., aes(value, SalePrice.Adj)) + 
+  ggtitle("Some Interesting Independent Variables") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4)
+```
+
+
+
+
+```{r}
+# scatterplot matrix for at least two of the independent variables and the dependent variable
+train  %>%
+  mutate(SalePrice.Adj = SalePrice / 10000,
+         GrLivArea.Adj = GrLivArea / 100, 
+         LotArea.Adj = LotArea / 100) %>% 
+  dplyr::select(SalePrice.Adj, LotArea.Adj, LotFrontage, GrLivArea.Adj, TotalBsmtSF) %>%
+  gather(variable, value, -SalePrice.Adj) %>% 
+  ggplot(., aes(value, SalePrice.Adj)) + 
+  ggtitle("Some Interesting Independent Variables") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4)
+  # theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+
+```{r}
+train  %>%
+  mutate(SalePrice.Adj = SalePrice / 10000) %>% 
+  dplyr::select(SalePrice.Adj, OverallQual, OverallCond, Neighborhood, BedroomAbvGr, FullBath, HalfBath) %>%
+  gather(variable, value, -SalePrice.Adj) %>% 
+  ggplot(., aes(value, SalePrice.Adj)) + 
+  ggtitle("Some Interesting Independent Variables") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4)
+```
+
+
+```{r}
+train  %>%
+  mutate(SalePrice.Adj = SalePrice / 10000, 
+         GrLivArea.Adj = GrLivArea / 100, 
+         LotArea.Adj = LotArea / 100) %>% 
+  dplyr::select(SalePrice.Adj, OverallQual, OverallCond, Neighborhood, BedroomAbvGr, FullBath, HalfBath, 
+         LotArea.Adj, LotFrontage, GrLivArea.Adj, TotalBsmtSF) %>%
+  gather(variable, value) %>% 
+  ggplot(., aes(value)) + 
+  ggtitle("Distribution of Interesting Independent Variables") + 
+  geom_histogram(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue", 
+             stat = "count") + 
+  theme(axis.text.x = element_blank()) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4)
 ```
 
 
 
 ```{r}
-# Focus on preferred predictors
-train %>% 
-  ggplot() + 
-  geom_point(aes(LotArea, SalePrice)) 
-train %>% 
-  ggplot() + 
-  geom_point(aes(OverallCond, SalePrice)) 
-train %>% 
-  ggplot() + 
-  geom_point(aes(OverallQual, SalePrice)) 
+train  %>%
+  mutate(SalePrice.Adj = SalePrice / 10000, 
+         GrLivArea.Adj = GrLivArea / 100, 
+         LotArea.Adj = LotArea / 100) %>% 
+  dplyr::select(SalePrice.Adj, OverallQual, OverallCond, Neighborhood, BedroomAbvGr, FullBath, HalfBath, 
+         LotArea.Adj, LotFrontage, GrLivArea.Adj, TotalBsmtSF) %>%
+  gather(variable, value) %>% 
+  ggplot(., aes(value)) + 
+  ggtitle("Distribution of Interesting Independent Variables") + 
+  geom_density(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  theme(axis.text.x = element_blank()) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4)
 ```
 
 
-Kaggle username is "zacharypalmore" and my score is 
 
+
+```{r}
+# Derive a correlation matrix for any three quantitative variables
+train %>% 
+  dplyr::select(SalePrice, LotArea, OverallQual, OverallCond) %>% 
+  cor() %>% 
+  as.matrix()
+```
+
+
+```{r}
+cor.test(train$SalePrice, train$OverallCond, conf.level = 0.80)
+cor.test(train$SalePrice, train$OverallQual, conf.level = 0.80)
+cor.test(train$SalePrice, train$LotArea, conf.level = 0.80)
+```
+
+
+There should be no worries about familywise errors which is the probability of making a false discovery (in other words, type 1 errors) because the values are relatively intuitive and easily interpreted as right or wrong. For example, a false rejection of the null hypothesis in the case of LotArea would likely mean that we conclude that greater lot sizes did not have an effect on sale price when we know this to be false. We should expect that for almost any of these variables an increase in something considered good or valuable by most people would result in an increase in sales price.  
+
+Meanwhile our variables could use some help and it is doubtful that many are beneficial to use in predicting sales price. In some of the most interesting variables that we thought would have the most influence over sales price, many are right skewed heavily. This will cause the model to predict higher than observed values if not accounted for.  
+
+The three variables we expect to perform best are LotArea, OverallQual, and OverallCond. Their correlations are completely different. OverallQual had the strongest correlation with SalePrice at about 0.79 which makes sense given that most people would consider it important to think about the overall quality of the home before agreeing to purchase it. However, there is still plenty of room for misinterpretation in any of these variables. 
+
+
+### Section 2: Linear Algebra and Correlation
+
+```{r}
+cor.mtx <- train %>% 
+  dplyr::select(SalePrice, LotArea, OverallQual, OverallCond) %>% 
+  cor() %>% 
+  as.matrix()
+pcn.mtx <- solve(cor.mtx)
+rdu.mtx <- cor.mtx %*% pcn.mtx
+lud.mtx <- lu.decomposition(rdu.mtx)
+cor.mtx
+pcn.mtx
+rdu.mtx
+lud.mtx
+```
+
+
+### Section 3: Calculus-Based Probability & Statistics
+
+
+```{r}
+fd.exp <- fitdistr(train$LotArea, densfun = "exponential")
+y <- fd.exp$estimate
+rate <- 1/y
+n <- rexp(1000, rate)
+par(mfrow = c(1,2))
+hist(train$LotArea, breaks = 75, main = "Origional")
+hist(n, breaks = 75, main = "Exponential")
+```
+
+
+
+```{r}
+# 5th and 95th Percentiles 
+print(paste("CDF Percentile =", signif(qexp(c(0.05, 0.95), rate = rate), 3)))
+# 95% confidence interval 
+print(paste("95% Confidence =",round((qnorm(c(0.025, 0.975),
+      mean=mean(train$LotArea), sd=sd(train$LotArea))), 3)))
+print(paste("Empirical =", round(quantile(train$LotArea, c(0.05, 0.95)), 3)))
+```
+
+The 5th and 95th percentiles differ from CDF to Empirical. Our histogram shows the exponential distribution spreads itself more normally than the original. From the 95% confidence calculation we have the range -9046.092 to 30079.748. This is completely unrealistic of the variable given that lot area is not normally distributed and is also always positive (otherwise you have nothing to sell). Alternatively we have the empirically calculated range 3311.7 to 17401.15 which is larger but more realistic. 
+
+
+### Section 4: Modeling
+
+```{r}
+mod1 <- lm(SalePrice~LotArea + OverallQual, train)
+summary(mod1)
+par(mfrow = c(2,2))
+plot(mod1)
+```
+
+This model was meant to elucidate the behavior of two of the most likely variables thought to influence sales price. Of course, this could be improved since we have plenty of room to do so. Ignoring the problem outliers in our Residuals vs Leverage plot as well as the sinking Scale-Location plot, we have close enough to normal set to build on (though declaring it normal is a stretch here too given the tails). Interestingly, our $R^2$ is moderately strong at about 0.659. 
+
+
+```{r}
+mod2.lm <- lm(SalePrice ~ LotArea + 
+                Neighborhood + 
+                LotFrontage + 
+                OverallQual + 
+                OverallCond + 
+                GrLivArea + 
+                HalfBath + 
+                FullBath + 
+                TotRmsAbvGrd + 
+                TotalBsmtSF + 
+                YearRemodAdd + 
+                YearBuilt + 
+                Fireplaces + 
+                GarageFinish + 
+                PavedDrive + 
+                GarageArea + 
+                GarageYrBlt +
+                GarageCars + 
+                PoolArea + 
+                KitchenAbvGr + 
+                KitchenQual + 
+                SaleCondition + 
+                SaleType +
+                factor(OverallQual) + 
+                LandSlope + 
+                rexp(LotArea) +
+                rexp(LotFrontage) + 
+                rexp(GrLivArea) + 
+                rexp(TotRmsAbvGrd) + 
+                rexp(TotalBsmtSF) +
+                rexp(GarageArea) 
+              , train)
+mod2.both <- stepAIC(mod2.lm, trace = F, direction = "both")
+mod2.call <- summary(mod2.both)$call
+mod2 <- lm(mod2.call[2], train)
+summary(mod2)
+plot(mod2)
+```
+
+
+The goal in this model was to add any variables to the plot we thougth might influence the sales price at then see if there any new trends we to be noticed and there are. Our initial expectation is at least partially wrong. We missed out on several beneficial variables (and may have missed more than what is listed here). Many of these predictors are not significant or particularly useful in predicting sales price. We select those that are significant and clean them up a bit before creating our third model. 
+
+
+```{r}
+train$LotFrontage[is.na(train$LotFrontage)] <- median(train$LotFrontage, na.rm = T)
+train$GarageCars[is.na(train$GarageCars)] <- median(train$GarageCars, na.rm = T)
+train$TotalBsmtSF[is.na(train$TotalBsmtSF)] <- median(train$TotalBsmtSF, na.rm = T)
+train$SaleType[is.na(train$SaleType)] <- "WD"
+train$KitchenQual[is.na(train$KitchenQual)] <- "TA"
+train$GarageFinish[is.na(train$GarageFinish)] <- "Unf"
+mod3 <- lm(SalePrice ~ 
+             LandSlope + 
+             OverallQual + 
+             KitchenQual + 
+             KitchenAbvGr + 
+             GarageCars + 
+             GarageFinish + 
+             Fireplaces + 
+             YearBuilt + 
+             TotalBsmtSF + 
+             TotRmsAbvGrd +
+             SaleType + 
+             GrLivArea + 
+             OverallCond + 
+             LotFrontage + 
+             Neighborhood 
+             , train)
+summary(mod3)
+par(mfrow = c(2,2))
+plot(mod3)
+```
+
+
+Though is it rudamentary at best, it performs rather well without needing all of the variables (or further cleaning). Our $R^2$ value is hovering around 0.84 and this is with a substantial amount of leverage and highly unorganized residuals and data. Several of the variables remain in their original data type when others would be better suited to modeling. It would also be interesting to include other variables in this model because again, we simply pulled from the previous one to scrap together a third model. We finish by making predictions based on this third model, even though the second one performed better in some respects such as their coefficients, $R^2$ and F-statistics. 
+
+
+```{r}
+# Make predictions
+df <- test %>% 
+  dplyr::select(
+            LandSlope,
+             OverallQual, 
+             KitchenQual, 
+             KitchenAbvGr, 
+             GarageCars,
+             GarageFinish, 
+             Fireplaces, 
+             YearBuilt, 
+             TotalBsmtSF,  
+             TotRmsAbvGrd, 
+             SaleType, 
+             GrLivArea, 
+             OverallCond, 
+             LotFrontage,  
+             Neighborhood)
+# impute missing values 
+df$LotFrontage[is.na(df$LotFrontage)] <- median(df$LotFrontage, na.rm = T)
+df$GarageCars[is.na(df$GarageCars)] <- median(df$GarageCars, na.rm = T)
+df$TotalBsmtSF[is.na(df$TotalBsmtSF)] <- median(df$TotalBsmtSF, na.rm = T)
+df[df=='NA'] <- NA
+df$SaleType[is.na(df$SaleType)] <- "WD"
+df$KitchenQual[is.na(df$KitchenQual)] <- "TA"
+df$GarageFinish[is.na(df$GarageFinish)] <- "Unf"
+predictions <- data.frame(test$Id, predict(mod3, df))
+colnames(predictions) <- c("Id","SalePrice")
+```
+
+
+
+```{r eval=F}
+# Export to csv for kaggle submission 
+write.csv(predictions, "C:/data/predictions.csv")
+```
+
+
+My Kaggle username is "zacharypalmore" and my score is 0.17215. This could have been greatly improved if I had imputed with realistic values removed missing values prior to each model, considered other variables beyond these initial thoughts, and much more. Honestly, I am surprised it turned out as well as it did given the circumstances. 
 
