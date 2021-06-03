@@ -27,13 +27,13 @@ mytimeseries <- ts(tute1[,-1], start=1981, frequency=4)
 # c) Construct time series plots of each of the three series. 
 # Check what happens when you don't include facets=TRUE.
 
-# With facets=TRUE.
+# A: With facets=TRUE.
 autoplot(mytimeseries, facets=TRUE)
 
-# With facets=FALSE.
+# A: With facets=FALSE.
 autoplot(mytimeseries, facets=FALSE)
 
-# Each series is plotted on the same plot with the same axes when facets=FALSE. 
+# A: Each series is plotted on the same plot with the same axes when facets=FALSE. 
 # Otherwise, facets=TRUE displays each series as its own plot with its own axis.
 
 
