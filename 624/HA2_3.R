@@ -66,5 +66,11 @@ ggAcf(myts)
 # indicate seasonal increases and decreases in sales. This is not observed and thus, 
 # we confirm there is little to no seasonality. 
 
+# A: This category was that of pharmaceutical, cosmetics, and toiletry goods. It makes
+# sense that this type of good would have a boost in sales towards the end of the year 
+# due to holidays, end of year sales, discounts, and other factors such as New Year's 
+# resolutions and restocking of toiletries. We believe based on our experience, these 
+# trends are reasonably justified. 
+
 
 
