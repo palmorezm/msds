@@ -1,8 +1,7 @@
-# HA 3.1
+# HA 7.1
 
 # Packages:
 library(forecast)
-library(dplyr)
 library(fma)
 library(fpp2)
 
