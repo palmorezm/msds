@@ -32,6 +32,8 @@ autoplot(gas)
 
 # b) What is the frequency of each series? Hint: apply the frequency() function.
 
+?frequency
+
 frequency(gold)
 frequency(woolyrnq)
 frequency(gas)

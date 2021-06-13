@@ -63,7 +63,7 @@ data.frame(index, n, outlier=n+500)
 
 # A: Alternatively we could index it
 
-plastics[42] <- plastics[42] + 500
+plastics[26] <- plastics[26] + 500
 dec2 <- plastics %>%
   decompose(type='multiplicative')
 autoplot(dec2, series='Data') +
@@ -87,7 +87,7 @@ autoplot(dec3, series='Data') +
 plastics[58] <- plastics[58] + 500
 dec4 <- plastics %>%
   decompose(type='multiplicative')
-autoplot(plastics, series='Data') +
+autoplot(dec3, series='Data') +
   autolayer(seasadj(dec4), series='Adj. Outlier 2')
 
 # A: Outliers near the beginning and end of the series appear to have a greater 
