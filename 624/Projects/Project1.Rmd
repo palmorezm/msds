@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
+Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
 
 ```{r}
 # Packages
