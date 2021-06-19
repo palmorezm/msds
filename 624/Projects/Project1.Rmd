@@ -1,0 +1,42 @@
+---
+title: "Project 1"
+author: "Group 3"
+date: "6/19/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
+
+```{r}
+# Packages
+library(dplyr)
+# Data source
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
+data <- data %>% 
+  rename(SeriesIND = ï..SeriesInd) 
+head(data, 5)
+```
+
+Our results will be in an excel spreadsheet containing one sheet (or tab) for each group. Predictions will be made for each of these groups based on the most appropriate model developed in this analysis. Each sheet will also have the variable *SeriesIND* listed ascending order for review. 
+
+## Analysis
+
+
+
+
+## Prediction
+
+
+
+
+
+
+
+
+
