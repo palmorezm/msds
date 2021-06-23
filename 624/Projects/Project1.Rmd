@@ -15,7 +15,7 @@ Given an unknown data source with several periods, we attempt to predict the nex
 
 ```{r}
 # Packages
-library(dplyr)
+library(tidyverse)
 # Data source
 data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
 data <- data %>% 
@@ -24,6 +24,65 @@ head(data, 5)
 ```
 
 Our results will be in an excel spreadsheet containing one sheet (or tab) for each group. Predictions will be made for each of these groups based on the most appropriate model developed in this analysis. Each sheet will also have the variable *SeriesIND* listed ascending order for review. 
+
+```{r}
+# Grouping
+S01 <- data %>% 
+  filter(group == "S01")
+S02 <- data %>% 
+  filter(group == "S02")
+S03 <- data %>% 
+  filter(group == "S03")
+S04 <- data %>% 
+  filter(group == "S04")
+S05 <- data %>% 
+  filter(group == "S05")
+S06 <- data %>% 
+  filter(group == "S06")
+
+# Imputation by function - missing something? lapply/sapply may work 
+soximp <- function(df){
+  for (i in colnames(df)){
+    if (sum(is.na(df[[i]])) !=0){
+      df[[i]][is.na(df[[i]])] <- median(df[[i]], na.rm=TRUE)
+    }
+  }
+}
+
+# Imputation loops for each group by median 
+for (i in colnames(S01)){
+  if (sum(is.na(S01[[i]])) != 0){
+    S01[[i]][is.na(S01[[i]])] <- median(S01[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S02)){
+  if (sum(is.na(S02[[i]])) != 0){
+    S02[[i]][is.na(S02[[i]])] <- median(S02[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S03)){
+  if (sum(is.na(S03[[i]])) != 0){
+    S03[[i]][is.na(S03[[i]])] <- median(S03[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S04)){
+  if (sum(is.na(S04[[i]])) != 0){
+    S04[[i]][is.na(S04[[i]])] <- median(S04[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S05)){
+  if (sum(is.na(S05[[i]])) != 0){
+    S05[[i]][is.na(S05[[i]])] <- median(S05[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S06)){
+  if (sum(is.na(S06[[i]])) != 0){
+    S06[[i]][is.na(S06[[i]])] <- median(S06[[i]], na.rm = TRUE)
+  } 
+}
+```
+
+
 
 ## Analysis
 
