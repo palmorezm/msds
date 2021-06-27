@@ -1,0 +1,100 @@
+---
+title: "Project 1"
+output:
+  html_document:
+    df_print: paged
+---
+
+
+
+```{r, warning=FALSE, message=FALSE}
+library(readxl)
+library(dplyr)
+library(forecast)
+library(fma)
+library(tsoutliers)
+library(tidyverse)
+```
+
+
+```{r}
+data <- read_excel("data.xlsx", sheet="S04", skip=2)
+df.1 <- data %>%
+          select(c('SeriesInd', 'Var01')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var01)
+
+df.2 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02)
+
+data <- read_excel("data.xlsx", sheet="S05", skip=2)
+df.3 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02) 
+
+df.4 <- data %>%
+          select(c('SeriesInd', 'Var03')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var03)
+
+data <- read_excel("data.xlsx", sheet="S06", skip=2)
+df.5 <- data %>%
+          select(c('SeriesInd', 'Var05')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var05)
+
+df.6 <- data %>%
+          select(c('SeriesInd', 'Var07')) %>%
+          filter(SeriesInd<= 43021) %>%
+          rename(ts = Var07)
+all_df <- list(df.1, df.2, df.3, df.4, df.5, df.6)
+```
+
+
+
+```{r}
+build_model <- function(train) {
+  model <- train %>%
+              tsclean() %>%
+              auto.arima()
+  return(model)
+}
+
+create_plot <- function(model, test, var){
+  predict1 <- forecast(model, h=488)
+  mape <- accuracy(predict1, test)["Test set", "MAPE"]
+  title <- sprintf("MAPE of %s is %f" , var, mape)
+  predict2 <- forecast(model, h=140)
+  return(autoplot(predict2, main=title))
+}
+
+iterate <- function(df_list){
+  variables <- list("S04 Var01", "S04 Var02", "S05 Var02", "S05 Var03", "S06 Var05", "S06 Var07")
+  plot_list = list()
+  i <- 1
+  for (x in df_list){
+    train <- window(x$ts, end=1135)
+    test <- window(x$ts, start=1136)
+    model <- build_model(train)
+    plot_list[[i]] <- create_plot(model, test, variables[i])
+    i <- i + 1
+  }
+return(gridExtra::grid.arrange(grobs = plot_list))
+}
+```
+
+
+```{r}
+iterate(all_df)
+```
+
+
+
+
+
+
+
+

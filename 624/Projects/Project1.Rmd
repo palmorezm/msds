@@ -97,10 +97,12 @@ for (i in colnames(S06)){
 Before we begin, the data is filtered to extract each time series by group. This isolates the Var01, Var02, Var03, Var05, and Var07 variables associated with groups S01, S02, and so on. Then, with each group and its respective variables’ behavior isolated, we clean and adjust the data to make use of it in the analysis. Once we determine the most appropriate models to forecast the proper variable in each group, we evaluate the results of our predictions. Our final forecasts are captured in the excel spreadsheet attached. 
 
 ## Analysis
-
-We began by addressing missing values. Given 10,572 observations, about 8% of each variable was missing. Several methods were tried to address this but the best were Kalman smoothing and simple imputation by the median of each ‘Var0X’ variable to fill in where appropriate. The ‘SeriesInd’ numeric date was also converted from its serial number form to a common date-time series. We then examined each group’s variables separately.
-
+### Subset S01, S02, S03 from the provided data.
+Subset Var01 and Var 02 from S01.
+Subset Var02 and Var 03 from S02.
+Subset Var05 and Var 07 from S03.
 ```{r}
+
 library(fpp2)
 
 #S01
@@ -144,12 +146,13 @@ S03_Var05<-S03_Var05[1:1625,]
 
 S03_Var07<-S03 %>%select(Var07)
 S03_Var07<-S03_Var07[1:1625,]
+
+
+
 ```
 
 
-
-Statistical summaries, box plots, and histograms were run on each group to evaluate where the average value of each variable was, if its distribution was skewed, determine whether outliers were present, and provide other descriptors of the data. These informed us that the average value (mean) of the variables are similar but their range varies widely with Var05 at 186.01 while Var02 covers a range of 479 million. Our analysis solves this potential problem by focusing on variables of the same scales as the intended target.
-
+### Clean NA from the subset data with imputeTS
 ```{r}
 library(imputeTS)
 # Summarize the subset data.
@@ -185,6 +188,11 @@ summary(S03_Var07)
 summary(S03_Var05)
 
 # NA  no longer exists
+```
+
+
+### Convert variables to time series.
+```{r}
 ts_S01_Var01<-ts(S01_Var01)
 ts_S01_Var02<-ts(S01_Var02)
 ts_S02_Var02<-ts(S02_Var02)
@@ -205,8 +213,13 @@ autoplot(ts_S02_Var02)
 autoplot(ts_S02_Var03)
 autoplot(ts_S03_Var05)
 autoplot(ts_S03_Var07)
+```
 
 
+
+### Verify skewness and Outliers
+
+```{r}
 par(mfrow = c(1,2))
 hist(ts_S01_Var01)
 boxplot(ts_S01_Var01)
@@ -234,19 +247,167 @@ boxplot(ts_S03_Var07)
 ```
 
 
-
-Additionally, all but group S03 of the histograms exhibited right skewness, and Var02 and Var03 had outliers. These were replaced using Friedman’s super smoothing method. Due to the randomness of these variables, determining outliers was difficult and there is a presence of additional overly influential points as determined using Cook's distance formula. We acknowledge the presence of these points but are unable to alter them as they are likely intentional based on the patterns in the data. For reference, the observations are shown in the scatter plot with color coding by each group. 
-
+Except for the S03, rest of the histgrams have right skewness, and Var02 and Var03 have some outliers. For V02, the outliers overlaps, it seems that they are not caused by mistake. It is more likely caused by shock. on the other hand, the Var03 has one point of outlier. Therefore, we assume the outlier from Var03 is caused by mistake.We use tsclean() function to get rid ofthe outlier from Var03.
 
 ```{r}
+ts_S02_Var03<-tsclean(ts_S02_Var03)
+
+boxplot(ts_S02_Var03) # the outlier from Var03 is cleaned.
+```
+
+### Seasonality
+ndiffs test for ts_S01_Var01.
+```{r}
+
+ndiffs(ts_S01_Var01)
+ts_S01_Var01%>%diff()%>%ndiffs()
+
+
+```
+The ndiffs test tells that ts_S01_Var01 requires 1 difference.
+
+
+ndiffs test for ts_S01_Var02.
+```{r}
+ndiffs(ts_S01_Var02)
+ts_S01_Var02%>%diff()%>%ndiffs()
+
+```
+
+
+ndiffs test for ts_S02_Var02.
+```{r}
+ndiffs(ts_S02_Var02)
+ts_S02_Var02%>%diff()%>%ndiffs()
+
+
+
+```
+
+
+ndiffs test for ts_S02_Var03.
+```{r}
+ndiffs(ts_S02_Var03)
+ts_S02_Var02%>%diff()%>%ndiffs()
+
+
+```
+
+ndiffs test for ts_S03_Var05.
+```{r}
+ndiffs(ts_S03_Var05)
+ts_S03_Var05%>%diff()%>%ndiffs()
+
+
+```
+
+ndiffs test for ts_S03_Var07.
+```{r}
+ndiffs(ts_S03_Var07)
+ts_S03_Var07%>%diff()%>%ndiffs()
+
 
 ```
 
 
 
 
+According to the ndiffs test, all the variables above require difference.
+
+
 ## Prediction
 
+Build training data
+
+```{r}
+train0101<-window(ts_S01_Var01, end=as.integer(length(ts_S01_Var01)*0.7))
+train0102<-window(ts_S01_Var02, end=as.integer(length(ts_S01_Var02)*0.7))
+train0202<-window(ts_S02_Var02, end=as.integer(length(ts_S02_Var02)*0.7))
+train0203<-window(ts_S02_Var03, end=as.integer(length(ts_S02_Var03)*0.7))
+train0305<-window(ts_S03_Var05, end=as.integer(length(ts_S03_Var05)*0.7))
+train0307<-window(ts_S03_Var07, end=as.integer(length(ts_S03_Var07)*0.7))
+```
+
+
+test set
+```{r}
+length(ts_S01_Var01)*0.3
+```
+We chose 30% of the variables as the test data.
+
+
+
+### MAPE Value
+```{r}
+library(dplyr)
+library(forecast)
+AA_fit0101 <- train0101 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0102 <- train0102 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0202 <- train0202 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0203 <- train0203 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0305 <- train0305 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0307 <- train0307 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+
+
+
+mape0101<-accuracy(AA_fit0101,ts_S01_Var01)["Test set", "MAPE"]
+mape0101
+
+mape0102<-accuracy(AA_fit0102,ts_S01_Var02)["Test set","MAPE"]
+mape0102
+
+mape0202<-accuracy(AA_fit0202,ts_S02_Var02)["Test set", "MAPE"]
+mape0202
+
+mape0203<-accuracy(AA_fit0203,ts_S02_Var03)["Test set", "MAPE"]
+mape0203
+
+mape0305<-accuracy(AA_fit0305,ts_S03_Var05)["Test set", "MAPE"]
+mape0101
+
+mape0307<-accuracy(AA_fit0307,ts_S03_Var07)["Test set", "MAPE"]
+mape0307
+```
+
+
+```{r}
+AA0101<-auto.arima(ts_S01_Var01, stepwise = F, approximation = F, seasonal = T)
+fcast0101<-forecast(AA0101,h=140)
+plot(fcast0101)
+
+AA0102<-auto.arima(ts_S01_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0102<-forecast(AA0102,h=140)
+plot(fcast0102)
+
+AA0202<-auto.arima(ts_S02_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0202<-forecast(AA0202,h=140)
+plot(fcast0202)
+
+
+AA0203<-auto.arima(ts_S02_Var03, stepwise = F, approximation = F, seasonal = T)
+fcast0203<-forecast(AA0203,h=140)
+plot(fcast0203)
+
+AA0305<-auto.arima(ts_S03_Var05, stepwise = F, approximation = F, seasonal = T)
+fcast0305<-forecast(AA0305,h=140)
+plot(fcast0305)
+
+
+
+AA0307<-auto.arima(ts_S03_Var07, stepwise = F, approximation = F, seasonal = T)
+fcast0307<-forecast(AA0307,h=140)
+plot(fcast0307)
+```
+
+
+```{r}
+fcast0101
+fcast0102
+fcast0202
+fcast0203
+fcast0305
+fcast0307
+```
 
 
 
