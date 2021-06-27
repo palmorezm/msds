@@ -6,8 +6,10 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F, warning=F, message=F)
+knitr::opts_chunk$set(include=F, echo = F, warning=F, message=F)
 ```
+
+**If running, remove include=F, begin with Appendix, and adjust file locations**
 
 ## Introduction
 
