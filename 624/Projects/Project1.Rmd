@@ -6,12 +6,12 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = F, warning=F, message=F)
 ```
 
 ## Introduction
 
-Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
+Given an unknown data source with several groups, we attempt to predict the next 140 values of a times series data set based on 1622 entries provided on multiple events. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and all associated code to produce the models can be found in the attached markdown file. The data with its first five rows, are shown below.  
 
 ```{r}
 # Packages
@@ -19,13 +19,25 @@ library(tidyverse)
 # Data source
 data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
 data <- data %>% 
-  rename(SeriesIND = ï..SeriesInd) 
+  rename(SeriesInd = ï..SeriesInd) 
 head(data, 5)
 ```
 
-Our results will be in an excel spreadsheet containing one sheet (or tab) for each group. Predictions will be made for each of these groups based on the most appropriate model developed in this analysis. Each sheet will also have the variable *SeriesIND* listed ascending order for review. 
+We create forecasts for two preselected variables within each of six predetermined groups. These groups are denoted S01, S02, S03, S04, S05, and S06 respectively. There are five variables within each group that we have to work with. They are Var01, Var02, Var03, Var05, and Var07 respectively. Our date variable ‘SeriesInd,’ is displayed in its numeric serial number form calculated with Excel. Although we do not know what the variables stand for, we can develop models to try and forecast their behavior. This chart contains a breakdown of which variables are forecast in each group.
 
 ```{r}
+# Chart
+varsbygroup <- data.frame(matrix(c("S01", "S02", "S03",
+                                   "S04", "S05", "S06", 
+                                   "Var01", "Var02", "Var05",
+                                   "Var01", "Var02", "Var05",
+                                   "Var02", "Var03", "Var07",
+                                   "Var02", "Var03", "Var07"),
+                                 nrow = 6, ncol=3))
+colnames(varsbygroup) <- c("Group", "Variable1", "Variable2")
+varsbygroup %>% 
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = T)
 # Grouping
 S01 <- data %>% 
   filter(group == "S01")
@@ -82,11 +94,155 @@ for (i in colnames(S06)){
 }
 ```
 
-
+Before we begin, the data is filtered to extract each time series by group. This isolates the Var01, Var02, Var03, Var05, and Var07 variables associated with groups S01, S02, and so on. Then, with each group and its respective variables’ behavior isolated, we clean and adjust the data to make use of it in the analysis. Once we determine the most appropriate models to forecast the proper variable in each group, we evaluate the results of our predictions. Our final forecasts are captured in the excel spreadsheet attached. 
 
 ## Analysis
 
-eidting test
+We began by addressing missing values. Given 10,572 observations, about 8% of each variable was missing. Several methods were tried to address this but the best were Kalman smoothing and simple imputation by the median of each ‘Var0X’ variable to fill in where appropriate. The ‘SeriesInd’ numeric date was also converted from its serial number form to a common date-time series. We then examined each group’s variables separately.
+
+```{r}
+library(fpp2)
+
+#S01
+S01<-subset(data, group == "S01", select = c(SeriesInd, Var01, Var02))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S01)
+
+# Subset Var01 and Var02 from S01.
+S01_Var01<-S01 %>%select(Var01)
+S01_Var01<-S01_Var01[1:1625,]
+
+
+S01_Var02<-S01 %>%select(Var02)
+S01_Var02<-S01_Var02[1:1625,]
+
+
+#S02
+S02<-subset(data, group == "S02", select = c(SeriesInd, Var02, Var03))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S02)
+
+# Subset Var02 and Var03 from S02.
+S02_Var02<-S02 %>%select(Var02)
+S02_Var02<-S02_Var02[1:1625,]
+
+
+S02_Var03<-S02 %>%select(Var03)
+S02_Var03<-S02_Var03[1:1625,]
+
+
+
+#S03
+S03<-subset(data, group == "S03", select = c(SeriesInd, Var05, Var07))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S03)
+
+# Subset Var05 and Var07 from S03.
+S03_Var05<-S03 %>%select(Var05)
+S03_Var05<-S03_Var05[1:1625,]
+
+
+S03_Var07<-S03 %>%select(Var07)
+S03_Var07<-S03_Var07[1:1625,]
+```
+
+
+
+Statistical summaries, box plots, and histograms were run on each group to evaluate where the average value of each variable was, if its distribution was skewed, determine whether outliers were present, and provide other descriptors of the data. These informed us that the average value (mean) of the variables are similar but their range varies widely with Var05 at 186.01 while Var02 covers a range of 479 million. Our analysis solves this potential problem by focusing on variables of the same scales as the intended target.
+
+```{r}
+library(imputeTS)
+# Summarize the subset data.
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# according to the summary of subsets, 
+# S01_Var01 has 5 NAs
+# S01_Var02 has 3 NAs
+# S02_Var02 has 3 NAs
+# S02_Var03 has 7 NAs
+# S03_Var07 has 7 NAs
+# S03_Var05 has 7 NAs
+
+# Using Kalman Smoothing to impute NAs.
+S01_Var01<-na_kalman(S01_Var01)
+S01_Var02<-na_kalman(S01_Var02)
+S02_Var02<-na_kalman(S02_Var02)
+S02_Var03<-na_kalman(S02_Var03)
+S03_Var05<-na_kalman(S03_Var05)
+S03_Var07<-na_kalman(S03_Var07)
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# NA  no longer exists
+ts_S01_Var01<-ts(S01_Var01)
+ts_S01_Var02<-ts(S01_Var02)
+ts_S02_Var02<-ts(S02_Var02)
+ts_S02_Var03<-ts(S02_Var03)
+ts_S03_Var05<-ts(S03_Var05)
+ts_S03_Var07<-ts(S03_Var07)
+
+str(ts_S01_Var01)
+str(ts_S01_Var02)
+str(ts_S02_Var02)
+str(ts_S02_Var03)
+str(ts_S03_Var05)
+str(ts_S03_Var07)
+
+autoplot(ts_S01_Var01)
+autoplot(ts_S01_Var02)
+autoplot(ts_S02_Var02)
+autoplot(ts_S02_Var03)
+autoplot(ts_S03_Var05)
+autoplot(ts_S03_Var07)
+
+
+par(mfrow = c(1,2))
+hist(ts_S01_Var01)
+boxplot(ts_S01_Var01)
+
+par(mfrow = c(1,2))
+hist(ts_S01_Var02)
+boxplot(ts_S01_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var02)
+boxplot(ts_S02_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var03)
+boxplot(ts_S02_Var03)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var05)
+boxplot(ts_S03_Var05)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var07)
+boxplot(ts_S03_Var07)
+
+```
+
+
+
+Additionally, all but group S03 of the histograms exhibited right skewness, and Var02 and Var03 had outliers. These were replaced using Friedman’s super smoothing method. Due to the randomness of these variables, determining outliers was difficult and there is a presence of additional overly influential points as determined using Cook's distance formula. We acknowledge the presence of these points but are unable to alter them as they are likely intentional based on the patterns in the data. For reference, the observations are shown in the scatter plot with color coding by each group. 
+
+
+```{r}
+
+```
+
+
 
 
 ## Prediction
