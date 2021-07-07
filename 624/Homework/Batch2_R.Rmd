@@ -1,0 +1,53 @@
+---
+title: "Homework Set 2 in R"
+subtitle: "DATA 624-01 Group 3"
+author: "Zachary Palmore"
+date: "7/7/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+KJ 6.3
+
+A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors), measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
+
+**Question**
+
+(a) Start R and use these commands to load the data: 
+> library(AppliedPredictiveModeling)
+> data(chemicalManufacturingProcess)
+
+**Code**
+
+```{r}
+#Load the data
+data(ChemicalManufacturingProcess)
+df = data.frame(ChemicalManufacturingProcess)
+head(df)
+```
+
+**Question**
+
+(b) A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
+
+**Question**
+
+(c) Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.
+
+**Question**
+
+(d) Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
+
+**Question**
+
+(e) Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list? 
+
+**Question**
+
+(f) Explore the relationships between each of the top predictors and the response. How could this information be helpful in improving yield in future runs of the manufacturing process?
+
+
+
