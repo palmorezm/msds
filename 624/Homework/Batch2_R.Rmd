@@ -24,12 +24,15 @@ Start R and use these commands to load the data:
 > library(AppliedPredictiveModeling)
 > data(chemicalManufacturingProcess)
 Code
+
 ```{r}
+library(AppliedPredictiveModeling)
 #Load the data
 data(ChemicalManufacturingProcess)
 df = data.frame(ChemicalManufacturingProcess)
 head(df)
 ```
+
 Response
 The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. yield contains the percent yield for each run.
 
