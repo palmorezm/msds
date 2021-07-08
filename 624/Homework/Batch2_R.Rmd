@@ -52,8 +52,11 @@ Response
 Part C 
 Question
 Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.
+
 Code
-```{r correlations}
+
+
+```{r correlations, eval=F}
 #Filter to only Yield and sort in descending order
 yield_corr = filter(melted_cormat_df, Var2 == "Yield")
 yield_corr$absvalue = abs(yield_corr$value)
@@ -61,9 +64,19 @@ yield_corr2 = yield_corr[order(-yield_corr[,4]),]
 yield_corr2
 ```
 
-```{r modeling}
+
+
+```{r modeling, eval=F}
 #Create the regression model
-lmyield = lm(Yield~ManufacturingProcess32 + ManufacturingProcess36 + ManufacturingProcess09 + ManufacturingProcess13 + BiologicalMaterial02 + BiologicalMaterial06 + BiologicalMaterial03, data=train)
+library(AppliedPredictiveModeling)
+lmyield = lm(Yield~ManufacturingProcess32 + 
+               ManufacturingProcess36 + 
+               ManufacturingProcess09 + 
+               ManufacturingProcess13 + 
+               BiologicalMaterial02 + 
+               BiologicalMaterial06 + 
+               BiologicalMaterial03, 
+             data=train)
 summary(lmyield)
 ```
 Response
@@ -77,14 +90,14 @@ Part D
 Question
 Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
 Code
-```{r}
+```{r, eval=F}
 #predict with the test data
-predict(lmyield, newdata = test, interval = ‘prediction’)
+predict(lmyield, newdata = test, interval ='prediction')
 ```
 
-```{r}
+```{r, eval=F}
 #Predict with the test data
-lmyield_test = predict(lmyield, newdata = test, interval = 'prediction')
+lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
 lmyield_test_df$actual = test$Yield
 lmyield_test_df
@@ -133,19 +146,20 @@ Question
 Tune several models on these data. An example is shown in the code. Which models appear to give the best performance? Does MARS select the informative predictors (those named X1–X5)?
 
 Code 
-```{r KNN Model}
+```{r KNN Model, eval=F}
 library(caret) 
 knnModel <- train(x = trainingData$x, y = trainingData$y, method = "knn", preProc = c("center", "scale"), tuneLength = 10) 
 knnModel
 ```
 
-```{r KNN Predictions}
+```{r KNN Predictions, eval=F}
 knnPred <- predict(knnModel, newdata = testData$x)
 ## The function 'postResample' can be used to get the test set 
 ## performance values 
 postResample(pred = knnPred, obs = testData$y)
 ```
-```{r SVM Model}
+
+```{r SVM Model, eval=F}
 svmModel <- train(x = trainingData$x,
                   y = trainingData$y,
                   method = "svmRadial",
@@ -156,7 +170,7 @@ svmPred <- predict(svmModel, newdata = testData$x)
 postResample(pred = svmPred, obs = testData$y)
 ```
 
-```{r Neural Net Model}
+```{r Neural Net Model, eval=F}
 nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
                         .size=c(1, 10, 15, 20),
                         .bag=FALSE)
@@ -173,7 +187,8 @@ nnetModel
 nnetPred <- predict(nnetModel, newdata = testData$x)
 postResample(pred = nnetPred, obs = testData$y)
 ```
-```{r Model Evaluation}
+
+```{r Model Evaluation, eval=F}
 postResample(pred = nnetPred, obs = testData$y)
 postResample(pred = svmPred, obs = testData$y)
 postResample(pred = marsPred, obs = testData$y)
