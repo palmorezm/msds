@@ -14,9 +14,7 @@ DATA 624-01 Group 3
 Z. Palmore, K. Popkin, K. Potter, C. Nan, J. Ramalingam 
 
 ## KJ 6.3
-A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of
-product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately
-one hundred thousand dollars per batch:
+A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
 
 ### Part A
 #### Question
@@ -26,7 +24,7 @@ Start R and use these commands to load the data:
 
 #### Code
 
-```{r}
+```{r, eval=T}
 library(AppliedPredictiveModeling)
 #Load the data
 data(ChemicalManufacturingProcess)
@@ -42,7 +40,7 @@ The matrix processPredictors contains the 57 predictors (12 describing the input
 A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
 
 #### Code
-```{r}
+```{r, eval=T}
 #Fill in missing values with the median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
@@ -50,11 +48,11 @@ for(i in 1:ncol(df)){
 
 #### Response
 
-Part C 
-Question
+### Part C 
+#### Question
 Split the data into a training and a test set, pre-process the data, and tune a model of your choice from this chapter.
 
-Code
+#### Code
 
 
 ```{r correlations, eval=F}
@@ -80,17 +78,18 @@ lmyield = lm(Yield~ManufacturingProcess32 +
              data=train)
 summary(lmyield)
 ```
-Response
+#### Response
 After splitting the data into a 75% training, 25% test datasets, I chose to build a linear regression model using the top 7 features based on the correlations.
 
 Here are the correlations…
 
 Here is the model.  The R2 of 61% isn’t very good and the only good predictor based on p-values and 0.05 cutoff is ManufacturingProcess32. 
 
-Part D
-Question
+### Part D
+#### Question
 Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
-Code
+
+#### Code
 ```{r, eval=F}
 #predict with the test data
 predict(lmyield, newdata = test, interval ='prediction')
@@ -106,25 +105,32 @@ lmyield_test_df
 lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', lmyield_test_rmse)
 ```
-Response
+
+####Response
+
 Using RMSE as the performance metric, the value if 1.25 as shown below…
 The optimal value of the performance metric for the Test data is 1.25 as shown below…
-Part E
-Question
-Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list? 
-Response
-As shown in the above correlations list the first 7 most correlated features are 4 process features, followed by 3 biological features.  
 
+### Part E
+
+#### Question
+Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list? 
+
+#### Response
+As shown in the above correlations list the first 7 most correlated features are 4 process features, followed by 3 biological features.  
 In reviewing the regression model’s summary, the Process32 and Process36 are the most relevant p-values and the BiologicalMaterial02 feature is the third most relevant.  Note that only the Process32 feature has a p-value < 0.05. 
-Part F
-Question
+
+### Part F
+
+#### Question
 Explore the relationships between each of the top predictors and the response. How could this information be helpful in improving yield in future runs of the manufacturing process?
-Response
+
+#### Response
 Per the previous exploration via correlations and p-values, the process features are topping the list of most relevant features.  This bodes well as these features can be changed (biological ones cannot change), so simulations could be done using the regression model and modified values.
 
 Note that prior to experimenting with process feature value changes, more experimentation is needed on what features to use.  Having an Adjusted R2 on the training data of only 60% and having only one feature in the model summary with a p-value of 0.05 indicates there is room for improvement.  A good next step might be to build the model via forward stepwise or backward stepwise regression.  Or, training on some other model such as Random Forest, could also be used to identify which features are most relevant.
 
-KJ 7.2
+## KJ 7.2
 Friedman (1991) introduced several benchmark data sets created by simulation. One of these simulations used the following nonlinear equation to  create data:  y = 10 sin(πx1x2) + 20(x3 − 0.5)2 + 10x4 + 5x5 + N(0, σ2)  where the x values are random variables uniformly distributed between [0, 1]  (there are also 5 other non-informative variables also created in the simulation).The package mlbench contains a function called mlbench.friedman1 that simulates these data: 
 > library(mlbench)
 > set.seed(200)
@@ -142,16 +148,101 @@ Friedman (1991) introduced several benchmark data sets created by simulation. On
 > testData <- mlbench.friedman1(5000, sd = 1)
 > testData$x <- data.frame(testData$x)
 
-Part A
-Question
+### Part A
+#### Question
 Tune several models on these data. An example is shown in the code. Which models appear to give the best performance? Does MARS select the informative predictors (those named X1–X5)?
 
+
+```{r}
+registerDoParallel()
+registerDoParallel(cores=2)
+getDoParWorkers()
+```
+
+
+
 Code 
-```{r KNN Model, eval=F}
-library(caret) 
-knnModel <- train(x = trainingData$x, y = trainingData$y, method = "knn", preProc = c("center", "scale"), tuneLength = 10) 
+```{r All Models, eval=T}
+library(mlbench)
+library(caret)
+library(AppliedPredictiveModeling)
+library(kernlab)
+library(doParallel) # Used for computation
+library(earth) # Package necessary for marsModel
+registerDoParallel(cores=2)
+getDoParWorkers()
+set.seed(200)
+trainingData <- mlbench.friedman1(200, sd = 1)
+## We convert the ' x ' data from a matrix to a data frame
+## One reason is that this will give the columns names.
+trainingData$x <- data.frame(trainingData$x)
+## Look at the data using
+#featurePlot(trainingData$x, trainingData$y)
+## or other methods.
+## This creates a list with a vector ' y ' and a matrix
+## of predictors ' x ' . Also simulate a large test set to
+## estimate the true error rate with good precision:
+testData <- mlbench.friedman1(5000, sd = 1)
+testData$x <- data.frame(testData$x)
+knnModel <- train(x = trainingData$x, y = trainingData$y, method = "knn", preProc = c("center", "scale"), tuneLength = 10)
+knnPred <- predict(knnModel, newdata = testData$x)
+## The function 'postResample' can be used to get the test set  
+## performance values
+postResample(pred = knnPred, obs = testData$y)
+svmModel <- train(x = trainingData$x,
+                  y = trainingData$y,
+                  method = "svmRadial",
+                  tuneLength=10,
+                  preProc = c("center", "scale"))
+svmPred <- predict(svmModel, newdata = testData$x)
+postResample(pred = svmPred, obs = testData$y)
+nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
+                        .size=c(1, 10, 15, 20),
+                        .bag=FALSE)
+nnetModel <- train(x = trainingData$x,
+                   y = trainingData$y,
+                   method = "avNNet",
+                   tuneGrid = nnetGrid,
+                   preProc = c("center", "scale"),
+                   trace=FALSE,
+                   linout=TRUE,
+                   maxit=500)
+# Neural net may take several minutes
+nnetPred <- predict(nnetModel, newdata = testData$x)
+postResample(pred = nnetPred, obs = testData$y)
+marsGrid <- expand.grid(.degree=1:2,
+                        .nprune=2:20)
+marsModel <- train(x = trainingData$x,
+                   y = trainingData$y,
+                   method = "earth",
+                   tuneGrid = marsGrid,
+                   preProc = c("center", "scale"))
+marsPred <- predict(marsModel, newdata = testData$x)
+postResample(pred = marsPred, obs = testData$y)
+varImp(marsModel)
+```
+
+
+```{r kNN Model}
 knnModel
 ```
+
+
+```{r SVM Model}
+svmModel
+```
+
+
+```{r Neural Net Model}
+nnetModel
+```
+
+
+```{r MARS Model}
+marsModel
+```
+
+
 
 ```{r KNN Predictions, eval=F}
 knnPred <- predict(knnModel, newdata = testData$x)
@@ -265,6 +356,45 @@ KJ 8.1
 >simulated <- as.data.frame(simulated)
 >colnames(simulated)[ncol(simulated)] <- "y"
 
+```{r, eval=T}
+library(mlbench)
+library(randomForest)
+library(caret)
+library(partykit)
+library(dplyr)
+library(gbm)
+library(Cubist)
+set.seed(200)
+simulated <- mlbench.friedman1(200, sd = 1)
+simulated <- cbind(simulated$x, simulated$y)
+simulated <- as.data.frame(simulated)
+colnames(simulated)[ncol(simulated)] <- "y"
+model1 <- randomForest(y ~ ., 
+                       data = simulated,
+                       importance = TRUE,
+                       ntree = 1000)
+rfImp1 <- varImp(model1, scale = FALSE)
+rfImp1
+simulated$duplicate1 <- simulated$V1 + rnorm(200) * .1
+cor(simulated$duplicate1, simulated$V1)
+model2 <- randomForest(y ~ ., 
+                          data = simulated,
+                          importance = TRUE,
+                          ntree = 1000)
+rfImp2 <- varImp(model2, scale = FALSE)
+rfImp2
+cforest_model <- cforest(y ~ ., data=simulated)
+# Unconditional importance measure
+varimp(cforest_model) %>% sort(decreasing = T)
+varimp(cforest_model, conditional=T) %>% sort(decreasing = T)
+gbm_Model <- gbm(y ~ ., data=simulated, distribution='gaussian')
+summary(gbm_Model)
+cubistModel <- cubist(x=simulated[,-(ncol(simulated)-1)], y=simulated$y, committees=100)
+varImp(cubistModel)
+```
+
+
+
 Part A
 Question
 Fit a random forest model to all of the predictors, then estimate the variable importance scores. Did the random forest model significantly use the uninformative predictors (V6 – V10)?
@@ -339,15 +469,18 @@ V6 - V10 scores are very low
 Duplicate 1 score is 0 in Cubist but higher in GBM.
 
 Hence based on the observations above, the pattern is different across the three models.
-KJ 8.2 
+
+
+
+## KJ 8.2 
 Use a simulation to show tree bias with different granularities.
 
-Part A
-Question
+### Part A
+#### Question
 Fit a random forest model to all of the predictors, then estimate the variable importance scores:
 
 Code
-```{r}
+```{r, eval=T}
 library(caret)
 library(rpart)
 set.seed(755)
@@ -358,19 +491,23 @@ simData <- data.frame(Y=Y, X1=X1, X2=X2)
 fit <- rpart(Y ~ ., data = simData)
 varImp(fit)
 ```
+
 Response
 The simulation is created with two variables  
 X1 -> Lesser variance  (Sequence of values) 
 X2 -> Higher Variance (Gaussian Random value)
 Target Variable Y -> X1 + X2
 Regression tree is fitted using rpart . Below is the R Code. The difference between two variables is significant and it shows the tree bias between two variables.
-KJ 8.3 
+
+## KJ 8.3 
 In stochastic gradient boosting the bagging fraction and learning rate will govern the construction of the trees as they are guided by the gradient. Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance. Figure 8.24 provides the variable importance plots for boosting using two extreme values for the bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data. The left-hand plot has both parameters set to 0.1, and the right-hand plot has both set to 0.9:
 
 [insert figure 8.24] 
+
 Part A
 Question
 Why does the model on the right focus its importance on just the first few of predictors, whereas the model on the left spreads importance across more predictors?
+
 Response
 There could be two reasons for the model on the right spreads importance on the first few predictors and the model on the left adds importance to few more predictors.
 Bragging Fraction : It represents the data usage in each iteration of trees. The left hand plot has a bragging fraction of 0.1 which is low and only 10% of data is used for random sampling. Whereas , the right hand plot has a bragging fraction of 0.9 which is large and 90% of data is used on each iteration which is almost the full dataset. Since the full data set is approximately used by the model on the right plot, only few predictors got importance but the left plot used partial dataset to get importance over few more predictors.
@@ -389,14 +526,13 @@ Code
 ```{r}
 library(gbm)
 library(AppliedPredictiveModeling)
-
 data(solubility)
-
 grid1 <- expand.grid(n.trees=100, interaction.depth=1, shrinkage=0.1, n.minobsinnode=10)
 gbm1 <- train(x = solTrainXtrans, y = solTrainY, method = 'gbm', tuneGrid = grid1, verbose = FALSE)
-
 grid2 <- expand.grid(n.trees=100, interaction.depth=10, shrinkage=0.1, n.minobsinnode=10)
 gbm2 <- train(x = solTrainXtrans, y = solTrainY, method = 'gbm', tuneGrid = grid2, verbose = FALSE)
+varImp(gbm1)
+varImp(gbm2)
 ```
 
 ```{r}
@@ -430,7 +566,8 @@ rf_test_df
 
 rf_test_rmse = rmse(rf_test_df$actual, rf_test_df$rf_test)
 cat('RMSE of the test data for this model is', rf_test_rmse)
-...
+```
+
 
 ```{r}
 #Create the ctree 
@@ -461,11 +598,40 @@ Question
 Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?
 Code
 Response
-Market Basket Analysis
+
+## Market Basket Analysis
 I am assigning one simple problem on market basket analysis / recommender systems. Imagine 10000 receipts sitting on your table. Each receipt represents a transaction with items that were purchased. The receipt is a representation of stuff that went into a customer’s basket – and therefore ‘Market Basket Analysis’. That is exactly what the Groceries Data Set contains: a collection of receipts with each line representing 1 receipt and the items purchased. Each line is called a transaction and each column in a row represents an item. Here is the dataset = GroceryDataSet.csv  (comma separated file) Your assignment is to use R to mine the data for association rules.  You should report support, confidence and lift and your top 10 rules by lift. 
-Part A
-Question
+
+### Part A
+#### Question
 Fit a random forest model to all of the predictors, then estimate the variable importance scores:
+
+
+```{r}
+library(arules)
+library(arulesViz)
+library(RColorBrewer)
+library(visNetwork)
+library(igraph)
+df <- read.csv("GroceryDataSet.csv")
+df_sparse <- read.transactions("GroceryDataset.csv",format="basket",sep=",")
+summary(df_sparse)
+itemFrequencyPlot(df_sparse,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Frequently Purchased Products")
+association.rules <- apriori(df_sparse, parameter = list(supp=0.004, conf=0.3))
+length(association.rules)
+inspect(sort(association.rules, by = 'lift')[1:10])
+subset.rules <- which(colSums(is.subset(association.rules, association.rules)) > 1) # get subset rules in vector
+length(subset.rules)  
+subset.association.rules. <- association.rules[-subset.rules] # remove subset rules.
+inspect(sort(subset.association.rules., by = 'lift')[1:10])
+plot(subset.association.rules.,method="two-key plot")
+plot(association.rules)
+top10subRules <- head(subset.association.rules., n = 10, by = "lift")
+plot(top10subRules, method = "graph",  engine = "htmlwidget")
+subRules2<-head(subset.association.rules., n=10, by="lift")
+plot(subRules2, method="paracoord")
+```
+
 
 Code
 ```{r}
@@ -506,6 +672,7 @@ plot(top10subRules, method = "graph",  engine = "htmlwidget")
 subRules2<-head(subset.association.rules., n=10, by="lift")
 plot(subRules2, method="paracoord")
 ```
+
 Response
 Association Rules mining in R is achieved by usage of apriori function available under arules package. Association rules mining is a two step process. 
 Frequent Itemset Generation 
