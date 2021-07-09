@@ -6,24 +6,25 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, eval=F)
 ```
 
 Homework Set 2 in R 
 DATA 624-01 Group 3 
 Z. Palmore, K. Popkin, K. Potter, C. Nan, J. Ramalingam 
 
-KJ 6.3
+## KJ 6.3
 A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of
 product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately
 one hundred thousand dollars per batch:
 
-Part A
-Question
+### Part A
+#### Question
 Start R and use these commands to load the data:
 > library(AppliedPredictiveModeling)
 > data(chemicalManufacturingProcess)
-Code
+
+#### Code
 
 ```{r}
 library(AppliedPredictiveModeling)
@@ -33,21 +34,21 @@ df = data.frame(ChemicalManufacturingProcess)
 head(df)
 ```
 
-Response
+#### Response
 The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. yield contains the percent yield for each run.
 
-Part B
-Question
+### Part B
+#### Question
 A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
 
-Code
+#### Code
 ```{r}
 #Fill in missing values with the median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
 ```
 
-Response
+#### Response
 
 Part C 
 Question
