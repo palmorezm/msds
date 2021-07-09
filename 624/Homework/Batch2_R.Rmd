@@ -291,12 +291,14 @@ SVM, Neural Networks and MARS models were used for testing performances. Below i
 
 KJ 7.5
 Exercise 6.3 describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models. 
+
 Part A
 Question
 Which nonlinear regression model gives the optimal resampling and test set performance?
+
 Code
 
-```{r}
+```{r, eval=F}
 #Using KNN for HW 7.5
 #Train KNN
 knnModel <- train(x=trainx, y=trainy)
@@ -329,6 +331,7 @@ head(predict(marsTuned, testx))
 #Relevant features with MARS
 varImp(marsTuned)
 ```
+
 Response
 MARS and KNN models were trained and tested with the chemical data. Here is the R code. The best performance, but only by a narrow margin, appears to come from MARS with an RMSE of 1.15 versus KNN’s RMSE of 1.21. Performance from MARS summary is that the final values used were nprune = 4 and degree = 2.  This produced an RMSE of 1.15 as shown below. Performance from KNN summary is that the best mtry = 29.  This produced an RMSE of 1.21 as shown below. 
 
@@ -337,6 +340,9 @@ Question
 Which predictors are most important in the optimal nonlinear regression model? Do either the biological or process variables dominate the list? How do the top ten important predictors compare to the top ten predictors from the optimal linear model?
 
 Code
+
+[missing code to show below - fill in]
+
 Response
 The Process32, Process09, and Biological12 appear to be the most important features for the model. It appears that Process variables are more important, which bodes well for future improvements, since these variables can be modified. For the linear model, the Process32, Process36, and BiologicalMaterial02 were the top three features based on p-values. For the non-linear model the Process32, Process09, and Biological12 appear to be the most important features.  Only the Process 32 appears in both models.
 
@@ -549,11 +555,14 @@ KJ 8.7
 Refer to Exercises 6.3 and 7.5 which describe a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several tree-based models:
 
 Part A
+
 Question
 Which tree-based regression model gives the optimal resampling and test set performance?
+
 Code
 ```{r}
-#Create the Random Forest Tree
+# Packages?
+# Create the Random Forest Tree
 rf_model = randomForest(Yield~ManufacturingProcess32 + ManufacturingProcess36 + ManufacturingProcess09 + ManufacturingProcess13 + BiologicalMaterial02 + BiologicalMaterial06 + BiologicalMaterial03, data=train)
 ```
 
@@ -587,16 +596,24 @@ cat('RMSE of the test data for this model is', ctree_test_rmse)
 
 Response
 I used a randomforest and ctree algorithm to fit and predict two models.  The RMSE’s were close at 1.14 for Random Forest and 1.28 for cTree, so RandomForest edged out cTree.
+
 Part B
 Question
 Which predictors are most important in the optimal tree-based regression model? Do either the biological or process variables dominate the list? How do the top 10 important predictors compare to the top 10 predictors from the optimal linear and nonlinear models?
 Code
+
+[missing code - fill in to demonstrate response]
+
 Response
 As shown in the table below, Process32, 36, 09, and 13 are the most important predictors. Clearly the Process variables dominate the list. For the linear model, the Process32, Process36, and BiologicalMaterial02 were the top three features based on p-values. For the non-linear model the Process32, Process09, and Biological12 appear to be the most important features. For the tree based regression models, the Process 32, Process36, and Process 09 top the list. This is interesting because linear model ranked the Process32 and 36 at the top and the non-linear placed Process09 as second highest. The consistently high ranking of Process32, 36, and 09’s feature importance across the linear, non-linear, and tree based models all substantiate that these Process variables are the most important, and that overall Process variables have a greater influence on Yield than Manufacturing variables.  But, the final model that actually get used in Production, will most likely include several of the Manufacturing variables. 
+
 Part C
 Question
 Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?
 Code
+
+[missing a plot chunk for visual interpretation]
+
 Response
 
 ## Market Basket Analysis
