@@ -1,0 +1,1262 @@
+---
+title: "Project 1 Markdown Submission"
+author: "Group 3"
+date: "6/19/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(include=F, echo = F, warning=F, message=F)
+```
+
+**If running, remove include=F, begin with Appendix, and adjust file locations**
+
+## Introduction
+
+Given an unknown data source with several groups, we attempt to predict the next 140 values of a times series data set based on 1622 entries provided on multiple events. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and all associated code to produce the models can be found in the attached markdown file. The data with its first five rows, are shown below.  
+
+```{r}
+# Packages
+library(tidyverse)
+# Data source
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
+data <- data %>% 
+  rename(SeriesInd = ï..SeriesInd) 
+head(data, 5)
+```
+
+We create forecasts for two preselected variables within each of six predetermined groups. These groups are denoted S01, S02, S03, S04, S05, and S06 respectively. There are five variables within each group that we have to work with. They are Var01, Var02, Var03, Var05, and Var07 respectively. Our date variable ‘SeriesInd,’ is displayed in its numeric serial number form calculated with Excel. Although we do not know what the variables stand for, we can develop models to try and forecast their behavior. This chart contains a breakdown of which variables are forecast in each group.
+
+```{r}
+# Chart
+varsbygroup <- data.frame(matrix(c("S01", "S02", "S03",
+                                   "S04", "S05", "S06", 
+                                   "Var01", "Var02", "Var05",
+                                   "Var01", "Var02", "Var05",
+                                   "Var02", "Var03", "Var07",
+                                   "Var02", "Var03", "Var07"),
+                                 nrow = 6, ncol=3))
+colnames(varsbygroup) <- c("Group", "Variable1", "Variable2")
+varsbygroup %>% 
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = T)
+# Grouping
+S01 <- data %>% 
+  filter(group == "S01")
+S02 <- data %>% 
+  filter(group == "S02")
+S03 <- data %>% 
+  filter(group == "S03")
+S04 <- data %>% 
+  filter(group == "S04")
+S05 <- data %>% 
+  filter(group == "S05")
+S06 <- data %>% 
+  filter(group == "S06")
+
+# Imputation by function - missing something? lapply/sapply may work 
+soximp <- function(df){
+  for (i in colnames(df)){
+    if (sum(is.na(df[[i]])) !=0){
+      df[[i]][is.na(df[[i]])] <- median(df[[i]], na.rm=TRUE)
+    }
+  }
+}
+
+# Imputation loops for each group by median 
+for (i in colnames(S01)){
+  if (sum(is.na(S01[[i]])) != 0){
+    S01[[i]][is.na(S01[[i]])] <- median(S01[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S02)){
+  if (sum(is.na(S02[[i]])) != 0){
+    S02[[i]][is.na(S02[[i]])] <- median(S02[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S03)){
+  if (sum(is.na(S03[[i]])) != 0){
+    S03[[i]][is.na(S03[[i]])] <- median(S03[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S04)){
+  if (sum(is.na(S04[[i]])) != 0){
+    S04[[i]][is.na(S04[[i]])] <- median(S04[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S05)){
+  if (sum(is.na(S05[[i]])) != 0){
+    S05[[i]][is.na(S05[[i]])] <- median(S05[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S06)){
+  if (sum(is.na(S06[[i]])) != 0){
+    S06[[i]][is.na(S06[[i]])] <- median(S06[[i]], na.rm = TRUE)
+  } 
+}
+```
+
+Before we begin, the data is filtered to extract each time series by group. This isolates the Var01, Var02, Var03, Var05, and Var07 variables associated with groups S01, S02, and so on. Then, with each group and its respective variables’ behavior isolated, we clean and adjust the data to make use of it in the analysis. Once we determine the most appropriate models to forecast the proper variable in each group, we evaluate the results of our predictions. Our final forecasts are captured in the excel spreadsheet attached. 
+
+## Analysis
+
+We began by addressing missing values. Given 10,572 observations, about 8% of each variable was missing. Several methods were tried to address this but the best were Kalman smoothing and simple imputation by the median of each ‘Var0X’ variable to fill in where appropriate. The ‘SeriesInd’ numeric date was also converted from its serial number form to a common date-time series. We then examined each group’s variables separately.
+
+```{r}
+library(fpp2)
+
+#S01
+S01<-subset(data, group == "S01", select = c(SeriesInd, Var01, Var02))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S01)
+
+# Subset Var01 and Var02 from S01.
+S01_Var01<-S01 %>%select(Var01)
+S01_Var01<-S01_Var01[1:1625,]
+
+
+S01_Var02<-S01 %>%select(Var02)
+S01_Var02<-S01_Var02[1:1625,]
+
+
+#S02
+S02<-subset(data, group == "S02", select = c(SeriesInd, Var02, Var03))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S02)
+
+# Subset Var02 and Var03 from S02.
+S02_Var02<-S02 %>%select(Var02)
+S02_Var02<-S02_Var02[1:1625,]
+
+
+S02_Var03<-S02 %>%select(Var03)
+S02_Var03<-S02_Var03[1:1625,]
+
+
+
+#S03
+S03<-subset(data, group == "S03", select = c(SeriesInd, Var05, Var07))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S03)
+
+# Subset Var05 and Var07 from S03.
+S03_Var05<-S03 %>%select(Var05)
+S03_Var05<-S03_Var05[1:1625,]
+
+
+S03_Var07<-S03 %>%select(Var07)
+S03_Var07<-S03_Var07[1:1625,]
+```
+
+
+
+Statistical summaries, box plots, and histograms were run on each group to evaluate where the average value of each variable was, if its distribution was skewed, determine whether outliers were present, and provide other descriptors of the data. These informed us that the average value (mean) of the variables are similar but their range varies widely with Var05 at 186.01 while Var02 covers a range of 479 million. Our analysis solves this potential problem by focusing on variables of the same scales as the intended target.
+
+```{r}
+library(imputeTS)
+# Summarize the subset data.
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# according to the summary of subsets, 
+# S01_Var01 has 5 NAs
+# S01_Var02 has 3 NAs
+# S02_Var02 has 3 NAs
+# S02_Var03 has 7 NAs
+# S03_Var07 has 7 NAs
+# S03_Var05 has 7 NAs
+
+# Using Kalman Smoothing to impute NAs.
+S01_Var01<-na_kalman(S01_Var01)
+S01_Var02<-na_kalman(S01_Var02)
+S02_Var02<-na_kalman(S02_Var02)
+S02_Var03<-na_kalman(S02_Var03)
+S03_Var05<-na_kalman(S03_Var05)
+S03_Var07<-na_kalman(S03_Var07)
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# NA  no longer exists
+ts_S01_Var01<-ts(S01_Var01)
+ts_S01_Var02<-ts(S01_Var02)
+ts_S02_Var02<-ts(S02_Var02)
+ts_S02_Var03<-ts(S02_Var03)
+ts_S03_Var05<-ts(S03_Var05)
+ts_S03_Var07<-ts(S03_Var07)
+
+str(ts_S01_Var01)
+str(ts_S01_Var02)
+str(ts_S02_Var02)
+str(ts_S02_Var03)
+str(ts_S03_Var05)
+str(ts_S03_Var07)
+
+autoplot(ts_S01_Var01)
+autoplot(ts_S01_Var02)
+autoplot(ts_S02_Var02)
+autoplot(ts_S02_Var03)
+autoplot(ts_S03_Var05)
+autoplot(ts_S03_Var07)
+
+
+par(mfrow = c(1,2))
+hist(ts_S01_Var01)
+boxplot(ts_S01_Var01)
+
+par(mfrow = c(1,2))
+hist(ts_S01_Var02)
+boxplot(ts_S01_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var02)
+boxplot(ts_S02_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var03)
+boxplot(ts_S02_Var03)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var05)
+boxplot(ts_S03_Var05)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var07)
+boxplot(ts_S03_Var07)
+```
+
+
+Additionally, all but group S03 of the histograms exhibited right skewness, and Var02 and Var03 had outliers. These were replaced using Friedman’s super smoothing method. Due to the randomness of these variables, determining outliers was difficult and there is a presence of additional overly influential points as determined using Cook's distance formula. We acknowledge the presence of these points but are unable to alter them as they are likely intentional based on the patterns in the data. For reference, the observations are shown in the scatter plot with color coding by each group. 
+
+
+```{r}
+data[c(1:7)]%>%
+  gather(variable, value, -SeriesInd, -group) %>%
+  ggplot(., aes(value, SeriesInd, color = group)) + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=21, 
+             alpha = 0.75) + 
+  coord_flip() + 
+   facet_wrap(~variable, 
+             scales ="free") + 
+  labs(title = "Variable Patterns", 
+       subtitle = "Color Coded by Group", 
+       x="Value", 
+       y="Time", 
+       caption = "Contains all non-null observations of the given data set") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5), 
+        plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom", 
+        axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(), 
+        plot.caption = element_text(hjust=0.5)
+        )
+```
+
+Seasonality was also considered. It is possible this data follows a weak seasonal trend that increases during summer months but there is not a lot of evidence to support regular fluctuations. Regular gaps were noticed in the time series on a weekly basis and several methods were used in attempts to fix this. However, the data appears randomly distributed and as such, acts randomly. For this reason, we left the gaps alone and any further adjustments made were minimal to avoid disturbing any existing patterns in the data. 
+
+```{r}
+ndiffs(ts_S01_Var01)
+ts_S01_Var01%>%diff()%>%ndiffs()
+ndiffs test for ts_S01_Var02.
+ndiffs(ts_S01_Var02)
+ts_S01_Var02%>%diff()%>%ndiffs()
+ndiffs test for ts_S02_Var02
+ndiffs(ts_S02_Var02)
+ts_S02_Var02%>%diff()%>%ndiffs()
+ndiffs test for ts_S02_Var03.
+ndiffs(ts_S02_Var03)
+ts_S02_Var02%>%diff()%>%ndiffs()
+ndiffs test for ts_S03_Var05.
+ndiffs(ts_S03_Var05)
+ts_S03_Var05%>%diff()%>%ndiffs()
+ndiffs test for ts_S03_Var07.
+ndiffs(ts_S03_Var07)
+ts_S03_Var07%>%diff()%>%ndiffs()
+# According to the ndiffs test, all the variables above require difference.
+```
+
+
+We determined that the best model type was an Auto Regressive Integrated Moving Average (ARIMA) with drift. Unfortunately, all variables required differencing to achieve stationarity. This indicates that any predictions made with these variables may be unrealistic because of inherent random changes in statistics like the mean and variance of these variables over time. We transform the data in our attempts to achieve stationarity but it should be noted that our review of stationarity is only a rough estimate using the aforementioned summary statistics so that we may apply this ARIMA method. Otherwise, we would have to conclude this data is inherently unpredictable and as such, render model forecasts useless. Rather, we focus on forecasting each variable individually and try to keep it simple.
+
+
+
+## Prediction
+
+```{r}
+train0101<-window(ts_S01_Var01, end=as.integer(length(ts_S01_Var01)*0.7))
+train0102<-window(ts_S01_Var02, end=as.integer(length(ts_S01_Var02)*0.7))
+train0202<-window(ts_S02_Var02, end=as.integer(length(ts_S02_Var02)*0.7))
+train0203<-window(ts_S02_Var03, end=as.integer(length(ts_S02_Var03)*0.7))
+train0305<-window(ts_S03_Var05, end=as.integer(length(ts_S03_Var05)*0.7))
+train0307<-window(ts_S03_Var07, end=as.integer(length(ts_S03_Var07)*0.7))
+length(ts_S01_Var01)*0.3
+library(dplyr)
+library(forecast)
+AA_fit0101 <- train0101 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0102 <- train0102 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0202 <- train0202 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0203 <- train0203 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0305 <- train0305 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0307 <- train0307 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+
+
+
+mape0101<-accuracy(AA_fit0101,ts_S01_Var01)["Test set", "MAPE"]
+mape0101
+
+mape0102<-accuracy(AA_fit0102,ts_S01_Var02)["Test set","MAPE"]
+mape0102
+
+mape0202<-accuracy(AA_fit0202,ts_S02_Var02)["Test set", "MAPE"]
+mape0202
+
+mape0203<-accuracy(AA_fit0203,ts_S02_Var03)["Test set", "MAPE"]
+mape0203
+
+mape0305<-accuracy(AA_fit0305,ts_S03_Var05)["Test set", "MAPE"]
+mape0101
+
+mape0307<-accuracy(AA_fit0307,ts_S03_Var07)["Test set", "MAPE"]
+mape0307
+AA0101<-auto.arima(ts_S01_Var01, stepwise = F, approximation = F, seasonal = T)
+fcast0101<-forecast(AA0101,h=140)
+plot(fcast0101)
+
+AA0102<-auto.arima(ts_S01_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0102<-forecast(AA0102,h=140)
+plot(fcast0102)
+
+AA0202<-auto.arima(ts_S02_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0202<-forecast(AA0202,h=140)
+plot(fcast0202)
+
+
+AA0203<-auto.arima(ts_S02_Var03, stepwise = F, approximation = F, seasonal = T)
+fcast0203<-forecast(AA0203,h=140)
+plot(fcast0203)
+
+AA0305<-auto.arima(ts_S03_Var05, stepwise = F, approximation = F, seasonal = T)
+fcast0305<-forecast(AA0305,h=140)
+plot(fcast0305)
+
+
+
+AA0307<-auto.arima(ts_S03_Var07, stepwise = F, approximation = F, seasonal = T)
+fcast0307<-forecast(AA0307,h=140)
+plot(fcast0307)
+
+fcast0101
+fcast0102
+fcast0202
+fcast0203
+fcast0305
+fcast0307
+
+S0101 <- fcast0101$mean
+S0102 <- fcast0102$mean
+S0202 <- fcast0202$mean
+S0203 <- fcast0203$mean
+S0305 <- fcast0305$mean
+S0307 <- fcast0307$mean
+S0101_preds <- S0101[1:140]
+S0102_preds <- S0102[1:140]
+S0202_preds <- S0202[1:140]
+S0203_preds <- S0203[1:140]
+S0305_preds <- S0305[1:140]
+S0307_preds <- S0307[1:140]
+csv <- data.frame(cbind(S0101_preds, S0102_preds, S0202_preds, S0203_preds,S0305_preds, S0307_preds))
+write.csv(csv, file = "C:/data/csv.csv")
+```
+
+
+
+To evaluate our models we split the data into training and testing data sets with 70% reserved for training and 30% set aside for testing. We use the training data to build our models to forecast the proper variables in each group. We repeat the cleaning performed in the analysis and forecast the values with our ARIMA model method. These predicted values are then compared with the testing data to see if they agree using mean absolute percentage error (MAPE). Predicted values that differ from expectations increase the amount of error. Three groups are selected to visualize major trends.
+
+
+
+```{r}
+library(readxl)
+library(dplyr)
+library(forecast)
+library(fma)
+library(tsoutliers)
+library(tidyverse)
+
+data <- read_excel("data.xlsx", sheet="S04", skip=2)
+df.1 <- data %>%
+          select(c('SeriesInd', 'Var01')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var01)
+df.2 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02)
+data <- read_excel("data.xlsx", sheet="S05", skip=2)
+df.3 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02) 
+df.4 <- data %>%
+          select(c('SeriesInd', 'Var03')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var03)
+data <- read_excel("data.xlsx", sheet="S06", skip=2)
+df.5 <- data %>%
+          select(c('SeriesInd', 'Var05')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var05)
+df.6 <- data %>%
+          select(c('SeriesInd', 'Var07')) %>%
+          filter(SeriesInd<= 43021) %>%
+          rename(ts = Var07)
+all_df <- list(df.1, df.2, df.3, df.4, df.5, df.6)
+
+build_model <- function(train) {
+  model <- train %>%
+              tsclean() %>%
+              auto.arima()
+  return(model)
+}
+create_plot <- function(model, test, var){
+  predict1 <- forecast(model, h=488)
+  mape <- accuracy(predict1, test)["Test set", "MAPE"]
+  title <- sprintf("MAPE of %s is %f" , var, mape)
+  predict2 <- forecast(model, h=140)
+  return(autoplot(predict2, main=title))
+}
+iterate <- function(df_list){
+  variables <- list("S04 Var01", "S04 Var02", "S05 Var02", "S05 Var03", "S06 Var05", "S06 Var07")
+  plot_list = list()
+  i <- 1
+  for (x in df_list){
+    train <- window(x$ts, end=1135)
+    test <- window(x$ts, start=1136)
+    model <- build_model(train)
+    plot_list[[i]] <- create_plot(model, test, variables[i])
+    i <- i + 1
+  }
+return(gridExtra::grid.arrange(grobs = plot_list))
+}
+
+iterate(all_df)
+```
+
+
+Variables ‘Var05’ and ‘Var07’ in group S06 performed best based on this selection; however, it is easy to see none of them are predictable. The blue areas mark a cone of possibilities with darker shades having higher probabilities of occurrence. The straight black line shown in the center of these cones is clearly misinterpreting the data. The observed variation in each variable produces a zig-zagging black line which our model does not estimate. This is to be expected given the stationarity of data and the inherently unpredictable nature of this data set. Overall, the data appears to drift randomly from its historical observations. All remaining variables follow the same pattern. 
+
+
+## Appendix
+
+```{r, warning=FALSE, message=FALSE}
+library(readxl)
+library(dplyr)
+library(forecast)
+library(fma)
+library(tsoutliers)
+library(tidyverse)
+```
+
+
+```{r}
+data <- read_excel("data.xlsx", sheet="S04", skip=2)
+df.1 <- data %>%
+          select(c('SeriesInd', 'Var01')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var01)
+df.2 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02)
+data <- read_excel("data.xlsx", sheet="S05", skip=2)
+df.3 <- data %>%
+          select(c('SeriesInd', 'Var02')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var02) 
+df.4 <- data %>%
+          select(c('SeriesInd', 'Var03')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var03)
+data <- read_excel("data.xlsx", sheet="S06", skip=2)
+df.5 <- data %>%
+          select(c('SeriesInd', 'Var05')) %>%
+          filter(SeriesInd<= 43021)  %>%
+          rename(ts = Var05)
+df.6 <- data %>%
+          select(c('SeriesInd', 'Var07')) %>%
+          filter(SeriesInd<= 43021) %>%
+          rename(ts = Var07)
+all_df <- list(df.1, df.2, df.3, df.4, df.5, df.6)
+```
+
+
+
+```{r}
+build_model <- function(train) {
+  model <- train %>%
+              tsclean() %>%
+              auto.arima()
+  return(model)
+}
+create_plot <- function(model, test, var){
+  predict1 <- forecast(model, h=488)
+  mape <- accuracy(predict1, test)["Test set", "MAPE"]
+  title <- sprintf("MAPE of %s is %f" , var, mape)
+  predict2 <- forecast(model, h=140)
+  return(autoplot(predict2, main=title))
+}
+iterate <- function(df_list){
+  variables <- list("S04 Var01", "S04 Var02", "S05 Var02", "S05 Var03", "S06 Var05", "S06 Var07")
+  plot_list = list()
+  i <- 1
+  for (x in df_list){
+    train <- window(x$ts, end=1135)
+    test <- window(x$ts, start=1136)
+    model <- build_model(train)
+    plot_list[[i]] <- create_plot(model, test, variables[i])
+    i <- i + 1
+  }
+return(gridExtra::grid.arrange(grobs = plot_list))
+}
+```
+
+
+```{r}
+iterate(all_df)
+```
+
+
+
+```{r}
+# Packages
+library(tidyverse)
+library(psych)
+library(kableExtra)
+library(forecast)
+# Data source
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
+data <- data %>% 
+  rename(SeriesInd = ï..SeriesInd) 
+colnames(data)
+
+
+describe(data)
+
+data %>% 
+  describe() %>% 
+  mutate(missing = 10572 - n, 
+         percent = (missing/10572)*100) %>% 
+  t() %>%
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped","HOLD_position", "scale_down"), full_width = T)
+
+sample <- head(data, 5)
+sample %>% 
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = T)
+```
+
+
+```{r}
+data[c(1:7)]  %>%
+  gather(variable, value, -SeriesInd, -group) %>% 
+  ggplot(., aes(value, SeriesInd, color=group)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dotdash", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), axis.text.y = element_blank())
+```
+
+
+```{r}
+data[c(1:7)]%>%
+  gather(variable, value, -SeriesInd, -group) %>%
+  ggplot(., aes(value, SeriesInd, color = group)) + 
+  geom_point() + coord_flip() +
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 2) 
+```
+
+
+```{r}
+data[c(1:7)]%>%
+  gather(variable, value, -SeriesInd, -group) %>%
+  ggplot(., aes(value, SeriesInd, color = group)) + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=21, 
+             alpha = 0.75) + 
+  coord_flip() + 
+   facet_wrap(~variable, 
+             scales ="free") + 
+  labs(title = "Variable Patterns", 
+       subtitle = "Color Coded by Group", 
+       x="Value", 
+       y="Time", 
+       caption = "Contains all non-null observations of the given data set") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5), 
+        plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom", 
+        axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(), 
+        plot.caption = element_text(hjust=0.5)
+        )
+```
+
+
+```{r}
+data[c(1:7)]%>%
+  gather(variable, value, -SeriesInd, -group) %>%
+  ggplot(., aes(value, SeriesInd, color = group)) + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=21, 
+             alpha = 0.05) +
+  geom_line(aes(color=group)) + 
+  coord_flip() + 
+   facet_wrap(~variable, 
+             scales ="free") + 
+  labs(title = "Variable Patterns", 
+       subtitle = "Color Coded by Group", 
+       x="Value", 
+       y="Time", 
+       caption = "Contains all non-null observations of the given data set") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust=0.5), 
+        plot.subtitle = element_text(hjust=0.5),
+        legend.position = "bottom", 
+        axis.ticks.x=element_blank(),
+        axis.text.x=element_blank(), 
+        plot.caption = element_text(hjust=0.5)
+        )
+```
+
+
+```{r}
+varsbygroup <- data.frame(matrix(c("S01", "S02", "S03", "S04", "S05", "S06", 
+                                   "Var01", "Var02", "Var05", "Var01", "Var02", "Var05",
+                                   "Var02", "Var03", "Var07", "Var02", "Var03", "Var07"), 
+                                 nrow = 6, ncol=3))
+colnames(varsbygroup) <- c("Group", "Variable1", "Variable2")
+```
+
+
+
+```{r}
+varsbygroup %>% 
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = T)
+```
+
+
+```{r}
+# Packages
+library(tidyverse)
+# Data source
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
+data <- data %>% 
+  rename(SeriesInd = ï..SeriesInd) 
+head(data, 5)
+```
+
+#Create fit data
+```{r}
+S01_fitVar01_data = S01[1:1622,c('SeriesIND','Var01')]
+S01_fitVar02_data = S01[1:1622,c('SeriesIND','Var02')]
+S01_fitVar05_data = S01[1:1622,c('SeriesIND','Var05')]
+
+S02_fitVar01_data = S02[1:1622,c('SeriesIND','Var01')]
+S02_fitVar02_data = S02[1:1622,c('SeriesIND','Var02')]
+S02_fitVar05_data = S02[1:1622,c('SeriesIND','Var05')]
+
+S03_fitVar01_data = S03[1:1622,c('SeriesIND','Var01')]
+S03_fitVar02_data = S03[1:1622,c('SeriesIND','Var02')]
+S03_fitVar05_data = S03[1:1622,c('SeriesIND','Var05')]
+```
+
+```{r}
+fit_S01_Var01 = auto.arima(S01_fitVar01_data[,'Var01'])
+fit_S01_Var02 = auto.arima(S01_fitVar02_data[,'Var02'])
+fit_S01_Var05 = auto.arima(S01_fitVar05_data[,'Var05'])
+
+fit_S02_Var01 = auto.arima(S02_fitVar01_data[,'Var01'])
+fit_S02_Var02 = auto.arima(S02_fitVar02_data[,'Var02'])
+fit_S02_Var05 = auto.arima(S02_fitVar05_data[,'Var05'])
+
+fit_S03_Var01 = auto.arima(S03_fitVar01_data[,'Var01'])
+fit_S03_Var02 = auto.arima(S03_fitVar02_data[,'Var02'])
+fit_S03_Var05 = auto.arima(S03_fitVar05_data[,'Var05'])
+
+```
+
+## Prediction
+```{r}
+predict_S01_Var01 = fit_S01_Var01 %>% forecast(h=140) %>% data.frame
+predict_S01_Var02 = fit_S01_Var02 %>% forecast(h=140) %>% data.frame
+predict_S01_Var05 = fit_S01_Var05 %>% forecast(h=140) %>% data.frame
+
+predict_S02_Var01 = fit_S02_Var01 %>% forecast(h=140) %>% data.frame
+predict_S02_Var02 = fit_S02_Var02 %>% forecast(h=140) %>% data.frame
+predict_S02_Var05 = fit_S02_Var05 %>% forecast(h=140) %>% data.frame
+
+predict_S03_Var01 = fit_S03_Var01 %>% forecast(h=140) %>% data.frame
+predict_S03_Var02 = fit_S03_Var02 %>% forecast(h=140) %>% data.frame
+predict_S03_Var05 = fit_S03_Var05 %>% forecast(h=140) %>% data.frame
+
+```
+
+#Write predictions to csv and Excel
+```{r}
+predictions_S123_v125_df = data.frame(predict_S01_Var01[1],predict_S01_Var02[1], predict_S01_Var05[1],
+predict_S02_Var01[1],predict_S02_Var02[1],predict_S02_Var05[1],predict_S03_Var01[1],predict_S03_Var02[1],
+predict_S03_Var05[1])
+
+colnames(predictions_S123_v125_df) <- c('S01_Var01', 'S01_Var02', 'S01_Var05', 'S02_Var01', 'S02_Var02', 'S02_Var05', 'S03_Var01', 'S03_Var02', 'S03_Var05')
+
+write.csv(x = predictions_S123_v125_df, file='predictions_S123_V125_Ken.csv')
+write.xlsx(predictions_S123_v125_df, 'predictions_S123_V125_Ken.xlsx')
+```
+
+
+---
+title: "DATA624_Project1"
+author: "Jeyaraman Ramalingam"
+date: "6/25/2021"
+output:   
+  html_document:
+    toc: yes
+    toc_depth: '4'
+    df_print: paged
+    toc_float: yes
+    theme: journal
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(zoo)
+library(xts)
+library(forecast)
+library(urca)
+library(ROCR)
+library(readxl)
+library(TSstudio)
+library(stringr)
+library(kableExtra)
+```
+
+## Input Dataset
+
+```{r}
+df <- read_excel('Data Set for Class.xls')
+head(df,5)
+```
+
+## Data Preparation
+
+```{r pressure, echo=FALSE}
+df <- readxl::read_excel('Data Set for Class.xls')
+df$allDates <- as.Date(df$SeriesInd, origin = "1900-01-01")
+allDates <- seq.Date(min(df$allDates),max(df$allDates),"day")
+```
+
+## Data Subsetting
+```{r}
+df_build<-function(grp,variable){
+  final_df = subset(df[,c(1,2,variable,8)], is.na(group)==TRUE | group == grp)%>% .[,c(3,4)]%>% left_join(as.data.frame(allDates),.,by=c("allDates"= "allDates"))
+  colnames(final_df)[1:2]<-c("allDates","Var")
+  df_xts <- xts(c(final_df$Var),  order.by=as.Date(final_df$allDates))%>% na.approx()
+  return(df_xts)  
+}
+```
+
+## Models
+```{r}
+arima_model <- function(df_xts)
+{
+  df_xts_train <- window(df_xts,start="2011-05-08",end="2016-12-08")
+  df_xts_test <- window(df_xts,start="2016-12-09",end="2018-05-03")
+  aa_model <- auto.arima(log(df_xts_train))
+  summary(aa_model)
+  coef(aa_model)
+  checkresiduals(aa_model)
+  fc <- forecast(aa_model,h=511)
+  fc$mean<-exp(fc$mean)
+  fc$upper<-exp(fc$upper)
+  fc$lower<-exp(fc$lower)
+  fc$x<-exp(fc$x)
+  
+  return(fc)
+}
+```
+
+## Accuracy
+```{r}
+plot_fc <- function(fc)
+{
+  return(autoplot(fc))
+}
+accuracy_test <- function(fc,df_xts)
+{
+  df_xts_train <- window(df_xts,start="2011-05-08",end="2016-12-08")
+  df_xts_test <- window(df_xts,start="2016-12-09",end="2018-05-03")
+  Mape_value<-accuracy(fc,df_xts_test)
+  return(Mape_value)
+}
+```
+
+### Forecasts
+```{r}
+list_group<- c("S04:3:4","S05:4:5","S06:5:7")
+mape_df <- data.frame(matrix(ncol=3,nrow=3))
+plt_list <- list()
+k=1
+for (i in 1:3)
+{
+  j=2
+  grp_split<-unlist(str_split(list_group[i],":"))
+  grp<-grp_split[[1]]
+  var=list(grp_split[[2]],grp_split[[3]])
+  mape_df[i,1]=grp
+  for(item in var)
+  {
+    cat(paste("### Model for "," ",grp," ",item))
+    df_xts<-df_build(grp,as.numeric(item))
+    fc<-arima_model(df_xts)
+    acc<-accuracy_test(fc,df_xts)
+    mape_df[i,j]=acc[2,5]
+    plt_list[[k]]<-plot_fc(fc)
+    j=j+1
+    k=k+1
+    #write.csv(fc,file=paste0(grp,"_",item,".csv"))
+  }  
+}
+```
+
+### Mape Values
+
+```{r}
+colnames(mape_df)=c("Group","Var 1","Var 2")
+knitr::kable(mape_df)%>%  kable_styling()
+```
+
+### Forecast Plots
+
+```{r}
+gridExtra::grid.arrange(grobs = plt_list)
+```
+
+
+```{r}
+# Grouping
+S01 <- data %>% 
+  filter(group == "S01")
+S02 <- data %>% 
+  filter(group == "S02")
+S03 <- data %>% 
+  filter(group == "S03")
+S04 <- data %>% 
+  filter(group == "S04")
+S05 <- data %>% 
+  filter(group == "S05")
+S06 <- data %>% 
+  filter(group == "S06")
+
+# Imputation by function - missing something? lapply/sapply may work 
+soximp <- function(df){
+  for (i in colnames(df)){
+    if (sum(is.na(df[[i]])) !=0){
+      df[[i]][is.na(df[[i]])] <- median(df[[i]], na.rm=TRUE)
+    }
+  }
+}
+
+# Imputation loops for each group by median 
+for (i in colnames(S01)){
+  if (sum(is.na(S01[[i]])) != 0){
+    S01[[i]][is.na(S01[[i]])] <- median(S01[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S02)){
+  if (sum(is.na(S02[[i]])) != 0){
+    S02[[i]][is.na(S02[[i]])] <- median(S02[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S03)){
+  if (sum(is.na(S03[[i]])) != 0){
+    S03[[i]][is.na(S03[[i]])] <- median(S03[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S04)){
+  if (sum(is.na(S04[[i]])) != 0){
+    S04[[i]][is.na(S04[[i]])] <- median(S04[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S05)){
+  if (sum(is.na(S05[[i]])) != 0){
+    S05[[i]][is.na(S05[[i]])] <- median(S05[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S06)){
+  if (sum(is.na(S06[[i]])) != 0){
+    S06[[i]][is.na(S06[[i]])] <- median(S06[[i]], na.rm = TRUE)
+  } 
+}
+```
+
+
+
+## Analysis
+### Subset S01, S02, S03 from the provided data.
+Subset Var01 and Var 02 from S01.
+Subset Var02 and Var 03 from S02.
+Subset Var05 and Var 07 from S03.
+```{r}
+
+library(fpp2)
+
+#S01
+S01<-subset(data, group == "S01", select = c(SeriesInd, Var01, Var02))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S01)
+
+# Subset Var01 and Var02 from S01.
+S01_Var01<-S01 %>%select(Var01)
+S01_Var01<-S01_Var01[1:1625,]
+
+
+S01_Var02<-S01 %>%select(Var02)
+S01_Var02<-S01_Var02[1:1625,]
+
+
+#S02
+S02<-subset(data, group == "S02", select = c(SeriesInd, Var02, Var03))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S02)
+
+# Subset Var02 and Var03 from S02.
+S02_Var02<-S02 %>%select(Var02)
+S02_Var02<-S02_Var02[1:1625,]
+
+
+S02_Var03<-S02 %>%select(Var03)
+S02_Var03<-S02_Var03[1:1625,]
+
+
+
+#S03
+S03<-subset(data, group == "S03", select = c(SeriesInd, Var05, Var07))%>%
+  mutate(date=as.Date(SeriesInd, origin = "1905-01-01"))
+summary(S03)
+
+# Subset Var05 and Var07 from S03.
+S03_Var05<-S03 %>%select(Var05)
+S03_Var05<-S03_Var05[1:1625,]
+
+
+S03_Var07<-S03 %>%select(Var07)
+S03_Var07<-S03_Var07[1:1625,]
+```
+
+
+### Clean NA from the subset data with imputeTS
+```{r}
+library(imputeTS)
+# Summarize the subset data.
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# according to the summary of subsets, 
+# S01_Var01 has 5 NAs
+# S01_Var02 has 3 NAs
+# S02_Var02 has 3 NAs
+# S02_Var03 has 7 NAs
+# S03_Var07 has 7 NAs
+# S03_Var05 has 7 NAs
+
+# Using Kalman Smoothing to impute NAs.
+S01_Var01<-na_kalman(S01_Var01)
+S01_Var02<-na_kalman(S01_Var02)
+S02_Var02<-na_kalman(S02_Var02)
+S02_Var03<-na_kalman(S02_Var03)
+S03_Var05<-na_kalman(S03_Var05)
+S03_Var07<-na_kalman(S03_Var07)
+
+summary(S01_Var01)
+summary(S01_Var02)
+summary(S02_Var02)
+summary(S02_Var03)
+summary(S03_Var07)
+summary(S03_Var05)
+
+# NA  no longer exists
+```
+
+
+### Convert variables to time series.
+```{r}
+ts_S01_Var01<-ts(S01_Var01)
+ts_S01_Var02<-ts(S01_Var02)
+ts_S02_Var02<-ts(S02_Var02)
+ts_S02_Var03<-ts(S02_Var03)
+ts_S03_Var05<-ts(S03_Var05)
+ts_S03_Var07<-ts(S03_Var07)
+
+str(ts_S01_Var01)
+str(ts_S01_Var02)
+str(ts_S02_Var02)
+str(ts_S02_Var03)
+str(ts_S03_Var05)
+str(ts_S03_Var07)
+
+autoplot(ts_S01_Var01)
+autoplot(ts_S01_Var02)
+autoplot(ts_S02_Var02)
+autoplot(ts_S02_Var03)
+autoplot(ts_S03_Var05)
+autoplot(ts_S03_Var07)
+```
+
+
+
+### Verify skewness and Outliers
+
+```{r}
+par(mfrow = c(1,2))
+hist(ts_S01_Var01)
+boxplot(ts_S01_Var01)
+
+par(mfrow = c(1,2))
+hist(ts_S01_Var02)
+boxplot(ts_S01_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var02)
+boxplot(ts_S02_Var02)
+
+par(mfrow = c(1,2))
+hist(ts_S02_Var03)
+boxplot(ts_S02_Var03)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var05)
+boxplot(ts_S03_Var05)
+
+par(mfrow = c(1,2))
+hist(ts_S03_Var07)
+boxplot(ts_S03_Var07)
+
+```
+
+
+Except for the S03, rest of the histgrams have right skewness, and Var02 and Var03 have some outliers. For V02, the outliers overlaps, it seems that they are not caused by mistake. It is more likely caused by shock. on the other hand, the Var03 has one point of outlier. Therefore, we assume the outlier from Var03 is caused by mistake.We use tsclean() function to get rid ofthe outlier from Var03.
+
+```{r}
+ts_S02_Var03<-tsclean(ts_S02_Var03)
+
+boxplot(ts_S02_Var03) # the outlier from Var03 is cleaned.
+```
+
+### Seasonality
+ndiffs test for ts_S01_Var01.
+```{r}
+
+ndiffs(ts_S01_Var01)
+ts_S01_Var01%>%diff()%>%ndiffs()
+
+
+```
+The ndiffs test tells that ts_S01_Var01 requires 1 difference.
+
+
+ndiffs test for ts_S01_Var02.
+```{r}
+ndiffs(ts_S01_Var02)
+ts_S01_Var02%>%diff()%>%ndiffs()
+
+```
+
+
+ndiffs test for ts_S02_Var02.
+```{r}
+ndiffs(ts_S02_Var02)
+ts_S02_Var02%>%diff()%>%ndiffs()
+
+
+
+```
+
+
+ndiffs test for ts_S02_Var03.
+```{r}
+ndiffs(ts_S02_Var03)
+ts_S02_Var02%>%diff()%>%ndiffs()
+
+
+```
+
+ndiffs test for ts_S03_Var05.
+```{r}
+ndiffs(ts_S03_Var05)
+ts_S03_Var05%>%diff()%>%ndiffs()
+
+
+```
+
+ndiffs test for ts_S03_Var07.
+```{r}
+ndiffs(ts_S03_Var07)
+ts_S03_Var07%>%diff()%>%ndiffs()
+
+
+```
+
+
+
+
+According to the ndiffs test, all the variables above require difference.
+
+
+
+
+## Prediction
+
+Build training data
+
+```{r}
+train0101<-window(ts_S01_Var01, end=as.integer(length(ts_S01_Var01)*0.7))
+train0102<-window(ts_S01_Var02, end=as.integer(length(ts_S01_Var02)*0.7))
+train0202<-window(ts_S02_Var02, end=as.integer(length(ts_S02_Var02)*0.7))
+train0203<-window(ts_S02_Var03, end=as.integer(length(ts_S02_Var03)*0.7))
+train0305<-window(ts_S03_Var05, end=as.integer(length(ts_S03_Var05)*0.7))
+train0307<-window(ts_S03_Var07, end=as.integer(length(ts_S03_Var07)*0.7))
+```
+
+
+test set
+```{r}
+length(ts_S01_Var01)*0.3
+```
+We chose 30% of the variables as the test data.
+
+
+
+### MAPE Value
+```{r}
+library(dplyr)
+library(forecast)
+AA_fit0101 <- train0101 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0102 <- train0102 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0202 <- train0202 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0203 <- train0203 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0305 <- train0305 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+AA_fit0307 <- train0307 %>% auto.arima(stepwise = FALSE, approximation =FALSE, seasonal = TRUE) %>% forecast(h=488)
+
+
+
+mape0101<-accuracy(AA_fit0101,ts_S01_Var01)["Test set", "MAPE"]
+mape0101
+
+mape0102<-accuracy(AA_fit0102,ts_S01_Var02)["Test set","MAPE"]
+mape0102
+
+mape0202<-accuracy(AA_fit0202,ts_S02_Var02)["Test set", "MAPE"]
+mape0202
+
+mape0203<-accuracy(AA_fit0203,ts_S02_Var03)["Test set", "MAPE"]
+mape0203
+
+mape0305<-accuracy(AA_fit0305,ts_S03_Var05)["Test set", "MAPE"]
+mape0101
+
+mape0307<-accuracy(AA_fit0307,ts_S03_Var07)["Test set", "MAPE"]
+mape0307
+```
+
+
+```{r}
+AA0101<-auto.arima(ts_S01_Var01, stepwise = F, approximation = F, seasonal = T)
+fcast0101<-forecast(AA0101,h=140)
+plot(fcast0101)
+
+AA0102<-auto.arima(ts_S01_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0102<-forecast(AA0102,h=140)
+plot(fcast0102)
+
+AA0202<-auto.arima(ts_S02_Var02, stepwise = F, approximation = F, seasonal = T)
+fcast0202<-forecast(AA0202,h=140)
+plot(fcast0202)
+
+
+AA0203<-auto.arima(ts_S02_Var03, stepwise = F, approximation = F, seasonal = T)
+fcast0203<-forecast(AA0203,h=140)
+plot(fcast0203)
+
+AA0305<-auto.arima(ts_S03_Var05, stepwise = F, approximation = F, seasonal = T)
+fcast0305<-forecast(AA0305,h=140)
+plot(fcast0305)
+
+
+
+AA0307<-auto.arima(ts_S03_Var07, stepwise = F, approximation = F, seasonal = T)
+fcast0307<-forecast(AA0307,h=140)
+plot(fcast0307)
+```
+
+
+```{r}
+fcast0101
+fcast0102
+fcast0202
+fcast0203
+fcast0305
+fcast0307
+```
+
+```{r}
+S0101 <- fcast0101$mean
+S0102 <- fcast0102$mean
+S0202 <- fcast0202$mean
+S0203 <- fcast0203$mean
+S0305 <- fcast0305$mean
+S0307 <- fcast0307$mean
+S0101_preds <- S0101[1:140]
+S0102_preds <- S0102[1:140]
+S0202_preds <- S0202[1:140]
+S0203_preds <- S0203[1:140]
+S0305_preds <- S0305[1:140]
+S0307_preds <- S0307[1:140]
+csv <- data.frame(cbind(S0101_preds, S0102_preds, S0202_preds, S0203_preds,S0305_preds, S0307_preds))
+write.csv(csv, file = "C:/data/csv.csv")
+```
+

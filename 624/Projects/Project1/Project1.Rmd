@@ -6,12 +6,12 @@ output: word_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = F, warning=F, message=F)
 ```
 
 ## Introduction
 
-Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
+Given an unknown data source with several groups, we attempt to predict the next 140 values of a times series data set based on 1622 entries provided on multiple events. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and all associated code to produce the models can be found in the attached markdown file. The data with its first five rows, are shown below.  
 
 ```{r}
 # Packages
@@ -19,13 +19,25 @@ library(tidyverse)
 # Data source
 data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
 data <- data %>% 
-  rename(SeriesIND = ï..SeriesInd) 
+  rename(SeriesInd = ï..SeriesInd) 
 head(data, 5)
 ```
 
-Our results will be in an excel spreadsheet containing one sheet (or tab) for each group. Predictions will be made for each of these groups based on the most appropriate model developed in this analysis. Each sheet will also have the variable *SeriesIND* listed ascending order for review. 
+We create forecasts for two preselected variables within each of six predetermined groups. These groups are denoted S01, S02, S03, S04, S05, and S06 respectively. There are five variables within each group that we have to work with. They are Var01, Var02, Var03, Var05, and Var07 respectively. Our date variable ‘SeriesInd,’ is displayed in its numeric serial number form calculated with Excel. Although we do not know what the variables stand for, we can develop models to try and forecast their behavior. This chart contains a breakdown of which variables are forecast in each group.
 
 ```{r}
+# Chart
+varsbygroup <- data.frame(matrix(c("S01", "S02", "S03",
+                                   "S04", "S05", "S06", 
+                                   "Var01", "Var02", "Var05",
+                                   "Var01", "Var02", "Var05",
+                                   "Var02", "Var03", "Var07",
+                                   "Var02", "Var03", "Var07"),
+                                 nrow = 6, ncol=3))
+colnames(varsbygroup) <- c("Group", "Variable1", "Variable2")
+varsbygroup %>% 
+  kbl(booktabs = T) %>% 
+  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = T)
 # Grouping
 S01 <- data %>% 
   filter(group == "S01")
@@ -82,7 +94,7 @@ for (i in colnames(S06)){
 }
 ```
 
-
+Before we begin, the data is filtered to extract each time series by group. This isolates the Var01, Var02, Var03, Var05, and Var07 variables associated with groups S01, S02, and so on. Then, with each group and its respective variables’ behavior isolated, we clean and adjust the data to make use of it in the analysis. Once we determine the most appropriate models to forecast the proper variable in each group, we evaluate the results of our predictions. Our final forecasts are captured in the excel spreadsheet attached. 
 
 ## Analysis
 ### Subset S01, S02, S03 from the provided data.
@@ -301,8 +313,6 @@ ts_S03_Var07%>%diff()%>%ndiffs()
 
 
 According to the ndiffs test, all the variables above require difference.
-
-
 
 
 ## Prediction
