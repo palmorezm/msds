@@ -19,6 +19,7 @@ library(tidyverse)
 library(corrplot)
 library(MASS)
 library(forecast)
+library(caret)
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 ph.desc <- describe(ph)
@@ -115,6 +116,7 @@ data <- df %>%
                 PSC, 
                 PSC.Fill, 
                 PSC.CO2,
+                PH,
                 Mnf.Flow, 
                 Carb.Pressure1, 
                 Fill.Pressure, 
@@ -134,6 +136,20 @@ data <- df %>%
                 Balling.Lvl)
 ```
 
+
+```{r}
+# Split 70-30 training test
+set.seed(1102)
+index <- createDataPartition(data$PH, p = .7, 
+                             list = FALSE, times = 1)
+train <- data[index,]
+test <- data[-index,]
+rindex <- data %>%
+  filter(TARGET_FLAG == 1)
+reg.tindex <- createDataPartition(rindex$TARGET_AMT, p = .7, list = FALSE, times = 1)
+reg.train <- rindex[reg.tindex,]
+reg.test <- rindex[-reg.tindex,]
+```
 
 
 
