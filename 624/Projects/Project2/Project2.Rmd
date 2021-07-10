@@ -18,6 +18,7 @@ library(kableExtra)
 library(tidyverse)
 library(corrplot)
 library(MASS)
+library(forecast)
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 ph.desc <- describe(ph)
@@ -27,7 +28,6 @@ kable(t(ph.desc))
 
 
 ```{r}
-library(forecast)
 plot(ph$PH)
 # Create time series object
 autoplot()
@@ -101,5 +101,118 @@ summary(pm)
 model.ks <- lm(PH~., df)
 summary(model.ks)
 ```
+
+
+
+
+```{r}
+data <- df %>% 
+  dplyr::select(Brand.Code, 
+                Carb.Volume,
+                Fill.Ounces,
+                PC.Volume,
+                Carb.Temp,
+                PSC, 
+                PSC.Fill, 
+                PSC.CO2,
+                Mnf.Flow, 
+                Carb.Pressure1, 
+                Fill.Pressure, 
+                Hyd.Pressure2, 
+                Hyd.Pressure3, 
+                Filler.Level,
+                Temperature, 
+                Usage.cont,
+                Carb.Flow,
+                Density,
+                Balling,
+                Pressure.Vacuum, 
+                Oxygen.Filler, 
+                Bowl.Setpoint, 
+                Pressure.Setpoint, 
+                Alch.Rel,
+                Balling.Lvl)
+```
+
+
+
+
+
+
+
+
+## Model Building and Evaluation (Chunjie)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
