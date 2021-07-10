@@ -1,0 +1,47 @@
+---
+title: "Project2"
+author: "Group 3"
+date: "7/9/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Project 2
+
+```{r}
+library(utils) # Need to add to any data read in
+library(psych)
+library(kableExtra)
+library(tidyverse)
+library(corrplot)
+
+ph <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
+ph.desc <- describe(ph)
+kable(t(ph.desc))
+```
+
+
+
+```{r}
+library(forecast)
+plot(ph$PH)
+# Create time series object
+autoplot()
+numerics <- ph %>% 
+  dplyr::select(is.numeric) 
+res <- cor(numerics, use = "complete.obs")
+round(res, 2)
+corrplot::corrplot(res, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
+numerics[is.na(numerics)] <- median(numerics, na.rm=TRUE)
+ph %>% 
+  dplyr::select(is.numeric)
+ggplot()
+```
+
+
+
