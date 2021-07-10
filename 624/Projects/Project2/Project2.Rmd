@@ -39,8 +39,11 @@ corrplot::corrplot(res, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 numerics[is.na(numerics)] <- median(numerics, na.rm=TRUE)
 ph %>% 
-  dplyr::select(is.numeric)
-ggplot()
+  select(PH, Oxygen.Filler) %>% 
+  mutate(ValueIndex = 1:length(ph$PH)) %>% 
+  ggplot() + 
+  geom_point(aes(ValueIndex, PH, color = Oxygen.Filler))
+ggplot(ph, aes(PH)) + geom_histogram() 
 ```
 
 
