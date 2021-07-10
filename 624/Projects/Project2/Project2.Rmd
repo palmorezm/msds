@@ -144,11 +144,6 @@ index <- createDataPartition(data$PH, p = .7,
                              list = FALSE, times = 1)
 train <- data[index,]
 test <- data[-index,]
-rindex <- data %>%
-  filter(TARGET_FLAG == 1)
-reg.tindex <- createDataPartition(rindex$TARGET_AMT, p = .7, list = FALSE, times = 1)
-reg.train <- rindex[reg.tindex,]
-reg.test <- rindex[-reg.tindex,]
 ```
 
 
