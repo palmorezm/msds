@@ -15,7 +15,6 @@ knitr::opts_chunk$set(echo = TRUE, eval=F)
 
 ___
 
-
 ## KJ 6.3
 A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
 
@@ -125,7 +124,7 @@ lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', lmyield_test_rmse)
 ```
 
-####Response
+#### Response
 
 Using RMSE as the performance metric, the value if 1.25 as shown below…
 The optimal value of the performance metric for the Test data is 1.25 as shown below…
@@ -291,7 +290,7 @@ varImp(marsModel)
 Response
 SVM, Neural Networks and MARS models were used for testing performances. Below is R Code for the models. Comparing RMSE values of three models , It is clear that the MARS model performs better. The RMSE value is 1.32. Yes , It selects the informative predictors (X1-X5). R Code and results are below.
 
-KJ 7.5
+## KJ 7.5
 Exercise 6.3 describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models. 
 
 Part A
