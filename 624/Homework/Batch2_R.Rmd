@@ -24,7 +24,7 @@ Start R and use these commands to load the data:
 
 #### Code
 
-```{r, eval=T}
+```{r}
 library(AppliedPredictiveModeling)
 #Load the data
 data(ChemicalManufacturingProcess)
@@ -40,7 +40,7 @@ The matrix processPredictors contains the 57 predictors (12 describing the input
 A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
 
 #### Code
-```{r, eval=T}
+```{r}
 #Fill in missing values with the median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
@@ -55,9 +55,15 @@ Split the data into a training and a test set, pre-process the data, and tune a 
 #### Code
 
 
-```{r correlations, eval=F}
+```{r correlations}
+library(reshape2)
+library(dplyr)
+cormat <- round(cor(df),2)
+melted_cormat = melt(cormat)
+melted_cormat_df = data.frame(melted_cormat)
 #Filter to only Yield and sort in descending order
-yield_corr = filter(melted_cormat_df, Var2 == "Yield")
+yield_corr <- melted_cormat_df %>% 
+  filter(Var2 == "Yield")
 yield_corr$absvalue = abs(yield_corr$value)
 yield_corr2 = yield_corr[order(-yield_corr[,4]),]
 yield_corr2
@@ -65,9 +71,16 @@ yield_corr2
 
 
 
-```{r modeling, eval=F}
-#Create the regression model
+```{r modeling}
 library(AppliedPredictiveModeling)
+#Create Train and Test data sets
+bound <- floor((nrow(df)/4)*3)      #define % of training and test set
+df <- df[sample(nrow(df)), ]        
+train <- df[1:bound, ]                   
+test <- df[(bound+1):nrow(df), ] 
+
+
+#Create the regression model
 lmyield = lm(Yield~ManufacturingProcess32 + 
                ManufacturingProcess36 + 
                ManufacturingProcess09 + 
@@ -78,6 +91,7 @@ lmyield = lm(Yield~ManufacturingProcess32 +
              data=train)
 summary(lmyield)
 ```
+
 #### Response
 After splitting the data into a 75% training, 25% test datasets, I chose to build a linear regression model using the top 7 features based on the correlations.
 
@@ -90,18 +104,20 @@ Here is the model.  The R2 of 61% isn’t very good and the only good predictor 
 Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
 
 #### Code
-```{r, eval=F}
+```{r}
 #predict with the test data
 predict(lmyield, newdata = test, interval ='prediction')
 ```
 
-```{r, eval=F}
+
+
+```{r}
+library(Metrics)
 #Predict with the test data
 lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
 lmyield_test_df$actual = test$Yield
 lmyield_test_df
-
 lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', lmyield_test_rmse)
 ```
@@ -162,7 +178,7 @@ getDoParWorkers()
 
 
 Code 
-```{r All Models, eval=T}
+```{r All Models}
 library(mlbench)
 library(caret)
 library(AppliedPredictiveModeling)
@@ -219,39 +235,22 @@ marsModel <- train(x = trainingData$x,
                    preProc = c("center", "scale"))
 marsPred <- predict(marsModel, newdata = testData$x)
 postResample(pred = marsPred, obs = testData$y)
+knnModel
+svmModel
+nnetModel
+marsModel
 varImp(marsModel)
 ```
 
 
-```{r kNN Model}
-knnModel
-```
-
-
-```{r SVM Model}
-svmModel
-```
-
-
-```{r Neural Net Model}
-nnetModel
-```
-
-
-```{r MARS Model}
-marsModel
-```
-
-
-
-```{r KNN Predictions, eval=F}
+```{r KNN Predictions}
 knnPred <- predict(knnModel, newdata = testData$x)
 ## The function 'postResample' can be used to get the test set 
 ## performance values 
 postResample(pred = knnPred, obs = testData$y)
 ```
 
-```{r SVM Model, eval=F}
+```{r SVM Model}
 svmModel <- train(x = trainingData$x,
                   y = trainingData$y,
                   method = "svmRadial",
@@ -262,7 +261,7 @@ svmPred <- predict(svmModel, newdata = testData$x)
 postResample(pred = svmPred, obs = testData$y)
 ```
 
-```{r Neural Net Model, eval=F}
+```{r Neural Net Model}
 nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
                         .size=c(1, 10, 15, 20),
                         .bag=FALSE)
@@ -280,7 +279,7 @@ nnetPred <- predict(nnetModel, newdata = testData$x)
 postResample(pred = nnetPred, obs = testData$y)
 ```
 
-```{r Model Evaluation, eval=F}
+```{r Model Evaluation,}
 postResample(pred = nnetPred, obs = testData$y)
 postResample(pred = svmPred, obs = testData$y)
 postResample(pred = marsPred, obs = testData$y)
@@ -298,7 +297,30 @@ Which nonlinear regression model gives the optimal resampling and test set perfo
 
 Code
 
-```{r, eval=F}
+```{r}
+library(AppliedPredictiveModeling)
+#Load the data
+data(ChemicalManufacturingProcess)
+df = data.frame(ChemicalManufacturingProcess)
+#Create Train and Test data sets
+bound <- floor((nrow(df)/4)*3)      #define % of training and test set
+df <- df[sample(nrow(df)), ]         
+train <- df[1:bound, ]              
+test <- df[(bound+1):nrow(df), ] 
+#Create the train x and train y datasets for HW 7.5
+trainx = train[,2:ncol(train)]
+trainy = train$Yield
+testx = test[,2:ncol(test)]
+testy = test$Yield
+# Recreate RMSE from 6.3
+
+```
+
+
+
+
+```{r}
+library(caret)
 #Using KNN for HW 7.5
 #Train KNN
 knnModel <- train(x=trainx, y=trainy)
@@ -362,7 +384,7 @@ KJ 8.1
 >simulated <- as.data.frame(simulated)
 >colnames(simulated)[ncol(simulated)] <- "y"
 
-```{r, eval=T}
+```{r}
 library(mlbench)
 library(randomForest)
 library(caret)
@@ -486,7 +508,7 @@ Use a simulation to show tree bias with different granularities.
 Fit a random forest model to all of the predictors, then estimate the variable importance scores:
 
 Code
-```{r, eval=T}
+```{r}
 library(caret)
 library(rpart)
 set.seed(755)
@@ -561,7 +583,19 @@ Which tree-based regression model gives the optimal resampling and test set perf
 
 Code
 ```{r}
-# Packages?
+library(AppliedPredictiveModeling)
+#Load the data
+data(ChemicalManufacturingProcess)
+df = data.frame(ChemicalManufacturingProcess)
+for(i in 1:ncol(df)){
+  df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
+#Create Train and Test data sets
+bound <- floor((nrow(df)/4)*3)      #define % of training and test set
+df <- df[sample(nrow(df)), ]     
+train <- df[1:bound, ]                   
+test <- df[(bound+1):nrow(df), ] 
+sum(is.na(train))
+sum(is.na(test))
 # Create the Random Forest Tree
 rf_model = randomForest(Yield~ManufacturingProcess32 + ManufacturingProcess36 + ManufacturingProcess09 + ManufacturingProcess13 + BiologicalMaterial02 + BiologicalMaterial06 + BiologicalMaterial03, data=train)
 ```
@@ -584,12 +618,13 @@ ctree_model = cforest(Yield~ManufacturingProcess32 + ManufacturingProcess36 + Ma
 ```
 
 ```{r}
+library(Metrics)
 #Predict with the test data
 ctree_test = predict(ctree_model, newdata = test)
 ctree_test_df = data.frame(ctree_test)
 ctree_test_df$actual = test$Yield
 ctree_test_df
-
+# USes lmyield from 6.3 
 ctree_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', ctree_test_rmse)
 ```
