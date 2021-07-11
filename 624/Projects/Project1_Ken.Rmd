@@ -1,0 +1,148 @@
+---
+title: "Project 1"
+author: "Group 3"
+date: "6/19/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Given an unknown data source with several periods, we attempt to predict the next 140 based on the total 1622 periods in this data set. Our predictions will be fine-tuned to reduce the mean absolute percentage error (MAPE) as much as possible. The packages we will be using and the data, with its first five rows, is shown below. 
+
+```{r}
+# Packages
+library(tidyverse)
+library(forecast)
+library(MLmetrics)
+library(openxlsx)
+
+# Data source
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
+data <- data %>% 
+  rename(SeriesIND = ï..SeriesInd) 
+head(data, 5)
+```
+
+Our results will be in an excel spreadsheet containing one sheet (or tab) for each group. Predictions will be made for each of these groups based on the most appropriate model developed in this analysis. Each sheet will also have the variable *SeriesIND* listed ascending order for review. 
+
+```{r}
+# Grouping
+S01 <- data %>% 
+  filter(group == "S01")
+S02 <- data %>% 
+  filter(group == "S02")
+S03 <- data %>%
+  filter(group == "S03")
+S04 <- data %>% 
+  filter(group == "S04")
+S05 <- data %>% 
+  filter(group == "S05")
+S06 <- data %>% 
+  filter(group == "S06")
+
+# Imputation by function - missing something? lapply/sapply may work 
+soximp <- function(df){
+  for (i in colnames(df)){
+    if (sum(is.na(df[[i]])) !=0){
+      df[[i]][is.na(df[[i]])] <- median(df[[i]], na.rm=TRUE)
+    }
+  }
+}
+
+# Imputation loops for each group by median 
+for (i in colnames(S01)){
+  if (sum(is.na(S01[[i]])) != 0){
+    S01[[i]][is.na(S01[[i]])] <- median(S01[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S02)){
+  if (sum(is.na(S02[[i]])) != 0){
+    S02[[i]][is.na(S02[[i]])] <- median(S02[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S03)){
+  if (sum(is.na(S03[[i]])) != 0){
+    S03[[i]][is.na(S03[[i]])] <- median(S03[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S04)){
+  if (sum(is.na(S04[[i]])) != 0){
+    S04[[i]][is.na(S04[[i]])] <- median(S04[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S05)){
+  if (sum(is.na(S05[[i]])) != 0){
+    S05[[i]][is.na(S05[[i]])] <- median(S05[[i]], na.rm = TRUE)
+  } 
+}
+for (i in colnames(S06)){
+  if (sum(is.na(S06[[i]])) != 0){
+    S06[[i]][is.na(S06[[i]])] <- median(S06[[i]], na.rm = TRUE)
+  } 
+}
+```
+
+#Create fit data
+```{r}
+S01_fitVar01_data = S01[1:1622,c('SeriesIND','Var01')]
+S01_fitVar02_data = S01[1:1622,c('SeriesIND','Var02')]
+S01_fitVar05_data = S01[1:1622,c('SeriesIND','Var05')]
+
+S02_fitVar01_data = S02[1:1622,c('SeriesIND','Var01')]
+S02_fitVar02_data = S02[1:1622,c('SeriesIND','Var02')]
+S02_fitVar05_data = S02[1:1622,c('SeriesIND','Var05')]
+
+S03_fitVar01_data = S03[1:1622,c('SeriesIND','Var01')]
+S03_fitVar02_data = S03[1:1622,c('SeriesIND','Var02')]
+S03_fitVar05_data = S03[1:1622,c('SeriesIND','Var05')]
+
+```
+
+## Analysis
+```{r}
+fit_S01_Var01 = auto.arima(S01_fitVar01_data[,'Var01'])
+fit_S01_Var02 = auto.arima(S01_fitVar02_data[,'Var02'])
+fit_S01_Var05 = auto.arima(S01_fitVar05_data[,'Var05'])
+
+fit_S02_Var01 = auto.arima(S02_fitVar01_data[,'Var01'])
+fit_S02_Var02 = auto.arima(S02_fitVar02_data[,'Var02'])
+fit_S02_Var05 = auto.arima(S02_fitVar05_data[,'Var05'])
+
+fit_S03_Var01 = auto.arima(S03_fitVar01_data[,'Var01'])
+fit_S03_Var02 = auto.arima(S03_fitVar02_data[,'Var02'])
+fit_S03_Var05 = auto.arima(S03_fitVar05_data[,'Var05'])
+
+```
+
+## Prediction
+```{r}
+predict_S01_Var01 = fit_S01_Var01 %>% forecast(h=140) %>% data.frame
+predict_S01_Var02 = fit_S01_Var02 %>% forecast(h=140) %>% data.frame
+predict_S01_Var05 = fit_S01_Var05 %>% forecast(h=140) %>% data.frame
+
+predict_S02_Var01 = fit_S02_Var01 %>% forecast(h=140) %>% data.frame
+predict_S02_Var02 = fit_S02_Var02 %>% forecast(h=140) %>% data.frame
+predict_S02_Var05 = fit_S02_Var05 %>% forecast(h=140) %>% data.frame
+
+predict_S03_Var01 = fit_S03_Var01 %>% forecast(h=140) %>% data.frame
+predict_S03_Var02 = fit_S03_Var02 %>% forecast(h=140) %>% data.frame
+predict_S03_Var05 = fit_S03_Var05 %>% forecast(h=140) %>% data.frame
+
+```
+
+#Write predictions to csv and Excel
+```{r}
+predictions_S123_v125_df = data.frame(predict_S01_Var01[1],predict_S01_Var02[1], predict_S01_Var05[1],
+predict_S02_Var01[1],predict_S02_Var02[1],predict_S02_Var05[1],predict_S03_Var01[1],predict_S03_Var02[1],
+predict_S03_Var05[1])
+
+colnames(predictions_S123_v125_df) <- c('S01_Var01', 'S01_Var02', 'S01_Var05', 'S02_Var01', 'S02_Var02', 'S02_Var05', 'S03_Var01', 'S03_Var02', 'S03_Var05')
+
+write.csv(x = predictions_S123_v125_df, file='predictions_S123_V125_Ken.csv')
+write.xlsx(predictions_S123_v125_df, 'predictions_S123_V125_Ken.xlsx')
+```
+
