@@ -35,9 +35,12 @@ library(flextable)
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 obs.sample <- as.data.frame(t(head(sample_n(ph[1:33], 5), 5)))
+obs.sample <- as.data.frame(lapply(obs.sample[2:33,], 
+function(x) round(as.numeric(as.character(x)),1)))
+obs.sample <- rbind(ph$ï..Brand.Code, obs.sample)
 obs.sample <- obs.sample %>% 
   mutate(Variable = colnames(ph)) %>%
-  dplyr::select(Variable, 1, 2, 3, 4, 5)
+  dplyr::select(Variable, X1, X2, X3, X4, X5)
 flextable(obs.sample) %>% 
   theme_vanilla() %>% 
   set_table_properties(layout = "autofit")
@@ -45,23 +48,26 @@ flextable(obs.sample) %>%
 
 
 
-We note a few interesting facts before exploring further. We notice that data is missing. These appear as empty spots on the table. It also appears due to the conversion of spreadsheet formats from excel to csv when hosting the data, our first column variable name is legible but needs the "i.." symbol removed. None of the other 33 variables need to be renamed. Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary between roughly -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). We take a closer look at these variables with some descriptive statistics.   
+We note a few interesting facts before exploring further. We notice that data is missing. These appear as empty spots on the table. It also appears that due to the conversion of spreadsheet formats from excel to csv when hosting the data, our first column variable name is legible but needs the "i.." symbol removed. None of the other 33 variables need to be renamed. Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary between roughly -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). We take a closer look at these variables with some descriptive statistics.   
 
 
 
 ```{r, eval=T}
 ph.desc <- ph %>% 
   describe() %>%
+  mutate("pm" = round(((2571 - n)/2571)*100, 2), 
+         obs = n, 
+         med = median) %>% 
   round(digits = 1) %>% 
-  mutate('missing' = round(((2571 - n)/2571)*100, 2), 
-         obs = n) %>%
-  dplyr::select(obs, missing, median, mean, 
-                sd, min, max, range, skew, se)
+  mutate(var = colnames(ph)) %>%
+  dplyr::select(var, obs, pm, mean, med,
+                sd, min, max, skew, se)
 flextable::flextable(ph.desc) %>% 
   theme_vanilla() %>% 
   set_table_properties(layout = "autofit")
 ```
 
+In the header the abbreviations stand for observations (obs), percent missing (missing), median, mean, standard deviation, minimum, maximum, range, skew, and standard error. These are calculated for each variable. To get a better understanding of the target variable we are trying to make predictions for, we visualize the points as a scatterplot.       
 
 
 ```{r}
@@ -74,12 +80,11 @@ corrplot::corrplot(res, type = "upper", order = "hclust",
          tl.col = "black", tl.srt = 45)
 numerics[is.na(numerics)] <- median(numerics, na.rm=TRUE)
 ph %>% 
-  select(PH, Oxygen.Filler) %>% 
+  dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(ValueIndex = 1:length(ph$PH)) %>% 
   ggplot() + 
-  geom_point(aes(ValueIndex, PH, color = Oxygen.Filler))
+  geom_point(aes(ValueIndex, PH, color = PH))
 ggplot(ph, aes(PH)) + geom_histogram() 
-ggplot(ph, aes(PH, PH)) + geom_violin() 
 ```
 
 
