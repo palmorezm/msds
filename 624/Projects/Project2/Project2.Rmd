@@ -245,6 +245,31 @@ data <- df %>%
 ```
 
 
+
+
+
+
+```{r}
+library(naniar)
+miss_var_summary(data)
+vis_miss(data, sort_miss = TRUE) 
+```
+
+
+
+```{r}
+library(zoo)
+library(naniar)
+data<-na.locf(data,fromLast = TRUE)
+is.na(data)
+
+
+vis_miss(data, sort_miss = TRUE) 
+str(data)
+```
+
+
+
 ```{r}
 # Split 70-30 training test
 set.seed(1102)
@@ -253,6 +278,54 @@ index <- createDataPartition(data$PH, p = .7,
 train <- data[index,]
 test <- data[-index,]
 ```
+
+
+
+
+Ridge Regression
+
+```{r}
+library(elasticnet)
+trctrl<- trainControl(method="repeatedcv", number=3, repeats=2)
+
+ridge <- caret::train(PH~., data=train, method="ridge", 
+                trControl=trctrl)
+ridgePred <- predict(ridge, newdata = test)
+ridge_test<-data.frame(postResample(pred = ridgePred, obs = test$PH)) 
+ridge_test
+
+```
+
+
+
+Random Forest
+```{r}
+library(party)
+library(caret)
+forest <- train(PH~., data=train, method="cforest", 
+                trControl=trctrl,
+                tuneLength =2)
+forestPred <- predict(forest, newdata = test)
+forest_test<-data.frame(postResample(pred = forestPred, obs = test$PH)) 
+forest_test
+```
+
+
+Support Vector
+
+```{r}
+library(caret)
+library(kernlab)
+svm_grid <-  expand.grid(C = c(1,1000))
+svm<-train(PH~., data = train, 
+                 method = 'svmRadialCost', 
+                 trControl = trctrl, 
+                 tuneGrid = svm_grid)
+svmPred <- predict(svm, newdata = test)
+svm_test<-data.frame(postResample(pred = svmPred, obs = test$PH)) 
+svm_test
+```
+
 
 
 # Model Selection
