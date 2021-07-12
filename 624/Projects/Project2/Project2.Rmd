@@ -75,8 +75,9 @@ In the header the abbreviations stand for observations (obs), percent missing (m
 ph %>% 
   dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(ValueIndex = 1:length(ph$PH)) %>% 
-  ggplot() + 
-  geom_point(aes(ValueIndex, PH, color = PH)) 
+  ggplot(aes(PH, Oxygen.Filler)) + 
+  geom_point(aes(color = Oxygen.Filler)) + 
+  geom_smooth(method = "lm")
 ```
 
 
