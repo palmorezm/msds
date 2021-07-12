@@ -32,6 +32,7 @@ library(corrplot)
 library(MASS)
 library(caret)
 library(flextable)
+theme_set(theme_minimal())
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 obs.sample <- as.data.frame(t(head(sample_n(ph[1:33], 5), 5)))
@@ -71,20 +72,85 @@ In the header the abbreviations stand for observations (obs), percent missing (m
 
 
 ```{r}
-plot(ph$PH)
-numerics <- ph %>% 
-  dplyr::select(is.numeric) 
-res <- cor(numerics, use = "complete.obs")
-round(res, 2)
-corrplot::corrplot(res, type = "upper", order = "hclust", 
-         tl.col = "black", tl.srt = 45)
-numerics[is.na(numerics)] <- median(numerics, na.rm=TRUE)
 ph %>% 
   dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(ValueIndex = 1:length(ph$PH)) %>% 
   ggplot() + 
-  geom_point(aes(ValueIndex, PH, color = PH))
-ggplot(ph, aes(PH)) + geom_histogram() 
+  geom_point(aes(ValueIndex, PH, color = PH)) 
+```
+
+
+
+```{r}
+ph %>%
+  gather(variable, value, -PH) %>% 
+  ggplot(., aes(value, PH)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light sky blue") + 
+  geom_smooth(formula = y ~x, 
+              method = "lm", 
+              size=.1,
+              se = TRUE,
+              color = "black", 
+              linetype = "line", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        plot.title = element_blank())
+```
+
+
+```{r}
+ph %>%
+  gather(variable, value) %>% 
+  ggplot(., aes(value)) + 
+  ggtitle("Linearity of Values") + 
+  geom_histogram(stat="count", 
+                 fill = "white",
+             size=1, 
+             shape=1, 
+             color="light sky blue") + 
+  geom_density() + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        plot.title = element_blank())
+```
+
+
+```{r}
+ph %>%
+  gather(variable, value, -PH) %>% 
+  ggplot(., aes(value, PH)) + 
+  ggtitle("Linearity of Values") + 
+  geom_violin(fill = "white",
+             color="light sky blue") + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        plot.title = element_blank())
+```
+
+
+
+
+```{r}
+numerics <- ph %>% 
+  dplyr::select(where(is.numeric)) 
+res <- cor(numerics, use = "complete.obs")
+round(res, 2)
+corrplot::corrplot(res, type = "upper", order = "hclust", 
+         tl.col = "black", tl.srt = 45)
 ```
 
 
