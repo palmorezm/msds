@@ -49,7 +49,7 @@ flextable(obs.sample) %>%
 
 
 
-We note a few interesting facts before exploring further. We notice that data is missing. These appear as empty spots on the table. It also appears that due to the conversion of spreadsheet formats from excel to csv when hosting the data, our first column variable name is legible but needs the "i.." symbol removed. None of the other 33 variables need to be renamed. Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary between roughly -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). We take a closer look at these variables with some descriptive statistics.   
+We note a few interesting facts before exploring further. We notice that data is missing. These appear as empty spots on the table. It also appears that due to the conversion of spreadsheet formats from excel to csv when hosting the data, our first column variable name is legible but needs the "i.." symbol removed. None of the other 33 variables need to be renamed. Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary between roughly -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). We take a closer look at these variables with some descriptive statistics.  
 
 
 
@@ -74,16 +74,16 @@ In the header the abbreviations stand for observations (obs), percent missing (m
 ```{r}
 ph %>% 
   dplyr::select(PH, Oxygen.Filler) %>% 
-  mutate(ValueIndex = 1:length(ph$PH)) %>% 
-  ggplot(aes(PH, Oxygen.Filler)) + 
-  geom_point(aes(color = Oxygen.Filler)) + 
-  geom_smooth(method = "lm")
+  mutate(Index = 1:length(ph$PH)) %>% 
+  ggplot(aes(Index, PH)) + 
+  geom_point(aes(color = PH)) + 
+  geom_smooth(method = "loess")
 ```
 
 
 
 ```{r}
-ph %>%
+ph[c(2:9,26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
   ggtitle("Linearity of Values") + 
@@ -91,20 +91,89 @@ ph %>%
              size=1, 
              shape=1, 
              color="light sky blue") + 
-  geom_smooth(formula = y ~x, 
+  geom_smooth(formula = y~x, 
               method = "lm", 
-              size=.1,
+              size=1,
               se = TRUE,
               color = "black", 
-              linetype = "line", 
+              linetype = "dashed", 
               alpha=0.25) + 
   facet_wrap(~variable, 
              scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), 
-        axis.text.y = element_blank(), 
-        plot.title = element_blank())
+             ncol = 4) 
 ```
+
+
+
+
+```{r}
+ph[c(10:17,26)] %>%
+  gather(variable, value, -PH) %>% 
+  ggplot(., aes(value, PH)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light sky blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=1,
+              se = TRUE,
+              color = "black", 
+              lty = "dashed", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) 
+```
+
+
+```{r}
+ph[c(18:26)] %>%
+  gather(variable, value, -PH) %>% 
+  ggplot(., aes(value, PH)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light sky blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dashed", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) 
+```
+
+
+
+
+```{r}
+ph[c(27:33,26)] %>% 
+  mutate(pH = PH) %>% 
+  gather(variable, value, -PH) %>% 
+  ggplot(., aes(value, PH)) + 
+  ggtitle("Linearity of Values") + 
+  geom_point(fill = "white",
+             size=1, 
+             shape=1, 
+             color="light sky blue") + 
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=1,
+              se = TRUE,
+              color = "black", 
+              linetype = "dashed", 
+              alpha=0.25) + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) 
+```
+
 
 
 ```{r}
@@ -113,11 +182,9 @@ ph %>%
   ggplot(., aes(value)) + 
   ggtitle("Linearity of Values") + 
   geom_histogram(stat="count", 
-                 fill = "white",
-             size=1, 
-             shape=1, 
-             color="light sky blue") + 
-  geom_density() + 
+                 binwidth = 10, 
+                 fill = "white", 
+                 color="light sky blue") + 
   facet_wrap(~variable, 
              scales ="free",
              ncol = 4) +
@@ -158,10 +225,29 @@ corrplot::corrplot(res, type = "upper", order = "hclust",
 
 
 ```{r}
-ggplot() + geom_boxplot(aes(ph$PH))
+ph %>% 
+  gather(variable, value) %>%
+  ggplot(aes(value)) + 
+  geom_boxplot(aes(color=variable)) + 
+  facet_wrap(~variable,
+             scales = "free", 
+             ncol = 4)
+ph %>%
+  gather(variable, value) %>% 
+  ggplot(., aes(value)) + 
+  ggtitle("Boxplot of Variables") + 
+  geom_boxplot() + 
+  facet_wrap(~variable, 
+             scales ="free",
+             ncol = 4) +
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank())
 ```
 
+
+
 # Data Preparation
+
 
 ```{r}
 # replaces NA with median (given a removal of missing values in calculation)
@@ -244,6 +330,23 @@ data <- df %>%
                 Balling.Lvl)
 ```
 
+
+
+```{r}
+nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
+                        .size=c(1, 10, 15, 20),
+                        .bag=FALSE)
+nnetModel <- train(x = trainingData$x,
+                   y = trainingData$y,
+                   method = "avNNet",
+                   tuneGrid = nnetGrid,
+                   preProc = c("center", "scale"),
+                   trace=FALSE,
+                   linout=TRUE,
+                   maxit=500)
+# Neural net may take several minutes
+nnetPred <- predict(nnetModel, newdata = testData$x)
+```
 
 
 
