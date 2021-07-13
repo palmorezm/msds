@@ -29,7 +29,7 @@ library(utils)
 library(psych)
 library(tidyverse)
 library(corrplot)
-library(ggcorplot)
+library(ggcorrplot)
 library(MASS)
 library(caret)
 library(flextable)
@@ -206,20 +206,43 @@ ph %>%
 
 
 ```{r}
-numerics <- ph %>% 
-  dplyr::select(where(is.numeric)) 
-cors <- cor(numerics, use = "complete.obs")
+ordered <- ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  arrange() 
+cors <- cor(ordered, use = "complete.obs")
 round(cors, 2)
 corrplot::corrplot(cors, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
 
 p.mat <- ggcorrplot::cor_pmat(cors, sig.level = 0.05)
 sum(p.mat > .05)
-ggcorrplot(res, "square", "lower", 
+ggcorrplot(cors, "square", "lower", 
            colors = c("#6D9EC1", "white", "#E46726"), 
            outline.color = "white", 
            digits = 1, 
-           p.mat=p.mat) + 
+           p.mat=p.mat,
+           hc.order = FALSE, 
+           hc.method = "complete") + 
+  coord_flip() + 
+  labs(title = "Corrlation Matrix with Significance Label 0.05")
+# Alternative
+order <- ph %>% 
+  dplyr::select(where(is.numeric)) %>%
+  arrange() %>%  
+  gather(variable, value) %>% 
+  pivot_wider(id_cols = variable, names_from = variable, values_from = value) %>%
+  unnest()
+order <- order[,order(colnames(order),decreasing=TRUE)]
+cors <- cor(order, use = "complete.obs")
+p.mat <- ggcorrplot::cor_pmat(cors, sig.level = 0.05)
+sum(p.mat > .05)
+ggcorrplot(cors, "square", "lower", 
+           colors = c("#6D9EC1", "white", "#E46726"), 
+           outline.color = "white", 
+           digits = 1, 
+           p.mat=p.mat,
+           hc.order = FALSE, 
+           hc.method = "complete") + 
   coord_flip() + 
   labs(title = "Corrlation Matrix with Significance Label 0.05")
 ```
@@ -375,11 +398,12 @@ data <- df %>%
 
 
 ```{r}
+
 nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
                         .size=c(1, 10, 15, 20),
                         .bag=FALSE)
-nnetModel <- train(x = trainingData$x,
-                   y = trainingData$y,
+nnetModel <- train(x = train,
+                   y = train,
                    method = "avNNet",
                    tuneGrid = nnetGrid,
                    preProc = c("center", "scale"),

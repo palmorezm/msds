@@ -106,15 +106,11 @@ Here is the model.  The R2 of 61% isn’t very good and the only good predictor 
 Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
 
 #### Code
-```{r}
-#predict with the test data
-predict(lmyield, newdata = test, interval ='prediction')
-```
-
-
 
 ```{r}
 library(Metrics)
+#predict with the test data
+predict(lmyield, newdata = test, interval ='prediction')
 #Predict with the test data
 lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
@@ -169,13 +165,6 @@ Friedman (1991) introduced several benchmark data sets created by simulation. On
 ### Part A
 #### Question
 Tune several models on these data. An example is shown in the code. Which models appear to give the best performance? Does MARS select the informative predictors (those named X1–X5)?
-
-
-```{r}
-registerDoParallel()
-registerDoParallel(cores=2)
-getDoParWorkers()
-```
 
 
 
@@ -245,41 +234,6 @@ varImp(marsModel)
 ```
 
 
-```{r KNN Predictions}
-knnPred <- predict(knnModel, newdata = testData$x)
-## The function 'postResample' can be used to get the test set 
-## performance values 
-postResample(pred = knnPred, obs = testData$y)
-```
-
-```{r SVM Model}
-svmModel <- train(x = trainingData$x,
-                  y = trainingData$y,
-                  method = "svmRadial",
-                  tuneLength=10,
-                  preProc = c("center", "scale"))
-svmModel
-svmPred <- predict(svmModel, newdata = testData$x)
-postResample(pred = svmPred, obs = testData$y)
-```
-
-```{r Neural Net Model}
-nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
-                        .size=c(1, 10, 15, 20),
-                        .bag=FALSE)
-
-nnetModel <- train(x = trainingData$x,
-                   y = trainingData$y,
-                   method = "avNNet",
-                   tuneGrid = nnetGrid,
-                   preProc = c("center", "scale"),
-                   trace=FALSE,
-                   linout=TRUE,
-                   maxit=500)
-nnetModel
-nnetPred <- predict(nnetModel, newdata = testData$x)
-postResample(pred = nnetPred, obs = testData$y)
-```
 
 ```{r Model Evaluation,}
 postResample(pred = nnetPred, obs = testData$y)
@@ -287,7 +241,8 @@ postResample(pred = svmPred, obs = testData$y)
 postResample(pred = marsPred, obs = testData$y)
 varImp(marsModel)
 ```
-Response
+
+#### Response
 SVM, Neural Networks and MARS models were used for testing performances. Below is R Code for the models. Comparing RMSE values of three models , It is clear that the MARS model performs better. The RMSE value is 1.32. Yes , It selects the informative predictors (X1-X5). R Code and results are below.
 
 ## KJ 7.5
@@ -299,32 +254,78 @@ Which nonlinear regression model gives the optimal resampling and test set perfo
 
 Code
 
+
 ```{r}
+# Recreate RMSE from 6.3
+# Part A load the data
 library(AppliedPredictiveModeling)
 #Load the data
 data(ChemicalManufacturingProcess)
 df = data.frame(ChemicalManufacturingProcess)
+# Part B Fill in missing values with the median of each feature
+for(i in 1:ncol(df)){
+  df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
+# Part C Correlations and Modeling
+library(reshape2)
+library(dplyr)
+cormat <- round(cor(df),2)
+melted_cormat = melt(cormat)
+melted_cormat_df = data.frame(melted_cormat)
+#Filter to only Yield and sort in descending order
+yield_corr <- melted_cormat_df %>% 
+  filter(Var2 == "Yield")
+yield_corr$absvalue = abs(yield_corr$value)
+yield_corr2 = yield_corr[order(-yield_corr[,4]),]
+yield_corr2
+library(AppliedPredictiveModeling)
 #Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
-df <- df[sample(nrow(df)), ]         
-train <- df[1:bound, ]              
+df <- df[sample(nrow(df)), ]        
+train <- df[1:bound, ]                   
 test <- df[(bound+1):nrow(df), ] 
-#Create the train x and train y datasets for HW 7.5
-trainx = train[,2:ncol(train)]
-trainy = train$Yield
-testx = test[,2:ncol(test)]
-testy = test$Yield
-# Recreate RMSE from 6.3
-
+#Create the regression model
+lmyield = lm(Yield~ManufacturingProcess32 + 
+               ManufacturingProcess36 + 
+               ManufacturingProcess09 + 
+               ManufacturingProcess13 + 
+               BiologicalMaterial02 + 
+               BiologicalMaterial06 + 
+               BiologicalMaterial03, 
+             data=train)
+summary(lmyield)
+# Part D Predictions
+library(Metrics)
+# predict with the test data
+predict(lmyield, newdata = test, interval ='prediction')
+# Predict with the test data
+lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
+lmyield_test_df = data.frame(lmyield_test)
+lmyield_test_df$actual = test$Yield
+lmyield_test_df
+lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
+cat('RMSE of the test data for this model is', lmyield_test_rmse)
 ```
 
 
-
-
 ```{r}
-library(caret)
+#Create Train and Test data sets
+bound <- floor((nrow(df)/4)*3)      #define % of training and test set
+
+df <- df[sample(nrow(df)), ]         
+train <- df[1:bound, ]              
+test <- df[(bound+1):nrow(df), ] 
+
+#Create the train x and train y datasets for HW 7.5
+trainx = train[,2:ncol(train)]
+trainy = train$Yield
+
+testx = test[,2:ncol(test)]
+testy = test$Yield
+
 #Using KNN for HW 7.5
 #Train KNN
+library(caret) #contains train
+
 knnModel <- train(x=trainx, y=trainy)
 knnModel
 
@@ -333,6 +334,9 @@ knnPred <- predict(knnModel, newdata = testx)
 
 ## The function 'postResample' can be used to get the test set
 ## performance values
+
+library(caret) #contains postResample
+
 postResample(pred = knnPred, obs = testy)
 #Using MARS for HW7.5
 #Train using MARS
@@ -355,6 +359,8 @@ head(predict(marsTuned, testx))
 #Relevant features with MARS
 varImp(marsTuned)
 ```
+
+
 
 Response
 MARS and KNN models were trained and tested with the chemical data. Here is the R code. The best performance, but only by a narrow margin, appears to come from MARS with an RMSE of 1.15 versus KNN’s RMSE of 1.21. Performance from MARS summary is that the final values used were nprune = 4 and degree = 2.  This produced an RMSE of 1.15 as shown below. Performance from KNN summary is that the best mtry = 29.  This produced an RMSE of 1.21 as shown below. 
@@ -475,6 +481,7 @@ varimp(cforest_model) %>% sort(decreasing = T)
 
 varimp(cforest_model, conditional=T) %>% sort(decreasing = T)
 ```
+
 Response
 Uninformative predictors V6 - V10 are rated low
 Importance of duplicate1 correlated with V1 is reduced
@@ -565,13 +572,8 @@ varImp(gbm1)
 varImp(gbm2)
 ```
 
-```{r}
-varImp(gbm1)
-```
 
-```{r}
-varImp(gbm2)
-```
+
 Response
 Increasing the interaction depth will improve the predictor importance significantly. The below R code will create two GBM models. Looking at two sets of Importance values It is evident that with the interaction depth 10 the importance is spread across several predictors.
 
@@ -626,7 +628,56 @@ ctree_test = predict(ctree_model, newdata = test)
 ctree_test_df = data.frame(ctree_test)
 ctree_test_df$actual = test$Yield
 ctree_test_df
-# USes lmyield from 6.3 
+# Uses lmyield from 6.3 
+# Recreate lmyield and RMSE from 6.3 
+# Part A load the data
+library(AppliedPredictiveModeling)
+#Load the data
+data(ChemicalManufacturingProcess)
+df = data.frame(ChemicalManufacturingProcess)
+# Part B Fill in missing values with the median of each feature
+for(i in 1:ncol(df)){
+  df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
+# Part C Correlations and Modeling
+library(reshape2)
+library(dplyr)
+cormat <- round(cor(df),2)
+melted_cormat = melt(cormat)
+melted_cormat_df = data.frame(melted_cormat)
+#Filter to only Yield and sort in descending order
+yield_corr <- melted_cormat_df %>% 
+  filter(Var2 == "Yield")
+yield_corr$absvalue = abs(yield_corr$value)
+yield_corr2 = yield_corr[order(-yield_corr[,4]),]
+yield_corr2
+library(AppliedPredictiveModeling)
+#Create Train and Test data sets
+bound <- floor((nrow(df)/4)*3)      #define % of training and test set
+df <- df[sample(nrow(df)), ]        
+train <- df[1:bound, ]                   
+test <- df[(bound+1):nrow(df), ] 
+#Create the regression model
+lmyield = lm(Yield~ManufacturingProcess32 + 
+               ManufacturingProcess36 + 
+               ManufacturingProcess09 + 
+               ManufacturingProcess13 + 
+               BiologicalMaterial02 + 
+               BiologicalMaterial06 + 
+               BiologicalMaterial03, 
+             data=train)
+summary(lmyield)
+# Part D Predictions
+library(Metrics)
+# predict with the test data
+predict(lmyield, newdata = test, interval ='prediction')
+# Predict with the test data
+lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
+lmyield_test_df = data.frame(lmyield_test)
+lmyield_test_df$actual = test$Yield
+lmyield_test_df
+lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
+cat('RMSE of the test data for this model is', lmyield_test_rmse)
+# Create ctree with lmyield
 ctree_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', ctree_test_rmse)
 ```
@@ -660,6 +711,7 @@ I am assigning one simple problem on market basket analysis / recommender system
 #### Question
 Fit a random forest model to all of the predictors, then estimate the variable importance scores:
 
+Code
 
 ```{r}
 library(arules)
@@ -690,45 +742,6 @@ plot(subRules2, method="paracoord")
 ```
 
 
-Code
-```{r}
-df <- read.csv("GroceryDataSet.csv")
-df_sparse <- read.transactions("GroceryDataset.csv",format="basket",sep=",")
-summary(df_sparse)
-```
-
-```{r}
-itemFrequencyPlot(df_sparse,topN=20,type="absolute",col=brewer.pal(8,'Pastel2'), main="Frequently Purchased Products")
-```
-
-```{r}
-association.rules <- apriori(df_sparse, parameter = list(supp=0.004, conf=0.3,maxlen=5))
-length(association.rules)
-inspect(sort(association.rules, by = 'lift')[1:10])
-```
-
-```{r}
-subset.rules <- which(colSums(is.subset(association.rules, association.rules)) > 1) # get subset rules in vector
-length(subset.rules)  
-
-subset.association.rules. <- association.rules[-subset.rules] # remove subset rules.
-summary(subset.association.rules.)
-inspect(sort(subset.association.rules., by = 'lift')[1:10])
-```
-
-```{r}
-plot(subset.association.rules., method="two-key plot")
-```
-
-```{r}
-top10subRules <- head(subset.association.rules., n = 10, by = "lift")
-plot(top10subRules, method = "graph",  engine = "htmlwidget")
-```
-
-```{r}
-subRules2<-head(subset.association.rules., n=10, by="lift")
-plot(subRules2, method="paracoord")
-```
 
 Response
 Association Rules mining in R is achieved by usage of apriori function available under arules package. Association rules mining is a two step process. 
