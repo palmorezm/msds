@@ -29,9 +29,11 @@ library(utils)
 library(psych)
 library(tidyverse)
 library(corrplot)
+library(ggcorplot)
 library(MASS)
 library(caret)
 library(flextable)
+library(bestNormalize)
 theme_set(theme_minimal())
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
@@ -76,13 +78,17 @@ ph %>%
   dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(Index = 1:length(ph$PH)) %>% 
   ggplot(aes(Index, PH)) + 
-  geom_point(aes(color = PH)) + 
-  geom_smooth(method = "loess")
+  geom_point(aes(color = PH, alpha=.25)) + 
+  geom_smooth(method = "loess", 
+              color="goldenrod2", 
+              lty = "solid", 
+              fill = "yellow1")
 ```
 
 
 
 ```{r}
+# 1st set of variables - excluding brand code (categorical)
 ph[c(2:9,26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
@@ -95,18 +101,13 @@ ph[c(2:9,26)] %>%
               method = "lm", 
               size=1,
               se = TRUE,
-              color = "black", 
-              linetype = "dashed", 
+              color = "grey24", 
+              linetype = "dotdash", 
               alpha=0.25) + 
   facet_wrap(~variable, 
              scales ="free",
              ncol = 4) 
-```
-
-
-
-
-```{r}
+# 2nd set of variables
 ph[c(10:17,26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
@@ -119,16 +120,13 @@ ph[c(10:17,26)] %>%
               method = "lm", 
               size=1,
               se = TRUE,
-              color = "black", 
-              lty = "dashed", 
+              color = "grey24", 
+              lty = "dotdash", 
               alpha=0.25) + 
   facet_wrap(~variable, 
              scales ="free",
              ncol = 4) 
-```
-
-
-```{r}
+# 3rd set of variables 
 ph[c(18:26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
@@ -141,18 +139,14 @@ ph[c(18:26)] %>%
               method = "lm", 
               size=1,
               se = TRUE,
-              color = "black", 
-              linetype = "dashed", 
-              alpha=0.25) + 
+              color = "grey24", 
+              linetype = "dotdash", 
+              alpha=0.25, 
+              fill="white") + 
   facet_wrap(~variable, 
              scales ="free",
              ncol = 4) 
-```
-
-
-
-
-```{r}
+# last 8 variables
 ph[c(27:33,26)] %>% 
   mutate(pH = PH) %>% 
   gather(variable, value, -PH) %>% 
@@ -166,8 +160,8 @@ ph[c(27:33,26)] %>%
               method = "lm", 
               size=1,
               se = TRUE,
-              color = "black", 
-              linetype = "dashed", 
+              color = "grey24", 
+              linetype = "dotdash", 
               alpha=0.25) + 
   facet_wrap(~variable, 
              scales ="free",
@@ -195,18 +189,17 @@ ph %>%
 
 
 ```{r}
-ph %>%
+# Tornado plots by variable?
+ph %>% 
   gather(variable, value, -PH) %>% 
-  ggplot(., aes(value, PH)) + 
-  ggtitle("Linearity of Values") + 
-  geom_violin(fill = "white",
-             color="light sky blue") + 
-  facet_wrap(~variable, 
-             scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), 
-        axis.text.y = element_blank(), 
-        plot.title = element_blank())
+  ggplot(aes(variable, value)) + 
+  geom_violin(trim = FALSE, scale="area", 
+              aes(color=variable, fill=variable, alpha=0.15, )) + coord_flip() + 
+  geom_boxplot(width=.05, shape=1, alpha=0.20, color="black", size=.5) + 
+  theme(legend.position = "None", 
+        axis.title.x = element_blank(), 
+        axis.title.y = element_blank(), axis.text.y = element_blank()) + 
+  facet_wrap(~variable, scales = "free")
 ```
 
 
@@ -215,34 +208,68 @@ ph %>%
 ```{r}
 numerics <- ph %>% 
   dplyr::select(where(is.numeric)) 
-res <- cor(numerics, use = "complete.obs")
-round(res, 2)
-corrplot::corrplot(res, type = "upper", order = "hclust", 
+cors <- cor(numerics, use = "complete.obs")
+round(cors, 2)
+corrplot::corrplot(cors, type = "upper", order = "hclust", 
          tl.col = "black", tl.srt = 45)
+
+p.mat <- ggcorrplot::cor_pmat(cors, sig.level = 0.05)
+sum(p.mat > .05)
+ggcorrplot(res, "square", "lower", 
+           colors = c("#6D9EC1", "white", "#E46726"), 
+           outline.color = "white", 
+           digits = 1, 
+           p.mat=p.mat) + 
+  coord_flip() + 
+  labs(title = "Corrlation Matrix with Significance Label 0.05")
 ```
-
-
 
 
 ```{r}
+# Function to calculate and set pointrange
+xysdu <- function(x) {
+   m <- mean(x)
+   ymin <- m - sd(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymin = ymin, ymax = ymax))
+}
+# Full picture point range 
 ph %>% 
-  gather(variable, value) %>%
-  ggplot(aes(value)) + 
-  geom_boxplot(aes(color=variable)) + 
-  facet_wrap(~variable,
-             scales = "free", 
-             ncol = 4)
-ph %>%
+  dplyr::select(where(is.numeric)) %>% 
   gather(variable, value) %>% 
-  ggplot(., aes(value)) + 
-  ggtitle("Boxplot of Variables") + 
-  geom_boxplot() + 
-  facet_wrap(~variable, 
-             scales ="free",
-             ncol = 4) +
-  theme(axis.text.x = element_blank(), 
-        axis.text.y = element_blank())
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (smaller)
+ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(-MFR, -Filler.Speed, -Carb.Flow, -Mnf.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (Medium)
+ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(MFR, Mnf.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (larger)
+ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(Filler.Speed, Carb.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
 ```
+
 
 
 
@@ -262,7 +289,7 @@ sum(is.na(ph))
 ```{r}
 # select numeric variables
 ph.numerics <- ph %>% 
-  dplyr::select(is.numeric)
+  dplyr::select(where(is.numeric))
 # remove outliers based on IQR
 for (i in colnames(ph.numerics)) {
   iqr <- IQR(ph.numerics[[i]])
@@ -277,6 +304,21 @@ Brand.Code <- ph$ï..Brand.Code
 df <- cbind(Brand.Code, ph.numerics)
 sum(is.na(df$Brand.Code))
 ```
+
+
+```{r}
+# Produce recommended transformations
+df.nums <- df %>% 
+  dplyr::select(where(is.numeric))
+best.norms <- df.nums[1:11,1:10]
+for (i in colnames(df.nums)) {
+  best.norms[[i]] <- bestNormalize(df.nums[[i]],
+                                  allow_orderNorm = FALSE,
+                                  out_of_sample =FALSE)
+}
+best.norms$Carb.Volume$chosen_transform
+```
+
 
 
 # Model Building
