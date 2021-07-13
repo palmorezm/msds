@@ -11,7 +11,7 @@ always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval=T, warning=F, message=F)
+knitr::opts_chunk$set(echo = TRUE, eval=T, warning=F, message=F )
 ```
 
 ___
@@ -29,10 +29,19 @@ Start R and use these commands to load the data:
 
 ```{r}
 library(AppliedPredictiveModeling)
+library(flextable)
+library(dplyr)
 #Load the data
 data(ChemicalManufacturingProcess)
 df = data.frame(ChemicalManufacturingProcess)
-head(df)
+# Show initial observations
+initial.obs <- as.data.frame(t(head(df)))
+initial.obs <- initial.obs %>% 
+  mutate(Variable = colnames(df)) %>% 
+  dplyr::select(Variable, 1, 2, 3, 4, 5)
+flextable(initial.obs) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 #### Response
