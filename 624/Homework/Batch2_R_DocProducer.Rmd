@@ -17,13 +17,16 @@ knitr::opts_chunk$set(echo = TRUE, eval=T, warning=F, message=F )
 ___
 
 ## KJ 6.3
-A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors),measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
+A chemical manufacturing process for a pharmaceutical product was discussed in Sect. 1.4. In this problem, the objective is to understand the relationship between biological measurements of the raw materials (predictors), measurements of the manufacturing process (predictors), and the response of product yield. Biological predictors cannot be changed but can be used to assess the quality of the raw material before processing. On the other hand, manufacturing process predictors can be changed in the manufacturing process. Improving product yield by 1% will boost revenue by approximately one hundred thousand dollars per batch:
 
 ### Part A
 #### Question
-Start R and use these commands to load the data:
-> library(AppliedPredictiveModeling)
-> data(chemicalManufacturingProcess)
+Start R and use these commands to load the data: 
+
+    > library(AppliedPredictiveModeling)
+    > data(chemicalManufacturingProcess)
+
+
 
 #### Code
 
@@ -45,7 +48,7 @@ flextable(initial.obs) %>%
 ```
 
 #### Response
-The matrix processPredictors contains the 57 predictors (12 describing the input biological material and 45 describing the process predictors) for the 176 manufacturing runs. yield contains the percent yield for each run.
+Our code displays a table with the first 5 observations of each predictor variable. The table contains 57 predictors with 12 of those describing the input biological material and 45 describing the process predictors from 176 manufacturing runs. The response variable ‘Yield’ contains the percent yield for each run. There are missing values for several variables that will need imputation. 
 
 ### Part B
 #### Question
@@ -53,12 +56,25 @@ A small percentage of cells in the predictor set contain missing values. Use an 
 
 #### Code
 ```{r}
-#Fill in missing values with the median of each feature
+library(mice)
+# Find what percentage of the data contain missing values
+length(df$Yield)
+sum(is.na(df))
+sum(is.na(df))/(length(df$Yield) * length(df)) * 100 # ~1.04% 
+# Check for patterns in missing data
+md.pattern(df) # They are random - data is 'observed'
+# Using mice function for predictive mean matching
+df.mice <- mice(df, method = "pmm")
+summary(df.mice)
+# Method using median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
 ```
 
 #### Response
+
+Roughly 1.04% of the data was missing. It was first checked for patterns in the missing values. There were none. The missing data points were noted as random occurrences where no special treatment was required during imputation. We then ran two methods of imputation for referencing, one by predictive mean matching and the other by median. We decided to use the data set imputed by the median of each variable. No missing values remained. 
+
 
 ### Part C 
 #### Question
@@ -68,6 +84,7 @@ Split the data into a training and a test set, pre-process the data, and tune a 
 
 
 ```{r correlations}
+library(AppliedPredictiveModeling)
 library(reshape2)
 library(dplyr)
 cormat <- round(cor(df),2)
@@ -78,11 +95,9 @@ yield_corr <- melted_cormat_df %>%
   filter(Var2 == "Yield")
 yield_corr$absvalue = abs(yield_corr$value)
 yield_corr2 = yield_corr[order(-yield_corr[,4]),]
-yield_corr2
 ```
 
 ```{r modeling}
-library(AppliedPredictiveModeling)
 #Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]        
@@ -103,15 +118,21 @@ summary(lmyield)
 ```
 
 #### Response
-After splitting the data into a 75% training, 25% test datasets, I chose to build a linear regression model using the top 7 features based on the correlations.
+After splitting the data 75% training and 25% test datasets we chose to build a linear regression model using the top 7 features that had the strongest correlations with ‘Yield.’  They were selected based on absolute correlation strength. A table of all variable correlations with Yield is shown for reference. 
 
-Here are the correlations…
+```{r, echo=FALSE}
+flextable(yield_corr2) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
 
-Here is the model.  The R2 of 61% isn’t very good and the only good predictor based on p-values and 0.05 cutoff is ManufacturingProcess32. 
+Those selected are shown in the model summary which had a multiple R2 value of 0.6395 indicating the model captures roughly 64% of the variation in response. This is likely not the best model for prediction with this data and the only significant predictor (based on an alpha level of 0.05) is ManufacturingProcess32. However, this was a simple model choice we could gather information from and improve on as necessary since we were given the option to tune the model of our choice.
+
+
 
 ### Part D
 #### Question
-Predict the response for the test set.What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
+Predict the response for the test set. What is the value of the performance metric and how does this compare with the resampled performance metric on the training set?
 
 #### Code
 
@@ -130,8 +151,9 @@ cat('RMSE of the test data for this model is', lmyield_test_rmse)
 
 #### Response
 
-Using RMSE as the performance metric, the value if 1.25 as shown below…
-The optimal value of the performance metric for the Test data is 1.25 as shown below…
+
+
+
 
 ### Part E
 
