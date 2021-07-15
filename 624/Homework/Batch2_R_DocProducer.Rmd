@@ -26,8 +26,6 @@ Start R and use these commands to load the data:
     > library(AppliedPredictiveModeling)
     > data(chemicalManufacturingProcess)
 
-
-
 #### Code
 
 ```{r}
@@ -48,28 +46,34 @@ flextable(initial.obs) %>%
 ```
 
 #### Response
-Our code displays a table with the first 5 observations of each predictor variable. The table contains 57 predictors with 12 of those describing the input biological material and 45 describing the process predictors from 176 manufacturing runs. The response variable ‘Yield’ contains the percent yield for each run. There are missing values for several variables that will need imputation. 
+Our code displays a table with the first 5 observations of each predictor variable. The table contains 57 predictors with 12 of those describing the input biological material and 45 describing the process predictors from 176 manufacturing runs. The response variable ‘Yield’ contains the percent yield for each run. There are missing values for several variables that will need imputation.  
 
 ### Part B
 #### Question
 A small percentage of cells in the predictor set contain missing values. Use an imputation function to fill in these missing values (e.g., see Sect. 3.8).
 
 #### Code
-```{r}
+```{r, eval=F, results='hide'}
 library(mice)
 # Find what percentage of the data contain missing values
-length(df$Yield)
-sum(is.na(df))
+length(df$Yield) # 176 
+sum(is.na(df)) # 106
 sum(is.na(df))/(length(df$Yield) * length(df)) * 100 # ~1.04% 
 # Check for patterns in missing data
 md.pattern(df) # They are random - data is 'observed'
 # Using mice function for predictive mean matching
-df.mice <- mice(df, method = "pmm")
+df.mice <- mice(df, method = "pmm", seed = 624)
 summary(df.mice)
+```
+
+
+```{r}
 # Method using median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
 ```
+
+
 
 #### Response
 
@@ -82,12 +86,14 @@ Split the data into a training and a test set, pre-process the data, and tune a 
 
 #### Code
 
-
-```{r correlations}
+```{r prep and correlations}
 library(AppliedPredictiveModeling)
 library(reshape2)
 library(dplyr)
-cormat <- round(cor(df),2)
+library(caret)
+df.nz <- df %>% 
+  select_at(vars(-one_of(nearZeroVar(.,names=T))))
+cormat <- round(cor(df.nz),2)
 melted_cormat = melt(cormat)
 melted_cormat_df = data.frame(melted_cormat)
 #Filter to only Yield and sort in descending order
@@ -98,6 +104,7 @@ yield_corr2 = yield_corr[order(-yield_corr[,4]),]
 ```
 
 ```{r modeling}
+set.seed(44)
 #Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]        
@@ -115,10 +122,20 @@ lmyield = lm(Yield~ManufacturingProcess32 +
                BiologicalMaterial03, 
              data=train)
 summary(lmyield)
+# Check the RMSE and R2
+lmyield_train = predict(lmyield, newdata = train, interval ='prediction')
+lmyield_train_df = data.frame(lmyield_train)
+lmyield_train_df$actual = train$Yield
+lmyield_train_rmse = rmse(lmyield_train_df$actual, lmyield_train_df$fit)
+df.rtrain<- data.frame(RMSE = lmyield_train_rmse, R2 = caret::R2(lmyield_train, train$Yield))
+df.rtrain
 ```
 
 #### Response
-After splitting the data 75% training and 25% test datasets we chose to build a linear regression model using the top 7 features that had the strongest correlations with ‘Yield.’  They were selected based on absolute correlation strength. A table of all variable correlations with Yield is shown for reference. 
+
+For pre-processing we identified and removed variables with a near zero variance then converted our existing data frame into a long format. This process removed one variable, "BiologicalMaterial07." We then created a correlation matrix of the predictors with our response, ‘Yield,’ to complete our preprocessing steps. 
+
+After splitting the data 75% to training and 25% to our test set, we chose to build a linear regression model using the top 7 features that had the strongest correlations with ‘Yield.’  They were selected based on absolute correlation strength. A table of all variable correlations with Yield is shown for reference. 
 
 ```{r, echo=FALSE}
 flextable(yield_corr2) %>% 
@@ -126,7 +143,7 @@ flextable(yield_corr2) %>%
   set_table_properties(layout = "autofit")
 ```
 
-Those selected are shown in the model summary which had a multiple R2 value of 0.6395 indicating the model captures roughly 64% of the variation in response. This is likely not the best model for prediction with this data and the only significant predictor (based on an alpha level of 0.05) is ManufacturingProcess32. However, this was a simple model choice we could gather information from and improve on as necessary since we were given the option to tune the model of our choice.
+Those selected are shown in the model summary which had a multiple R2 value of 0.6689 indicating the model captures roughly 67% of the variation in response. We note that, this is likely not the best model for prediction with this data and the only significant predictor (based on an alpha level of 0.05) is ManufacturingProcess32. However, this was a simple model choice we could gather information from and improve on as necessary since we were given the option to tune the model of our choice.
 
 
 
@@ -138,20 +155,29 @@ Predict the response for the test set. What is the value of the performance metr
 
 ```{r}
 library(Metrics)
-#predict with the test data
-predict(lmyield, newdata = test, interval ='prediction')
+library(caret)
 #Predict with the test data
 lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
 lmyield_test_df$actual = test$Yield
-lmyield_test_df
 lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
 cat('RMSE of the test data for this model is', lmyield_test_rmse)
+# Show calculations as data frame with RMSE and R squared
+df.rtest <- data.frame(RMSE = lmyield_test_rmse, R2 = caret::R2(lmyield_test, test$Yield))
+df.res <- rbind(df.rtrain, df.rtest)
+df.res <- df.res %>% 
+  mutate(Dataset = c("Train", "Test")) %>% 
+  dplyr::select(Dataset, RMSE, R2.fit, R2.lwr, R2.upr)
+flextable(df.res) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+df.res$R2.fit[2]
+round(df.res$R2.fit[2],2)*100
 ```
 
 #### Response
 
-
+Our fit $R^2$ value is `r df.res$R2.fit[2]` which indicates our model explains about `r round(df.res$R2.fit[2],2)*100`% on the test set. This is lower than optimal if we were making predictions based on it and our RMSE (root mean squared error) does not perform as well as it could either. Compared to the same metrics on the training dataset, the test data performed slightly poorer at prediction. We can trace these results back to the model selection, which, if reselected, would likely improve given the information we have gained from this model. 
 
 
 
@@ -159,6 +185,26 @@ cat('RMSE of the test data for this model is', lmyield_test_rmse)
 
 #### Question
 Which predictors are most important in the model you have trained? Do either the biological or process predictors dominate the list? 
+
+#### Code
+
+```{r}
+library(caret)
+library(dplyr)
+var.importance <- varImp(lmyield)
+var.importance 
+# pls_importance <- varImp(lmyield)$importance %>%
+#  as.data.frame() %>%
+#  rownames_to_column("Variable") %>%
+#  filter(Overall >= 50) %>%
+#  arrange(desc(Overall)) %>%
+#  mutate(importance = row_number())
+
+varImp(pls_model) %>%
+  plot(., top = max(pls_importance$importance), main = "Important Variables")
+```
+
+
 
 #### Response
 As shown in the above correlations list the first 7 most correlated features are 4 process features, followed by 3 biological features.  
