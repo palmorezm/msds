@@ -542,6 +542,7 @@ Explore the relationships between the top predictors and the response for the pr
 ```{r}
 library(ggplot2)
 library(tidyr)
+impsvm.df <- impsvm.tbl
 df %>% 
   dplyr::select(c(impsvm.df$Predictor[1:10])) %>% 
   tibble::rownames_to_column("Yield.chr") %>% 
