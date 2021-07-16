@@ -91,6 +91,7 @@ library(AppliedPredictiveModeling)
 library(reshape2)
 library(dplyr)
 library(caret)
+library(Metrics)
 df.nz <- df %>% 
   select_at(vars(-one_of(nearZeroVar(.,names=T))))
 cormat <- round(cor(df.nz),2)
@@ -104,7 +105,7 @@ yield_corr2 = yield_corr[order(-yield_corr[,4]),]
 ```
 
 ```{r modeling}
-set.seed(44)
+set.seed(41)
 #Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]        
@@ -121,7 +122,8 @@ lmyield = lm(Yield~ManufacturingProcess32 +
                BiologicalMaterial06 + 
                BiologicalMaterial03, 
              data=train)
-summary(lmyield)
+lmmod.summary <- summary(lmyield)
+lmmod.summary
 # Check the RMSE and R2
 lmyield_train = predict(lmyield, newdata = train, interval ='prediction')
 lmyield_train_df = data.frame(lmyield_train)
@@ -133,7 +135,7 @@ df.rtrain
 
 #### Response
 
-For pre-processing we identified and removed variables with a near zero variance then converted our existing data frame into a long format. This process removed one variable, "BiologicalMaterial07." We then created a correlation matrix of the predictors with our response, ‘Yield,’ to complete our preprocessing steps. 
+For pre-processing we identified and removed variables with a near zero variance then converted our existing data frame into a long format. This process removed one variable, "BiologicalMaterial07." We then created a correlation matrix of the predictors with our response, ‘Yield,’ and down selected to reduce the data dimensions and complete our preprocessing steps. 
 
 After splitting the data 75% to training and 25% to our test set, we chose to build a linear regression model using the top 7 features that had the strongest correlations with ‘Yield.’  They were selected based on absolute correlation strength. A table of all variable correlations with Yield is shown for reference. 
 
@@ -143,8 +145,7 @@ flextable(yield_corr2) %>%
   set_table_properties(layout = "autofit")
 ```
 
-Those selected are shown in the model summary which had a multiple R2 value of 0.6689 indicating the model captures roughly 67% of the variation in response. We note that, this is likely not the best model for prediction with this data and the only significant predictor (based on an alpha level of 0.05) is ManufacturingProcess32. However, this was a simple model choice we could gather information from and improve on as necessary since we were given the option to tune the model of our choice.
-
+Those selected are shown in the model summary which had a multiple R2 value of `r lmmod.summary$r.squared` indicating the model captures roughly `r round(lmmod.summary$r.squared, 2)*100`% of the variation in response. We note that, this is likely not the best model for prediction with this data and the only significant predictors (based on an alpha level of 0.05) were ManufacturingProcess32 and ManufacturingProcess09. However, this was a simple model choice we could gather information from and improve on as necessary since we were given the option to tune the model of our choice.
 
 
 ### Part D
@@ -192,51 +193,78 @@ Which predictors are most important in the model you have trained? Do either the
 library(caret)
 library(dplyr)
 var.importance <- varImp(lmyield)
-var.importance 
-# pls_importance <- varImp(lmyield)$importance %>%
-#  as.data.frame() %>%
-#  rownames_to_column("Variable") %>%
-#  filter(Overall >= 50) %>%
-#  arrange(desc(Overall)) %>%
-#  mutate(importance = row_number())
+sort(var.importance$Overall, decreasing = TRUE)
 
-varImp(pls_model) %>%
-  plot(., top = max(pls_importance$importance), main = "Important Variables")
+var.importance <- varImp(lmyield) %>% 
+  tibble::rownames_to_column("Variable") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Variable, Importance)
+flextable(var.importance) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 
 
 #### Response
-As shown in the above correlations list the first 7 most correlated features are 4 process features, followed by 3 biological features.  
-In reviewing the regression model’s summary, the Process32 and Process36 are the most relevant p-values and the BiologicalMaterial02 feature is the third most relevant.  Note that only the Process32 feature has a p-value < 0.05. 
+As shown in the above table with rank, variable, and importance values, the manufacturing process takes the most importance. Process predictors are seemingly more important with our model. However, looking back at the correlations when down selecting for our model, manufacturing processes still dominated the list when considering all available variables. 
+
+Recall that since our model relied on the 7 strongest correlations with Yield, the number of variables used in the model were already reduced. We also note that only two of our variables had significance below an alpha level of 0.05. Both of those variables were also process predictors (ManufacturingProcess32 and ManufacturingProcess09).   
+
 
 ### Part F
 
 #### Question
 Explore the relationships between each of the top predictors and the response. How could this information be helpful in improving yield in future runs of the manufacturing process?
 
-#### Response
-Per the previous exploration via correlations and p-values, the process features are topping the list of most relevant features.  This bodes well as these features can be changed (biological ones cannot change), so simulations could be done using the regression model and modified values.
+#### Code 
 
-Note that prior to experimenting with process feature value changes, more experimentation is needed on what features to use.  Having an Adjusted R2 on the training data of only 60% and having only one feature in the model summary with a p-value of 0.05 indicates there is room for improvement.  A good next step might be to build the model via forward stepwise or backward stepwise regression.  Or, training on some other model such as Random Forest, could also be used to identify which features are most relevant.
+```{r}
+library(AppliedPredictiveModeling)
+library(ggcorrplot)
+library(corrplot)
+corr <- round(cor(df), 1)
+p.mat <- ggcorrplot::cor_pmat(corr)
+ggcorrplot(corr = corr, 
+           "square", 
+           "upper",
+           p.mat = p.mat, 
+           sig.level = 0.05,
+           outline.color = "white", 
+           color = c("#6D9EC1", "white",
+                     "#E46726"),
+           ggtheme = ggplot2::theme_minimal()) + coord_flip()
+```
+
+
+#### Response
+We outline the relationships between each variable from the entire data set in the correlation plot where orange indicates a stronger positive relationship and blue indicates a stronger negative relationship. 
+
+Given our previous exploration of correlations, p-value significance levels, and feature fit with linear modeling, we can easily confirm that process predictors have more relevance in predicting yield. This bodes well as these features can be changes while biological ones cannot change. Simulations could be done using linear and other model types with modifications to focus on those predictors. 
+
+A good next step might be to build the model via forward stepwise or backward stepwise regression (or both). Training on some other models such as Random Forest, could also be used to identify which features are most relevant and expose their true nature when influencing yield. We note that prior to experimenting with process features value changes, it is difficult to know what will perform well.  
+
 
 ## KJ 7.2
 Friedman (1991) introduced several benchmark data sets created by simulation. One of these simulations used the following nonlinear equation to  create data:  y = 10 sin(πx1x2) + 20(x3 − 0.5)2 + 10x4 + 5x5 + N(0, σ2)  where the x values are random variables uniformly distributed between [0, 1]  (there are also 5 other non-informative variables also created in the simulation).The package mlbench contains a function called mlbench.friedman1 that simulates these data: 
-> library(mlbench)
-> set.seed(200)
-> trainingData <- mlbench.friedman1(200, sd = 1)
-> ## We convert the 'x' data from a matrix to a data frame
-> ## One reason is that this will give the columns names.
-> trainingData$x <- data.frame(trainingData$x)
-> ## Look at the data using
-> featurePlot(trainingData$x, trainingData$y)
-> ## or other methods.
->
-> ## This creates a list with a vector 'y' and a matrix
-> ## of predictors 'x'. Also simulate a large test set to
-> ## estimate the true error rate with good precision:
-> testData <- mlbench.friedman1(5000, sd = 1)
-> testData$x <- data.frame(testData$x)
+
+    > library(mlbench)
+    > set.seed(200)
+    > trainingData <- mlbench.friedman1(200, sd = 1)
+    > ## We convert the 'x' data from a matrix to a data frame
+    > ## One reason is that this will give the columns names.
+    > trainingData$x <- data.frame(trainingData$x)
+    > ## Look at the data using
+    > featurePlot(trainingData$x, trainingData$y)
+    > ## or other methods.
+    >
+    > ## This creates a list with a vector 'y' and a matrix
+    > ## of predictors 'x'. Also simulate a large test set to
+    > ## estimate the true error rate with good precision:
+    > testData <- mlbench.friedman1(5000, sd = 1)
+    > testData$x <- data.frame(testData$x)
 
 ### Part A
 #### Question
@@ -309,14 +337,32 @@ marsModel
 ```
 
 ```{r Model Evaluation,}
+pr.nnet <- postResample(pred = nnetPred, obs = testData$y)
 postResample(pred = nnetPred, obs = testData$y)
+pr.svm <- postResample(pred = svmPred, obs = testData$y)
 postResample(pred = svmPred, obs = testData$y)
+pr.mars <- postResample(pred = marsPred, obs = testData$y)
 postResample(pred = marsPred, obs = testData$y)
+modstat7.2 <- as.data.frame(rbind(pr.nnet, pr.svm, pr.mars))
+modstat7.2 <- modstat7.2 %>%
+  mutate(Model = c("NNET", "SVM", "MARS")) %>% 
+  dplyr::select(Model,RMSE,Rsquared,MAE)
 varImp(marsModel)
 ```
 
 #### Response
-SVM, Neural Networks and MARS models were used for testing performances. Below is R Code for the models. Comparing RMSE values of three models , It is clear that the MARS model performs better. The RMSE value is 1.32. Yes , It selects the informative predictors (X1-X5). R Code and results are below.
+KNN, SVM, Neural Network, and MARS models were used for testing performances. Since the KNN model code was given as an example and did not perform as well as the others, we leave its performance statistics out. 
+
+Based on RMSE, the MARS model performs best. It also appears to select the informative predictors (X1-X5). A table of these statistics is provided to compare each model we created. 
+
+
+```{r, echo=FALSE}
+flextable(modstat7.2) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+
 
 ## KJ 7.5
 Exercise 6.3 describes data for a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several nonlinear regression models. 
@@ -328,28 +374,30 @@ Which nonlinear regression model gives the optimal resampling and test set perfo
 #### Code
 ```{r}
 # Recreate RMSE from 6.3
+########################
 # Part A load the data
 library(AppliedPredictiveModeling)
-#Load the data
+library(reshape2)
+library(dplyr)
+library(Metrics)
+library(caret)
+set.seed(0701)
+# Load the data
 data(ChemicalManufacturingProcess)
 df = data.frame(ChemicalManufacturingProcess)
 # Part B Fill in missing values with the median of each feature
 for(i in 1:ncol(df)){
   df[is.na(df[,i]), i] <- median(df[,i], na.rm = TRUE)}
 # Part C Correlations and Modeling
-library(reshape2)
-library(dplyr)
 cormat <- round(cor(df),2)
 melted_cormat = melt(cormat)
 melted_cormat_df = data.frame(melted_cormat)
-#Filter to only Yield and sort in descending order
+# Filter to only Yield and sort in descending order
 yield_corr <- melted_cormat_df %>% 
   filter(Var2 == "Yield")
 yield_corr$absvalue = abs(yield_corr$value)
 yield_corr2 = yield_corr[order(-yield_corr[,4]),]
-yield_corr2
-library(AppliedPredictiveModeling)
-#Create Train and Test data sets
+# Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]        
 train <- df[1:bound, ]                   
@@ -363,64 +411,81 @@ lmyield = lm(Yield~ManufacturingProcess32 +
                BiologicalMaterial06 + 
                BiologicalMaterial03, 
              data=train)
-summary(lmyield)
 # Part D Predictions
-library(Metrics)
-# predict with the test data
-predict(lmyield, newdata = test, interval ='prediction')
 # Predict with the test data
 lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
 lmyield_test_df$actual = test$Yield
-lmyield_test_df
 lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
-cat('RMSE of the test data for this model is', lmyield_test_rmse)
 ```
 
 ```{r}
 # Apply 6.3 to 7.5 
-library(caret)
-#Create Train and Test data sets
+########################
+# Create Train and Test data sets
+set.seed(0701)
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]         
 train <- df[1:bound, ]              
 test <- df[(bound+1):nrow(df), ] 
-#Create the train x and train y datasets for HW 7.5
+# Create the train x and train y datasets for HW 7.5
 trainx = train[,2:ncol(train)]
 trainy = train$Yield
-
 testx = test[,2:ncol(test)]
 testy = test$Yield
-#Using KNN for HW 7.5
-#Train KNN
-knnModel <- train(x=trainx, y=trainy)
-knnModel
-#Example from the book on how to predict
-knnPred <- predict(knnModel, newdata = testx)
-## The function 'postResample' can be used to get the test set
-## performance values
-postResample(pred = knnPred, obs = testy)
-#Using MARS for HW7.5
-#Train using MARS
-marsFit <- earth(trainx, trainy)
-summary(marsFit)
-#MARS tune
-# Define the candidate models to test
-marsGrid <- expand.grid(.degree = 1:2, .nprune = 2:38)
-# Fix the seed so that the results can be reproduced
-set.seed(100)
-marsTuned <- train(trainx, trainy,method = "earth",tuneGrid = marsGrid, trControl = trainControl(method = "cv"))
-marsTuned
-#Predict with MARS
-head(predict(marsTuned, testx))
-#Relevant features with MARS
-varImp(marsTuned)
+# K-Nearest Neighbors (KNN) Model
+mod.knn <- train(x = trainx, 
+                 y = trainy, 
+                 method = "knn",
+                 tuneLength=10)
+# Radial Supper Vector Machine (SVM) Model
+mod.svm <- train(x = trainx,
+                        y = trainy,
+                        method = "svmRadial",
+                        tuneLength=10)
+# Multivariate Adaptive Regression Spline (MARS) Model
+marsGrid <- expand.grid(.degree=1:2, 
+                        .nprune=2:10)
+mod.mar <- train(x = trainx, 
+                 y = trainy, 
+                 method = "earth",
+                 tuneGrid = marsGrid)
+# Tabulate results
+mod.compare <- resamples(list(
+  KNN = mod.knn, SVM = mod.svm, MARS = mod.mar))
+summary(mod.compare)
+# Create performance function for testing 
+ModTest <- function(x, testdf, testtarget) {
+  method <- c()
+  res <- data.frame()
+  for(x in x){
+    method <- c(method, x$method)
+    pred <- predict(x, newdata=testdf)
+    res <- rbind(res, t(postResample(pred=pred, obs=testtarget)))
+  }
+  row.names(res) <- method
+  return(res)
+}
+x <- list(mod.knn, mod.svm, mod.mar)
+ModTest.Results <- ModTest(x, testx, testy)
+ModTest.Results <- ModTest.Results %>% 
+  mutate(Model = c("KNN", "SVM", "MARS")) %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
 ```
 
 
 
+
 #### Response
-MARS and KNN models were trained and tested with the chemical data. Here is the R code. The best performance, but only by a narrow margin, appears to come from MARS with an RMSE of 1.15 versus KNN’s RMSE of 1.21. Performance from MARS summary is that the final values used were nprune = 4 and degree = 2.  This produced an RMSE of 1.15 as shown below. Performance from KNN summary is that the best mtry = 29.  This produced an RMSE of 1.21 as shown below. 
+KNN, SVM, and MARS models were trained, summarized, tuned, and tested with the chemical data. The SVM model performs the best in its R squared value and has a lower MAE. For this we would use the SVM model. However, the MARS model produced a lower RMSE in our prediction test. See the model test results table based on predicted data for more descriptive statistics. 
+
+```{r, echo=FALSE}
+flextable(ModTest.Results) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+
 
 ### Part B
 #### Question
@@ -428,29 +493,93 @@ Which predictors are most important in the optimal nonlinear regression model? D
 
 #### Code
 
-[missing code to show below - fill in]
+```{r}
+library(caret)
+imp.svm <- varImp(mod.svm)
+imp.mar <- varImp(mod.mar)
+impsvm.tbl <- imp.svm$importance %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,6)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+impmar.tbl <- imp.mar$importance %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,6)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+```
+
 
 #### Response
-The Process32, Process09, and Biological12 appear to be the most important features for the model. It appears that Process variables are more important, which bodes well for future improvements, since these variables can be modified. For the linear model, the Process32, Process36, and BiologicalMaterial02 were the top three features based on p-values. For the non-linear model the Process32, Process09, and Biological12 appear to be the most important features.  Only the Process 32 appears in both models.
+The process variables dominate the list regardless of how we review the models. The top ten most important predictors are majority process based. If we assume the SVM is our best and review its predictors we can produce the following rank for each predictor with its importance score: 
+
+```{r, echo=FALSE}
+flextable(impsvm.tbl[1:10,]) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+Alternatively, we can perform the same calculations on the MARS model if it were selected as our best and there would only be 3 predictors with ManufacturingProcess32 of most importance. Our MARS ranking would look shorter. 
+```{r, echo=FALSE}
+flextable(impmar.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+We note that the methods used to determine the optimal nonlinear regression model are different than those of the optimal linear model. For example, our varImp function in the caret package of R does not contain a method for selecting model type when evaluating predictor importance. Instead, it seems to filter the variables through regression, fit a LOESS line from predictor to outcome, and calculate an R squared term for each predictor. It then orders the predictors by R squared value in descending order, arranging the highest (and most important) predictors at the top. This is not the same for all model types. 
+
 
 ### Part C
 #### Question
 Explore the relationships between the top predictors and the response for the predictors that are unique to the optimal nonlinear regression model. Do these plots reveal intuition about the biological or process predictors and their relationship with yield?
 
 #### Code
+
+```{r}
+library(ggplot2)
+library(tidyr)
+df %>% 
+  dplyr::select(c(impsvm.df$Predictor[1:10])) %>% 
+  tibble::rownames_to_column("Yield.chr") %>% 
+  mutate(Yield = as.numeric(Yield.chr)) %>%
+  dplyr::select(-Yield.chr) %>% 
+  gather(key, value, -Yield) %>% 
+  ggplot(aes(value, Yield, color=key)) + 
+  geom_point(aes(alpha = 0.25)) +
+  geom_smooth() + 
+  geom_smooth(method = "lm", 
+              linetype = "dotdash", 
+              color = "black", se = F) +
+  theme(legend.position = "none") + 
+  labs(x = "Value", y = "Yield", title = "Relationships of Top SVM Model Predictors with Yield") + 
+  facet_wrap(~key, scales = "free", ncol = 5) + 
+  theme_minimal() + 
+  theme(legend.position = "none")
+```
+
+
+
 #### Response
+
+Scatterplots with LOESS and linear estimates are fit to our 10 most important predictors from the SVM model to gain an understanding of their relationships with Yield as it is observed. We notice that ManufacturingProcess32 has the clearest linear relationship with yield and the process predictors each seem to have a single optimal value for maximizing yield (beyond which there are diminishing returns). Biological predictors remain less predictable to our model. Thus, we can say part of our intuition is confirmed based on our exploration of the data. However, our radial SVM model transformed the data such that we are not able to visualize its relationship clearly in two-dimensional space. Thus, the initial observations before modeling provide the best visualization to gain well-rounded understanding. 
+
 
 ## KJ 8.1 
 8.1. Recreate the simulated data from Exercise 7.2: 
 
->library(mlbench)
->set.seed(200)
->simulated <- mlbench.friedman1(200, sd = 1)
->simulated <- cbind(simulated$x, simulated$y)
->simulated <- as.data.frame(simulated)
->colnames(simulated)[ncol(simulated)] <- "y"
+    >library(mlbench)
+    >set.seed(200)
+    >simulated <- mlbench.friedman1(200, sd = 1)
+    >simulated <- cbind(simulated$x, simulated$y)
+    >simulated <- as.data.frame(simulated)
+    >colnames(simulated)[ncol(simulated)] <- "y"
 
-```{r}
+```{r, echo=FALSE, eval=FALSE}
+# Recreated with Part A - D 
 library(mlbench)
 library(randomForest)
 library(caret)
@@ -495,18 +624,39 @@ Fit a random forest model to all of the predictors, then estimate the variable i
 
 #### Code
 ```{r}
+# Some packages used in later parts
+library(mlbench)
 library(randomForest)
 library(caret)
+library(partykit)
+library(dplyr)
+library(gbm)
+library(Cubist)
+library(flextable)
+set.seed(200)
+simulated <- mlbench.friedman1(200, sd = 1)
+simulated <- cbind(simulated$x, simulated$y)
+simulated <- as.data.frame(simulated)
+colnames(simulated)[ncol(simulated)] <- "y"
 model1 <- randomForest(y ~ ., 
                        data = simulated,
                        importance = TRUE,
                        ntree = 1000)
 rfImp1 <- varImp(model1, scale = FALSE)
-rfImp1
+rfImp1.tbl <- rfImp1 %>%
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+flextable(rfImp1.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 #### Response
-The importance given to the predictors (V6-V10) is very less and hence the usage is insignificant.
+Given our ranked table of importance by predictor, V6 – V10 are near zero or negative indicating their insignificance in the random forest model. 
 
 ### Part B
 #### Question
@@ -519,11 +669,21 @@ model2 <- randomForest(y ~ .,
                           importance = TRUE,
                           ntree = 1000)
 rfImp2 <- varImp(model2, scale = FALSE)
-rfImp2
+rfImp2.tbl <- rfImp2 %>%
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+flextable(rfImp2.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
-Response
-The Importance is split between predictors, the importance of V1 predictor is split across the correlated variable.
+#### Response
+
+A new table of ranked predictors by importance shows that when adding a predictor that is highly correlated with one of the informative predictors the importance of the predictor is split across the correlated variables. For example, adding a predictor highly correlated with V1 dropped its importance from about 9 to roughly 5 and the remaining importance was reassigned to the highly correlated ‘duplicate1’ variable. Predictors V4 and V2 held their importance the same. By maintaining the same level while V1’s importance dropped, both V4 and V2 became the two most importance predictors. 
 
 ### Part C
 #### Question
@@ -536,13 +696,21 @@ library(dplyr)
 cforest_model <- cforest(y ~ ., data=simulated)
 # Unconditional importance measure
 varimp(cforest_model) %>% sort(decreasing = T)
-varimp(cforest_model, conditional=T) %>% sort(decreasing = T)
+varimp.tbl <- varimp(cforest_model, conditional=T) %>% sort(decreasing = T)
+varimp.tbl <- varimp.tbl %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(.)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(.,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+flextable(varimp.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 #### Response
-Uninformative predictors V6 - V10 are rated low
-Importance of duplicate1 correlated with V1 is reduced
-Other importance of Predictors are also reduced
+The uninformative predictors V6 - V10 are still rated with low importance. Predictor ‘duplicate1’ (that is highly correlated with V1) was reduced in importance from the varimp() function. All other importance values are also reduced. From this, we can conclude the patterns between traditional and modified measures of importance are very similar in order and arrangement, but the modified measure reduces predictor importance to a smaller scale. When importance is already small, this may reorder the insignificant predictors as V6-V10 have been. 
 
 ### Part D
 #### Question
@@ -553,18 +721,47 @@ Repeat this process with different tree models, such as boosted trees and Cubist
 library(gbm)
 library(Cubist)
 gbm_Model <- gbm(y ~ ., data=simulated, distribution='gaussian')
+gbm.summary <- summary(gbm_Model)
+gbm.tbl <- gbm.summary %>% 
+  as.data.frame() %>% 
+  arrange(desc(rel.inf)) %>% 
+  mutate(Rank = row_number(), 
+         Predictor = var,
+         Importance = round(rel.inf,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
 summary(gbm_Model)
 cubistModel <- cubist(x=simulated[,-(ncol(simulated)-1)], y=simulated$y, committees=100)
-varImp(cubistModel)
+cube.varimp.tbl <- varImp(cubistModel) %>%
+  as.data.frame() %>%
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
 ```
 
 #### Response
-Top rated predictor is V4 in GBM and V1 in Cubist
-V6 - V10 scores are very low 
-Duplicate 1 score is 0 in Cubist but higher in GBM.
 
-Hence based on the observations above, the pattern is different across the three models.
+The top-rated predictor is V4 in a GBM model and V1 in a Cubist model. Predictors V6 - V10 remain very low in importance. The predictor ‘duplicate1’ scored a 0 for importance in the Cubist model but higher in GBM. We review the patterns through two tables with the predictors from GBM first.  
 
+```{r, echo=FALSE}
+flextable(gbm.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+
+For GBM compared to random forest, the scale of importance to the model has changed. In GBM no value is negative. The lowest bound is 0. GBM is also a measure of relative influence, not strictly importance which seems to follow a more exponential scale from most to least important predictors. We also review the Cubist model’s predictors. 
+
+```{r, echo=FALSE}
+flextable(cube.varimp.tbl) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+For Cubist model the change in vector magnitude from least to most important is even greater than GBM (and far from any random forest). It is also bounded by 0 at its lowest like GBM but the orders are slightly different. Predictor ‘duplicate1’ is ranked 5th in both models but V1 ranks higher in Cubist. 
+
+Based on the observations above, the pattern is different across the models. 
 
 
 ## KJ 8.2 
@@ -584,15 +781,30 @@ Y <- X1 + rnorm(600, mean=2, sd=4)
 X2 <- rnorm(600, mean=2, sd=4)
 simData <- data.frame(Y=Y, X1=X1, X2=X2)
 fit <- rpart(Y ~ ., data = simData)
-varImp(fit)
+v1 <- round(var(X1), 3)
+v2 <- round(var(X2), 3)
+sim.tbl1 <- varImp(fit) %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Simulation") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         RepQuantity = 600,
+         Variance = c(v1, v2),
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Simulation, RepQuantity, Variance, Importance)
+flextable(sim.tbl1) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 #### Response
-The simulation is created with two variables  
-X1 -> Lesser variance  (Sequence of values) 
-X2 -> Higher Variance (Gaussian Random value)
-Target Variable Y -> X1 + X2
-Regression tree is fitted using rpart . Below is the R Code. The difference between two variables is significant and it shows the tree bias between two variables.
+The simulation was created with two variables. Each was assigned a mean of 2 and standard deviation of 4. The two variables differ in variance.  
+
+    * X1 -> Lesser variance  (Sequence of values) 
+    * X2 -> Higher Variance (Gaussian Random value)
+    * Target Variable Y -> X1 + X2
+
+A regression tree is fitted using recursive partitioning and importance calculated with the caret package’s varImp() method. We can see simulation ‘X1’ has greater importance than ‘X2.’ The variance also differs with ‘X2’ being over 56 times greater than ‘X1.’ The difference between two variables is significant and it shows the tree bias between two variables.
 
 ## KJ 8.3 
 In stochastic gradient boosting the bagging fraction and learning rate will govern the construction of the trees as they are guided by the gradient. Although the optimal values of these parameters should be obtained through the tuning process, it is helpful to understand how the magnitudes of these parameters affect magnitudes of variable importance. Figure 8.24 provides the variable importance plots for boosting using two extreme values for the bagging fraction (0.1 and 0.9) and the learning rate (0.1 and 0.9) for the solubility data. The left-hand plot has both parameters set to 0.1, and the right-hand plot has both set to 0.9:
@@ -604,17 +816,23 @@ In stochastic gradient boosting the bagging fraction and learning rate will gove
 Why does the model on the right focus its importance on just the first few of predictors, whereas the model on the left spreads importance across more predictors?
 
 #### Response
-There could be two reasons for the model on the right spreads importance on the first few predictors and the model on the left adds importance to few more predictors.
-Bragging Fraction : It represents the data usage in each iteration of trees. The left hand plot has a bragging fraction of 0.1 which is low and only 10% of data is used for random sampling. Whereas , the right hand plot has a bragging fraction of 0.9 which is large and 90% of data is used on each iteration which is almost the full dataset. Since the full data set is approximately used by the model on the right plot, only few predictors got importance but the left plot used partial dataset to get importance over few more predictors.
-Learning Rate : It means a higher number of predictions are added to the model output. Since the right hand plot has more predictions the correlation is more and hence only the first few predictors were considered significant.
+There could be two reasons the model on the right focuses its importance on the first few predictors while the model on the left spreads its importance out. These are outlined below: 
+
+**Bragging Fraction** – it represent the data usage in each interation of trees. The plot on the left has a bragging fraction of 0.1 which is low and only 105 of the data is used for random sampling. Whereas, the plot on the right has a bragging fraction of 0.9 which is quite large comparatively. It indicates 90% of the data is used on each iteration which is alsmot the full data set. Since almost the full data set is used (by the model on the right), a handful of predictors are able to pick up more importance. This concentrates the importance as shown in the plot on the right. The opposite occurs in the plot on the left with where only 10% of the data set is used.  
+
+**Learning Rate** – it means a higher number of predictions are added to the model output. Since the plot on the right has more predictions, the correlation is greater. Thus, only the first few predictors were considered significant. 
+
 
 ### Part B
 #### Question
 Which model do you think would be more predictive of other samples?
-Response
-Because of the above explanations the two parameters are crucial in selecting the more predictive model. In my opinion the model with lesser fraction and learning rate would be more predictive than the one with lower values. Hence the left hand plot is more predictive.
-Part C
-Question
+
+#### Response
+Since the bragging fraction and learning rate can control overfitting of the model, they are crucial in selecting the more predictive model. If we are trying to cover more predictions for unseen samples, then a smaller bragging fraction and lower learning rate should be more predictive than one with a larger fraction and higher rate. This is because it includes a higher proportion of possible sample predictions. Thus, the left plot would probably be more predictive of other samples. However, there is a point that one must make a bias-variance compromise to remain usefully predictive. 
+
+### Part C
+
+#### Question
 How would increasing interaction depth affect the slope of predictor importance for either model in Fig. 8.24?
 
 #### Code
@@ -626,14 +844,44 @@ grid1 <- expand.grid(n.trees=100, interaction.depth=1, shrinkage=0.1, n.minobsin
 gbm1 <- train(x = solTrainXtrans, y = solTrainY, method = 'gbm', tuneGrid = grid1, verbose = FALSE)
 grid2 <- expand.grid(n.trees=100, interaction.depth=10, shrinkage=0.1, n.minobsinnode=10)
 gbm2 <- train(x = solTrainXtrans, y = solTrainY, method = 'gbm', tuneGrid = grid2, verbose = FALSE)
-varImp(gbm1)
-varImp(gbm2)
+gbm1.df <- varImp(gbm1)
+gbm2.df <- varImp(gbm2)
+gbm1.tbl <- gbm1.df$importance %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
+gbm2.tbl <- gbm2.df$importance %>% 
+  as.data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Rank = row_number(), 
+         Importance = round(Overall,3)) %>% 
+  dplyr::select(Rank, Predictor, Importance)
 ```
 
 
-
 #### Response
-Increasing the interaction depth will improve the predictor importance significantly. The below R code will create two GBM models. Looking at two sets of Importance values It is evident that with the interaction depth 10 the importance is spread across several predictors.
+Increasing interaction depth improves predictor importance significantly. Two tables were created from two GBM models measuring importance of each predictor. They show the first 10 predictors and their rank by importance in descending order. The only difference between the models is interaction depth. The first contains an interaction depth of 1 and is shown:  
+
+```{r, echo=F}
+flextable(gbm1.tbl[1:10,]) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+The second contains an interaction depth of 10. Notice the difference in importance scores and ranked order of importance compared to the first table.  
+
+```{r, echo=F}
+flextable(gbm2.tbl[1:10,]) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+The order of predictors changed (see ranks 3 – 10) and the importance decreased quicker with greater interaction depth. With the interaction depth at 10, the importance spread across more predictors shrinking the importance values for the first 10 predictors in the second table. 
+
 
 ## KJ 8.7 
 Refer to Exercises 6.3 and 7.5 which describe a chemical manufacturing process. Use the same data imputation, data splitting, and pre-processing steps as before and train several tree-based models:
@@ -647,6 +895,11 @@ Which tree-based regression model gives the optimal resampling and test set perf
 ```{r}
 # Code from exercise 6.3 and 7.5
 library(AppliedPredictiveModeling)
+library(Metrics)
+library(reshape2)
+library(dplyr)
+library(caret)
+set.seed(0130)
 #Load the data
 data(ChemicalManufacturingProcess)
 df = data.frame(ChemicalManufacturingProcess)
@@ -660,29 +913,30 @@ test <- df[(bound+1):nrow(df), ]
 sum(is.na(train))
 sum(is.na(test))
 # Create the Random Forest Tree
-rf_model = randomForest(Yield~ManufacturingProcess32 + ManufacturingProcess36 + ManufacturingProcess09 + ManufacturingProcess13 + BiologicalMaterial02 + BiologicalMaterial06 + BiologicalMaterial03, data=train)
+rf_model = randomForest(Yield~., 
+                        data=train)
 ```
 
 ```{r}
-library(Metrics)
-library(AppliedPredictiveModeling)
-library(reshape2)
-library(dplyr)
 # Apply 6.3 and 7.5 
 # Predict with the test data
+set.seed(0130)
 rf_test = predict(rf_model, newdata = test)
 rf_test_df = data.frame(rf_test)
 rf_test_df$actual = test$Yield
-rf_test_df
 rf_test_rmse = rmse(rf_test_df$actual, rf_test_df$rf_test)
-cat('RMSE of the test data for this model is', rf_test_rmse)
+# Random forest model
+rfMod <- train(x = trainx,
+                 y = trainy,
+                 method = 'rf',
+                 tuneLength = 10)
 #Create the ctree 
-ctree_model = cforest(Yield~ManufacturingProcess32 + ManufacturingProcess36 + ManufacturingProcess09 + ManufacturingProcess13 + BiologicalMaterial02 + BiologicalMaterial06 + BiologicalMaterial03, data=train)
+ctree_model = cforest(Yield~., 
+                      data=train)
 #Predict with the test data
 ctree_test = predict(ctree_model, newdata = test)
 ctree_test_df = data.frame(ctree_test)
 ctree_test_df$actual = test$Yield
-ctree_test_df
 # Uses lmyield from 6.3 
 # Recreate lmyield and RMSE from 6.3 
 # Part A load the data
@@ -701,65 +955,142 @@ yield_corr <- melted_cormat_df %>%
   filter(Var2 == "Yield")
 yield_corr$absvalue = abs(yield_corr$value)
 yield_corr2 = yield_corr[order(-yield_corr[,4]),]
-yield_corr2
 #Create Train and Test data sets
 bound <- floor((nrow(df)/4)*3)      #define % of training and test set
 df <- df[sample(nrow(df)), ]        
 train <- df[1:bound, ]                   
 test <- df[(bound+1):nrow(df), ] 
 #Create the regression model
-lmyield = lm(Yield~ManufacturingProcess32 + 
-               ManufacturingProcess36 + 
-               ManufacturingProcess09 + 
-               ManufacturingProcess13 + 
-               BiologicalMaterial02 + 
-               BiologicalMaterial06 + 
-               BiologicalMaterial03, 
+lmyield = lm(Yield~., 
              data=train)
-summary(lmyield)
 # Part D Predictions
-# predict with the test data
-predict(lmyield, newdata = test, interval ='prediction')
 # Predict with the test data
 lmyield_test = predict(lmyield, newdata = test, interval ='prediction')
 lmyield_test_df = data.frame(lmyield_test)
 lmyield_test_df$actual = test$Yield
-lmyield_test_df
 lmyield_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
-cat('RMSE of the test data for this model is', lmyield_test_rmse)
-# Create ctree with lmyield
+# Create ctree include lmyield
 ctree_test_rmse = rmse(lmyield_test_df$actual, lmyield_test_df$fit)
-cat('RMSE of the test data for this model is', ctree_test_rmse)
+ctreeMod <- train(x = trainx,
+                 y = trainy,
+                 method = 'ctree2',
+                 tuneLength = 10)
+# cForest Model
+cforestMod <- train(x = trainx,
+                 y = trainy,
+                 method = 'cforest',
+                 tuneLength = 10)
+# Single tree 
+singtree <- train(x = trainx,
+                    y = trainy,
+                    method = "rpart",
+                    tuneLength = 10,
+                    control = rpart.control(maxdepth=2))
+# Cubist model
+cubeMod <- train(x = trainx,
+                     y = trainy,
+                     method = 'cubist')
+# Tabulate performance statistics
+ct.res <- postResample(lmyield_test_df$actual, lmyield_test_df$fit)
+rf.res <- postResample(rf_test_df$actual, rf_test_df$rf_test)
+res <- resamples(list(SingleTree = singtree, 
+                      RandomForest = rfMod,
+                      CTree = ctreeMod, 
+                      Cubist = cubeMod, 
+                      CForest = cforestMod))
+x <- list(singtree, 
+          rfMod, 
+          ctreeMod, 
+          cubeMod, 
+          cforestMod)
+ModTest.Results <- ModTest(x, testx, testy)
+ModTest.Results <- ModTest.Results %>% 
+  mutate(Model = c("SingleTree", "RandomForest", "CTree", "Cubist", "CForest")) %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+flextable(ModTest.Results) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
 ```
 
 #### Response
-I used a randomforest and ctree algorithm to fit and predict two models. The RMSE’s were close at 1.14 for Random Forest and 1.28 for cTree, so RandomForest edged out cTree.
+Comparing SingleTree, RandomForest, CTree, Cubist, and CForest models, we found that the cubist model performed best due to lower root mean squared error RMSE, higher coefficient of determination (Rsquared), and lowest mean absolute error MAE. Although this was a single evaluation. Future tests could switch these results as we would expect with prediction of unknown data sources. 
+
+Additionally, determining the optimal model often depends on its application and which source of error you attempt to reduce the most. For prediction in general, a lower RMSE would probably fare better than Rsquared and take priority over MAE but it all depends on the problem and circumstances. 
+
 
 ### Part B
 #### Question
 Which predictors are most important in the optimal tree-based regression model? Do either the biological or process variables dominate the list? How do the top 10 important predictors compare to the top 10 predictors from the optimal linear and nonlinear models?
+
 #### Code
 
-[missing code - fill in to demonstrate response]
+```{r}
+rf <- varImp(rf_model)
+ct <- varimp(ctree_model)
+rf <- rf %>% 
+  data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(Overall)) %>% 
+  mutate(Importance = round(Overall, 3), 
+         Rank = row_number()) %>%
+  dplyr::select(Rank, Predictor, Importance) 
+ct <- ct %>% 
+  data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>% 
+  arrange(desc(.)) %>% 
+  mutate(Importance = round(., 3), 
+         Rank = row_number()) %>%
+  dplyr::select(Rank, Predictor, Importance) 
+rpart
+```
+
+
 
 #### Response
-As shown in the table below, Process32, 36, 09, and 13 are the most important predictors. Clearly the Process variables dominate the list. For the linear model, the Process32, Process36, and BiologicalMaterial02 were the top three features based on p-values. For the non-linear model the Process32, Process09, and Biological12 appear to be the most important features. For the tree based regression models, the Process 32, Process36, and Process 09 top the list. This is interesting because linear model ranked the Process32 and 36 at the top and the non-linear placed Process09 as second highest. The consistently high ranking of Process32, 36, and 09’s feature importance across the linear, non-linear, and tree based models all substantiate that these Process variables are the most important, and that overall Process variables have a greater influence on Yield than Manufacturing variables.  But, the final model that actually get used in Production, will most likely include several of the Manufacturing variables. 
+
+The most important predictors in every model run thus far, including these two tree-based models, have been process predictors. The process variables held the majority of spots in the top 10 most important predictors in almost every model run thus far as well. However, some biological predictors creeped into the top 10 with our ctree and random forest models. Take a look at the ranked 2, 3, 5, and 9 spots in the table of importance from the random forest model: 
+
+```{r, echo = FALSE}
+flextable(ct[1:10,]) %>%
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+Now, look at ranked spots 2, 3, 5, 9, and 10 in our ctree model. Importance values have also changed scale, maxing out near 100, while our ctree maximum importance value was just over 1. 
+
+```{r, echo = FALSE}
+flextable(ct[1:10,]) %>%
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+In any case, the top 10 predictors in linear and nonlinear models imply the same general rule, that manufacturing processes (especially ManufacturingProcess32, ManufacturingProcess13, and ManufacturingProcess09) are the most important predictors of Yield. If one desires to maximize Yield, it would be best advised to improve these processes.  
+
+
 
 ### Part C
 #### Question
 Plot the optimal single tree with the distribution of yield in the terminal nodes. Does this view of the data provide additional knowledge about the biological or process predictors and their relationship with yield?
+
+
+
 #### Code
 
-[missing a plot chunk for visual interpretation]
+```{r}
+plot(singtree$finalModel)
+text(singtree$finalModel)
+```
+
 
 #### Response
 
-## Market Basket Analysis
-I am assigning one simple problem on market basket analysis / recommender systems. Imagine 10000 receipts sitting on your table. Each receipt represents a transaction with items that were purchased. The receipt is a representation of stuff that went into a customer’s basket – and therefore ‘Market Basket Analysis’. That is exactly what the Groceries Data Set contains: a collection of receipts with each line representing 1 receipt and the items purchased. Each line is called a transaction and each column in a row represents an item. Here is the dataset = GroceryDataSet.csv  (comma separated file) Your assignment is to use R to mine the data for association rules.  You should report support, confidence and lift and your top 10 rules by lift. 
+Through the hierarchical structure shown in this plot of a single tree model, we can easily determine the most important predictor (ManufacturingProcess32) and its relationship with Yield through nodes (or limbs since we are using tree references). It also shows us how importance it gets distributed to the next two most important predictors in this data set. We could continue this through all the branches of a single model to see where all predictors are ranked. 
 
-### Part A
+For example, the single split in this model uses data from ManufacturingProcess32, which we suspected was the most significant influencer of Yield from our previous models. From this view we also notice that Yield and ManufacturingProcess32 are linearly related. An increase in one should result in an increase in the other.  Since this is single tree model, we know that values are assigned by computing the mean of the group and splitting it by our single most important predictor, which is almost certainly, ManufacturingProcess32. 
+
+## Market Basket Analysis
 #### Question
-Fit a random forest model to all of the predictors, then estimate the variable importance scores:
+I am assigning one simple problem on market basket analysis / recommender systems. Imagine 10000 receipts sitting on your table. Each receipt represents a transaction with items that were purchased. The receipt is a representation of stuff that went into a customer’s basket – and therefore ‘Market Basket Analysis’. That is exactly what the Groceries Data Set contains: a collection of receipts with each line representing 1 receipt and the items purchased. Each line is called a transaction and each column in a row represents an item. Here is the dataset = GroceryDataSet.csv  (comma separated file) Your assignment is to use R to mine the data for association rules.  You should report support, confidence and lift and your top 10 rules by lift. 
 
 #### Code
 
@@ -794,31 +1125,17 @@ plot(subRules2, method="paracoord")
 
 
 #### Response
-Association Rules mining in R is achieved by usage of apriori function available under arules package. Association rules mining is a two step process. 
-Frequent Itemset Generation 
-Rules Generation
-Once the rules are generated the top 10 rules can be classified based on the output. The below steps illustrate the step-by-step approach for mining association rules. Load and Summarize the dataset. Below R code loads the R Sparse matrix and displays summary. Find Frequently purchased products. Below R code plots the top 20 purchased products. 
+Our association rules mining was achieved using apriori algorithm functions available in the arules package, which we use throughout this analysis. Association rules mining is a two-step process:
 
-Association Rules generation:
-The association rules are generated using apriori function by passing the sparse matrix generated in the previous step.
 
-Choice of Minimum Support 
-Supp = (Products purchased at least 5 times a day)/total number of transactions
-Supp = (6*7)/nrow(df) = 0.004
+    1.	Frequent Itemset Generation 
+    2.	Rules Generation 
 
-Choice of Confidence : After running trial and error on the different combinations the confidence of 0.3 was generating a decent number of rules as well as the combination.
+Once the rules are generated, the top 10 rules were classified based on the output. To get there we loaded and summarized the data set as a sparce matrix. We then found the most frequently purchased products. The top 20 are shown in our code. We created our choice of minimum support to help classify the data. This formula is:
 
-There are a total of 735 rules generated and the top 10 rules are displayed above. From the results it appears that the highest association is created for liquor and bottled beer with the lift value of 5.24
+(Products purchased at least 5 times a day)/total number of transactions Supp = (6*7)/nrow(df) = 0.004
 
-Redundant Rules Cleanup:
-Lets cleanup the redundant rules by using the subset function as per below R code. 
+Through trial and error on different combinations of items, we found that the confidence of 0.3 generated a decent number of rules for our combination. This produced a total of 735 rules and the top 10 rules are displayed as our “Parallel coordinates plot for 10 rules.” It appears the highest association is created for liquor and bottled beer with the life value of 5.24. 
 
-The highest association did not change after removing redundancy, but the other rules have changed. Liquor and bottled beer are the most dependent purchases with the lift value of 5.24.
+Going further, we cleaned up the redundant rules by subseting and down selecting our combination. The resultant highest association did not change but the other rules did. The results are shown in the “Parallel coordinates plot for 10 rules.” The most dependent purchases remained liquor and bottled beer with the life value of 5.24. 
 
-Visualization of Association Rules
-
-Scatter Plot
-Below R Code creates a scatter plot for the final set of rules. 
-
-Graph Based Visual:
-Below R Code creates a graph plot for the final set of rules 
