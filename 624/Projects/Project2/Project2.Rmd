@@ -13,7 +13,7 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval=F)
+knitr::opts_chunk$set(echo = TRUE, eval=F, message = F, warning=F)
 ```
 
 # Summary
@@ -22,19 +22,37 @@ knitr::opts_chunk$set(echo = TRUE, eval=F)
 
 # Data Exploration
 
-Data is loaded and all packages used throughout the report are noted. We view a random sample of the data below. It shows the randomly selected observations as the first, second, third, fourth, and fifth for each variable. 
+Our data consists of 33 variables from a food and beverage manufacturing company. Our goal is to predict the hydronium ion concentration, or pH, which is a measure of acidity or alkalinity. This ‘PH’ measure, as shown in the data, is a Key Performance Indicator (KPI) and must conform to a critical range.  
+
+## Initial Observations
+
+The data is loaded, and all packages used throughout the report are provided. We view a random sample of the data to inspect initial observations. It shows the randomly selected data as 1 -5 denoting the first, second, third, fourth, and fifth observation for each variable.
 
 ```{r, eval=T, warning=F, message=F}
 library(utils)
 library(psych)
+library(pls)
 library(tidyverse)
 library(corrplot)
+library(elasticnet)
+library(kernlab)
+library(plotrix)
 library(ggcorrplot)
+library(ggpubr)
+library(party)
 library(MASS)
+library(mice)
+library(mboost)
+library(VIM)
+library(rpart)
 library(caret)
+library(zoo)
+library(naniar)
+library(partykit)
 library(flextable)
 library(bestNormalize)
 theme_set(theme_minimal())
+set.seed(004)
 ph <- read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 obs.sample <- as.data.frame(t(head(sample_n(ph[1:33], 5), 5)))
@@ -50,9 +68,14 @@ flextable(obs.sample) %>%
 ```
 
 
+From these initial observations, we notice that data is missing. These appear as empty spots on the table. Some data points are also zero or negative but is unclear if this is intentional. For example, variable ‘Pressure.Vacuum’ is negative as one might expect when holding pressure in vacuum, but the variables ‘Mnf.Flow,’ ‘PSC,’ ‘Hyd.Pressure1,’ ‘Hyd.Pressure2,’ ‘Hyd.Pressure3,’ and others are less intuitive. 
 
-We note a few interesting facts before exploring further. We notice that data is missing. These appear as empty spots on the table. It also appears that due to the conversion of spreadsheet formats from excel to csv when hosting the data, our first column variable name is legible but needs the "i.." symbol removed. None of the other 33 variables need to be renamed. Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary between roughly -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). We take a closer look at these variables with some descriptive statistics.  
+Our table also displays differences the in scale of the variable’s raw values. This will need to be reviewed to ensure it does not harm the model’s predictive capabilities. It also appears that due to the conversion of the spreadsheet format from excel to ‘csv’ when hosting the data remotely, our first column variable name is legible but needs the “i..” symbol removed. None of the other 33 variables need to be renamed. We take a closer look at these variables with some descriptive statistics.
 
+
+## Inferential Statisitcs
+
+Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary widely between -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). For this reason, we review each variable’s statistics individually. We calculate their total observations (obs), percent missing (pm), mean, median (med), standard deviation (sd), minimum value (min), maximum value (max), skewness (skew), and standard error (se) and combine them into a table by variable.  
 
 
 ```{r, eval=T}
@@ -70,29 +93,54 @@ flextable::flextable(ph.desc) %>%
   set_table_properties(layout = "autofit")
 ```
 
-In the header the abbreviations stand for observations (obs), percent missing (missing), median, mean, standard deviation, minimum, maximum, range, skew, and standard error. These are calculated for each variable. To get a better understanding of the target variable we are trying to make predictions for, we visualize the points as a scatterplot.       
+No variable is missing greater than 8.2% (MFR) of its cases with 25 of the 33 variables at or under 1% missing. Our target ‘PH,’ is only missing 0.2%. A simple imputation should fix this without issue, as long as the errors are randomly dispersed. 
 
+The standard deviations inform us that the spread of each variables is also wide in several cases like ‘Filler.Speed,’ and ‘Carb.Flow’ while extremely narrow or even 0 for variables, ‘Oxygen.Filler,’ ‘PSC,’ PSC.CO2,’  ‘PSC.Fill,’ ‘Carb.Volume,’ and several more. These statistics confirm that we will be working with data objects of completely different scales each centered around their own averages. Our target ‘PH,’ has very little deviation as well, but in this case, it is to be expected since by nature it follows a logarithmic pattern and we are only seeing values between 7.9 and 9.4.   
 
-```{r}
+There is some skewness among the variables and thereby potential outliers. This is most pronounced in the variables, ‘MFR,’ and ‘Filler.Speed,’ where the data has skewed left from its averages. Fortunately, all but two variables (Carb.Flow and Filler.Speed) have low standard errors indicating that nearly all variables will serve as good reference data sets for prediction due to low variation in spread from their means. To learn how good these variables may be at predicting, we need to see the relationship of each with our target ‘PH,’ interpret, and apply the results during modeling. 
+   
+## Variable Relationships
+
+To gain a better understanding of the relationships between our variables and the target ‘PH’ we visualize the points as scatterplots with fitted regression lines. Before we make our first plot, we create an index value for ‘PH’ in the order it was read. This shows the pattern in individual measures of acidity or alkalinity as they were taken. We call this index value the ‘Position’ given its purpose of describing measurement position for each ‘PH’ value. 
+
+```{r, eval=T}
 ph %>% 
   dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(Index = 1:length(ph$PH)) %>% 
-  ggplot(aes(Index, PH)) + 
-  geom_point(aes(color = PH, alpha=.25)) + 
+  ggplot(aes(Index, PH, color = PH, alpha=.01)) + 
+  geom_point(aes()) + 
   geom_smooth(method = "loess", 
               color="goldenrod2", 
               lty = "solid", 
-              fill = "yellow1")
+              fill = "yellow1") +
+  geom_smooth(method = "lm", 
+              color="grey34", 
+              lty = "dotted", 
+              fill = "grey13") +
+  labs(subtitle = "PH Patterns by Position",
+       x = "Position", y = "PH") +
+  theme(legend.position = "none")
+# Bounds estimates
+cap99 <- (length(ph$PH) - 4) / length(ph$PH)
 ```
 
+Interestingly, the pattern appears to fit an almost perfect sinusoidal curve, as demonstrated by the yellow line which is a closely fit locally weighted scatterplot smoothing (LOESS). For contrast, the black line attempts to fit a linear trend to the data. The shade of blue of each point indicates PH level and clustering. The lighter the point, the more alkaline and more solitary the measurement while darker points are more acidic and grouped together. A good example of the lightest point is the lone outlier plotted well above a pH of 9 just past position 1000.  
+
+A greater number of blue points (pH measurements) fall onto and around the yellow line than the black linear line and the pH shades do not show any big clusters or groups of pH values. From this we can be confident in two principles about this data. First, that the data measurements are random with no obvious pH clusters and secondly, that the data’s collection process was not random, it was more sinusoidal. 
+
+From this perspective, it is likely that there is a give and take of pH in each beverage. They are likely bounded by pH levels and the fluctuations in each beverage was accurately captured by the machine or device measuring pH. At this stage, we can also estimate the bounds as 99.84% of the measurements fall between 8.0 and 9.0 while over 75% is between 8.25 and 8.75. This should not have a tremendous effect on all models, but it would certainly affect any business decisions related to our predictions. 
+
+We continue to visualize the relationship of our target ‘PH,’ with the variables. For ease of viewing, we plot these variables in 4 sets each given a linear black line of best fit using ‘PH,’ as the response. 
 
 
-```{r}
+```{r, eval=T}
 # 1st set of variables - excluding brand code (categorical)
 ph[c(2:9,26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
-  ggtitle("Linearity of Values") + 
+  labs(
+    subtitle =
+      "Variable Relationships with Yield Set 1") + 
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -106,12 +154,17 @@ ph[c(2:9,26)] %>%
               alpha=0.25) + 
   facet_wrap(~variable, 
              scales ="free",
-             ncol = 4) 
+             ncol = 4) + 
+  theme(axis.text.x = element_blank(), 
+        axis.text.y = element_blank(), 
+        axis.ticks = element_blank()) 
 # 2nd set of variables
 ph[c(10:17,26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
-  ggtitle("Linearity of Values") + 
+  labs(
+    subtitle =
+      "Variable Relationships with Yield Set 2") +
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -130,7 +183,9 @@ ph[c(10:17,26)] %>%
 ph[c(18:26)] %>%
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
-  ggtitle("Linearity of Values") + 
+  labs(
+    subtitle =
+      "Variable Relationships with Yield Set 3") +
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -151,7 +206,10 @@ ph[c(27:33,26)] %>%
   mutate(pH = PH) %>% 
   gather(variable, value, -PH) %>% 
   ggplot(., aes(value, PH)) + 
-  ggtitle("Linearity of Values") + 
+  labs(
+    subtitle =
+      "Variable Relationships with Yield Set 4") +
+  labs(subtitle = ) +
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -168,9 +226,11 @@ ph[c(27:33,26)] %>%
              ncol = 4) 
 ```
 
+None of the variables appear to follow a linear relationship with ‘PH.’ If they were, it would look similar to the plot of ‘PH,’ with itself. Most variables are continuous. Excluding a handful of seemingly discrete numerical values such as ‘Pressure.Setpoint,’ ‘Bowl.Setpoint,’ and ‘Alch.Rel,’ there is an inherent randomness to all relationships with ‘PH.’ We repeat the visualization process to create histograms of each variable to review their distributions. 
 
 
-```{r}
+
+```{r, eval=T}
 ph %>%
   gather(variable, value) %>% 
   ggplot(., aes(value)) + 
@@ -187,8 +247,64 @@ ph %>%
         plot.title = element_blank())
 ```
 
+At a binwidth of 10, ‘PH’ appears normally distributed. However, many variables have two modes (biomodal) and skewed. Temperature is skewed right due to a suspected outlier. We will need to fix this before modeling.
 
-```{r}
+Additionally, the discrete numeric values formed by ‘Pressure.Setpoint,’ and ‘Bowl.Setpoint,’ in our scatterplots are confirmed. They can be spotted easily this way since they look more like our categorical variable “Brand.Code” than a continuous variable like ‘Temperature.’ Given these results, we must consider skew more closely. We use a point range function and visual to explore further. 
+
+```{r, eval=T}
+# Function to calculate and set pointrange
+xysdu <- function(x) {
+   m <- mean(x)
+   ymin <- m - sd(x)
+   ymax <- m + sd(x)
+   return(c(y = m, ymin = ymin, ymax = ymax))
+}
+# Full picture point range 
+ptrng.full <- ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (smaller)
+ptrng.small <- ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(-MFR, -Filler.Speed, -Carb.Flow, -Mnf.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (Medium)
+ptrng.med <- ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(MFR, Mnf.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+# Similar point ranges (larger)
+ptrng.lrg <- ph %>% 
+  dplyr::select(where(is.numeric)) %>% 
+  dplyr::select(Filler.Speed, Carb.Flow) %>% 
+  gather(variable, value) %>% 
+  ggplot(aes(variable, value)) + coord_flip() +
+  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
+  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
+  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
+ggarrange(ptrng.small, 
+          ggarrange(ptrng.lrg, ptrng.med, ncol = 1, labels = c("B", "C")), nrow = 1, labels = "A"
+          )
+```
+
+The red dot on each variable range is its median while the black dot is its mean. The more of the black dot we see, the more skewed that distribution is. Here, we label three parts A, B, and C to denote a corresponding group of variables on similar scales with centers of their distribution closer together than other groups. It is best to simply think of these labels as A being the small-scale group, B showing the large-scale group, and C as a middle or medium scale group. 
+
+Using a point range visualization like this lets us check the magnitude of outliers by exploiting the difference in robustness between median and mean. It also helps us pick out exactly which variables are best for modeling by sighting variables with many points that influence their distribution more than other variables. Unfortunately, we are still not sure if any of the seemingly outlier points were intentional so a fare bit of intuition is used to identify what should and should not be influencing the distribution. 
+
+
+```{r, echo=FALSE, eval=FALSE}
 # Tornado plots by variable?
 ph %>% 
   gather(variable, value, -PH) %>% 
@@ -203,9 +319,7 @@ ph %>%
 ```
 
 
-
-
-```{r}
+```{r, echo=F, eval=FALSE}
 ordered <- ph %>% 
   dplyr::select(where(is.numeric)) %>% 
   arrange() 
@@ -225,7 +339,12 @@ ggcorrplot(cors, "square", "lower",
            hc.method = "complete") + 
   coord_flip() + 
   labs(title = "Corrlation Matrix with Significance Label 0.05")
-# Alternative
+```
+
+When considering variable relationships, we also need to consider their correlations. In this final correlation plot we examine not only the variable’s correlation with ‘PH’ but all variable’s correlations with one another. 
+
+```{r, eval=T}
+# Correlation Plot
 order <- ph %>% 
   dplyr::select(where(is.numeric)) %>%
   arrange() %>%  
@@ -247,69 +366,42 @@ ggcorrplot(cors, "square", "lower",
   labs(title = "Corrlation Matrix with Significance Label 0.05")
 ```
 
-
-```{r}
-# Function to calculate and set pointrange
-xysdu <- function(x) {
-   m <- mean(x)
-   ymin <- m - sd(x)
-   ymax <- m + sd(x)
-   return(c(y = m, ymin = ymin, ymax = ymax))
-}
-# Full picture point range 
-ph %>% 
-  dplyr::select(where(is.numeric)) %>% 
-  gather(variable, value) %>% 
-  ggplot(aes(variable, value)) + coord_flip() +
-  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
-  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
-  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
-# Similar point ranges (smaller)
-ph %>% 
-  dplyr::select(where(is.numeric)) %>% 
-  dplyr::select(-MFR, -Filler.Speed, -Carb.Flow, -Mnf.Flow) %>% 
-  gather(variable, value) %>% 
-  ggplot(aes(variable, value)) + coord_flip() +
-  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
-  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
-  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
-# Similar point ranges (Medium)
-ph %>% 
-  dplyr::select(where(is.numeric)) %>% 
-  dplyr::select(MFR, Mnf.Flow) %>% 
-  gather(variable, value) %>% 
-  ggplot(aes(variable, value)) + coord_flip() +
-  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
-  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
-  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
-# Similar point ranges (larger)
-ph %>% 
-  dplyr::select(where(is.numeric)) %>% 
-  dplyr::select(Filler.Speed, Carb.Flow) %>% 
-  gather(variable, value) %>% 
-  ggplot(aes(variable, value)) + coord_flip() +
-  stat_summary(fun.data=xysdu, geom = "Pointrange", shape=16, size=.5, color="black") +
-  stat_summary(fun.y=median, geom="point", shape=16, size=2, color="red") + 
-  theme(legend.position = "None", axis.title.x = element_blank(), axis.title.y = element_blank())
-```
-
+Although computed and shown for reference, we ignore insignificantly correlated variables with p-values greater than or equal to 0.05. Those we ignore have an ‘X’ drawn through its box. Variables directly measuring pressure and flow exhibit more negative control over ‘PH’ shown in darker blue. The only significant exception to this is ‘Carb.Flow.’ Meanwhile, ‘Bowl.Setpoint,’ ‘Filler.Level,’ ‘Oxygen.Filler,’ and ‘Usage.Count’ are the only remaining significantly correlated variables.  
 
 
 
 # Data Preparation
+## Imputation
 
+Before imputing, we check for patterns in the missing data. According to the mice method used in the md.pattern() function, there is no clear pattern. The errors are randomly dispersed. However, since we discovered some natural eb and flow in the collection process we double check with our own eyes.    
 
-```{r}
+```{r, eval=T}
+# Check for missing data patterns with mice
+na.pattern.mice <- md.pattern(ph) # No clear pattern
+# Double check with hist and plot 
+aggr(ph, col=c('navyblue','red'), 
+                 numbers=TRUE, sortVars=TRUE, 
+                 labels=names(ph), cex.axis=.7, 
+                 gap=3, ylab=c("Histogram","Pattern")) 
+# Small amount missing - simple median will do
+obs.missing.perc <- 
+  (sum(ph.desc$obs) / (33*2571)*100)
 # replaces NA with median (given a removal of missing values in calculation)
 for (i in colnames(ph)) {
   ph[[i]][is.na(ph[[i]])] <- median(ph[[i]], na.rm=TRUE)
 }
+# Confirm none are missing
 sum(is.na(ph))
 ```
 
+The histogram distributes the missing data as expected from our inferential statistics. The lion’s share of missing values (8.2%) is concentrated under variable ‘MFR’ dwarfing the next variables by comparison. Our pattern plot also randomly spreads red pixelated rectangles on a dark blue background, indicating completely random missing values. Since the quantity of missing values is quite small (less than 1%) we perform a simple imputation by the median of each variable using a for loop. 
 
 
-```{r}
+## Outlier Extraction
+
+To extract and remove outliers, we first identify which variables contain the outliers. Variable ‘Brand.Code’ is categorical and has no missing values so we exclude it by selecting all numeric variables (which includes everything else). We then identify and replace those outliers using a formula with upper and lower bounds to extract nonoutlier data, leaving the rest as outliers. Thus, we conveniently quantify these outliers as greater than or less than 1.5 times each variable’s interquartile range.   
+
+```{r, eval=T}
 # select numeric variables
 ph.numerics <- ph %>% 
   dplyr::select(where(is.numeric))
@@ -325,11 +417,17 @@ ph.numerics <- outlier_free
 # join outlier free numerics with categorical 
 Brand.Code <- ph$ï..Brand.Code
 df <- cbind(Brand.Code, ph.numerics)
-sum(is.na(df$Brand.Code))
+df.summary <- summary(df)
 ```
 
+After identifying and replacing outliers by looping through each variable in the data, we join the outlier free numeric data with the excluded ‘Brand.Code’ variable. This retains the data types as read in and is complete with a binding function for data frames. We then check for missing data in ‘Brand.Code’ to ensure it all transferred appropriately and review the results to see that very few outliers were present.  
 
-```{r}
+
+## Transformations
+
+Although the data did not exhibit linear trends, nor fit a typically gaussian pattern in its isolation, we consider transformations that would best normalize each variable’s distribution. Using a function in the bestNormalize package we store the chosen transformations of each variable in a data frame named ‘best.norms’ along with corresponding metrics to transform them. 
+
+```{r, eval=T}
 # Produce recommended transformations
 df.nums <- df %>% 
   dplyr::select(where(is.numeric))
@@ -342,31 +440,33 @@ for (i in colnames(df.nums)) {
 best.norms$Carb.Volume$chosen_transform
 ```
 
+From this data frame, we can call upon the desired variables to know which transformation is best at a specific time. The ideal transformation to normalize the ‘Carb.Volume’ variable is shown in the code as an example. These will be used in conjunction with model importance when building models.
 
+## Split and Selections
 
-# Model Building
-
+We split the data set giving 70% to training and 30% testing data frames. Using a forward and backward traveling stepwise regression that considered Akaike information criterion (AIC) to evaluate model fit, we determined the best variables. Quite intuitively, any coefficient in the model that had a p-value lower than 0.05, was used. This indicated significant coefficient to us and was the basis for our selection-based models. 
 
 ```{r}
-model.pm <- lm(PH~.,df)
-pm <- stepAIC(model.pm, trace = F, direction = "both")
-p <- summary(pm)$call
-pm <- lm(p[2], df)
-summary(pm)
+# Split 70-30 training/test
+set.seed(1102)
+index <- createDataPartition(
+    df$PH, p = .7, 
+    list = FALSE, times = 1)
+train <- df[index,]
+test <- df[-index,]
+# Create trainx and y
+trainx <- train %>%
+  dplyr::select(-PH)
+trainy <- train$PH
+testx <- test %>%
+  dplyr::select(-PH)
+testy <- test$PH
 ```
 
 
-
 ```{r}
-model.ks <- lm(PH~., df)
-summary(model.ks)
-```
-
-
-
-
-```{r}
-data <- df %>% 
+# StepAIC Model Selectors
+df.selected <- df %>% 
   dplyr::select(Brand.Code, 
                 Carb.Volume,
                 Fill.Ounces,
@@ -393,92 +493,153 @@ data <- df %>%
                 Pressure.Setpoint, 
                 Alch.Rel,
                 Balling.Lvl)
+
 ```
 
 
+# Model Building
 
-```{r}
+Given a clean data set and options of using transformed and down selected data, we can begin to build models for predicting our target variable, ‘PH.’ There are many models, so we organize them into two categories: parametric and nonparametric. We refrain from explaining why the models are selected until the ‘model selection’ section.  
 
-nnetGrid <- expand.grid(.decay=c(0, 0.01, 0.1, 0.5, 0.9),
-                        .size=c(1, 10, 15, 20),
-                        .bag=FALSE)
-nnetModel <- train(x = train,
-                   y = train,
-                   method = "avNNet",
-                   tuneGrid = nnetGrid,
-                   preProc = c("center", "scale"),
-                   trace=FALSE,
-                   linout=TRUE,
-                   maxit=500)
-# Neural net may take several minutes
-nnetPred <- predict(nnetModel, newdata = testData$x)
+For a quick reference, in parametric models the parameters used to generate predictions are fixed. Whereas nonparametric models tend to change parameters with the size of data. To further generalize, if the model has a predetermined outcome between predictor and response, then it is parametric (Ex: linear, multiple regression). All others are nonparametric.   
+ 
+
+## Parametric Models
+
+
+
+```{r stepwise regression}
+model.pm <- lm(PH~.,train)
+pm <- stepAIC(model.pm, 
+              trace = F, 
+              direction = "both")
+p <- summary(pm)$call
+pm <- lm(p[2], df)
+summary(pm)
 ```
 
+With the stepwise regression complete, we try another method colloquially known as the ’kitchen sink’ or KS model. This will throw everything but the kitchen sink into the model as parameters and return significance values to us in the form of p-values. Performing this model helps to evaluate the selection of the previous model. 
 
-
-
-
-```{r}
-library(naniar)
-miss_var_summary(data)
-vis_miss(data, sort_miss = TRUE) 
+```{r Kitchen Sink}
+model.ks <- lm(PH~., train)
+summary(model.ks)
 ```
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
-
-```{r}
-library(zoo)
-library(naniar)
-data<-na.locf(data,fromLast = TRUE)
-is.na(data)
-
-
-vis_miss(data, sort_miss = TRUE) 
-str(data)
-```
-
-
-
-```{r}
-# Split 70-30 training test
-set.seed(1102)
-index <- createDataPartition(data$PH, p = .7, 
-                             list = FALSE, times = 1)
-train <- data[index,]
-test <- data[-index,]
-```
-
-
-
-
-Ridge Regression
-
-```{r}
-library(elasticnet)
-trctrl<- trainControl(method="repeatedcv", number=3, repeats=2)
-
-ridge <- caret::train(PH~., data=train, method="ridge", 
-                trControl=trctrl)
-ridgePred <- predict(ridge, newdata = test)
-ridge_test<-data.frame(postResample(pred = ridgePred, obs = test$PH)) 
+```{r Ridge Regression}
+trctrl<- trainControl(method="repeatedcv", 
+                      number=3, 
+                      repeats=2)
+model.rr <- caret::train(PH~., data=train,
+                      method="ridge",
+                      trControl=trctrl)
+ridgePred <- predict(model.rr, newdata = test)
+ridge_test <-data.frame(
+  postResample(pred = ridgePred, 
+               obs = test$PH)) 
 ridge_test
+model.rr
+```
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+
+```{r GLM Boosted}
+model.glmb <- train(x = trainx, 
+                  y = trainy, 
+                  method = "glmboost", 
+                  preProcess = c("center", "scale"),
+                  tuneLength = 10)
+model.glmb
+```
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+```{r Partial Least Squares}
+model.pls <- train(x = trainx, 
+                  y = trainy, 
+                  method = "pls", 
+                  preProcess = c("center", "scale"),
+                  tuneLength = 10)
+model.pls
 ```
 
 
 
-Random Forest
-```{r}
-library(party)
-library(caret)
-forest <- train(PH~., data=train, method="cforest", 
+## Nonparametric Models
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+
+```{r MARS}
+marsGrid <- expand.grid(.degree=1:2, 
+                        .nprune=2:10)
+model.mar <- train(x = trainx, 
+                 y = trainy, 
+                 method = "earth",
+                 preProcess = c("center", "scale"),
+                 tuneGrid = marsGrid)
+model.mar
+```
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+
+```{r Random Forest}
+ctl <- trainControl(method='repeatedcv', 
+                        number=10, 
+                        repeats=3)
+mtry <- sqrt(ncol(train))
+tunegrid <- expand.grid(.mtry=mtry)
+model.rf <- train(PH~., 
+                  data=train, 
+                  method='rf',
+                  tuneGrid=tunegrid, 
+                  preProcess = c("center", "scale"),
+                  trControl=ctl)
+model.rf
+```
+
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+
+
+```{r Neural Net}
+# Neural net may take several minutes to run
+nnet_grid <- expand.grid(.decay = 
+                           c(0, 0.01, .1), 
+                         .size = c(1:10), 
+                         .bag = FALSE)
+nnet_maxnwts <- 5 * ncol(train) + 5 + 1
+model.nnet <- train(
+  PH ~ ., data = train, method = "avNNet",
+  center = TRUE,
+  scale = TRUE,
+  tuneGrid = nnet_grid,
+  trControl = trainControl(method = "cv"),
+  linout = TRUE,
+  trace = FALSE,
+  MaxNWts = nnet_maxnwts,
+  maxit = 500
+)
+
+model.nnet
+```
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+
+```{r Conditional Forest}
+model.cforest <- train(PH~., 
+                data=train, 
+                method="cforest", 
                 trControl=trctrl,
+                preProcess = c("center", "scale"),
                 tuneLength =2)
-forestPred <- predict(forest, newdata = test)
+forestPred <- predict(model.cforest, newdata = test)
 forest_test<-data.frame(postResample(pred = forestPred, obs = test$PH)) 
 forest_test
 ```
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
 Support Vector
 
@@ -486,25 +647,45 @@ Support Vector
 library(caret)
 library(kernlab)
 svm_grid <-  expand.grid(C = c(1,1000))
-svm<-train(PH~., data = train, 
+svm <- train(PH~., data = train, 
                  method = 'svmRadialCost', 
                  trControl = trctrl, 
                  tuneGrid = svm_grid)
 svmPred <- predict(svm, newdata = test)
-svm_test<-data.frame(postResample(pred = svmPred, obs = test$PH)) 
+svm_test <- data.frame(
+  postResample(pred = svmPred, obs = test$PH)) 
 svm_test
 ```
 
-
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
 # Model Selection
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
-# Predictions
+## Evaluation Criteria
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+## Predictions 
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+## Selection
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
 # Conclusion
 
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+## Table of Results
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
+## Discussion 
+
+Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
 
 
 
