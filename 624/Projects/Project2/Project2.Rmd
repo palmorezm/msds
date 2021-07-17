@@ -446,7 +446,7 @@ From this data frame, we can call upon the desired variables to know which trans
 
 We split the data set giving 70% to training and 30% testing data frames. Using a forward and backward traveling stepwise regression that considered Akaike information criterion (AIC) to evaluate model fit, we determined the best variables. Quite intuitively, any coefficient in the model that had a p-value lower than 0.05, was used. This indicated significant coefficient to us and was the basis for our selection-based models. 
 
-```{r}
+```{r, eval=T}
 # Split 70-30 training/test
 set.seed(1102)
 index <- createDataPartition(
@@ -464,7 +464,7 @@ testy <- test$PH
 ```
 
 
-```{r}
+```{r, eval=T}
 # StepAIC Model Selectors
 df.selected <- df %>% 
   dplyr::select(Brand.Code, 
@@ -644,20 +644,19 @@ Some words here. Some words here. Some words here. Some words here. Some words h
 Support Vector
 
 ```{r}
-library(caret)
-library(kernlab)
 svm_grid <-  expand.grid(C = c(1,1000))
-svm <- train(PH~., data = train, 
+model.svm <- train(PH~., data = train, 
                  method = 'svmRadialCost', 
                  trControl = trctrl, 
                  tuneGrid = svm_grid)
-svmPred <- predict(svm, newdata = test)
+svmPred <- predict(model.svm, newdata = test)
 svm_test <- data.frame(
   postResample(pred = svmPred, obs = test$PH)) 
 svm_test
 ```
 
 Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+
 
 # Model Selection
 
