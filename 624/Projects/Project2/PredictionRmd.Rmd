@@ -1,0 +1,125 @@
+---
+title: "Untitled"
+author: "Zachary Palmore"
+date: "7/17/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Predictions
+
+```{r Load Data}
+# Prediction script
+library(utils)
+library(psych)
+library(stats)
+library(pls)
+library(tidyverse)
+library(corrplot)
+library(elasticnet)
+library(kernlab)
+library(plotrix)
+library(imputeMissings)
+library(ggcorrplot)
+library(ggpubr)
+library(ROCR)
+library(party)
+library(MASS)
+library(mice)
+library(mboost)
+library(VIM)
+library(rpart)
+library(caret)
+library(zoo)
+library(rpart)
+library(rpart.plot)
+library(naniar)
+library(partykit)
+library(flextable)
+library(bestNormalize)
+library(doParallel) # Used for computation
+library(earth) # Package necessary for marsModel
+registerDoParallel(cores=2)
+theme_set(theme_minimal())
+set.seed(004)
+ph <- read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentEvaluation-%20TO%20PREDICT.csv")
+#################################
+```
+
+
+
+```{r Impute}
+# Numeric
+ph.numerics <- ph %>% 
+  dplyr::select(where(is.numeric)) 
+ph.numerics <- sapply( ph.numerics, as.numeric )
+ph.numerics <- naniar::impute_median(ph.numerics)
+naniar::impute_median(ph.numerics)
+sum(is.na(ph.numerics))
+ph.numerics <- ph.numerics %>% 
+  data.frame() 
+# Categorical
+Brand.Code <- ph$ï..Brand.Code
+val <- unique(Brand.Code[!is.na(Brand.Code)])
+my_mode <- val[which.max(tabulate(match(Brand.Code, val)))]
+Brand.Code.imputed <- Brand.Code
+Brand.Code.imputed[is.na(Brand.Code.imputed)] <- my_mode
+```
+
+
+```{r Remove Outliers}
+for (i in colnames(ph.numerics)) {
+  iqr <- IQR(ph.numerics[[i]])
+  q <- quantile(ph.numerics[[i]], probs = c(0.25, 0.75), na.rm = FALSE)
+  qupper <- q[2]+1.5*iqr
+  qlower <- q[1]+1.5*iqr
+  outlier_free <- subset(ph.numerics, ph.numerics[[i]] > (q[1] - 1.5*iqr) & ph.numerics[[i]] < (q[2]+1.5*iqr) )
+}
+ph.numerics <- outlier_free
+# join outlier free numerics with categorical 
+Brand.Code <- Brand.Code.imputed
+df <- cbind(Brand.Code, ph.numerics)
+df.summary <- summary(df)
+sum(is.na(df))
+```
+
+
+```{r Random Forest Model}
+ctl <- trainControl(method='repeatedcv', 
+                    number=10, 
+                    repeats=3)
+mtry <- sqrt(ncol(df))
+tunegrid <- expand.grid(.mtry=mtry)
+# Not Run - see Project2 for training data
+# model.rf <- train(PH~., 
+#                  data=train, 
+#                  method='rf',
+#                  tuneGrid=tunegrid, 
+#                  preProcess = c("center", "scale"),
+#                  trControl=ctl)
+rfPred <- predict(model.rf, newdata = df)
+rf_test <- data.frame(
+  postResample(pred = rfPred, obs = test$PH)) 
+model.rf
+rf_test
+caret::varImp(model.rf)
+```
+
+
+```{r}
+prj2_real_predictions <- predict(model.rf, newdata = df)
+write.csv(prj2_real_predictions, file = "C:/data/prj2_real_predictions.csv")
+```
+
+
+
+
+
+
+
+
+
