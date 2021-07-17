@@ -42,6 +42,7 @@ library(kernlab)
 library(plotrix)
 library(ggcorrplot)
 library(ggpubr)
+library(ROCR)
 library(party)
 library(MASS)
 library(mice)
@@ -148,7 +149,7 @@ ph[c(2:9,26)] %>%
   ggplot(., aes(value, PH)) + 
   labs(
     subtitle =
-      "Variable Relationships with Yield Set 1") + 
+      "Variable Relationships with PH Set 1") + 
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -172,7 +173,7 @@ ph[c(10:17,26)] %>%
   ggplot(., aes(value, PH)) + 
   labs(
     subtitle =
-      "Variable Relationships with Yield Set 2") +
+      "Variable Relationships with PH Set 2") +
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -193,7 +194,7 @@ ph[c(18:26)] %>%
   ggplot(., aes(value, PH)) + 
   labs(
     subtitle =
-      "Variable Relationships with Yield Set 3") +
+      "Variable Relationships with PH Set 3") +
   geom_point(fill = "white",
              size=1, 
              shape=1, 
@@ -216,7 +217,7 @@ ph[c(27:33,26)] %>%
   ggplot(., aes(value, PH)) + 
   labs(
     subtitle =
-      "Variable Relationships with Yield Set 4") +
+      "Variable Relationships with PH Set 4") +
   labs(subtitle = ) +
   geom_point(fill = "white",
              size=1, 
@@ -1060,6 +1061,8 @@ model.imps <- model.imps %>%
   data.frame() 
 names(model.imps) <- as.matrix(model.imps[1,])
 model.imps <- model.imps[-1,]
+model.imps <- model.imps %>% 
+  tibble::rownames_to_column("Model")
 flextable::flextable(model.imps) %>% 
   theme_vanilla() %>% 
   set_table_properties(layout = "autofit")
@@ -1068,11 +1071,16 @@ flextable::flextable(model.imps) %>%
 The predictor deemed most important in our stepwise regression ‘Mnf.Flow’ turned out to have no importance in the random forest. In fact, the only variable that showed promise from our selection in the random forest model was ‘Temperature’ with an importance value of 28.6. This may be caused by the formula unique to the model type since MARS, GLMB, and SVM share a similar adaptive regression capability. Future studies should explore this further to exploit the benefits of specific predictor-response relationships if there are any to be found. 
 
 
+Lastly, in future studies it would also be wise to consider alternative models, reduce the outlier leniency by shrinking the IQR multiplier, and perhaps create new features from existing predictors. While our model provides an impressive amount of accuracy it could be improved. New features could include ratios of pressure and temperature, for example, since they are known to have a clear linear relationship in nature. Adjustments such as these would also provide deeper insight into the eb and flow pattern of the randomly distributed ‘PH’ measurements in the manufacturing process, which, is the main challenge we face when making predictions. 
 
 
 
 
-
+```{r}
+predict(model.rf)
+?pred()
+library(ROCR)
+```
 
 
 
