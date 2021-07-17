@@ -50,6 +50,8 @@ library(VIM)
 library(rpart)
 library(caret)
 library(zoo)
+library(rpart)
+library(rpart.plot)
 library(naniar)
 library(partykit)
 library(flextable)
@@ -526,7 +528,7 @@ For a quick reference, in parametric models the parameters used to generate pred
 
 We begin with a stepwise regression model that travels forwards and backwards through the parameters to select the best ones. It uses Akaike information criterion (AIC) to evaluate model fit. This model was used to generate the previously selected parameters in our ‘Select and Split’ section. 
 
-```{r stepwise regression}
+```{r stepwise regression, eval=TRUE}
 model.pm <- lm(PH~.,train)
 pm <- stepAIC(model.pm, 
               trace = F, 
@@ -543,7 +545,7 @@ caret::varImp(model.pm) %>%
 
 With the stepwise regression complete, we try another method colloquially known as the ’kitchen sink’ or KS model. This will throw everything but the kitchen sink into the model as parameters and return significance values to us in the form of p-values. Performing this model helps to evaluate the selection of the previous model. 
 
-```{r Kitchen Sink}
+```{r Kitchen Sink, eval=TRUE}
 model.ks <- lm(PH~., train)
 ksPred <- predict(model.ks, newdata = test)
 ks_test <- data.frame(
@@ -555,7 +557,7 @@ caret::varImp(model.ks) %>%
 
 We begin with a stepwise regression model that travels forwards and backwards through the parameters to select the best ones. It uses Akaike information criterion (AIC) to evaluate model fit. This model was used to generate the previously selected parameters in our ‘Select and Split’ section.
 
-```{r Ridge Regression}
+```{r Ridge Regression, eval=TRUE}
 trctrl<- trainControl(method="repeatedcv", 
                       number=3, 
                       repeats=2)
@@ -573,7 +575,7 @@ caret::varImp(model.rr)
 With the stepwise regression complete, we try another method colloquially known as the ’kitchen sink’ or KS model. This will throw everything but the kitchen sink into the model as parameters and return significance values to us in the form of p-values. Performing this model helps to evaluate the selection of the previous model.
 
 
-```{r GLM Boosted}
+```{r GLM Boosted, eval=TRUE}
 model.glmb <- train(x = trainx, 
                   y = trainy, 
                   method = "glmboost", 
@@ -588,7 +590,7 @@ caret::varImp(model.glmb)
 
 A ridge regression is performed next. While this model was not expected to be the best model, it set up a framework to understand how well the standard error of the predictors influences our response. Since ridge regression acts to limit standard error, we would expect that if the model turned out to be one of the best, there would be significant standard error in our predictors. From this model we also refine the level of importance we could assign to each predictor. 
 
-```{r Partial Least Squares}
+```{r Partial Least Squares, eval=TRUE}
 model.pls <- train(x = trainx, 
                   y = trainy, 
                   method = "pls", 
@@ -607,7 +609,7 @@ From previous plots, we can infer that the data is not linear and thus linear mo
 
 For the final distinctly parametric model on nonspecialized data, we have a partial least squares (PLS) regression. With this, the dimensions of the model are reduced to focus the model on the least harmful set of predictors. This subset of predictors could be used to enhance other models as well. We give close attention to level of importance of each predictor in these models as they will inform the models we think will perform best.  
 
-```{r MARS}
+```{r MARS, eval=TRUE}
 marsGrid <- expand.grid(.degree=1:2, 
                         .nprune=2:10)
 model.mar <- train(x = trainx, 
@@ -624,7 +626,7 @@ caret::varImp(model.mar)
 
 A multivariate adaptive regression spline (MARS) models nonlinearity among predictors and their outcome. This is partly why it was selected for our first parametric model. It also works well at discovering patterns in interactions better than linear regression models by using hinge functions. It is best to think of these as drawing a straight line through points with slight kinks when the data changes direction. These kinks can make a MARS model highly accurate in prediction. We center and scale the data prior to processing.  
 
-```{r Random Forest}
+```{r Random Forest, eval=TRUE}
 ctl <- trainControl(method='repeatedcv', 
                         number=10, 
                         repeats=3)
@@ -645,7 +647,7 @@ caret::varImp(model.rf)
 
 Another common nonparametric model generally good at prediction is the random forest (RF) model. This kind of model is built on decision trees that can merge limbs to form more accurate predictions than simple regression. It also adds some degree of randomness while growing its trees to improve performance.  Here, again the data is centered and scaled since many of the predictors were not close to the same magnitude and some were far from one another’s average in their distributions.  
 
-```{r Neural Net}
+```{r Neural Net, eval=TRUE}
 # Neural net may take several minutes to run
 nnet_grid <- expand.grid(.decay = 
                            c(0, 0.01, .1), 
@@ -672,7 +674,7 @@ caret::varImp(model.nnet)
 
 Inspired by the human brain, neural networks (NNET) have become popular for discovering patterns in data. It works by training or adjusting an input with a weighted value based on the performance of previous inputs. When the output is correct, additional weight is given to that input. For this reason, neural networks a principally limited by the number of neurons available for inputs and the time required to train them. Many problems benefit from the use of NNETs because the algorithm can produce highly accurate results as long as the data going into in is capable.  
 
-```{r Conditional Forest}
+```{r Conditional Forest, eval=TRUE}
 model.cf <- train(PH~., 
                 data=train, 
                 method="cforest", 
@@ -689,7 +691,7 @@ Conditional forests (CF) are popular as well since they can generally handle sma
 
 Support Vector
 
-```{r Support Vector Machine}
+```{r Support Vector Machine, eval=TRUE}
 svm_grid <-  expand.grid(C = c(1,1000))
 model.svm <- train(PH~., data = train, 
                  method = 'svmRadialCost', 
@@ -705,7 +707,7 @@ caret::varImp(model.svm)
 Support vector machines (SVM) are particularly great at working in higher dimensions and detecting outliers. While we are uncertain if any predictor-response relationships exist in higher dimensions, it would be best practice to include the option. This supervised learning method can specify whether dimensionality should be a greater consideration since we already know outliers are no longer an issue. 
 
 
-```{r KNN}
+```{r KNN, eval=TRUE}
 model.knn <- preProcess(train, "knnImpute")
 model.knn <- train(
   PH ~ ., data = train, 
@@ -728,7 +730,7 @@ For our last nonparametric model, we consider a k-nearest neighbor (KNN). It is 
 
 This next set of models builds on the most important predictors and models of the previous parametric and nonparametric models. They are repeated model types executed with new, specialized data to each model. Our main takeaway is the down-selection of the data by stepwise regression from the first model. The remaining models added information to confirm our assumptions about predictor importance and provide estimates of which models would perform best. We begin with another KS model.  
 
-```{r}
+```{r Special KS, eval=TRUE}
 model.ks.sel <- lm(PH~., train.selected)
 ksPred.sel <- predict(model.ks.sel, newdata = test.selected)
 ks_sel_test <- data.frame(
@@ -741,7 +743,7 @@ caret::varImp(model.ks.sel)
 It came as no surprise that similar results occurred akin to that of the original kitchen sink model in the parametric section. However, this model appears to perform slightly better, having a higher Rsquared value in its summary. We consider the ridge regression once more as well. 
 
 
-```{r}
+```{r Special RR, eval=TRUE}
 trctrl <- trainControl(method="repeatedcv", 
                       number=3, 
                       repeats=2)
@@ -759,7 +761,7 @@ caret::varImp(model.rr.sel)
 
 Here again, we have made an improvement in the Rsquared term from our previous ridge regression model. This is good news since it likely means a higher RMSE as well. We continue modeling with another partial least squares’ regression. 
 
-```{r}
+```{r Special PLS, eval=TRUE}
 model.pls.sel <- train(x = trainx.selected, 
                   y = trainy.selected, 
                   method = "pls", 
@@ -775,7 +777,7 @@ caret::varImp(model.pls.sel)
 
 In this model we improve yet again from the original, but worse than the ridge regression and ks models based on Rsquared values. Ideally, we want capture as much variation as possible in the predictions and it is clear through these three models so far that the selected data improve general model performance. 
 
-```{r}
+```{r Special RF, eval=TRUE}
 ctl <- trainControl(method='repeatedcv', 
                         number=10, 
                         repeats=3)
@@ -797,7 +799,7 @@ caret::varImp(model.rf.sel)
 The random forest model appeared to have done best of all models at capturing variations in predictors with the ‘PH’ response. For testing purposes, we recreated this data set with the selected data although we expect the overall Rsquared for this model to be slightly lower since it is a subset of the original data, and the random forest model is not sensitive to more data but is sensitive to less input.   
 
 
-```{r}
+```{r Special CF, eval=TRUE}
 model.cf.sel <- train(PH~., 
                 data=train.selected, 
                 method="cforest", 
@@ -812,7 +814,7 @@ caret::varImp(model.cf.sel)
 
 A close second, the conditional forest model has an Rsquared just under the traditional random forest model. Unfortunately, both the conditional and random forest models perform worse with the down selected data. This was to be expected but still worth the effort to test it since they are quite close to one another. We finish off with a support vector model which again, did not perform as well as the original. This seems to be the case for all nonparametric models. 
 
-```{r}
+```{r Special SVM, eval=TRUE}
 svm_grid <-  expand.grid(C = c(1,1000))
 model.svm.sel <- train(PH~., data = train.selected, 
                  method = 'svmRadialCost', 
@@ -839,14 +841,30 @@ We focus on three main metrics to evaluate the models. They are the root mean sq
 
 Predictions are made with the test set that contains 30% of the original data. The function postResample() from the caret package was used during model creation and evaluation to assess each model when building them. This led us to assume that the random forest would perform best. This plot of the tree-error response curve demonstrates why.
 
-```{r}
-plot(model.rf$finalModel, main="Tree Error Response Curve", col = "darkgreen")
+```{r, eval=TRUE}
+rf.MAE <- round(model.rf$results$MAE, 6)
+plot(model.rf$finalModel, main="Tree Error Response Curve", col = "darkgreen") 
+text(xy.coords(250, 0.02), 
+     labels = paste("MAE =",rf.MAE)) 
 ```
 
 As the number of trees increase the errors made by the model decreased on an exponential scale. Although we are aware there are variations in the dark green error curve, they are hardly visible because of how small the changes are. It took less than 50 trees to produce an error response below 0.012 and it steadily moved closer to zero with additional trees. 
 
-After making our judgement on the random forest model we then intentionally recreated new models on down selected data to in six separate attempts improve model MAE. Our intent was to beat it. However, the original nonparametric random forest model remained the primary source of prediction due to it having the lowest MAE and second RMSE and Rsquared. It was used to generate our predictions.  
+```{r, eval=TRUE}
+decisiontree <- train(x = trainx,
+                      y = trainy,
+                      method = "rpart",
+                      tuneLength = 7,
+                      control = rpart.control(maxdepth=2))
+rpart.plot(decisiontree$finalModel)
+```
 
+Decision trees dendrograms can also provide meaningful information about the final model's predictors selection process. Our model contains 500 trees and produces highly accurate results within the first 50. While it would be great to know what this tree looked like, it would not be visible on this page. Instead, we create an exemplary decision tree of the same with only the first few decisions. 
+
+In this example we visualize to comprehend how our random forest model functionally makes decisions. Each bubble is a node corresponding to a predictor. Nodes are arranged in descending order of importance. In this case the most important predictor happens to be 'Mnf.Flow' which is why it is placed at the top of the model. The model also computes selector criterion at each node to descend the predictors in order of importance. The ideal quantity of decisions are then quantified by the model to minimize errors. This dendrogram only contains 7 nodes. Our final random forest model does not have the same nodes but shares the same process. 
+
+
+After making our judgement on the random forest model we then intentionally recreated new models on down selected data to in six separate attempts improve model MAE. Our intent was to beat it. However, the original nonparametric random forest model remained the primary source of prediction due to it having the lowest MAE and second RMSE and Rsquared. It was used to generate our predictions.  
 
 
 # Conclusion
@@ -857,7 +875,7 @@ After cleaning approximately 2,571 observations in each of the 33 variables of t
 
 The results of all 17 models are summarized by RMSE, Rsquared, and MAE in the follow table. Model names are abbreviated for quick referencing and any model with an “ * ” next to it is a specialized form of that model. 
 
-```{r}
+```{r, eval=TRUE}
 model.results <- data.frame(t(pm_test)) %>% 
   mutate("Model" = "PM") %>% 
   dplyr::select(Model, RMSE, Rsquared, MAE)
@@ -972,7 +990,7 @@ flextable(model.results) %>%
 
 When reviewing the most important predictors to each model but especially the winning random forest model, there is a discrepancy. For example, a table has been compiled with the first 9 predictors from the most important stepwise AIC regression selection. They are ordered. 
 
-```{r}
+```{r, eval=TRUE}
 # Calculate Importance by Predictor
 # Rearrange in descending order
 model.imps <- data.frame()
