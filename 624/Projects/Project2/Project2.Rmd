@@ -16,17 +16,20 @@ header-includes:
 knitr::opts_chunk$set(echo = TRUE, eval=F, message = F, warning=F)
 ```
 
+___
+\newpage
+
 # Summary
 
-
+Our objective was to predict the acidity or alkalinity of samples as closely as possible to actual values based on data provided from a food and beverage manufacturing company. Each sample must fit within a critical range. With 7 being neutral and pH set on a logarithm scale from 1 -10, each sample leaned towards higher alkalinity (basicness) with an average ‘PH’ of about 8.5. There were roughly 2571 samples and 33 potential predictors with measurements of those samples. We found that a nonparametric random forest model performed best based on the mean absolute error (MAE), root mean squared error (RMSE) and coefficient of determination (Rsquared). We also discovered that the samples were already generally bounded within a concise range of ‘PH’ values having 99.84% of samples between 8.0 and 9.0. We were not given a specific critical range, but this one appears to occur naturally. There are also regular variations in the target variable ‘PH,’ resembling an eb and flow during the manufacturing process. Measurements of ‘PH,’ including those missing, were randomly distributed and data required pre-processing for analysis. 
 
 # Data Exploration
 
-Our data consists of 33 variables from a food and beverage manufacturing company. Our goal is to predict the hydronium ion concentration, or pH, which is a measure of acidity or alkalinity. This ‘PH’ measure, as shown in the data, is a Key Performance Indicator (KPI) and must conform to a critical range.  
+Our data consists of 33 variables from a food and beverage manufacturing company. Our goal is to predict the hydronium ion concentration, or pH, which is a measure of acidity or alkalinity. This ‘PH’ measure, as shown in the data, is a Key Performance Indicator (KPI) and must conform to a critical range.
 
 ## Initial Observations
 
-The data is loaded, and all packages used throughout the report are provided. We view a random sample of the data to inspect initial observations. It shows the randomly selected data as 1 -5 denoting the first, second, third, fourth, and fifth observation for each variable.
+The data is loaded, and all packages used throughout the report are provided. We view a random sample of the data to inspect initial observations. It shows the randomly selected data as 1 – 5 denoting the first, second, third, fourth, and fifth observation for each variable.
 
 ```{r, eval=T, warning=F, message=F}
 library(utils)
@@ -51,6 +54,9 @@ library(naniar)
 library(partykit)
 library(flextable)
 library(bestNormalize)
+library(doParallel) # Used for computation
+library(earth) # Package necessary for marsModel
+registerDoParallel(cores=2)
 theme_set(theme_minimal())
 set.seed(004)
 ph <- read.csv(
@@ -68,14 +74,14 @@ flextable(obs.sample) %>%
 ```
 
 
-From these initial observations, we notice that data is missing. These appear as empty spots on the table. Some data points are also zero or negative but is unclear if this is intentional. For example, variable ‘Pressure.Vacuum’ is negative as one might expect when holding pressure in vacuum, but the variables ‘Mnf.Flow,’ ‘PSC,’ ‘Hyd.Pressure1,’ ‘Hyd.Pressure2,’ ‘Hyd.Pressure3,’ and others are less intuitive. 
+From these initial observations, we notice that data is missing. These appear as empty spots on the table. Some data points are also zero or negative, but it is unclear if this is intentional. For example, variable ‘Pressure.Vacuum’ is negative as one might expect when holding pressure in a vacuum, but the variables ‘Mnf.Flow,’ ‘PSC,’ ‘Hyd.Pressure1,’ ‘Hyd.Pressure2,’ ‘Hyd.Pressure3,’ and others are less intuitive.
 
-Our table also displays differences the in scale of the variable’s raw values. This will need to be reviewed to ensure it does not harm the model’s predictive capabilities. It also appears that due to the conversion of the spreadsheet format from excel to ‘csv’ when hosting the data remotely, our first column variable name is legible but needs the “i..” symbol removed. None of the other 33 variables need to be renamed. We take a closer look at these variables with some descriptive statistics.
+Our table also displays differences in the scale of the variables’ raw values. This will need to be reviewed to ensure it does not harm the model’s predictive capabilities. It also appears that due to the conversion of the spreadsheet format from excel to ‘csv’ when hosting the data remotely, our first column variable name is legible but needs the “i..” symbol removed. None of the other 33 variables need to be renamed. We take a closer look at these variables with some descriptive statistics.
 
 
-## Inferential Statisitcs
+## Inferential Statistics
 
-Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary widely between -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). For this reason, we review each variable’s statistics individually. We calculate their total observations (obs), percent missing (pm), mean, median (med), standard deviation (sd), minimum value (min), maximum value (max), skewness (skew), and standard error (se) and combine them into a table by variable.  
+Our target variable, PH, appears to be on a scale between 1 and 10, as it should be, while the others vary widely between -100 (Mnf.Flow) and greater than 4000 (Filler.Speed). For this reason, we review each variable’s statistics individually. We calculate their total observations (obs), percent missing (pm), mean, median (med), standard deviation (sd), minimum value (min), maximum value (max), skewness (skew), and standard error (se) and combine them into a table by variable.
 
 
 ```{r, eval=T}
@@ -93,17 +99,20 @@ flextable::flextable(ph.desc) %>%
   set_table_properties(layout = "autofit")
 ```
 
-No variable is missing greater than 8.2% (MFR) of its cases with 25 of the 33 variables at or under 1% missing. Our target ‘PH,’ is only missing 0.2%. A simple imputation should fix this without issue, as long as the errors are randomly dispersed. 
+No variable is missing greater than 8.2% (MFR) of its cases with 25 of the 33 variables at or under 1% missing. Our target ‘PH,’ is only missing 0.2%. A simple imputation should fix this without issue, as long as the errors are randomly dispersed.
 
-The standard deviations inform us that the spread of each variables is also wide in several cases like ‘Filler.Speed,’ and ‘Carb.Flow’ while extremely narrow or even 0 for variables, ‘Oxygen.Filler,’ ‘PSC,’ PSC.CO2,’  ‘PSC.Fill,’ ‘Carb.Volume,’ and several more. These statistics confirm that we will be working with data objects of completely different scales each centered around their own averages. Our target ‘PH,’ has very little deviation as well, but in this case, it is to be expected since by nature it follows a logarithmic pattern and we are only seeing values between 7.9 and 9.4.   
+The standard deviations inform us that the spread of each variable is also wide in several cases like ‘Filler.Speed’ and ‘Carb.Flow,’ while extremely narrow or even 0 for variables ‘Oxygen.Filler,’ ‘PSC,’ PSC.CO2,’ ‘PSC.Fill,’ ‘Carb.Volume,’ and several more. These statistics confirm that we will be working with data objects of completely different scales each centered around their own averages. Our target ‘PH,’ has very little deviation as well, but in this case, it is to be expected since by nature it follows a logarithmic pattern, and we are only seeing values between 7.9 and 9.4.
 
-There is some skewness among the variables and thereby potential outliers. This is most pronounced in the variables, ‘MFR,’ and ‘Filler.Speed,’ where the data has skewed left from its averages. Fortunately, all but two variables (Carb.Flow and Filler.Speed) have low standard errors indicating that nearly all variables will serve as good reference data sets for prediction due to low variation in spread from their means. To learn how good these variables may be at predicting, we need to see the relationship of each with our target ‘PH,’ interpret, and apply the results during modeling. 
+There is some skewness among the variables and thereby potential outliers. This is most pronounced in the variables, ‘MFR,’ and ‘Filler.Speed,’ where the data has skewed left from its averages. Fortunately, all but two variables (Carb.Flow and Filler.Speed) have low standard errors indicating that nearly all variables will serve as good reference data sets for prediction due to low variation in spread from their means. To learn how good these variables may be at predicting, we need to see the relationship of each with our target ‘PH,’ interpret, and apply the results during modeling.
    
 ## Variable Relationships
 
-To gain a better understanding of the relationships between our variables and the target ‘PH’ we visualize the points as scatterplots with fitted regression lines. Before we make our first plot, we create an index value for ‘PH’ in the order it was read. This shows the pattern in individual measures of acidity or alkalinity as they were taken. We call this index value the ‘Position’ given its purpose of describing measurement position for each ‘PH’ value. 
+To gain a better understanding of the relationships between our variables and the target ‘PH,’ we visualize the points as scatterplots with fitted regression lines. Before we make our first plot, we create an index value for ‘PH’ in the order it was read. This shows the pattern in individual measures of acidity or alkalinity as they were taken. We call this index value the ‘Position’ given its purpose of describing measurement position for each ‘PH’ value.
 
 ```{r, eval=T}
+# Bounds estimates
+cap99 <- (length(ph$PH) - 4) / length(ph$PH)
+# Plot of Target PH
 ph %>% 
   dplyr::select(PH, Oxygen.Filler) %>% 
   mutate(Index = 1:length(ph$PH)) %>% 
@@ -120,18 +129,15 @@ ph %>%
   labs(subtitle = "PH Patterns by Position",
        x = "Position", y = "PH") +
   theme(legend.position = "none")
-# Bounds estimates
-cap99 <- (length(ph$PH) - 4) / length(ph$PH)
 ```
 
-Interestingly, the pattern appears to fit an almost perfect sinusoidal curve, as demonstrated by the yellow line which is a closely fit locally weighted scatterplot smoothing (LOESS). For contrast, the black line attempts to fit a linear trend to the data. The shade of blue of each point indicates PH level and clustering. The lighter the point, the more alkaline and more solitary the measurement while darker points are more acidic and grouped together. A good example of the lightest point is the lone outlier plotted well above a pH of 9 just past position 1000.  
+Interestingly, the pattern appears to fit an almost perfect sinusoidal curve, as demonstrated by the yellow line which is a closely fit locally weighted scatterplot smoothing (LOESS). For contrast, the black line attempts to fit a linear trend to the data. The shade of blue of each point indicates PH level and clustering. The lighter the point, the more alkaline and more solitary the measurement while darker points are more acidic and grouped together. A good example of the lightest point is the lone outlier plotted well above a pH of 9 just past position 1000.
 
-A greater number of blue points (pH measurements) fall onto and around the yellow line than the black linear line and the pH shades do not show any big clusters or groups of pH values. From this we can be confident in two principles about this data. First, that the data measurements are random with no obvious pH clusters and secondly, that the data’s collection process was not random, it was more sinusoidal. 
+A greater number of blue points (pH measurements) fall onto and around the yellow line than the black linear line and the pH shades do not show any big clusters or groups of pH values. From this we can be confident in two principles about this data. First, that the data measurements are random with no obvious pH clusters and secondly, that the data’s collection process was not random, it was more sinusoidal.
 
-From this perspective, it is likely that there is a give and take of pH in each beverage. They are likely bounded by pH levels and the fluctuations in each beverage was accurately captured by the machine or device measuring pH. At this stage, we can also estimate the bounds as 99.84% of the measurements fall between 8.0 and 9.0 while over 75% is between 8.25 and 8.75. This should not have a tremendous effect on all models, but it would certainly affect any business decisions related to our predictions. 
+From this perspective, it is likely that there is a give and take of pH in each beverage. They are likely bounded by pH levels and the fluctuations in each beverage were accurately captured by the machine or device measuring pH. At this stage, we can also estimate the bounds as 99.84% of the measurements fall between 8.0 and 9.0 while over 75% are between 8.25 and 8.75. This should not have a tremendous effect on all models, but it would certainly affect any business decisions related to our predictions.
 
-We continue to visualize the relationship of our target ‘PH,’ with the variables. For ease of viewing, we plot these variables in 4 sets each given a linear black line of best fit using ‘PH,’ as the response. 
-
+We continue to visualize the relationship of our target ‘PH,’ with the variables. For ease of viewing, we plot these variables in 4 sets each given a linear black line of best fit using ‘PH,’ as the response.
 
 ```{r, eval=T}
 # 1st set of variables - excluding brand code (categorical)
@@ -226,8 +232,7 @@ ph[c(27:33,26)] %>%
              ncol = 4) 
 ```
 
-None of the variables appear to follow a linear relationship with ‘PH.’ If they were, it would look similar to the plot of ‘PH,’ with itself. Most variables are continuous. Excluding a handful of seemingly discrete numerical values such as ‘Pressure.Setpoint,’ ‘Bowl.Setpoint,’ and ‘Alch.Rel,’ there is an inherent randomness to all relationships with ‘PH.’ We repeat the visualization process to create histograms of each variable to review their distributions. 
-
+None of the variables appear to follow a linear relationship with ‘PH.’ If they were, it would look similar to the plot of ‘PH,’ with itself. Most variables are continuous. Excluding a handful of seemingly discrete numerical values such as ‘Pressure.Setpoint,’ ‘Bowl.Setpoint,’ and ‘Alch.Rel,’ there is an inherent randomness to all relationships with ‘PH.’ We repeat the visualization process to create histograms of each variable to review their distributions.
 
 
 ```{r, eval=T}
@@ -247,7 +252,7 @@ ph %>%
         plot.title = element_blank())
 ```
 
-At a binwidth of 10, ‘PH’ appears normally distributed. However, many variables have two modes (biomodal) and skewed. Temperature is skewed right due to a suspected outlier. We will need to fix this before modeling.
+At a binwidth of 10, ‘PH’ appears normally distributed. However, many variables have two modes (biomodal) and are skewed. Temperature is skewed right due to a suspected outlier. We will need to fix this before modeling.
 
 Additionally, the discrete numeric values formed by ‘Pressure.Setpoint,’ and ‘Bowl.Setpoint,’ in our scatterplots are confirmed. They can be spotted easily this way since they look more like our categorical variable “Brand.Code” than a continuous variable like ‘Temperature.’ Given these results, we must consider skew more closely. We use a point range function and visual to explore further. 
 
@@ -299,9 +304,9 @@ ggarrange(ptrng.small,
           )
 ```
 
-The red dot on each variable range is its median while the black dot is its mean. The more of the black dot we see, the more skewed that distribution is. Here, we label three parts A, B, and C to denote a corresponding group of variables on similar scales with centers of their distribution closer together than other groups. It is best to simply think of these labels as A being the small-scale group, B showing the large-scale group, and C as a middle or medium scale group. 
+The red dot on each variable range is its median while the black dot is its mean. The more of the black dot we see, the more skewed that distribution is. Here, we label three parts A, B, and C to denote a corresponding group of variables on similar scales with centers of their distribution closer together than other groups. It is best to simply think of these labels as A being the small-scale group, B showing the large-scale group, and C as a middle or medium scale group.
 
-Using a point range visualization like this lets us check the magnitude of outliers by exploiting the difference in robustness between median and mean. It also helps us pick out exactly which variables are best for modeling by sighting variables with many points that influence their distribution more than other variables. Unfortunately, we are still not sure if any of the seemingly outlier points were intentional so a fare bit of intuition is used to identify what should and should not be influencing the distribution. 
+Using a point range visualization like this lets us check the magnitude of outliers by exploiting the difference in robustness between median and mean. It also helps us pick out exactly which variables are best for modeling by sighting variables with many points that influence their distribution more than other variables. Unfortunately, we are still not sure if any of the seemingly outlier points were intentional so a fair bit of intuition is used to identify what should and should not be influencing the distribution.
 
 
 ```{r, echo=FALSE, eval=FALSE}
@@ -338,10 +343,10 @@ ggcorrplot(cors, "square", "lower",
            hc.order = FALSE, 
            hc.method = "complete") + 
   coord_flip() + 
-  labs(title = "Corrlation Matrix with Significance Label 0.05")
+  labs(title = "Correlation Matrix with Significance Label 0.05")
 ```
 
-When considering variable relationships, we also need to consider their correlations. In this final correlation plot we examine not only the variable’s correlation with ‘PH’ but all variable’s correlations with one another. 
+When considering variable relationships, we also need to consider their correlations. In this final correlation plot we examine not only the variable’s correlation with ‘PH’ but all variables’ correlations with one another.
 
 ```{r, eval=T}
 # Correlation Plot
@@ -366,14 +371,14 @@ ggcorrplot(cors, "square", "lower",
   labs(title = "Corrlation Matrix with Significance Label 0.05")
 ```
 
-Although computed and shown for reference, we ignore insignificantly correlated variables with p-values greater than or equal to 0.05. Those we ignore have an ‘X’ drawn through its box. Variables directly measuring pressure and flow exhibit more negative control over ‘PH’ shown in darker blue. The only significant exception to this is ‘Carb.Flow.’ Meanwhile, ‘Bowl.Setpoint,’ ‘Filler.Level,’ ‘Oxygen.Filler,’ and ‘Usage.Count’ are the only remaining significantly correlated variables.  
+Although computed and shown for reference, we ignore insignificantly correlated variables with p-values greater than or equal to 0.05. Those we ignore have an ‘X’ drawn through its box. Variables directly measuring pressure and flow exhibit more negative control over ‘PH’ shown in darker blue. The only significant exception to this is ‘Carb.Flow.’ Meanwhile, ‘Bowl.Setpoint,’ ‘Filler.Level,’ ‘Oxygen.Filler,’ and ‘Usage.Count’ are the only remaining significantly correlated variables.
 
 
 
 # Data Preparation
 ## Imputation
 
-Before imputing, we check for patterns in the missing data. According to the mice method used in the md.pattern() function, there is no clear pattern. The errors are randomly dispersed. However, since we discovered some natural eb and flow in the collection process we double check with our own eyes.    
+Before imputing, we check for patterns in the missing data. According to the mice method used in the md.pattern() function, there is no clear pattern. The errors are randomly dispersed. However, since we discovered some natural eb and flow in the collection process we double check with our own eyes.   
 
 ```{r, eval=T}
 # Check for missing data patterns with mice
@@ -394,12 +399,12 @@ for (i in colnames(ph)) {
 sum(is.na(ph))
 ```
 
-The histogram distributes the missing data as expected from our inferential statistics. The lion’s share of missing values (8.2%) is concentrated under variable ‘MFR’ dwarfing the next variables by comparison. Our pattern plot also randomly spreads red pixelated rectangles on a dark blue background, indicating completely random missing values. Since the quantity of missing values is quite small (less than 1%) we perform a simple imputation by the median of each variable using a for loop. 
+The histogram distributes the missing data as expected from our inferential statistics. The lion’s share of missing values (8.2%) is concentrated under variable ‘MFR’ dwarfing the next variables by comparison. Our pattern plot also randomly spreads red pixelated rectangles on a dark blue background, indicating completely random missing values. Since the quantity of missing values is quite small (less than 1%) we perform a simple imputation by the median of each variable using a for loop.
 
 
 ## Outlier Extraction
 
-To extract and remove outliers, we first identify which variables contain the outliers. Variable ‘Brand.Code’ is categorical and has no missing values so we exclude it by selecting all numeric variables (which includes everything else). We then identify and replace those outliers using a formula with upper and lower bounds to extract nonoutlier data, leaving the rest as outliers. Thus, we conveniently quantify these outliers as greater than or less than 1.5 times each variable’s interquartile range.   
+To extract and remove outliers, we first identify which variables contain the outliers. Variable ‘Brand.Code’ is categorical and has no missing values so we exclude it by selecting all numeric variables (which includes everything else). We then identify and replace those outliers using a formula with upper and lower bounds to extract nonoutlier data, leaving the rest as outliers. Thus, we conveniently quantify these outliers as greater than or less than 1.5 times each variable’s interquartile range.
 
 ```{r, eval=T}
 # select numeric variables
@@ -420,12 +425,12 @@ df <- cbind(Brand.Code, ph.numerics)
 df.summary <- summary(df)
 ```
 
-After identifying and replacing outliers by looping through each variable in the data, we join the outlier free numeric data with the excluded ‘Brand.Code’ variable. This retains the data types as read in and is complete with a binding function for data frames. We then check for missing data in ‘Brand.Code’ to ensure it all transferred appropriately and review the results to see that very few outliers were present.  
+After identifying and replacing outliers by looping through each variable in the data, we join the outlier free numeric data with the excluded ‘Brand.Code’ variable. This retains the data types as read in and is complete with a binding function for data frames. We then check for missing data in ‘Brand.Code’ to ensure it all transferred appropriately and review the results to see that very few outliers were present. 
 
 
 ## Transformations
 
-Although the data did not exhibit linear trends, nor fit a typically gaussian pattern in its isolation, we consider transformations that would best normalize each variable’s distribution. Using a function in the bestNormalize package we store the chosen transformations of each variable in a data frame named ‘best.norms’ along with corresponding metrics to transform them. 
+Although the data did not exhibit linear trends, nor fit a typically gaussian pattern in its isolation, we consider transformations that would best normalize each variable’s distribution. Using a function in the bestNormalize package we store the chosen transformations of each variable in a data frame named ‘best.norms’ along with corresponding metrics to transform them.
 
 ```{r, eval=T}
 # Produce recommended transformations
@@ -444,7 +449,7 @@ From this data frame, we can call upon the desired variables to know which trans
 
 ## Split and Selections
 
-We split the data set giving 70% to training and 30% testing data frames. Using a forward and backward traveling stepwise regression that considered Akaike information criterion (AIC) to evaluate model fit, we determined the best variables. Quite intuitively, any coefficient in the model that had a p-value lower than 0.05, was used. This indicated significant coefficient to us and was the basis for our selection-based models. 
+We split the data set giving 70% to training and 30% to testing data frames. Using a forward and backward traveling stepwise regression that considered Akaike information criterion (AIC) to evaluate model fit, we determined the best variables. Quite intuitively, any coefficient in the model that had a p-value lower than 0.05 was used. This indicated a significant coefficient to us and was the basis for our selection-based models. 
 
 ```{r, eval=T}
 # Split 70-30 training/test
@@ -454,7 +459,7 @@ index <- createDataPartition(
     list = FALSE, times = 1)
 train <- df[index,]
 test <- df[-index,]
-# Create trainx and y
+# Create train x and y
 trainx <- train %>%
   dplyr::select(-PH)
 trainy <- train$PH
@@ -493,20 +498,33 @@ df.selected <- df %>%
                 Pressure.Setpoint, 
                 Alch.Rel,
                 Balling.Lvl)
-
+set.seed(1102)
+index <- createDataPartition(
+    df.selected$PH, p = .7, 
+    list = FALSE, times = 1)
+train.selected <- df.selected[index,]
+test.selected <- df.selected[-index,]
+# Create selected variation of train x and y
+trainx.selected <- train.selected %>%
+  dplyr::select(-PH)
+trainy.selected <- train.selected$PH
+testx.selected <- test.selected %>%
+  dplyr::select(-PH)
+testy.selected <- test.selected$PH
 ```
 
 
 # Model Building
 
-Given a clean data set and options of using transformed and down selected data, we can begin to build models for predicting our target variable, ‘PH.’ There are many models, so we organize them into two categories: parametric and nonparametric. We refrain from explaining why the models are selected until the ‘model selection’ section.  
+Given a clean data set and options of using transformed and down selected data, we can begin to build models for predicting our target variable, ‘PH.’ There are 17 models, so we organize them into three categories: parametric, nonparametric, and specialized. We refrain from explaining why the models are selected until the ‘model selection’ section but include importance values for each predictor used in the models. 
 
-For a quick reference, in parametric models the parameters used to generate predictions are fixed. Whereas nonparametric models tend to change parameters with the size of data. To further generalize, if the model has a predetermined outcome between predictor and response, then it is parametric (Ex: linear, multiple regression). All others are nonparametric.   
+For a quick reference, in parametric models the parameters used to generate predictions are fixed. Whereas nonparametric models tend to change parameters with the size of data. To further generalize, if the model has a predetermined outcome between predictor and response, then it is parametric (Ex: linear, multiple regression). All others are nonparametric. Specialized models can be either type but use the down-selected data with a slightly different cleaning process to adapt to their chosen transformations as mentioned previously. 
+
  
 
 ## Parametric Models
 
-
+We begin with a stepwise regression model that travels forwards and backwards through the parameters to select the best ones. It uses Akaike information criterion (AIC) to evaluate model fit. This model was used to generate the previously selected parameters in our ‘Select and Split’ section. 
 
 ```{r stepwise regression}
 model.pm <- lm(PH~.,train)
@@ -515,17 +533,27 @@ pm <- stepAIC(model.pm,
               direction = "both")
 p <- summary(pm)$call
 pm <- lm(p[2], df)
+pmPred <- predict(model.pm, newdata = test)
+pm_test <- data.frame(
+  postResample(pred = pmPred, obs = test$PH)) 
 summary(pm)
+caret::varImp(model.pm) %>% 
+  dplyr::arrange(desc(Overall))
 ```
 
 With the stepwise regression complete, we try another method colloquially known as the ’kitchen sink’ or KS model. This will throw everything but the kitchen sink into the model as parameters and return significance values to us in the form of p-values. Performing this model helps to evaluate the selection of the previous model. 
 
 ```{r Kitchen Sink}
 model.ks <- lm(PH~., train)
+ksPred <- predict(model.ks, newdata = test)
+ks_test <- data.frame(
+  postResample(pred = ksPred, obs = test$PH)) 
 summary(model.ks)
+caret::varImp(model.ks) %>% 
+  dplyr::arrange(desc(Overall))
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+We begin with a stepwise regression model that travels forwards and backwards through the parameters to select the best ones. It uses Akaike information criterion (AIC) to evaluate model fit. This model was used to generate the previously selected parameters in our ‘Select and Split’ section.
 
 ```{r Ridge Regression}
 trctrl<- trainControl(method="repeatedcv", 
@@ -534,15 +562,15 @@ trctrl<- trainControl(method="repeatedcv",
 model.rr <- caret::train(PH~., data=train,
                       method="ridge",
                       trControl=trctrl)
-ridgePred <- predict(model.rr, newdata = test)
-ridge_test <-data.frame(
-  postResample(pred = ridgePred, 
+rrPred <- predict(model.rr, newdata = test)
+rr_test <-data.frame(
+  postResample(pred = rrPred, 
                obs = test$PH)) 
-ridge_test
 model.rr
+caret::varImp(model.rr)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+With the stepwise regression complete, we try another method colloquially known as the ’kitchen sink’ or KS model. This will throw everything but the kitchen sink into the model as parameters and return significance values to us in the form of p-values. Performing this model helps to evaluate the selection of the previous model.
 
 
 ```{r GLM Boosted}
@@ -551,10 +579,14 @@ model.glmb <- train(x = trainx,
                   method = "glmboost", 
                   preProcess = c("center", "scale"),
                   tuneLength = 10)
+glmbPred <- predict(model.glmb, newdata = test)
+glmb_test <- data.frame(
+  postResample(pred = glmbPred, obs = test$PH)) 
 model.glmb
+caret::varImp(model.glmb)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+A ridge regression is performed next. While this model was not expected to be the best model, it set up a framework to understand how well the standard error of the predictors influences our response. Since ridge regression acts to limit standard error, we would expect that if the model turned out to be one of the best, there would be significant standard error in our predictors. From this model we also refine the level of importance we could assign to each predictor. 
 
 ```{r Partial Least Squares}
 model.pls <- train(x = trainx, 
@@ -562,14 +594,18 @@ model.pls <- train(x = trainx,
                   method = "pls", 
                   preProcess = c("center", "scale"),
                   tuneLength = 10)
+plsPred <- predict(model.pls, newdata = test)
+pls_test <- data.frame(
+  postResample(pred = plsPred, obs = test$PH)) 
 model.pls
+caret::varImp(model.pls)
 ```
 
-
+From previous plots, we can infer that the data is not linear and thus linear models are likely moot. The next model is called generalized linear modeling (GLM) and we give a boost (GLMB). In it, we accept that fact but attempt to form a link between predictors and response. This is fulfilled by a link function that reviews many potential distributions to assess which has the best fit. The boost is present to support the model in its search for the best link. Results provide another perspective on our predictor relationships so that hopefully, we can pick the best ones. 
 
 ## Nonparametric Models
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+For the final distinctly parametric model on nonspecialized data, we have a partial least squares (PLS) regression. With this, the dimensions of the model are reduced to focus the model on the least harmful set of predictors. This subset of predictors could be used to enhance other models as well. We give close attention to level of importance of each predictor in these models as they will inform the models we think will perform best.  
 
 ```{r MARS}
 marsGrid <- expand.grid(.degree=1:2, 
@@ -579,10 +615,14 @@ model.mar <- train(x = trainx,
                  method = "earth",
                  preProcess = c("center", "scale"),
                  tuneGrid = marsGrid)
+marPred <- predict(model.mar, newdata = test)
+mar_test <- data.frame(
+  postResample(pred = marPred, obs = test$PH)) 
 model.mar
+caret::varImp(model.mar)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+A multivariate adaptive regression spline (MARS) models nonlinearity among predictors and their outcome. This is partly why it was selected for our first parametric model. It also works well at discovering patterns in interactions better than linear regression models by using hinge functions. It is best to think of these as drawing a straight line through points with slight kinks when the data changes direction. These kinks can make a MARS model highly accurate in prediction. We center and scale the data prior to processing.  
 
 ```{r Random Forest}
 ctl <- trainControl(method='repeatedcv', 
@@ -596,12 +636,14 @@ model.rf <- train(PH~.,
                   tuneGrid=tunegrid, 
                   preProcess = c("center", "scale"),
                   trControl=ctl)
+rfPred <- predict(model.rf, newdata = test)
+rf_test <- data.frame(
+  postResample(pred = rfPred, obs = test$PH)) 
 model.rf
+caret::varImp(model.rf)
 ```
 
-
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
-
+Another common nonparametric model generally good at prediction is the random forest (RF) model. This kind of model is built on decision trees that can merge limbs to form more accurate predictions than simple regression. It also adds some degree of randomness while growing its trees to improve performance.  Here, again the data is centered and scaled since many of the predictors were not close to the same magnitude and some were far from one another’s average in their distributions.  
 
 ```{r Neural Net}
 # Neural net may take several minutes to run
@@ -621,29 +663,33 @@ model.nnet <- train(
   MaxNWts = nnet_maxnwts,
   maxit = 500
 )
-
+nnetPred <- predict(model.nnet, newdata = test)
+nnet_test <- data.frame(
+  postResample(pred = nnetPred, obs = test$PH)) 
 model.nnet
+caret::varImp(model.nnet)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.  
+Inspired by the human brain, neural networks (NNET) have become popular for discovering patterns in data. It works by training or adjusting an input with a weighted value based on the performance of previous inputs. When the output is correct, additional weight is given to that input. For this reason, neural networks a principally limited by the number of neurons available for inputs and the time required to train them. Many problems benefit from the use of NNETs because the algorithm can produce highly accurate results as long as the data going into in is capable.  
 
 ```{r Conditional Forest}
-model.cforest <- train(PH~., 
+model.cf <- train(PH~., 
                 data=train, 
                 method="cforest", 
                 trControl=trctrl,
                 preProcess = c("center", "scale"),
                 tuneLength =2)
-forestPred <- predict(model.cforest, newdata = test)
-forest_test<-data.frame(postResample(pred = forestPred, obs = test$PH)) 
-forest_test
+cfPred <- predict(model.cf, newdata = test)
+cf_test <- data.frame(postResample(pred = cfPred, obs = test$PH)) 
+model.cf
+caret::varImp(model.cf)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+Conditional forests (CF) are popular as well since they can generally handle smaller amounts of data with little significance better than other nonparametric and tree-based methods. Because of the ability of this model to conditionally build trees with data inputs complex interactions and predictors that share highly, potentially overly correlated relationships are not an issue for the model. We center and scale here again in hopes of improving accuracy. Through this model we expect to have the best performance overall. 
 
 Support Vector
 
-```{r}
+```{r Support Vector Machine}
 svm_grid <-  expand.grid(C = c(1,1000))
 model.svm <- train(PH~., data = train, 
                  method = 'svmRadialCost', 
@@ -652,41 +698,351 @@ model.svm <- train(PH~., data = train,
 svmPred <- predict(model.svm, newdata = test)
 svm_test <- data.frame(
   postResample(pred = svmPred, obs = test$PH)) 
-svm_test
+model.svm
+caret::varImp(model.svm)
 ```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+Support vector machines (SVM) are particularly great at working in higher dimensions and detecting outliers. While we are uncertain if any predictor-response relationships exist in higher dimensions, it would be best practice to include the option. This supervised learning method can specify whether dimensionality should be a greater consideration since we already know outliers are no longer an issue. 
+
+
+```{r KNN}
+model.knn <- preProcess(train, "knnImpute")
+model.knn <- train(
+  PH ~ ., data = train, 
+  method = "knn",
+  center = TRUE,
+  scale = TRUE,
+  trControl = trainControl("cv", number = 10),
+  tuneLength = 25
+)
+knnPred <- predict(model.knn, newdata = test)
+knn_test <- data.frame(
+  postResample(pred = knnPred, obs = test$PH)) 
+model.knn
+caret::varImp(model.knn)
+```
+
+For our last nonparametric model, we consider a k-nearest neighbor (KNN). It is one of the simplest algorithms and its main purpose is to classify clusters of sample points into groups for prediction. It is likely not the best model to use in our randomly scattered ‘PH’ measurements but there is a chance we are interpreting this data wrong. Having this may prove useful in widening the net of potential models capable of making the best predictions. 
+
+## Specialists
+
+This next set of models builds on the most important predictors and models of the previous parametric and nonparametric models. They are repeated model types executed with new, specialized data to each model. Our main takeaway is the down-selection of the data by stepwise regression from the first model. The remaining models added information to confirm our assumptions about predictor importance and provide estimates of which models would perform best. We begin with another KS model.  
+
+```{r}
+model.ks.sel <- lm(PH~., train.selected)
+ksPred.sel <- predict(model.ks.sel, newdata = test.selected)
+ks_sel_test <- data.frame(
+  postResample(pred = ksPred.sel, obs = test.selected$PH)) 
+summary(model.ks.sel)
+caret::varImp(model.ks.sel)
+```
+
+
+It came as no surprise that similar results occurred akin to that of the original kitchen sink model in the parametric section. However, this model appears to perform slightly better, having a higher Rsquared value in its summary. We consider the ridge regression once more as well. 
+
+
+```{r}
+trctrl <- trainControl(method="repeatedcv", 
+                      number=3, 
+                      repeats=2)
+model.rr.sel<- caret::train(PH~., 
+                            data=train.selected,
+                      method="ridge",
+                      trControl=trctrl)
+rrPred.sel <- predict(model.rr.sel, newdata = test.selected)
+rr_sel_test <-data.frame(
+  postResample(pred = rrPred.sel, 
+               obs = test.selected$PH)) 
+model.rr.sel
+caret::varImp(model.rr.sel)
+```
+
+Here again, we have made an improvement in the Rsquared term from our previous ridge regression model. This is good news since it likely means a higher RMSE as well. We continue modeling with another partial least squares’ regression. 
+
+```{r}
+model.pls.sel <- train(x = trainx.selected, 
+                  y = trainy.selected, 
+                  method = "pls", 
+                  preProcess = 
+                    c("center", "scale"),
+                  tuneLength = 10)
+plsPred.sel <- predict(model.pls.sel, newdata = test.selected)
+pls_sel_test <- data.frame(
+  postResample(pred = plsPred.sel, obs = test.selected$PH)) 
+model.pls.sel
+caret::varImp(model.pls.sel)
+```
+
+In this model we improve yet again from the original, but worse than the ridge regression and ks models based on Rsquared values. Ideally, we want capture as much variation as possible in the predictions and it is clear through these three models so far that the selected data improve general model performance. 
+
+```{r}
+ctl <- trainControl(method='repeatedcv', 
+                        number=10, 
+                        repeats=3)
+mtry <- sqrt(ncol(train.selected))
+tunegrid <- expand.grid(.mtry=mtry)
+model.rf.sel <- train(PH~., 
+                  data=train.selected, 
+                  method='rf',
+                  tuneGrid=tunegrid, 
+                  preProcess = c("center", "scale"),
+                  trControl=ctl)
+rfPred.sel <- predict(model.rf.sel, newdata = test.selected)
+rf_sel_test <- data.frame(
+  postResample(pred = rfPred.sel, obs = test.selected$PH)) 
+model.rf.sel
+caret::varImp(model.rf.sel)
+```
+
+The random forest model appeared to have done best of all models at capturing variations in predictors with the ‘PH’ response. For testing purposes, we recreated this data set with the selected data although we expect the overall Rsquared for this model to be slightly lower since it is a subset of the original data, and the random forest model is not sensitive to more data but is sensitive to less input.   
+
+
+```{r}
+model.cf.sel <- train(PH~., 
+                data=train.selected, 
+                method="cforest", 
+                trControl=trctrl,
+                preProcess = c("center", "scale"),
+                tuneLength =2)
+cfPred.sel <- predict(model.cf.sel, newdata = test.selected)
+cf_sel_test <- data.frame(postResample(pred = cfPred.sel, obs = test.selected$PH)) 
+model.cf.sel
+caret::varImp(model.cf.sel)
+```
+
+A close second, the conditional forest model has an Rsquared just under the traditional random forest model. Unfortunately, both the conditional and random forest models perform worse with the down selected data. This was to be expected but still worth the effort to test it since they are quite close to one another. We finish off with a support vector model which again, did not perform as well as the original. This seems to be the case for all nonparametric models. 
+
+```{r}
+svm_grid <-  expand.grid(C = c(1,1000))
+model.svm.sel <- train(PH~., data = train.selected, 
+                 method = 'svmRadialCost', 
+                 trControl = trctrl, 
+                 tuneGrid = svm_grid)
+svmPred.sel <- predict(model.svm.sel, newdata = test.selected)
+svm_sel_test <- data.frame(
+  postResample(pred = svmPred.sel, obs = test.selected$PH)) 
+model.svm.sel
+caret::varImp(model.svm.sel)
+```
+
 
 
 # Model Selection
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+Before selecting the best model, we decide on which summary statistics will produce the most accurate results in a real-world setting. We also review the importance of several predictors, make predictions on our test set, and visualize the results. 
 
 ## Evaluation Criteria
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+We focus on three main metrics to evaluate the models. They are the root mean squared error (RMSE), the coefficient of determination (R squared), and mean absolute error (MAE) in each model. Of these, MAE is the most important to us in evaluation. This is because it finds the absolute difference in forecast values from actual values. For our simulated training and testing data, this should prove most useful in identifying the most accurate model. However, if other metrics (RMSE and R squared) are particularly strong or weak, then slightly lower MAE may mean less overall. We consider these metrics holistically to get the full picture.   
 
-## Predictions 
+## Selection and Prediction
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+Predictions are made with the test set that contains 30% of the original data. The function postResample() from the caret package was used during model creation and evaluation to assess each model when building them. This led us to assume that the random forest would perform best. This plot of the tree-error response curve demonstrates why.
 
-## Selection
+```{r}
+plot(model.rf$finalModel, main="Tree Error Response Curve", col = "darkgreen")
+```
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+As the number of trees increase the errors made by the model decreased on an exponential scale. Although we are aware there are variations in the dark green error curve, they are hardly visible because of how small the changes are. It took less than 50 trees to produce an error response below 0.012 and it steadily moved closer to zero with additional trees. 
+
+After making our judgement on the random forest model we then intentionally recreated new models on down selected data to in six separate attempts improve model MAE. Our intent was to beat it. However, the original nonparametric random forest model remained the primary source of prediction due to it having the lowest MAE and second RMSE and Rsquared. It was used to generate our predictions.  
+
+
 
 # Conclusion
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+After cleaning approximately 2,571 observations in each of the 33 variables of this food and beverage manufacturing company, 17 models were generated to find that the best model was the nonparametric random forest. It has the lowest MAE which we favorited as the best predictor since it quantifies error of the model by directly measuring the absolute difference between expected and actual observations. It also had the second highest RMSE and Rsquared values of all models.   
 
-## Table of Results
+## Model Results
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+The results of all 17 models are summarized by RMSE, Rsquared, and MAE in the follow table. Model names are abbreviated for quick referencing and any model with an “ * ” next to it is a specialized form of that model. 
+
+```{r}
+model.results <- data.frame(t(pm_test)) %>% 
+  mutate("Model" = "PM") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Stepwise Model Results
+model.results.pm <- data.frame(t(pm_test)) %>% 
+  mutate("Model" = "STEP") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Kitchen Sink Model Results
+model.results.ks <- data.frame(t(ks_test)) %>% 
+  mutate("Model" = "KS") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Ridge Regression Model Results
+model.results.rr <- data.frame(t(rr_test)) %>% 
+  mutate("Model" = "RR") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Boosted Generalized Linear Model Results
+model.results.glmb <- data.frame(t(glmb_test)) %>%
+  mutate("Model" = "GLMB") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Partial Least Squares Model Results
+model.results.pls <- data.frame(t(pls_test)) %>% 
+  mutate("Model" = "PLS") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Multivariate Adaptive Splines Model Results
+model.results.mar <- data.frame(t(mar_test)) %>% 
+  mutate("Model" = "MAR") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Random Forest Model Results
+model.results.rf <- data.frame(t(rf_test)) %>% 
+  mutate("Model" = "RF") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Neural Net Model Results
+model.results.nnet <- data.frame(t(nnet_test)) %>%
+  mutate("Model" = "NNET") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Conditional Forest Model Results
+model.results.cf <- data.frame(t(cf_test)) %>% 
+  mutate("Model" = "CF") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Support Vector Machine Model Results
+model.results.svm <- data.frame(t(svm_test)) %>% 
+  mutate("Model" = "SVM") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# K-Nearest Neighbor Model Results
+model.results.knn <- data.frame(t(knn_test)) %>% 
+  mutate("Model" = "KNN") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Kitchen Sink Model Results
+model.results.ks.sel <- data.frame(
+  t(ks_sel_test)) %>%
+  mutate("Model" = "KS*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Ridge Regression Model Results
+model.results.rr.sel <- data.frame(
+  t(rr_sel_test)) %>% 
+  mutate("Model" = "RR*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Ridge Regression Model Results
+model.results.pls.sel <- data.frame(
+  t(pls_sel_test)) %>% 
+  mutate("Model" = "PLS*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Random Forest Model Results
+model.results.rf.sel <- data.frame(
+  t(rf_sel_test)) %>% 
+  mutate("Model" = "RF*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Conditional Forest Model Results
+model.results.cf.sel <- data.frame(
+  t(cf_sel_test)) %>% 
+  mutate("Model" = "CF*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Specialized Support Vector Model Results
+model.results.svm.sel <- data.frame(
+  t(svm_sel_test)) %>% 
+  mutate("Model" = "SVM*") %>% 
+  dplyr::select(Model, RMSE, Rsquared, MAE)
+# Combined Tabulated Model Results
+model.results <- rbind(
+  model.results.pm, 
+  model.results.ks, 
+  model.results.rr, 
+  model.results.glmb,
+  model.results.pls, 
+  model.results.mar,
+  model.results.rf, 
+  model.results.nnet,
+  model.results.cf, 
+  model.results.svm,
+  model.results.knn,
+  model.results.ks.sel,
+  model.results.rr.sel, 
+  model.results.pls.sel, 
+  model.results.rf.sel,
+  model.results.cf.sel, 
+  model.results.svm.sel
+)
+model.results <- model.results %>% 
+  dplyr::mutate(across(where(is.numeric), 
+                       round, 3)) %>% 
+  dplyr::arrange(MAE) %>% 
+  dplyr::mutate(Rank = row_number()) %>% 
+  dplyr::select(Rank, Model, RMSE, Rsquared, MAE)
+flextable(model.results) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+
 
 ## Discussion 
 
-Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here. Some words here.
+When reviewing the most important predictors to each model but especially the winning random forest model, there is a discrepancy. For example, a table has been compiled with the first 9 predictors from the most important stepwise AIC regression selection. They are ordered. 
 
+```{r}
+# Calculate Importance by Predictor
+# Rearrange in descending order
+model.imps <- data.frame()
+pm.imps <- caret::varImp(model.pm) %>% 
+  dplyr::arrange(desc(Overall))
+ks.imps <- caret::varImp(model.ks) %>% 
+  dplyr::arrange(desc(Overall))
+rr.imps <- caret::varImp(model.rr) 
+glmb.imps <- caret::varImp(model.glmb) 
+pls.imps <- caret::varImp(model.pls)
+mar.imps <- caret::varImp(model.mar)
+rf.imps <- caret::varImp(model.rf) 
+nnet.imps <- caret::varImp(model.nnet) 
+cf.imps <- caret::varImp(model.cf) 
+svm.imps <- caret::varImp(model.svm)
+knn.imps <- caret::varImp(model.knn)
+ks.sel.imps <- caret::varImp(model.ks.sel) %>% 
+  dplyr::arrange(desc(Overall))
+rr.sel.imps <- caret::varImp(model.rr.sel) 
+pls.sel.imps <- caret::varImp(model.pls.sel)
+rf.sel.imps <- caret::varImp(model.rf.sel)
+cf.sel.imps <- caret::varImp(model.cf.sel)
+svm.sel.imps <- caret::varImp(model.svm.sel)
+# Combine and Display Importance by Model
+model.imps <- pm.imps
+model.imps <- model.imps %>%
+  data.frame() %>% 
+  tibble::rownames_to_column("Predictor") %>%
+  dplyr::rename(STEP = Overall) %>% 
+  dplyr::arrange(desc(STEP)) %>% 
+  dplyr::slice_head(n = 9) %>% 
+  cbind(ks.imps[1:9,]) %>% 
+  cbind(rr.imps$importance[1:9,]) %>% 
+  cbind(glmb.imps$importance[1:9,]) %>%
+  cbind(pls.imps$importance[1:9,]) %>% 
+  cbind(mar.imps$importance[1:9,]) %>% 
+  cbind(rf.imps$importance[1:9,]) %>% 
+  cbind(nnet.imps$importance[1:9,]) %>% 
+  cbind(cf.imps$importance[1:9,]) %>% 
+  cbind(svm.imps$importance[1:9,]) %>% 
+  cbind(knn.imps$importance[1:9,]) %>% 
+  cbind(ks.sel.imps[1:9,]) %>% 
+  cbind(rr.sel.imps$importance[1:9,]) %>% 
+  cbind(pls.sel.imps$importance[1:9,]) %>% 
+  cbind(rf.sel.imps$importance[1:9,]) %>% 
+  cbind(cf.sel.imps$importance[1:9,]) %>% 
+  cbind(svm.sel.imps$importance[1:9,]) %>%
+  dplyr::rename(KS='ks.imps[1:9, ]',
+      RR='rr.imps$importance[1:9, ]',
+      GLMB='glmb.imps$importance[1:9, ]',
+      PLS='pls.imps$importance[1:9, ]',
+      MARS='mar.imps$importance[1:9, ]',
+      RF='rf.imps$importance[1:9, ]',
+      NNET='nnet.imps$importance[1:9, ]',
+      CF='cf.imps$importance[1:9, ]',
+      SVM='svm.imps$importance[1:9, ]',
+      KNN='knn.imps$importance[1:9, ]',
+      'KS*'='ks.sel.imps[1:9, ]',
+      'RR*'='rr.sel.imps$importance[1:9, ]',
+      'PLS*'='pls.sel.imps$importance[1:9, ]',
+      'RF*'='rf.sel.imps$importance[1:9, ]',
+      'CF*'='cf.sel.imps$importance[1:9, ]',
+      'SVM*'='svm.sel.imps$importance[1:9, ]',
+)
+flextable::flextable(model.imps) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
 
+The predictor deemed most important in our stepwise regression ‘Mnf.Flow’ turned out to have no importance in the random forest. In fact, the only variable that showed promise from our selection in the random forest model was ‘Temperature’ with an importance value of 28.6. This may be caused by the formula unique to the model type since MARS, GLMB, and SVM share a similar adaptive regression capability. Future studies should explore this further to exploit the benefits of specific predictor-response relationships if there are any to be found. 
 
 
 
