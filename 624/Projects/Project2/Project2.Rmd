@@ -1090,15 +1090,149 @@ The predictor deemed most important in our stepwise regression ‘Mnf.Flow’ tu
 Lastly, in future studies it would also be wise to consider alternative models, reduce the outlier leniency by shrinking the IQR multiplier, and perhaps create new features from existing predictors. While our model provides an impressive amount of accuracy it could be improved. New features could include ratios of pressure and temperature, for example, since they are known to have a clear linear relationship in nature. Adjustments such as these would also provide deeper insight into the eb and flow pattern of the randomly distributed ‘PH’ measurements in the manufacturing process, which, is the main challenge we face when making predictions. 
 
 
+## Python Supplement
+
+When compiling this portion of the project using the R programming language, we took note of important aspects we thought would be interesting to try in the Python programming language. The result is a supplemental piece to this project report that recreated key parts of our best model (random forest) in Python. The same performance metrics are used after we read in the predictions stored on a remotely hosted ‘.csv’ file.
+
+```{r, eval=T}
+# Load Data
+RandPy <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/RandPy_Predictions.csv")
+RandPy <- RandPy %>% 
+  data.frame() %>% 
+  rename(PredictionNumber = ï..Index) %>% 
+  mutate(AbsDiff = abs(RPH -PyPH), 
+         Diff = RPH -PyPH) 
+# Evaluate R2 squared function in caret::postResample() 
+R2 <- function(pred, obs, formula = "corr", na.rm = FALSE) {
+    n <- sum(complete.cases(pred))
+    switch(formula,
+           corr = cor(obs, pred, use = ifelse(na.rm, "complete.obs", "everything"))^2,
+           traditional = 1 - (sum((obs-pred)^2, na.rm = na.rm)/((n-1)*var(obs, na.rm = na.rm))))
+}
+# Run on initial 267 observations of test 
+R2(RandPy$RPH, test$PH[1:267]) # Functions with subset properly
+# Compute performance metrics
+R <- postResample(pred = RandPy$RPH, obs = test$PH[1:267])
+Py <- postResample(pred = RandPy$PyPH, obs = test$PH[1:267])
+pred.comparison <- rbind(R, Py) %>% 
+  data.frame() %>%
+  arrange(desc(MAE)) %>%
+  t() %>% 
+  data.frame() %>% 
+  mutate(Difference = Py - R) %>% 
+  tibble::rownames_to_column("Type") 
+# Tabulate results 
+flextable(pred.comparison) %>% 
+  theme_vanilla() %>% 
+  set_table_properties(layout = "autofit")
+```
+
+
+Differences between the languages are marginal. Given the randomness of decisions made in a random forest model, we expected results to be close but perhaps not this close. The difference in mean absolute error (MAE), our primary performance indicator, is less than 0.0084. At this level, it is difficult to imagine how miniscule the differences are so, we create a point range for perspective. 
+
+
+```{r, eval=TRUE}
+pred.comparison %>% 
+  gather(key, value) %>% 
+  filter(key != "Type") %>% 
+  mutate(Value = as.numeric(value)) %>% 
+  filter(key !="Difference") %>% 
+  ggplot(aes(key, Value)) + geom_pointrange(aes(ymin = min(Py), 
+                                                ymax = max(Py),
+                                                color=key, 
+                                                )) + 
+  geom_hline(yintercept = 0.24442111, color = "Orange") + 
+  geom_hline(yintercept = 0.01246797, color = "Orange") + 
+  geom_hline(yintercept = 0.23575419, color = "Black") + 
+  geom_hline(yintercept = 0.01983906, color = "Black") + 
+  annotate("rect", xmin = 0.01983906, xmax=0.01246797, 
+           ymin = 1, ymax = 0, alpha = 0.25) + 
+  coord_flip() + 
+  labs(subtitle = "Performance Differences by Programming Language")
+```
+
+Because the performance metrics exist within the range of 0–1, we set the x-axis as such. The thicker red line represents the full range of the python predictions bounded by the vertical orange lines at its ends. Alternatively, the thicker blue line represents the R programming language with black vertical lines at its boundaries. We compare the space between the orange and black vertical lines and the difference is miniscule at this scale. This indicates the differences in model predictions are likely due to chance. 
+
+We also explore this likeness through distribution, density, stacked histograms, and scatterplots. We fit a LOESS regression curve to the scatterplot to mimic the formation of our target variable ‘PH’ scatterplot. The stacked histogram focuses on the count of predictions at a standard binwidth of 0.25. Python is in red, and R is in blue. 
+
+```{r, eval=TRUE}
+RandPy.boxplot <- RandPy %>% 
+  dplyr::select(RPH, PyPH, PredictionNumber) %>% 
+  rename(R=RPH, Py=PyPH) %>%
+  gather(key, value, -PredictionNumber) %>% 
+  group_by(key) %>%
+  ggplot(aes(value, color = key)) + geom_boxplot(aes()) +
+  labs(subtitle = "Distribution of Predictions by Language")
+RandPy.hist <- RandPy %>% 
+  dplyr::select(RPH, PyPH, PredictionNumber) %>% 
+  rename(R=RPH, Py=PyPH) %>%
+  gather(key, value, -PredictionNumber) %>% 
+  group_by(key) %>%
+  ggplot(aes(value, fill = key)) + 
+  geom_histogram(aes(alpha = .5)) + 
+  theme(legend.position = "none") + 
+  labs(subtitle = "Stacked Count of Predictions by Language")
+RandPy.density <- RandPy %>% 
+  dplyr::select(RPH, PyPH, PredictionNumber) %>% 
+  rename(R=RPH, Py=PyPH) %>%
+  gather(key, value, -PredictionNumber) %>% 
+  group_by(key) %>%
+  ggplot(aes(value, fill = key, color = key)) + 
+  geom_density(aes(alpha = .5)) + 
+  theme(legend.position = "none") + 
+  labs(subtitle = "Density of Predictions by Language")
+RandPy.loess <-RandPy %>% 
+  dplyr::select(RPH, PyPH, PredictionNumber) %>% 
+  rename(R=RPH, Py=PyPH) %>%
+  gather(key, value, -PredictionNumber) %>% 
+  group_by(key) %>%
+  ggplot(aes(PredictionNumber, value, fill = key, color = key)) + 
+  geom_point(aes(alpha = .5)) + 
+  theme(legend.position = "none") + 
+  geom_smooth(formula = y~x, 
+              method = "loess", 
+              size=1,
+              se = T,
+              color = "grey32", 
+              lty = "dotted", 
+              alpha = 0.38) + 
+  labs(subtitle = "LOESS Regression by Prediction and Language")
+ggpubr::ggarrange(RandPy.boxplot, RandPy.density, RandPy.loess, RandPy.hist, ncol = 2, nrow = 1)
+```
+
+R seems to have a slight edge in this case at focusing its predictions. Unfortunately, this is what caused the tiny uptick in error. However, one advantage to this is that it is able to explain the variation in the actual values better than python’s predictions. Python does remain the better predictor overall in this particular sample. Once that sample changes and the models adjust, there is every indication that the results could flip in R’s favor. 
+
+Through this supplemental analysis we gain confidence in the model predictions and confirm that, python has the edge when reducing model errors unique to this specific instance. We conclude with this plot of both the predictions from both programming languages plotted together. Perhaps most importantly, their combined computing power compliments one another and produces a pattern that is a near perfect match to that of ‘PH’ values by position.  
 
 
 
-
-
-
-
-
-
+```{r, eval=TRUE}
+RandPy %>% 
+  dplyr::select(RPH, PyPH, PredictionNumber) %>% 
+  rename(R=RPH, Py=PyPH) %>%
+  gather(key, value, -PredictionNumber) %>%
+  ggplot(aes(PredictionNumber, value, color = key)) +
+  labs(
+    x = "PredictionNumber (Position)", 
+    y = "PH",
+    subtitle =
+      "Combined Predictions Scatterplot: R and Python") +
+  geom_point(fill = "white",
+             size=1, 
+             shape=1) + 
+  geom_smooth(formula = y~x, 
+              method = "loess", 
+              size=1,
+              se = T,
+              color = "yellow1", 
+              lty = "solid") +
+  geom_smooth(formula = y~x, 
+              method = "lm", 
+              size=1,
+              se = F,
+              color = "grey24", 
+              lty = "dotdash")  
+```
 
 
 
