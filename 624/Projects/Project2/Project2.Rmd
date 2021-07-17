@@ -34,6 +34,7 @@ The data is loaded, and all packages used throughout the report are provided. We
 ```{r, eval=T, warning=F, message=F}
 library(utils)
 library(psych)
+library(stats)
 library(pls)
 library(tidyverse)
 library(corrplot)
@@ -102,7 +103,7 @@ flextable::flextable(ph.desc) %>%
   set_table_properties(layout = "autofit")
 ```
 
-No variable is missing greater than 8.2% (MFR) of its cases with 25 of the 33 variables at or under 1% missing. Our target ‘PH,’ is only missing 0.2%. A simple imputation should fix this without issue, as long as the errors are randomly dispersed.
+No variable is missing greater than 8.2% (MFR) of its cases with 25 of the 33 variables at or under 1% missing. Our target ‘PH,’ is only missing 0.2%. The variable ‘i..Brand.Code’ appears to have no missing values but it is masked by the describe() function because it is the only categorical variable. Imputation by median and mode should fix these variable types (numeric, integer, and categorical) without issue, as long as the errors are randomly dispersed.
 
 The standard deviations inform us that the spread of each variable is also wide in several cases like ‘Filler.Speed’ and ‘Carb.Flow,’ while extremely narrow or even 0 for variables ‘Oxygen.Filler,’ ‘PSC,’ PSC.CO2,’ ‘PSC.Fill,’ ‘Carb.Volume,’ and several more. These statistics confirm that we will be working with data objects of completely different scales each centered around their own averages. Our target ‘PH,’ has very little deviation as well, but in this case, it is to be expected since by nature it follows a logarithmic pattern, and we are only seeing values between 7.9 and 9.4.
 
@@ -371,7 +372,7 @@ ggcorrplot(cors, "square", "lower",
            hc.order = FALSE, 
            hc.method = "complete") + 
   coord_flip() + 
-  labs(title = "Corrlation Matrix with Significance Label 0.05")
+  labs(title = "Correlation Matrix with Significance Label 0.05")
 ```
 
 Although computed and shown for reference, we ignore insignificantly correlated variables with p-values greater than or equal to 0.05. Those we ignore have an ‘X’ drawn through its box. Variables directly measuring pressure and flow exhibit more negative control over ‘PH’ shown in darker blue. The only significant exception to this is ‘Carb.Flow.’ Meanwhile, ‘Bowl.Setpoint,’ ‘Filler.Level,’ ‘Oxygen.Filler,’ and ‘Usage.Count’ are the only remaining significantly correlated variables.
@@ -394,6 +395,21 @@ aggr(ph, col=c('navyblue','red'),
 # Small amount missing - simple median will do
 obs.missing.perc <- 
   (sum(ph.desc$obs) / (33*2571)*100)
+# Numeric imputation by median
+ph.numerics <- ph %>% 
+  dplyr::select(where(is.numeric)) 
+ph.numerics <- sapply( ph.numerics, as.numeric )
+ph.numerics <- naniar::impute_median(ph.numerics)
+naniar::impute_median(ph.numerics)
+sum(is.na(ph.numerics))
+ph.numerics <- ph.numerics %>% 
+  data.frame() 
+# Categorical imputation by mode
+Brand.Code <- ph$ï..Brand.Code
+val <- unique(Brand.Code[!is.na(Brand.Code)])
+my_mode <- val[which.max(tabulate(match(Brand.Code, val)))]
+Brand.Code.imputed <- Brand.Code
+Brand.Code.imputed[is.na(Brand.Code.imputed)] <- my_mode
 # replaces NA with median (given a removal of missing values in calculation)
 for (i in colnames(ph)) {
   ph[[i]][is.na(ph[[i]])] <- median(ph[[i]], na.rm=TRUE)
@@ -1073,14 +1089,6 @@ The predictor deemed most important in our stepwise regression ‘Mnf.Flow’ tu
 
 Lastly, in future studies it would also be wise to consider alternative models, reduce the outlier leniency by shrinking the IQR multiplier, and perhaps create new features from existing predictors. While our model provides an impressive amount of accuracy it could be improved. New features could include ratios of pressure and temperature, for example, since they are known to have a clear linear relationship in nature. Adjustments such as these would also provide deeper insight into the eb and flow pattern of the randomly distributed ‘PH’ measurements in the manufacturing process, which, is the main challenge we face when making predictions. 
 
-
-
-
-```{r}
-predict(model.rf)
-?pred()
-library(ROCR)
-```
 
 
 
