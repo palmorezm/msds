@@ -1055,6 +1055,11 @@ model.imps <- model.imps %>%
       'CF*'='cf.sel.imps$importance[1:9, ]',
       'SVM*'='svm.sel.imps$importance[1:9, ]',
 )
+model.imps <- model.imps %>% 
+  t() %>% 
+  data.frame() 
+names(model.imps) <- as.matrix(model.imps[1,])
+model.imps <- model.imps[-1,]
 flextable::flextable(model.imps) %>% 
   theme_vanilla() %>% 
   set_table_properties(layout = "autofit")
