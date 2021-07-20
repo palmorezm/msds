@@ -1815,4 +1815,17 @@ else:
 for index, i in enumerate([1,2,3,4,5]):
     print(index, i)
 
+v = ([1,2,3,4,5,5,6,789,10])
+for index, i in enumerate([v]):
+    print(index, i)
+
+# TypeError: unsupported operand type(s) for -: 'list' and 'int'
+v = ([1,2,3,4,5,5,6,789,10])
+for index, i in enumerate([v]):
+    print(index, [i - 100])
+
+#TypeError: can't multiply sequence by non-int of type 'list'
+for index, i in enumerate([[1,2,3,4,5,5,6,789,10]]):
+    print(index, sum(i*i)) 
+
 
