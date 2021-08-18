@@ -1828,4 +1828,35 @@ for index, i in enumerate([v]):
 for index, i in enumerate([[1,2,3,4,5,5,6,789,10]]):
     print(index, sum(i*i)) 
 
+# Complete the code to return the output
+import numpy as np
+store = np.array(["X", "Z", "Z", "Z"])
+cost  = np.array([7, 1, 9, 4])
+select_cost = cost[store == "X"]
+print(select_cost)
+
+# You have the following DataFrame df:
+import pandas as pd 
+d = {'Month':["Jan","Apr","Mar","Feb"], 'Count':[52,29,46,3]}
+df = pd.DataFrame(d)
+print(df)
+# Complete the code to return the output 
+# 21.946905628508695
+# get the standard devation of 'Count'
+print(df['Count'].std())
+
+# Drop the first row of the data frame df
+import pandas as pd
+import numpy as np  
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+
+# Write code to display the 2nd and 3rd rows of a data frame df 
+import pandas as pd
+import numpy as np
+df = pd.DataFrame(np.array([['zero',"Jan", 52], ['one',"Feb", 24], ['two',"Mar", 3], ['three',"Apr", 35]]),
+                   columns=['ID', 'Month', 'Count'])
+print(df.iloc[1:3])
+
+
 
