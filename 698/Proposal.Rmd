@@ -1,0 +1,39 @@
+---
+title: "Master of Analytics Research Project Proposal"
+author: "Zachary Palmore"
+date: "8/21/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Proposal 
+
+
+### Topic 
+
+What is the likelihood of an individual being able to own a home in areas within the United States? 
+
+## Process 
+
+Consider the home-buying process. What does it look like today? How does an individual go about purchasing a house these days? For a study, find the average cost of goods and typical services, the average down payment, the amount of money in savings to put down, the cost of housing, property taxes, average income for the area, age groups with average amount of debt to income, education level, and other factors that might influence whether or not an individual can buy a home. This determine how good they look to a bank. It could be considered a lending/attraction problem for localities.
+
+This may be interesting to use with several different demographic profiles and model them after real-world scenarios. For example we could say this is Joe, he’s got two kids, a dog, and lives in an apartment with his partner Jen. We also have Karen, single, 4 cats, left a large inheritance. How would these two groups do when trying to buy a house in an area? 
+
+
+## Demographic Profiles
+
+Create 3 - 5 demographic profiles to capture the story behind the data. 
+
+## Business problem
+
+How to attract new homebuyers to the area 
+
+## Additional Information
+
+Goal - finds out where we fit in but also how all of these demographics fit in
+
+Additional Information: It might also be interesting to compare the same demographic profiles across historical trends. For example, how might a young couple, with a similar amount in savings fair compared to their older counterparts decades ago. 
+
