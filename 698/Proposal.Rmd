@@ -29,11 +29,20 @@ Create 3 - 5 demographic profiles to capture the story behind the data.
 
 ## Business problem
 
-How to attract new homebuyers to the area 
+How to attract new homebuyers to the area?
 
 ## Additional Information
 
 Goal - finds out where we fit in but also how all of these demographics fit in
 
 Additional Information: It might also be interesting to compare the same demographic profiles across historical trends. For example, how might a young couple, with a similar amount in savings fair compared to their older counterparts decades ago. 
+
+```{r}
+# Used with data cleaning script
+library(ggplot2)
+n <- 10
+combined %>% 
+  sample_n(size = n, replace = F) %>%
+  ggplot(aes(c(1:n), value)) + geom_point(aes(label = GeoName)) 
+```
 
