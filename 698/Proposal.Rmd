@@ -40,9 +40,9 @@ Additional Information: It might also be interesting to compare the same demogra
 ```{r}
 # Used with data cleaning script
 library(ggplot2)
-n <- 10
+n <- 1600
 combined %>% 
   sample_n(size = n, replace = F) %>%
-  ggplot(aes(c(1:n), value)) + geom_point(aes(label = GeoName)) 
+  ggplot(aes(c(1:n), value)) + geom_point(aes(label = GeoName))  
 ```
 
