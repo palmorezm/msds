@@ -1,6 +1,7 @@
 
 # MS Analytics Capstone
-# Data Cleaning
+# Data Cleaning Script 
+# Dataset: rpis_10yr.csv
 # Source: BEA 
 # https://apps.bea.gov/iTable/
 
@@ -18,11 +19,20 @@ rpi <- rpi[-1,]
 View(rpi)
 
 # Tidying
-melted <- rpi %>% 
+mrpi <- rpi %>% 
   gather(key, value, -GeoFips, -GeoName, -LineCode, -Description) 
-rpi.percapita <- subset(melted, LineCode==2)  
+rpi.percapita <- subset(mrpi, LineCode==2)  
 rpi.income <- subset(melted, LineCode==1)
-combined <- rbind(rpi.income, rpi.percapita)
-View(combined)
+mrpi <- rbind(rpi.income, rpi.percapita)
+View(mrpi)
 
+# Determine the presence of and deal with missing Values
+sum(is.na(mrpi)) # 28 
+which(is.na(mrpi))
+mrpi[49071,] # Displays the first selected NA
+mrpi[which(is.na(mrpi)),] # Displays all NA's
+na.omit(mrpi)
 
+# Data Types
+mrpi %>% 
+  dplyr::select_if(is.numeric) # none are numeric
