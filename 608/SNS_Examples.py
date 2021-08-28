@@ -31,4 +31,11 @@ gender = [ "Female", "Female", "Female", "Female",
 sns.countplot(x = gender)
 plt.show()
 
-# 
+# Adding Pandas
+# This will allow us to use DataFrames 
+
+# Importing the data 
+import pandas as pd # Includes needed functions
+df = pd.read_csv("data/masculinity.csv") # 
+df.head()
+
