@@ -36,6 +36,10 @@ plt.show()
 
 # Importing the data 
 import pandas as pd # Includes needed functions
-df = pd.read_csv("data/masculinity.csv") # 
+# data taken from remote Github by FiveThirtyEight
+df = pd.read_csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/masculinity-survey/masculinity-survey.csv") 
 df.head()
 
+# Remove missing values 
+df = df.dropna()
+df.head()
