@@ -36,3 +36,5 @@ na.omit(mrpi)
 # Data Types
 mrpi %>% 
   dplyr::select_if(is.numeric) # none are numeric
+
+
