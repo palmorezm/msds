@@ -9,7 +9,7 @@
 library(dplyr)
 library(tidyr)
 
-# Regional Price Parities
+# Regional Price Parities (RPP)
 # Extraction
 rpp <- data.frame(read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/rpps_10yr.csv"))
 rpp <- rpp[4:nrow(rpp),]
