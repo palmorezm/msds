@@ -86,7 +86,14 @@ Lets dig in on the state with the 3rd most companies in the data set. Imagine yo
 
 ```{r}
 # Answer Question 2 here
-
+data.frame(table(inc$State)) %>% 
+  arrange(desc(Freq))
+# Based on this table of frequencies; NY is 3rd
+df <- inc %>% 
+  filter(State == "NY") 
+df %>% 
+  group_by(Industry) %>%
+  summarise(sum(Employees))
 ```
 
 ## Question 3
