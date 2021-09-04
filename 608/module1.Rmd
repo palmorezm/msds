@@ -2,7 +2,7 @@
 title: "Module1"
 author: "Group 3"
 date: "9/2/2021"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -34,30 +34,57 @@ Think a bit on what these summaries mean. Use the space below to add some more r
 
 ```{r}
 # Insert your code here, create more chunks as necessary
-library(ggplot2)
-library(dplyr)
+library(tidyverse)
+library(psych)
 theme_set(theme_minimal()) # Set plot theme
 sum(is.na(inc)) # 12 missing values
 inc[which(is.na(inc)),] # Print all missing value indecies
 # They hold no significance and can be removed completely
 inc <- na.omit(inc) # remove missing values
-# plot(inc)
 
+# Only 8 variables; we can plot all
 inc %>% 
-  summarise(StateCo = table(State)
-inc %>% 
-  ggplot(aes(x = reorder(State, Rank))) + 
-  geom_bar(aes()) + 
-  coord_flip()
+  dplyr::select(-Name, -City, -State, -Industry) %>% # 4 characters variables are useless in plot
+  gather(key, value) %>% # gather into key value pairs
+  ggplot(aes(value)) + # create ggplot
+  geom_boxplot() + # as a geometric boxplot
+  facet_wrap(~key, scales ="free") + # by each key
+  theme(axis.ticks.x = element_blank()) # hide x axis tick marks
 
-inc %>% 
-  ggplot(aes(State)) + 
-  geom_histogram(stat="count", na.rm = T, aes()) + 
-  coord_flip()
+# Results:
+# There are a lot of outliers
+# Comparing other variables to rank which has no outliers
+# The remaining variables are dominated by outliers
 
-data.frame(table(inc$State)) %>% 
-  ggplot(aes(Var1, Freq)) + geom_col()
+# Look closer at statistics
+describe(inc)
+# Growth Rate, Revenue, and the number of Employees have high skew values
+# Those same values are also curtailed sharply mid distribution
+# These are to be expected in the fastest growing 5000 companies
 ```
+
+```{r}
+# Out of curiosity
+# Which states did best in their ranking? 
+inc %>% 
+  arrange(desc(Rank)) %>% 
+  group_by(State) %>% 
+  summarise(StateRank = (sum(Rank)/nrow(inc))) %>%
+  ggplot(aes(reorder(State, StateRank), StateRank)) + 
+  geom_col(aes(fill = StateRank, alpha = .80)) + coord_flip() +
+  labs(y = "Averaged Cumulative State Rank", x = "State", 
+       title = "Highest Ranked States from Fastest 5000 Companies", caption = "Data compiled and ranked by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5))
+# Could have also used a histogram with stat = "count" 
+```
+
+
 
 ## Question 1
 
@@ -69,15 +96,15 @@ Create a graph that shows the distribution of companies in the dataset by State 
 data.frame(table(inc$State)) %>% 
   ggplot(aes(reorder(Var1, -Freq), Freq)) + 
   geom_col(aes(fill = Freq, alpha = .80)) + 
-  coord_flip() + labs(x = "State", y = "Count", 
-    title = "Fastest Growing Companies in the U.S.",
+  coord_flip() + labs(x = "State", y = "Count of \"Fastest\" Companies", 
+    subtitle = "Number of Fastest Growing Companies in each State",
     caption = "Data on fastest 5000 companies compiled by Inc.") +
   theme(legend.position = "none", 
         panel.grid.minor.x = element_line(color = "lightgrey",
                                           linetype = "dotted"),
         panel.grid.minor.y = element_line(color = "lightgrey", 
                                           linetype = "dotted"),
-        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
         plot.caption = element_text(hjust = 0.5))
 ```
 
@@ -86,20 +113,45 @@ data.frame(table(inc$State)) %>%
 Lets dig in on the state with the 3rd most companies in the data set. Imagine you work for the state and are interested in how many people are employed by companies in different industries. Create a plot that shows the average and/or median employment by industry for companies in this state (only use cases with full data, use R's `complete.cases()` function.) In addition to this, your graph should show how variable the ranges are, and you should deal with outliers.
 
 ```{r}
-# This sounds like a boxplot/violin plot
+# This sounds like a boxplot/violin plot given an average/median employment by industry with a variable range for each state
+# this would also show outliers unless removed
 # However, the data is not averagable for the industry in the state
 # Unless you did something like this 
 inc %>% 
   filter(State == "NY") %>% 
   group_by(Industry) %>% 
-  summarise(IndMed = median(Employees)) # Consider a point range 
-  ggplot(ase()) + ge
+  summarise(IndMed = median(Employees)) # Calc median employment by industry in this state
 
 # Answer Question 2 here
 data.frame(table(inc$State)) %>% 
   arrange(desc(Freq))
-# Based on this table of frequencies; NY is 3rd
+# Based on this table of frequencies; NY is 3rd 
 
+# Remove outliers based on IQR of R boxplot
+outs <- boxplot(inc$Employees, plot=F)$out
+inc <- inc[-which(inc$Employees %in% outs),]
+
+# Applying the above method on average employment per industry we have
+inc %>% 
+  filter(State == "NY") %>% 
+  group_by(Industry) %>% 
+  summarise(IndMed = median(Employees)) %>% 
+  ggplot(aes(reorder(Industry, -IndMed)), IndMed) + 
+  geom_col(aes(y = IndMed, fill = IndMed, alpha = .80)) + 
+  coord_flip() + labs(y = "Average Number of Employees", x = "Industry", 
+                      title = "Average Employment by Industry in NY", 
+                      caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5))
+
+
+# Total employees per industry in the state of NY
 inc %>% 
   filter(State == "NY") %>%
   group_by(Industry) %>%
@@ -135,8 +187,8 @@ inc %>%
   geom_col(aes(y = TotRevPerEmp, 
            fill = TotRevPerEmp, alpha = .80)) + coord_flip() + 
   labs(y = "Revenue Per Employee (Millions of Dollars)", x = "Industry", 
-                      title = "NY Industry Employment", 
-                      subtitle = "By Fastest Growing 5000 Companies") +
+                      title = "Total Revenue per Employee in NY", 
+                      caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
   theme(legend.position = "none", 
         panel.grid.minor.x = element_line(color = "lightgrey",
                                           linetype = "dotted"),
