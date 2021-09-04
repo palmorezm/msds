@@ -93,10 +93,10 @@ Create a graph that shows the distribution of companies in the dataset by State 
 
 ```{r}
 # Answer Question 1 here
-data.frame(table(inc$State)) %>% 
-  ggplot(aes(reorder(Var1, -Freq), Freq)) + 
-  geom_col(aes(fill = Freq, alpha = .80)) + 
-  coord_flip() + labs(x = "State", y = "Count of \"Fastest\" Companies", 
+data.frame(table(inc$State)) %>%
+  ggplot(aes(reorder(Var1, Freq), Freq)) + 
+  geom_col(aes(fill = Freq, alpha = .80, width = 1.0)) + 
+  labs(x = "State", y = "Count of \"Fastest\" Companies", 
     subtitle = "Number of Fastest Growing Companies in each State",
     caption = "Data on fastest 5000 companies compiled by Inc.") +
   theme(legend.position = "none", 
@@ -105,7 +105,26 @@ data.frame(table(inc$State)) %>%
         panel.grid.minor.y = element_line(color = "lightgrey", 
                                           linetype = "dotted"),
         plot.subtitle = element_text(hjust = 0.5),
-        plot.caption = element_text(hjust = 0.5))
+        plot.caption = element_text(hjust = 0.5), 
+        axis.ticks.x = element_blank()) + coord_flip() 
+
+# Second Plot
+data.frame(table(inc$State)) %>%
+  ggplot(aes(reorder(Var1, Freq), Freq)) + 
+  geom_col(aes(fill = Freq, alpha = .80, width = .7)) + 
+  ylim(c(0, 800)) + labs(x = "State", y = "Count of \"Fastest\" Companies", 
+    subtitle = "Number of Fastest Growing Companies in each State",
+    caption = "Data on fastest 5000 companies compiled by Inc.") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5), 
+        axis.ticks.x = element_blank(), 
+        axis.text.y = element_text(face = "bold", size = 10)) + coord_flip() +
+  scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.2, -4)) 
 ```
 
 ## Quesiton 2
@@ -151,6 +170,24 @@ inc %>%
         plot.caption = element_text(hjust = 0.5))
 
 
+inc %>% 
+  filter(State == "NY", complete.cases(.)) %>% 
+  group_by(Industry) %>% 
+  summarise(IndMed = median(Employees)) %>% 
+  ggplot(aes(reorder(Industry, -IndMed)), IndMed) + 
+  geom_col(aes(y = IndMed, fill = IndMed, alpha = .80)) + 
+  coord_flip() + labs(y = "Average Number of Employees", x = "Industry", 
+                      title = "Average Employment by Industry in NY", 
+                      caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5))
+
 # Total employees per industry in the state of NY
 inc %>% 
   filter(State == "NY") %>%
@@ -169,6 +206,44 @@ inc %>%
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
         plot.caption = element_text(hjust = 0.5))
+
+# Boxplot with IQR outliers removed
+inc %>% 
+  filter(State == "NY") %>%
+  ggplot(aes(x = reorder(Industry, Employees, median), Employees)) + 
+  geom_boxplot(aes(fill = Industry)) + coord_flip() + ylim(c(0, 400)) +
+  labs(y = "Employees", x = "Industry", 
+       title = "NY Employment by Industry", 
+       subtitle = "Median shown as black line in center of boxplot",
+       caption = "From data on fastest 5000 companies as compiled by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5))
+
+# Boxplot with gradient fill 
+inc %>% 
+  filter(State == "NY") %>%
+  ggplot(aes(x = reorder(Industry, Employees, median), Employees)) + 
+  geom_boxplot(aes(fill = Industry)) + coord_flip() + ylim(c(0, 400)) +
+  labs(y = "Employees", x = "Industry", 
+       title = "NY Employment by Industry", 
+       subtitle = "Median shown as black line in center of boxplot",
+       caption = "From data on fastest 5000 companies as compiled by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5)) + 
+  scale_fill_gradient2()
+
 ```
 
 ## Question 3
@@ -188,6 +263,27 @@ inc %>%
            fill = TotRevPerEmp, alpha = .80)) + coord_flip() + 
   labs(y = "Revenue Per Employee (Millions of Dollars)", x = "Industry", 
                       title = "Total Revenue per Employee in NY", 
+                      caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
+  theme(legend.position = "none", 
+        panel.grid.minor.x = element_line(color = "lightgrey",
+                                          linetype = "dotted"),
+        panel.grid.minor.y = element_line(color = "lightgrey", 
+                                          linetype = "dotted"),
+        plot.title = element_text(hjust = 0.5),
+        plot.subtitle = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0.5))
+
+# Answer 3 without NY filter 
+inc %>% 
+  dplyr::select(Industry, Revenue, Employees) %>% 
+  mutate(RevPerEmp = Revenue / Employees) %>%
+  group_by(Industry) %>%
+  summarise(TotRevPerEmp = (sum(RevPerEmp)/1000000)) %>% 
+  ggplot(aes(reorder(Industry, -TotRevPerEmp), TotRevPerEmp)) + 
+  geom_col(aes(y = TotRevPerEmp, 
+           fill = TotRevPerEmp, alpha = .80)) + coord_flip() + 
+  labs(y = "Revenue Per Employee (Millions of Dollars)", x = "Industry", 
+                      title = "Total Revenue per Employee in US", 
                       caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
   theme(legend.position = "none", 
         panel.grid.minor.x = element_line(color = "lightgrey",
