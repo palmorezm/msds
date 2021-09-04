@@ -63,7 +63,7 @@ describe(inc)
 # These are to be expected in the fastest growing 5000 companies
 ```
 
-```{r}
+```{r results='hide'}
 # Out of curiosity
 # Which states did best in their ranking? 
 inc %>% 
@@ -95,7 +95,7 @@ Create a graph that shows the distribution of companies in the dataset by State 
 # Answer Question 1 here
 data.frame(table(inc$State)) %>%
   ggplot(aes(reorder(Var1, Freq), Freq)) + 
-  geom_col(aes(fill = Freq, alpha = .80, width = 1.0)) + 
+  geom_col(aes(fill = Freq, alpha = .80, width = .9)) + 
   labs(x = "State", y = "Count of \"Fastest\" Companies", 
     subtitle = "Number of Fastest Growing Companies in each State",
     caption = "Data on fastest 5000 companies compiled by Inc.") +
@@ -113,18 +113,22 @@ data.frame(table(inc$State)) %>%
   ggplot(aes(reorder(Var1, Freq), Freq)) + 
   geom_col(aes(fill = Freq, alpha = .80, width = .7)) + 
   ylim(c(0, 800)) + labs(x = "State", y = "Count of \"Fastest\" Companies", 
-    subtitle = "Number of Fastest Growing Companies in each State",
+    title = "Number of Fastest Growing Companies in each State",
     caption = "Data on fastest 5000 companies compiled by Inc.") +
   theme(legend.position = "none", 
         panel.grid.minor.x = element_line(color = "lightgrey",
                                           linetype = "dotted"),
         panel.grid.minor.y = element_line(color = "lightgrey", 
                                           linetype = "dotted"),
-        plot.subtitle = element_text(hjust = 0.5),
+        plot.title = element_text(hjust = 0.5),
         plot.caption = element_text(hjust = 0.5), 
         axis.ticks.x = element_blank(), 
-        axis.text.y = element_text(face = "bold", size = 10)) + coord_flip() +
-  scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.2, -4)) 
+        axis.text.y = element_text(face = "bold", size = 12), 
+        axis.text.x = element_text(size = 12), 
+        axis.title.x = element_text(face = "bold", size = 12), 
+        axis.title.y = element_blank()) + coord_flip() +
+  scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.8, -4)) + 
+  scale_y_continuous(limits = c(0, 710), breaks = seq(0, 700, 100), expand = c(-0.0001, 0.5))
 ```
 
 ## Quesiton 2
@@ -226,10 +230,14 @@ inc %>%
         plot.caption = element_text(hjust = 0.5))
 
 # Boxplot with gradient fill 
+# color = "red", fill = "orange", alpha = 0.2, outlier.color = "grey"
+# fill = median(Employees), alpha = .75
 inc %>% 
   filter(State == "NY") %>%
   ggplot(aes(x = reorder(Industry, Employees, median), Employees)) + 
-  geom_boxplot(aes(fill = Industry)) + coord_flip() + ylim(c(0, 400)) +
+  geom_boxplot(aes(fill = median(Employees), alpha = .75)) + coord_flip() + 
+  stat_summary(fun.y=median, geom="point", shape=21, 
+               size=2, color="lightblue", alpha = 0.9, fill = "white") + 
   labs(y = "Employees", x = "Industry", 
        title = "NY Employment by Industry", 
        subtitle = "Median shown as black line in center of boxplot",
@@ -241,9 +249,21 @@ inc %>%
                                           linetype = "dotted"),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
-        plot.caption = element_text(hjust = 0.5)) + 
-  scale_fill_gradient2()
+        plot.caption = element_text(hjust = 0.5),
+        axis.ticks.x = element_blank(), 
+        axis.text.y = element_text(face = "bold", size = 12), 
+        axis.text.x = element_text(size = 12), 
+        axis.title.x = element_text(face = "bold", size = 12), 
+        axis.title.y = element_blank())  + 
+  scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.8, -4)) + 
+  scale_y_continuous(limits = c(0, 200), breaks = seq(0, 200, 50), expand = c(0.01, 0.5))
 
+inc %>% 
+  filter(State == "NY") %>% 
+  filter(Industry == "Government Services") # Cipher Tech Solutions - only one in NY for this industry
+inc %>% 
+  filter(State == "NY") %>% 
+  filter(Industry == "Environmental Services") # Creative Environment Solutions - only one in NY for this industry
 ```
 
 ## Question 3
@@ -279,7 +299,7 @@ inc %>%
   mutate(RevPerEmp = Revenue / Employees) %>%
   group_by(Industry) %>%
   summarise(TotRevPerEmp = (sum(RevPerEmp)/1000000)) %>% 
-  ggplot(aes(reorder(Industry, -TotRevPerEmp), TotRevPerEmp)) + 
+  ggplot(aes(reorder(Industry, TotRevPerEmp), TotRevPerEmp)) + 
   geom_col(aes(y = TotRevPerEmp, 
            fill = TotRevPerEmp, alpha = .80)) + coord_flip() + 
   labs(y = "Revenue Per Employee (Millions of Dollars)", x = "Industry", 
@@ -292,7 +312,15 @@ inc %>%
                                           linetype = "dotted"),
         plot.title = element_text(hjust = 0.5),
         plot.subtitle = element_text(hjust = 0.5),
-        plot.caption = element_text(hjust = 0.5))
+        plot.caption = element_text(hjust = 0.5), 
+        axis.ticks.x = element_blank(), 
+        axis.text.y = element_text(face = "bold", size = 12), 
+        axis.text.x = element_text(size = 12), 
+        axis.title.x = element_text(face = "bold", size = 12), 
+        axis.title.y = element_blank())  + 
+  scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.8, -4)) + 
+  scale_y_continuous(limits = c(0, 200), breaks = seq(0, 200, 50), expand = c(0.01, 0.5))  
+  
 ```
 
 
