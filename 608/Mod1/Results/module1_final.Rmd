@@ -37,6 +37,7 @@ Think a bit on what these summaries mean. Use the space below to add some more r
 ```{r}
 # Insert your code here, create more chunks as necessary
 library(tidyverse)
+library(latex2exp)
 library(ggpubr)
 library(psych)
 theme_set(theme_minimal()) # Set plot theme
@@ -119,23 +120,23 @@ Create a graph that shows the distribution of companies in the dataset by State 
 # Answer Question 1 here
 data.frame(table(inc$State)) %>% 
   ggplot(aes(y = reorder(Var1, Freq), x = Freq)) + 
-  geom_col(aes(fill = Freq, alpha = .80, width = .9)) + 
+  geom_col(aes(fill = Freq, alpha = .80, width = .6)) + 
   labs(x = "State", y = "Count of \"Fastest\" Companies", 
     title = "Number of Fastest Growing Companies",
     caption = "Data on fastest 5000 companies compiled by Inc.") +
-  geom_text(aes(label = round(Freq, 0)), size = 3.6, hjust = 1) +
+  geom_text(aes(label = round(Freq, 0)), size = 3.6, hjust = -.5) +
+  xlim(c(0,750)) +
   theme(legend.position = "none", 
-        panel.grid.minor.x = element_line(color = "lightgrey",
-                                          linetype = "dotted"),
+        panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_line(color = "lightgrey", 
-                                          linetype = "dotted"),
+                                          linetype = "dotted", size = 3),
         plot.title = element_text(hjust = 0.5),
         plot.caption = element_text(hjust = 0.5), 
         axis.ticks.x = element_blank(), 
         axis.ticks.y = element_blank(),
         axis.text.y = element_text(size = 10), 
         axis.text.x = element_blank(), 
-        axis.title.x = element_text(size = 10), 
+        axis.title.x = element_blank(), 
         axis.title.y = element_blank(),) 
 ```
 
@@ -304,7 +305,7 @@ inc.ccs %>%
   scale_x_discrete(limits = rev(levels(inc$Var1)), expand = c(-0.8, -4))  +
   annotate("text", x = 5, y = 700, label = "Two Outliers Not Shown:") + 
   annotate("text", x = 3, y = 700, label = "Coty & Sutherland Global Services") +
-  scale_y_continuous(limits = c(0, 1050), breaks = seq(0, 1000, 500), expand = c(0.01, 0.5)) 
+  scale_y_continuous(limits = c(0, 1050), breaks = seq(0, 1000, 250), expand = c(0.01, 0.5)) 
 ```
 
 
@@ -469,7 +470,7 @@ inc.ccs %>%
   labs(y = "Dollars (Thousands)", x = "Industry", 
                       subtitle = "Fastest Growing Industries by Revenue Per Employee (U.S)", 
                       caption = "Contains data on fastest 5000 companies as compiled by Inc. magazine") +
-  geom_text(aes(label = round(TotRevPerEmp, 0)), size = 3, hjust = 1.08) +
+  geom_text(aes(label = round(TotRevPerEmp, 0)), size = 3, hjust = 1.01) +
   theme(legend.position = "none", 
         panel.grid.minor.x = element_line(color = "lightgrey",
                                           linetype = "dotted"),
@@ -483,9 +484,10 @@ inc.ccs %>%
         axis.text.x = element_blank(), 
         axis.title.x = element_text(size = 11), 
         axis.title.y = element_blank())   + 
-  annotate("text", x = 3, y = 800, label = "Uses Total Dollar Value Ratios:", size = 3.5) + 
-  annotate("text", x = 2, y = 800, 
-           label = "Revenue Per Capita = sum(Revenue)/sum(Employees)", size = 3.5)
+  annotate("text", x = 5.2, y = 800, label = "Formula (X = Industry):", size = 3.5) + 
+  annotate("text", x = 2.6, y = 800, 
+           label = latex2exp::TeX("$X_{RevenuePerCapita} = \\frac{\\sum(X_{Revenue})}{\\sum(X_{Employees})}$"), 
+           size = 3.5, output='character', parse=T)
 ```
 
 
