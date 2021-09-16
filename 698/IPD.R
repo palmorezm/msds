@@ -9,7 +9,10 @@
 library(dplyr)
 library(tidyr)
 
-# # Regional Price Parities (RPP)
+# Implicit Regional Price Deflator (IRPD - here referred to as simply IPD)
+# As defined by BEA 
+# The IRPD is a regional price index derived as the product of two terms: 
+# the regional price parity and the U.S. PCE price index.
 # Extraction
 ipd <- data.frame(read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/ipd_10yr.csv"))
 ipd <- ipd[4:nrow(ipd),] # 

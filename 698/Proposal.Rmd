@@ -46,3 +46,142 @@ combined %>%
   ggplot(aes(c(1:n), value)) + geom_point(aes(label = GeoName))  
 ```
 
+
+# New Strategy
+## Combine data sources
+
+```{r packages}
+library(tidyverse)
+library(maps)
+```
+
+
+
+```{r CAINC1}
+# Income, Population, & Per Capita Income by MSA from 1969
+# Extraction
+cainc1 <- data.frame(read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/CAINC1__ALL_AREAS_1969_2019.csv")) 
+l1 <- colnames(cainc1[1:8])
+l2 <- seq(1969, 2019, 1)
+l3 <- c(l1, l2)
+colnames(cainc1) <- l3
+
+# Tidying
+mcainc1 <- cainc1 %>% 
+  gather(year, value, 
+         -GeoFIPS, -GeoName, -Region, -TableName, -LineCode, 
+         -IndustryClassification, -Description, -Unit) 
+cainc1.personalincome <- subset(cainc1, LineCode==1)
+cainc1.population <- subset(cainc1, LineCode==2)  
+cainc1.percapitaincome<- subset(cainc1, LineCode==3) 
+cainc1 <- rbind(cainc1.personalincome, cainc1.population, cainc1.percapitaincome)
+View(mcainc1)
+
+# Cleaning
+# Determine the presence of and deal with missing Values
+# sum(is.na(mcainc1)) # 153 - recheck for assurance
+# which(is.na(mcainc1)) 
+# mcainc1[which(is.na(mcainc1)),] # Displays all NA's (if there are any)
+# Missing values in this data are direct from BEA 
+# Review each subset before omission/imputation
+# sum(is.na(cainc1.percapitaincome)) # 1 Missing
+# which(is.na(cainc1.percapitaincome)) # At 6397
+# cainc1.percapitaincome[6397,] # All missing 
+# which(is.na(cainc1.personalincome)) # At 6397
+# cainc1.personalincome[6397,] # All missing
+# which(is.na(cainc1.population)) # At 6397
+# cainc1.population[6397,] # Ditto as above
+# The one missing entry from the data created 153 missing entries when gathered
+mcainc1 <- na.omit(mcainc1)
+sum(is.na(mcainc1)) # 0 
+# However, omission removed more than expected
+# count(mcainc1) - 153 # Expected 153 removals 
+# sum(is.na(mcainc1)) # The value has changed. 
+# Solution: During rerun update notes!
+```
+
+
+
+```{r RPP_11yr}
+# Regional Price Parities by MSA from 2008 - 2019
+# Extraction
+rpp <- data.frame(read.csv(
+  "https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/rpp_msa_11yr.csv")) 
+rpp <- rpp[4:nrow(rpp),]
+colnames(rpp) <- rpp[1,]
+rpp <- rpp[-1,]
+
+# Tidying
+mrpp <- rpp %>% 
+  gather(key, value, -GeoFips, -GeoName, -LineCode, -Description) 
+rpp.allitems <- subset(mrpp, LineCode==1)
+rpp.goods <- subset(mrpp, LineCode==2)  
+rpp.rents <- subset(mrpp, LineCode==3) 
+rpp.services <- subset(mrpp, LineCode==4)  
+mrpp <- rbind(rpp.allitems, rpp.goods, rpp.rents, rpp.services)
+View(mrpp)
+
+# Determine the presence of and deal with missing Values
+sum(is.na(mrpp)) # 28 
+which(is.na(mrpp))
+mrpp[which(is.na(mrpp)),] # Displays all NA's (if there are any)
+# There are no missing values in this data set 
+```
+
+
+```{r combined}
+# Rename GeoFIPS to GeoFips for binding
+mcainc1 <- mcainc1 %>% 
+  rename(GeoFips = GeoFIPS)
+# Convert, rename, and adjust selection
+mrpp <- mrpp %>% 
+  rename(year = key) %>% 
+  mutate(LineCode2 = as.numeric(LineCode) + 10) %>% 
+  dplyr::select(-LineCode) %>% 
+  rename(LineCode = LineCode2) %>% 
+  dplyr::select(GeoFips, GeoName, LineCode, 
+                Description, year, value)
+# Repeat selection method on mcainc1 
+mcainc1 <- mcainc1 %>% 
+  dplyr::select(GeoFips, GeoName, LineCode, 
+                Description, year, value) 
+# Create combined data frame 
+df <- rbind(mcainc1, mrpp) %>% 
+  mutate(Year = as.numeric(year), 
+         Value = as.numeric(value)) %>% 
+  dplyr::select(-year, -value) 
+```
+
+
+
+
+```{r}
+
+df_pop_county <- data.frame(region=df$GeoFips)
+df_pop_county$value <- df$GeoFips
+y <- df_pop_county$value
+df_pop_county$color <- gray(y / max(y))
+
+counties <- county.fips %>% 
+  left_join(df_pop_county, by = c('fips' = 'region'))
+map("county", fill = TRUE, col = counties$color)
+
+df.test <- df %>% 
+  filter(LineCode == "11" & Year == "2008") %>% 
+  mutate(Color = scale(Value) + 100) %>% 
+  slice(-1, -2)
+
+map("county", fill = T, col = df.test$Color[,1])
+map("county", fill = T, col = df.test$Value)
+?maps::map()
+```
+
+
+
+
+
+
+
+
+
