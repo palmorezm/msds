@@ -10,7 +10,7 @@ library(dplyr)
 library(tidyr)
 
 
-# Income, Population, & Per Capita Income by MSA from 1969
+# Income, Population, & Per Capita Income by County from 1969 to 2019
 # Extraction
 cainc1 <- data.frame(read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/CAINC1__ALL_AREAS_1969_2019.csv")) 
