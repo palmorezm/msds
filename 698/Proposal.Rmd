@@ -151,13 +151,23 @@ df <- rbind(mcainc1, mrpp) %>%
   mutate(Year = as.numeric(year), 
          Value = as.numeric(value)) %>% 
   dplyr::select(-year, -value) 
+View(df)
+```
+
+
+
+```{r}
+dict <- df %>% 
+  filter(LineCode == "11" & Year == "2008") 
+data <- df %>% 
+  filter(LineCode == "3" & Year == "2008")
+data$GeoFips == dict$GeoFips
 ```
 
 
 
 
 ```{r}
-
 df_pop_county <- data.frame(region=df$GeoFips)
 df_pop_county$value <- df$GeoFips
 y <- df_pop_county$value
