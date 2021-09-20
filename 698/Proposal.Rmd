@@ -52,7 +52,6 @@ combined %>%
 
 ```{r packages}
 library(tidyverse)
-library(maps)
 ```
 
 
