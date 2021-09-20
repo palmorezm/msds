@@ -58,7 +58,7 @@ library(maps)
 
 
 ```{r CAINC1}
-# Income, Population, & Per Capita Income by MSA from 1969
+# Income, Population, & Per Capita Income by County from 1969 to 2019
 # Extraction
 cainc1 <- data.frame(read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/CAINC1__ALL_AREAS_1969_2019.csv")) 
@@ -132,7 +132,7 @@ mrpp[which(is.na(mrpp)),] # Displays all NA's (if there are any)
 
 
 ```{r CAINC1_11yr}
-# Income, Population, & Per Capita Income by County from 1969 to 2019
+# Income, Population, & Per Capita Income by MSA from 2008 to 2019
 # Extraction
 cainc1 <- data.frame(read.csv(
   "https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/cainc1_msa_11yr.csv")) 
@@ -166,14 +166,28 @@ mrpp  %>%
   filter(LineCode == 1)
 
 merged <- merge(minc, mrpp, by = "GeoFips")
-merged[c("LineCode.x","year","LineCode.y","key","value.y")]
 merged[c("LineCode.x","year","LineCode.y","key","value.y")] <- sapply(merged[c("LineCode.x","year","LineCode.y","key","value.y")], as.numeric)
-merged %>% 
+RelAf_tbl <- merged %>% 
   filter(LineCode.x == 3) %>% 
   mutate(RelAf = (value.x / value.y)/1000) %>% 
   filter(LineCode.y == 1) %>%
   arrange(desc(RelAf)) %>% 
   filter(year == 2019 & key == 2019)
+write.csv(RelAf_tbl, file = "C:/Users/Owner/Documents/Data/RelAf_tbl.csv")
+RelAf_tbl2 <- merged %>% 
+  filter(LineCode.x == 3) %>% 
+  mutate(RelAf = (value.x / value.y)/1000) %>% 
+  filter(LineCode.y == 1) %>%
+  arrange(desc(RelAf)) %>% 
+  filter(year == 2018 & key == 2018)
+write.csv(RelAf_tbl, file = "C:/Users/Owner/Documents/Data/RelAf_tbl2.csv")
+RelAf_tbl3 <- merged %>% 
+  filter(LineCode.x == 3) %>% 
+  mutate(RelAf = (value.x / value.y)/1000) %>% 
+  filter(LineCode.y == 1) %>%
+  arrange(desc(RelAf)) %>% 
+  filter(year == 2017 & key == 2017)
+write.csv(RelAf_tbl, file = "C:/Users/Owner/Documents/Data/RelAf_tbl3.csv")
 ```
 
 
