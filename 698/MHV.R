@@ -67,3 +67,4 @@ mhv <- rbind(h10, h9, h8, h7, h6, h5, h4, h3, h2, h1)
 colnames(mhv) <- c("GEOID", "GeoName", "MedianValue", "MOE", "Year")
 View(mhv)
 
+write.csv(mhv, "C:/Users/Owner/Documents/Data/mhv.csv")
