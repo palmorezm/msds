@@ -12,7 +12,7 @@ library(tidyr)
 
 #### Start with Median Home Values ####
 mhv <- data.frame(read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/mhv.csv"))
-IR <- .035 # Interest Rate
+IR <- .035 # Select Interest Rate
 
 mhv %>%
   filter(Year == 2019) %>% 
