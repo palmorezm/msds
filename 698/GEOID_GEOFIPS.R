@@ -73,26 +73,146 @@ minc <- rbind(minc.personalincome, minc.population, minc.percapitaincome)
 
  ################## End Minc Rerun ############################
 
-# Prepare for Merge
-
-minc <- minc %>% 
+# Prepare for test Merge
+df1 <- minc %>%  
+  filter(year == 2019 & LineCode == 3) %>%
   dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
-  filter(year >= 2010) %>% 
   slice(-1) 
 
-mhv <- mhv %>% 
+df2 <- mhv %>% 
   rename(value = MedianValue, 
-         year = Year) %>% 
-  dplyr::select("GeoFips", "GeoName", "year", "value")
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2019)
+# Test merge for 2019
+merged.df.2019 <- merge(df1, df2, by = "GeoFips")
+# Complete and functioning - for 2019
 
+# 2018
+df1 <- minc %>%  
+  filter(year == 2018 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
 
-# Merge data tables
-merged <- merge(mhv, minc, by = "GeoFips")
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2018)
+merged.df.2018 <- merge(df1, df2, by = "GeoFips")
 
+# 2017
+df1 <- minc %>%  
+  filter(year == 2017 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
 
-# Review Merge
-View(merged)
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2017)
+merged.df.2017 <- merge(df1, df2, by = "GeoFips")
 
+# 2016
+df1 <- minc %>%  
+  filter(year == 2016 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
 
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2016)
+merged.df.2016 <- merge(df1, df2, by = "GeoFips")
+
+# 2015
+df1 <- minc %>%  
+  filter(year == 2015 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2015)
+merged.df.2015 <- merge(df1, df2, by = "GeoFips")
+
+# 2014
+df1 <- minc %>%  
+  filter(year == 2014 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2014)
+merged.df.2014 <- merge(df1, df2, by = "GeoFips")
+
+# 2013
+df1 <- minc %>%  
+  filter(year == 2013 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2013)
+merged.df.2013 <- merge(df1, df2, by = "GeoFips")
+
+# 2012
+df1 <- minc %>%  
+  filter(year == 2012 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2012)
+merged.df.2012 <- merge(df1, df2, by = "GeoFips")
+
+# 2011
+df1 <- minc %>%  
+  filter(year == 2011 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2011)
+merged.df.2011 <- merge(df1, df2, by = "GeoFips")
+
+# 2010
+df1 <- minc %>%  
+  filter(year == 2010 & LineCode == 3) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+
+df2 <- mhv %>% 
+  rename(value = MedianValue, 
+         year = Year) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  filter(year == 2010)
+merged.df.2010 <- merge(df1, df2, by = "GeoFips")
+
+# Review Merges
+merged.df <- rbind(merged.df.2019, merged.df.2018, 
+      merged.df.2017, merged.df.2016, 
+      merged.df.2015, merged.df.2014, 
+      merged.df.2013, merged.df.2012, 
+      merged.df.2011, merged.df.2010) 
+
+# Rename and drop columns 
+merged.df <- merged.df %>% 
+  dplyr::select(-GeoName.y, -year.y)
+colnames(merged.df) <- c("GeoFips", 
+                         "GeoName", "year", "MEDINC", "MEDVAL")
+View(merged.df)
 
 

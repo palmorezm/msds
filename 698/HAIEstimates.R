@@ -54,3 +54,29 @@ mhv %>%
          QINC = PMT * 4 * 12, 
          HAI = (MEDINC / QINC) * 100 )  
 # Median Income  (MEDINC) needs to be included in the final computation
+
+
+##### After running GEOID_GEOFIPS Mergers Script #####
+
+# 384 Metros for 2019 Confirmed Reasonable HAI
+merged.df %>% 
+  filter(year == 2019) %>% 
+  mutate(IR = 0.035, 
+         PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINC = PMT * 4 * 12,
+         HAI = (MEDINC / QINC) * 100) %>%
+  filter(HAI >= 0 & HAI <= 500) %>% 
+  arrange(desc(HAI)) %>% View()
+
+
+# All metros 2010 through 2019
+merged.df %>% 
+  filter(year == 2019) %>% 
+  mutate(IR = 0.035, 
+         PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINC = PMT * 4 * 12,
+         HAI = (MEDINC / QINC) * 100) %>%
+  filter(HAI >= 0 & HAI <= 500) %>% 
+  arrange(desc(HAI)) %>% View()
+
+  
