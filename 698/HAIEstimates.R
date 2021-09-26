@@ -71,7 +71,6 @@ merged.df %>%
 
 # All metros 2010 through 2019
 merged.df %>% 
-  filter(year == 2019) %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
