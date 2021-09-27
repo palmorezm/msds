@@ -60,7 +60,7 @@ mhv %>%
 
 # 384 Metros for 2019 Confirmed Reasonable HAI
 merged.df %>% 
-  filter(year == 2019) %>% 
+  filter(year == 2018) %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
