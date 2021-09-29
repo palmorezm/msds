@@ -14,12 +14,6 @@ library(tidyr)
 mhv <- data.frame(read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/mhv.csv"))
 IR <- .035 # Select Interest Rate
 
-mhv %>%
-  filter(Year == 2019) %>% 
-  mutate(EMR = MedianValue * 0.8 * (IR / 12) / (1 * (1 / 1 + IR / 12)^360), 
-         QFI = (EMR * 4 * 12), 
-         HAI = (EMR / QFI)* 100) # Error occured with EMR
-
 #### Bring in Median Income ####
 
 # Income, Population, & Per Capita Income by MSA from 2008 to 2019
@@ -65,7 +59,6 @@ merged.df %>%
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
          HAI = (MEDINC / QINC) * 100) %>%
-  filter(HAI >= 0 & HAI <= 500) %>% 
   arrange(desc(HAI)) %>% View()
 
 
@@ -77,5 +70,19 @@ merged.df %>%
          HAI = (MEDINC / QINC) * 100) %>%
   filter(HAI >= 0 & HAI <= 500) %>% 
   arrange(desc(HAI)) %>% View()
+
+# 384 Metros for 2019 New Baseline HAI 
+# (minus average per person healthcare costs) - see link for details
+# https://www.cnbc.com/2019/10/09/americans-spend-twice-as-much-on-health-care-today-as-in-the-1980s.html
+merged.df %>% 
+  filter(year == 2018) %>% 
+  mutate(IR = 0.035, 
+         PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINC = PMT * 4 * 12,
+         HAI = (MEDINC / QINC) * 100, 
+         HHAI = ( (MEDINC - 5000) / QINC) * 100, 
+         DIF = HAI - HHAI ) %>%
+  arrange(desc(HAI)) %>% View()
+
 
   
