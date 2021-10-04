@@ -254,6 +254,9 @@ map("county", fill = T, col = df.test$Value)
 
 
 
+```{r}
+df_mapping
+```
 
 
 

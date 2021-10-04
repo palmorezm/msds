@@ -63,13 +63,13 @@ merged.df %>%
 
 
 # All metros 2010 through 2019
-merged.df %>% 
+df_mapping <- merged.df %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
          HAI = (MEDINC / QINC) * 100) %>%
   filter(HAI >= 0 & HAI <= 500) %>% 
-  arrange(desc(HAI)) %>% View()
+  arrange(desc(HAI)) 
 
 # 384 Metros for 2019 New Baseline HAI 
 # (minus average per person healthcare costs) - see link for details

@@ -29,7 +29,7 @@ g <- list(
 fig <- plot_ly()
 fig <- fig %>% 
   add_trace(type="choropleth", geojson=counties, locations=df$GeoFips, z=df$HAI, colorscale="Viridis",
-            zmin=0, zmax=500, marker=list(line=list(width=0)))
+            zmin=0, zmax=300, marker=list(line=list(width=0)))
 fig <- fig %>% colorbar(title = "HAI")
 fig <- fig %>% layout(
   title = "2016 US Unemployment by County"
