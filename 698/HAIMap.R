@@ -10,33 +10,17 @@
 library(dplyr)
 library(tidyr)
 library(rjson)
-library(plotly)
+library(tigris)
 
 
-data <- fromJSON(file="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
-data$features[[1]]
+counties <- rjson::fromJSON(file="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
+
 
 # Data comes from "HAIEstimates.R" and "GEOID_GEOFIPS.R" 
 df <- df_mapping %>% 
   filter(year == "2019")
 
-g <- list(
-  scope = 'usa',
-  projection = list(type = 'albers usa'),
-  showlakes = TRUE,
-  lakecolor = toRGB('white')
-)
-fig <- plot_ly()
-fig <- fig %>% 
-  add_trace(type="choropleth", geojson=counties, locations=df$GeoFips, z=df$HAI, colorscale="Viridis",
-            zmin=0, zmax=300, marker=list(line=list(width=0)))
-fig <- fig %>% colorbar(title = "HAI")
-fig <- fig %>% layout(
-  title = "2016 US Unemployment by County"
-)
 
-fig <- fig %>% layout(
-  geo = g
-)
+csa <- tigris::combined_statistical_areas()
 
-fig
+
