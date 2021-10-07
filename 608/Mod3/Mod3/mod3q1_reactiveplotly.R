@@ -17,14 +17,18 @@ df <- data %>%
   arrange(desc(Crude_Rate))
 
 ui <- fluidPage(
+  h3("2010 State Mortality Rankings"),
   selectizeInput(
     inputId = "Cause", 
     label = "Select Cause of Death", 
     choices = unique(df$ICD.Chapter), 
-    selected = "Neoplasms", 
+    selected = "Pregnancy, childbirth and the puerperium", 
     multiple = F
     ),
-    plotlyOutput(outputId = "p", height = "800px", width = "1000px")
+    plotlyOutput(outputId = "p", height = "800px", width = "1000px"), 
+  hr(), 
+  helpText("Data Source: CDC WONDER system, at
+https://wonder.cdc.gov/ucd-icd10.htm")
   )
 
 server <- function(input, output, ...) {
@@ -35,7 +39,7 @@ server <- function(input, output, ...) {
       plot_ly(., 
               x = ~Crude_Rate,
               y = ~reorder(State, Crude_Rate), 
-              text = ~round(Crude_Rate, 0), 
+              text = ~round(Crude_Rate, 1), 
               textposition = 'auto', 
               marker = list(color = 'rgb(150, 217, 250)',
                             line = list(color = 'rgb(2,38,100)', width = 1.25))) %>% 
@@ -47,20 +51,6 @@ server <- function(input, output, ...) {
 }
 
 shinyApp(ui, server)
-
-df %>% 
-  filter(ICD.Chapter == "Neoplasms") %>%
-  arrange(desc(Crude_Rate)) %>% 
-  plot_ly(., 
-          x = ~Crude_Rate,
-          y = ~reorder(State, Crude_Rate), 
-          text = ~round(Crude_Rate, 0), 
-          textposition = 'auto', 
-          marker = list(color = 'rgb(150, 217, 250)',
-                        line = list(color = 'rgb(2,38,100)', width = 1.25))) %>% 
-  layout(title = "Crude Mortality Rate by State",
-               xaxis = list(title = "Crude Rate (Per 100,000)"),
-               yaxis = list(title = "State"))
 
 
 
