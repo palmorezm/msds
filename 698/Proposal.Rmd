@@ -252,12 +252,18 @@ map("county", fill = T, col = df.test$Value)
 
 
 
+# Mid-Term Draft Directions
 
+Submit a draft of of your research project. 
 
-```{r}
-df_mapping
-```
+The final version of the project is a medium length (10-12 pages) paper describing the project, along with a runnable demo of any code. Code listings, interpreter output, and exploratory data visualization should not be included in the paper itself. This is an expanded version of the initial proposal that includes more discussion of prior approaches, results of the student's approach, and a final assessment of whether the project effectively solved the goal stated in the initial proposal.
 
+## Abstract
 
+## Introduction 
+
+## Data Exploration
+
+## 
 
 
