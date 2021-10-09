@@ -12,6 +12,7 @@
 library(shiny)
 library(plotly)
 library(dplyr)
+library(tidyr)
 
 data <- read.csv("https://raw.githubusercontent.com/charleyferrari/CUNY_DATA_608/master/module3/data/cleaned-cdc-mortality-1999-2010-2.csv", header = TRUE)
 df <- data %>%
@@ -63,7 +64,7 @@ data %>%
 
 
 # Plotly line plot to show change in crude mortality rate over time (year)
-data %>% 
+fig1 <- data %>% 
   group_by(Year, ICD.Chapter) %>% 
   mutate(National_Average = as.numeric(mean(Crude.Rate)), 
          Difference = Crude.Rate - National_Average, 
@@ -81,30 +82,73 @@ data %>%
   filter(State == "NY" & ICD.Chapter == "Neoplasms") %>% ungroup() %>% 
   plot_ly(., x = ~Year, y = ~Difference, type = 'bar') 
 
+fig2 <- data %>% 
+  group_by(Year, ICD.Chapter) %>% 
+  mutate(National_Average = as.numeric(mean(Crude.Rate)), 
+         Difference = as.numeric(Crude.Rate - National_Average),
+         LTNA = ifelse(Difference <0, Difference, NA),
+         GTNA = ifelse(Difference >=0, Difference, NA),
+         Time = as.Date(ISOdate(Year, 12, 31)) ) %>% 
+  filter(State == "MI" & ICD.Chapter == "Neoplasms") %>% 
+  ungroup() %>%
+  plot_ly(.,  
+          x = ~Year, 
+          y = ~GTNA, 
+          type = 'bar', 
+          marker = list(
+            color = 'blue'
+          ), 
+          name = "Above National Average") %>% 
+  add_bars(x = ~Year,
+           y = ~LTNA,
+           base = 0,
+           marker = list(
+             color = 'red'
+           ),
+           name = 'Below National Average'
+  )
+
+
+subplot(fig1, fig2)
+
+
+data$Crude.Rate[which(data$Crude.Rate >= 0)]
+which(data$Crude.Rate >= 0)
+
 
 ui <- fluidPage(
-  selectizeInput(
-    inputId = "Cause", 
-    label = "Select Cause of Death", 
-    choices = unique(data$ICD.Chapter), 
-    selected = "Pregnancy, childbirth and the puerperium", 
-    multiple = F
+  titlePanel("Title of Site Here"), 
+  fluidRow(
+    column(12, selectizeInput(
+      inputId = "Cause", 
+      label = "Select Cause of Death", 
+      choices = unique(data$ICD.Chapter), 
+      selected = "Pregnancy, childbirth and the puerperium", 
+      multiple = F
     ),
-    plotlyOutput(outputId = "p", height = "800px", width = "1000px"), 
-  
-  selectizeInput(
-    inputId = "State", 
-    label = "Select State", 
-    choices = unique(data$State), 
-    selected = "NY", 
-    multiple = T
+    selectizeInput(
+      inputId = "State", 
+      label = "Select State", 
+      choices = unique(data$State), 
+      selected = "NY", 
+      multiple = F
+    )
   ), 
-  plotlyOutput(outputId = "b", height = "800px", width = "1000px"),
-
+  fluidRow(
+    column(6, 
+           plotlyOutput(outputId = "p", 
+                        height = "600px", 
+                        width = "600px")), 
+    column(6,  
+           plotlyOutput(outputId = "b", 
+                            height = "600px", 
+                            width = "600px"))
+    ),
   hr(), 
   helpText("Data Source: CDC WONDER system, at
-https://wonder.cdc.gov/ucd-icd10.htm")
+https://wonder.cdc.gov/ucd-icd10.htm") 
   )
+)
 
 server <- function(input, output, ...) {
   output$p <- renderPlotly({
@@ -114,8 +158,8 @@ server <- function(input, output, ...) {
              Difference = Crude.Rate - National_Average, 
              Time = as.Date(ISOdate(Year, 12, 31)) ) %>% 
       filter(State == input$State & ICD.Chapter == input$Cause) %>% ungroup() %>% 
-      plot_ly(., x = ~Year, y = ~Crude.Rate, type = 'scatter', mode='lines') %>% 
-      add_trace(y = ~National_Average, name = "<b>No</b> Gaps", connectgaps = TRUE) %>% 
+      plot_ly(., x = ~Year, y = ~Crude.Rate, type = 'scatter', mode='lines', name = "Line1 Name") %>% 
+      add_trace(y = ~National_Average, name = "Line2 Name", connectgaps = TRUE) %>% 
       layout(title = "Title",
              xaxis = list(title = "X"),
              yaxis = list(title = "Y"))
@@ -125,18 +169,36 @@ server <- function(input, output, ...) {
     data %>% 
       group_by(Year, ICD.Chapter) %>% 
       mutate(National_Average = as.numeric(mean(Crude.Rate)), 
-             Difference = Crude.Rate - National_Average, 
+             Difference = as.numeric(Crude.Rate - National_Average),
+             LTNA = ifelse(Difference <0, Difference, NA),
+             GTNA = ifelse(Difference >=0, Difference, NA),
              Time = as.Date(ISOdate(Year, 12, 31)) ) %>% 
       filter(State == input$State & ICD.Chapter == input$Cause) %>% 
-      ungroup() %>% 
-      plot_ly(., 
+      ungroup() %>%
+      plot_ly(.,  
               x = ~Year, 
-              y = ~Difference, 
-              type = 'bar') %>%
+              y = ~GTNA, 
+              type = 'bar', 
+              marker = list(
+                color = 'blue'
+              ), 
+              name = "Above National Average") %>% 
+      add_bars(x = ~Year,
+               y = ~LTNA,
+               base = 0,
+               marker = list(
+                 color = 'red'
+               ),
+               name = 'Below National Average'
+      ) %>%
       layout(title = "Title",
              xaxis = list(title = "X"),
              yaxis = list(title = "Y"))
-    
+
+  })
+  output$c <- renderPlotly({
+    subplot(output$p, output$b) %>% 
+                        layout(title = 'Side By Side Subplots')
   })
 }
 
