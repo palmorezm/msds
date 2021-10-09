@@ -1,7 +1,6 @@
 
 # DATA 608
-# Reactive Plotly CDC Example
-
+# Reactive Plotly CDC Example 1
 
 library(shiny)
 library(plotly)

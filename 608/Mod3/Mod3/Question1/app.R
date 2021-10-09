@@ -16,6 +16,12 @@
 # for each cause of death.
 
 
+# Question 2: 
+# Often you are asked whether particular States are improving their mortality rates (per cause)
+# faster than, or slower than, the national average. Create a visualization that lets your clients
+# see this for themselves for one cause of death at the time. Keep in mind that the national
+# average should be weighted by the national population.
+
 
 library(shiny)
 library(ggplot2)
