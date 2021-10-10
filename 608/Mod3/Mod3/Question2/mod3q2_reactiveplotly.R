@@ -75,14 +75,14 @@ server <- function(input, output, ...) {
               y = ~GTNA, 
               type = 'bar', 
               marker = list(
-                color = 'blue'
+                color = 'red'
               ), 
               name = "Above National Average") %>% 
       add_bars(x = ~Year,
                y = ~LTNA,
                base = 0,
                marker = list(
-                 color = 'red'
+                 color = 'blue'
                ),
                name = 'Below National Average'
       ) %>%
