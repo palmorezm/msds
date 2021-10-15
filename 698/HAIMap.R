@@ -50,7 +50,7 @@ df %>%
   ggplot(aes(HAI, alpha = 0.5)) + geom_histogram(stat = "bin", binwidth = 10, fill='CadetBlue', color='white') + 
   geom_vline(xintercept = median(df$HAI), lty = "dotted", col = "black") + 
   geom_vline(xintercept = 100, lty = "dotdash", col = "orange") +
-  theme_minimal() + theme(legend.position = "none")
+  theme_minimal() + theme(legend.position = "none") 
 
 
 library(RColorBrewer)
@@ -73,7 +73,7 @@ df %>%
 
 
 df %>% 
-  top_frac(n = -0.1, wt = HAI) 
+  top_frac(n = -0.1, wt = HAI) # Lowest 10%
 
 
 
