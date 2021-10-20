@@ -86,3 +86,16 @@ merged.df %>%
 
 
   
+# Average HAI using 10 year average HAI varaible
+merged.df %>% 
+  filter(GeoName == "Harrisburg-Carlisle, PA (Metropolitan Statistical Area)") %>%
+  mutate(IR = 0.035, 
+         PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINC = PMT * 4 * 12,
+         HAI = (MEDINC / QINC) * 100, 
+         HHAI = ( (MEDINC - 5000) / QINC) * 100, 
+         DIF = HAI - HHAI, 
+         AVGHAI =  median((MEDINC / QINC) * 100 )
+        ) %>% 
+  arrange(desc(AVGHAI)) %>% View()
+
