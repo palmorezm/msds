@@ -104,6 +104,22 @@ df.health.unique()
 
 
 
+hue_order = ["Poor", "Fair", "Good"] 
+sns.barplot(x = "boro", y = "count_tree_id", 
+            hue = "health", hue_order = hue_order, data = df) # Plot 1
+sns.barplot(x = "health", y = "count_tree_id", 
+            hue = "boro", hue_order = hue_order, data = df) # Plot 2
+sns.barplot(x = "count_tree_id", y = "boro", 
+            hue = "health", hue_order = hue_order, data = df) # Plot 3
+
+df.groupby(['health'])
+
+honeymask = df['spc_common'] == "honeylocust"
+
+sns.barplot(x = "count_tree_id", y = "boro", 
+            hue = "health", hue_order = hue_order, data = df[honeymask])
+
+
 # Goals 
 # For Question 1:
 # Filter by species for all boroughs and color by health
@@ -137,7 +153,7 @@ app.layout = html.Div([
     [Input("species_dropdown", "value")])
 def update_bar_chart(species):
     mask = df["spc_common"] == species
-    fig2 = px.bar(df[mask], x="boro", y="boro", color="health")
+    fig2 = px.bar(df[mask], x="count_tree_ids", y="boro", color="health")
     return fig2
 
 app.run_server(debug=False)
@@ -182,13 +198,7 @@ app.layout = html.Div([
         value=species[0],
         clearable=False,
     ),
-    dcc.Dropdown(
-        id="species_dropdown",
-        options=[{"label": x, "value": x} for x in species],
-        value=species[0],
-        clearable=False,
-    ),
-    dcc.Graph(id="bar-chart"),
+    
     dcc.Graph(id="bar-chart"),
 ])
 
@@ -197,15 +207,12 @@ app.layout = html.Div([
     [Input("species_dropdown", "value")])
 def update_bar_chart(species):
     mask = df["spc_common"] == species
-    fig2 = px.bar(df[mask], x="count_tree_id", y="boro", color="health")
-    return fig2
-    Output("bar-chart", "figure"), 
-    [Input("species_dropdown", "value")]
-    mask = df["spc_common"] == species
-    fig2 = px.bar(df[mask], x="count_tree_id", y="boro", color="health")
+    fig2 = sns.barplot(x = "count_tree_id", y = "boro", 
+            hue = "health", hue_order = hue_order, data = df[mask])
     return fig2
 
 app.run_server(debug=False)
+
 
 
 
