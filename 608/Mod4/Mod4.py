@@ -92,6 +92,8 @@ fig.update_layout(barmode='group', xaxis_tickangle=0),
 fig.show()
 
 
+
+
 df.groupby('boro').size().value_counts('health').size().sort_values(ascending=False).reset_index()
 
 df.groupby(['health','boro']).size().sort_values(ascending=False).reset_index()
@@ -188,6 +190,7 @@ app.run_server(debug=False)
 
 # Build App 3 
 species = df.spc_common.unique()
+hue_order = ["Poor", "Fair", "Good"] 
 
 app = dash.Dash(__name__)
 
@@ -207,8 +210,8 @@ app.layout = html.Div([
     [Input("species_dropdown", "value")])
 def update_bar_chart(species):
     mask = df["spc_common"] == species
-    fig2 = sns.barplot(x = "count_tree_id", y = "boro", 
-            hue = "health", hue_order = hue_order, data = df[mask])
+    fig2 = px.bar(df[mask], x = "count_tree_id", y = "boro", 
+            color = 'health', pattern_shape = "health")
     return fig2
 
 app.run_server(debug=False)
