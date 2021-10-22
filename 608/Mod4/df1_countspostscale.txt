@@ -1,0 +1,54 @@
+     count_tree_id health  steward spc_common           boro  trees_scaled
+8              783   Good     1or2    pin oak          bronx      0.295127
+75               1   Poor  4orMore    pin oak          bronx      0.000000
+127            121   Poor     None    pin oak          bronx      0.045288
+215             98   Fair     1or2    pin oak          bronx      0.036608
+239              2   Poor     3or4    pin oak          bronx      0.000377
+278            578   Fair     None    pin oak          bronx      0.217760
+419           4811   Good     None    pin oak          bronx      1.815292
+649             16   Poor     1or2    pin oak          bronx      0.005661
+671              3   Fair     3or4    pin oak          bronx      0.000755
+774             30   Good     3or4    pin oak          bronx      0.010945
+824              2   Good  4orMore    pin oak          bronx      0.000377
+84             327   Fair     1or2    pin oak       brooklyn      0.123032
+170             44   Fair     3or4    pin oak       brooklyn      0.016228
+210              5   Fair  4orMore    pin oak       brooklyn      0.001510
+302           1142   Fair     None    pin oak       brooklyn      0.430613
+431           2548   Good     1or2    pin oak       brooklyn      0.961237
+547            349   Good     3or4    pin oak       brooklyn      0.131335
+621             49   Good  4orMore    pin oak       brooklyn      0.018115
+729           7585   Good     None    pin oak       brooklyn      2.862199
+842             62   Poor     1or2    pin oak       brooklyn      0.023021
+901              2   Poor     3or4    pin oak       brooklyn      0.000377
+997            230   Poor     None    pin oak       brooklyn      0.086425
+27            1222   Good     1or2    pin oak      manhattan      0.460805
+289             87   Poor     None    pin oak      manhattan      0.032456
+432              2   Fair  4orMore    pin oak      manhattan      0.000377
+444            236   Fair     1or2    pin oak      manhattan      0.088689
+465             36   Poor     1or2    pin oak      manhattan      0.013209
+498             65   Fair     3or4    pin oak      manhattan      0.024154
+506             11   Poor     3or4    pin oak      manhattan      0.003774
+567            416   Fair     None    pin oak      manhattan      0.156621
+710            313   Good     3or4    pin oak      manhattan      0.117749
+819           2170   Good     None    pin oak      manhattan      0.818580
+833             26   Good  4orMore    pin oak      manhattan      0.009435
+29             656   Good     1or2    pin oak  staten island      0.247197
+185              1   Poor  4orMore    pin oak  staten island      0.000000
+280            140   Poor     None    pin oak  staten island      0.052459
+437             99   Fair     1or2    pin oak  staten island      0.036985
+459             25   Poor     1or2    pin oak  staten island      0.009058
+489              2   Fair     3or4    pin oak  staten island      0.000377
+561            767   Fair     None    pin oak  staten island      0.289088
+700             43   Good     3or4    pin oak  staten island      0.015851
+805           5467   Good     None    pin oak  staten island      2.062866
+819              3   Good  4orMore    pin oak  staten island      0.000755
+12            2383   Good     1or2    pin oak         queens      0.898966
+163            438   Poor     None    pin oak         queens      0.164924
+268              2   Fair  4orMore    pin oak         queens      0.000377
+276            404   Fair     1or2    pin oak         queens      0.152092
+308              4   Poor     3or4    pin oak         queens      0.001132
+351           2184   Fair     None    pin oak         queens      0.823863
+531          16953   Good     None    pin oak         queens      6.397679
+818             59   Poor     1or2    pin oak         queens      0.021889
+842             20   Fair     3or4    pin oak         queens      0.007171
+969            148   Good     3or4    pin oak         queens      0.055478

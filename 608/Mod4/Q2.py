@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Oct 21 20:33:37 2021
+Created on Fri Oct 22 18:16:52 2021
 
 @author: Owner
 """
 
-# Question 1
-# For a given species (silver maple, honeylocust, or any single species), what proportion
-# trees are in good, fair, and poor health within each boro?
-
+# Question 2
+# For a given species (silver maple, honeylocust, or any single species), are stewards 
+# (steward activity measured by the ‘steward’ variable) having an impact on the health of trees?
 
 # Packages
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns
+import sklearn as sk
+from sklearn.preprocessing import scale
 from tabulate import tabulate
 import dash
 import dash_core_components as dcc
@@ -81,30 +82,28 @@ colors = ({'Poor':'red','Fair':'yellow','Good':'green'})
 
 # Order (As umbridge would say, "I will have order!")
 df5.sort_values(['health', 'steward'])
+df1.sort_values(['count_tree_id','boro','health','steward'])
 cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
                                'steward': ['1or2','3or4','4orMore','None'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
 
+# Preprocessing 
+skdf5_counttreeids = sk.preprocessing.scale(df5['count_tree_id'])
+df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
+df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
+
+
 # Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
+fig = px.bar(df5, x="health", y="trees_scaled", 
                  color="health", barmode="group",
-                 color_discrete_map= colors, 
+                 facet_row='steward', facet_col="boro",
+                 log_y=True, opacity=0.50,
                  category_orders= cat_orders)
 fig.show()
 
 
 
-# Plotly Full - See "Rotated Bar Chart Labels"
-# https://plotly.com/python/bar-charts/#customize-bar-charts-with-plotly-express
-
-
-
-
-
-# Test App (Functioning!) 
-# (except colors chnage with each species) - solved
-# 
-
+# Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
 
@@ -129,8 +128,10 @@ app.layout = html.Div([
 def update_bar_chart(species5):
     mask = df5["spc_common"] == species5
     fig = px.bar(df5[mask], 
-                 y="count_tree_id", x="boro", 
-                 color="health", barmode="group", 
+                 x="health", y="trees_scaled", 
+                 color="health", barmode="group",
+                 facet_row='steward', facet_col="boro",
+                 log_y=True, opacity=0.50,
                  category_orders= cat_orders)
     return fig
 
@@ -139,31 +140,5 @@ if __name__ == '__main__':
 
 
 
-
-# Dash Side-by-Side Figure Output
-app = dash.Dash()
-app.layout = html.Div([
-    html.Div([
-        html.Div([
-            html.H3('Column 1'),
-            dcc.Graph(id='g1', figure= px.bar(df5[mask], x="boro", y="count_tree_id", 
-                             color="health", barmode="group", 
-                             pattern_shape="health")
-                      ) 
-        ], className="six columns"),
-
-        html.Div([
-            html.H3('Column 2'),
-            dcc.Graph(id='g2', figure={'data': [{'y': [1, 2, 3]}]})
-        ], className="six columns"),
-    ], className="row")
-])
-
-app.css.append_css({
-    'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
-})
-
-if __name__ == '__main__':
-    app.run_server(debug=False)
 
 

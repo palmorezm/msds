@@ -1,0 +1,53 @@
+    health  steward spc_common  count_tree_id           boro
+176   Poor  4orMore    pin oak              1          bronx
+185   Poor  4orMore    pin oak              1  staten island
+824   Good  4orMore    pin oak              2          bronx
+487   Poor     3or4    pin oak              2          bronx
+305   Poor     3or4    pin oak              2       brooklyn
+432   Fair  4orMore    pin oak              2      manhattan
+268   Fair  4orMore    pin oak              2         queens
+489   Fair     3or4    pin oak              2  staten island
+481   Fair     3or4    pin oak              3          bronx
+819   Good  4orMore    pin oak              3  staten island
+308   Poor     3or4    pin oak              4         queens
+264   Fair  4orMore    pin oak              5       brooklyn
+506   Poor     3or4    pin oak             11      manhattan
+448   Poor     1or2    pin oak             16          bronx
+842   Fair     3or4    pin oak             20         queens
+459   Poor     1or2    pin oak             25  staten island
+833   Good  4orMore    pin oak             26      manhattan
+701   Good     3or4    pin oak             30          bronx
+465   Poor     1or2    pin oak             36      manhattan
+700   Good     3or4    pin oak             43  staten island
+819   Fair     3or4    pin oak             44       brooklyn
+818   Poor     1or2    pin oak             59         queens
+796   Poor     1or2    pin oak             62       brooklyn
+498   Fair     3or4    pin oak             65      manhattan
+289   Poor     None    pin oak             87      manhattan
+430   Fair     1or2    pin oak             98          bronx
+437   Fair     1or2    pin oak             99  staten island
+271   Poor     None    pin oak            121          bronx
+280   Poor     None    pin oak            140  staten island
+969   Good     3or4    pin oak            148         queens
+159   Poor     None    pin oak            230       brooklyn
+444   Fair     1or2    pin oak            236      manhattan
+710   Good     3or4    pin oak            313      manhattan
+271   Fair     1or2    pin oak            327       brooklyn
+952   Good     3or4    pin oak            349       brooklyn
+276   Fair     1or2    pin oak            404         queens
+567   Fair     None    pin oak            416      manhattan
+163   Poor     None    pin oak            438         queens
+559   Fair     None    pin oak            578          bronx
+29    Good     1or2    pin oak            656  staten island
+561   Fair     None    pin oak            767  staten island
+27    Good     1or2    pin oak            783          bronx
+348   Fair     None    pin oak           1142       brooklyn
+27    Good     1or2    pin oak           1222      manhattan
+819   Good     None    pin oak           2170      manhattan
+351   Fair     None    pin oak           2184         queens
+12    Good     1or2    pin oak           2383         queens
+9     Good     1or2    pin oak           2548       brooklyn
+809   Good     None    pin oak           4811          bronx
+805   Good     None    pin oak           5467  staten island
+520   Good     None    pin oak           7585       brooklyn
+531   Good     None    pin oak          16953         queens
