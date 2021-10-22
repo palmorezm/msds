@@ -1,0 +1,12 @@
+     count_tree_id health  steward spc_common
+8              783   Good     1or2    pin oak
+75               1   Poor  4orMore    pin oak
+127            121   Poor     None    pin oak
+215             98   Fair     1or2    pin oak
+239              2   Poor     3or4    pin oak
+278            578   Fair     None    pin oak
+419           4811   Good     None    pin oak
+649             16   Poor     1or2    pin oak
+671              3   Fair     3or4    pin oak
+774             30   Good     3or4    pin oak
+824              2   Good  4orMore    pin oak

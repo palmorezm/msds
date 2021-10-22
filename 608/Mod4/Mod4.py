@@ -19,6 +19,24 @@ import plotly.express as px
 import plotly.io as pio
 pio.renderers.default='browser' # Let plotly display in local browser
 
+# Bronx
+soql_url1  = ('https://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
+        '$select=health, steward, spc_common, count(tree_id)' +\
+        '&$where=boroname=\'Bronx\'' +\
+        '&$group=spc_common, health, steward').replace(' ', '%20')
+bronx = pd.read_json(soql_url1)
+#Brooklyn
+soql_url2  = ('https://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
+        '$select=health, steward, spc_common, count(tree_id)' +\
+        '&$where=boroname=\'Brooklyn\'' +\
+        '&$group=spc_common, health, steward').replace(' ', '%20')
+brooklyn = pd.read_json(soql_url2)
+# Manhattan
+soql_url3  = ('https://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
+        '$select=health, steward, spc_common, count(tree_id)' +\
+        '&$where=boroname=\'Manhattan\'' +\
+        '&$group=spc_common, health, steward').replace(' ', '%20')
+manhattan = pd.read_json(soql_url3)
 
 
 # Bronx 
@@ -72,17 +90,6 @@ trees = pd.concat(boroughs)
 df  = trees.dropna()
 
 
-# Refill unknowns
-df = trees.fillna("Unknown")
-
-
-borohealthdf = df[['count_tree_id','boro','health']]
-borohealthdf['health'].value_counts()
-
-pd.value_counts(df.boro).to_frame().reset_index()
-
-df.groupby('boro').groupby('health').size().sort_values(ascending=False).reset_index(name = 'Count of Tree IDs')
-
 fig = px.bar(df, x = "count_tree_id", y = "boro", color = "health")
 fig.update_layout(barmode='group', xaxis_tickangle=0)
 fig.show()
@@ -93,22 +100,10 @@ fig.show()
 
 
 
-
-df.groupby('boro').size().value_counts('health').size().sort_values(ascending=False).reset_index()
-
-df.groupby(['health','boro']).size().sort_values(ascending=False).reset_index()
-
-
-
-df.groupby(['health','boro']).transform('count')
-
-df.health.unique()
-
-
-
 hue_order = ["Poor", "Fair", "Good"] 
 sns.barplot(x = "boro", y = "count_tree_id", 
-            hue = "health", hue_order = hue_order, data = df) # Plot 1
+            hue = "health", hue_order = hue_order, data = df)
+plt.show() # Plot 1
 sns.barplot(x = "health", y = "count_tree_id", 
             hue = "boro", hue_order = hue_order, data = df) # Plot 2
 sns.barplot(x = "count_tree_id", y = "boro", 
