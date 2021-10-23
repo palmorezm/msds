@@ -92,19 +92,7 @@ fig = px.bar(df5, x="boro", y="count_tree_id",
                  category_orders= cat_orders)
 fig.show()
 
-
-
-# Plotly Full - See "Rotated Bar Chart Labels"
-# https://plotly.com/python/bar-charts/#customize-bar-charts-with-plotly-express
-
-
-
-
-
 # Test App (Functioning!) 
-# (except colors chnage with each species) - solved
-# 
-
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
 
