@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Oct 24 13:20:12 2021
+Created on Sun Oct 24 17:55:49 2021
 
 @author: Owner
 """
+
 
 # Question 1
 # For a given species (silver maple, honeylocust, or any single species), what proportion 
@@ -110,11 +111,11 @@ app.layout = html.Div([
         html.Div([
             html.H1('NYC Tree Species Health Assessment'),
             html.H3('Select Species'),
-            html.H5('Note that this data was collected by volunteers across each borough with the goal of cateloging all trees in the city'),
             dcc.Dropdown(id='dropdown',
                          options=[{"label": x, "value": x} for x in species],
                          value=species5[0],
                          clearable=False),
+            html.H4('Note that this data was collected by volunteers across each borough with the goal of cateloging all trees in the city'),
             html.H3('Question 1'),
             html.H4('What proportion of trees are in good, fair, or poor health?'),
             html.H4('Part A: We review the number of healthy individuals of the selected species using the count of trees by borough'),
