@@ -1,0 +1,58 @@
+Out[2]: 
+    steward           boro health    percent
+0      1or2          bronx   Fair  33.333333
+1      1or2          bronx   Good  33.333333
+2      1or2          bronx   Poor  33.333333
+3      1or2       brooklyn   Fair  33.333333
+4      1or2       brooklyn   Good  33.333333
+5      1or2       brooklyn   Poor  33.333333
+6      1or2      manhattan   Fair  33.333333
+7      1or2      manhattan   Good  33.333333
+8      1or2      manhattan   Poor  33.333333
+9      1or2         queens   Fair  36.363636
+10     1or2         queens   Good  36.363636
+11     1or2         queens   Poor  27.272727
+12     1or2  staten island   Fair  33.333333
+13     1or2  staten island   Good  33.333333
+14     1or2  staten island   Poor  33.333333
+15     3or4          bronx   Fair  44.444444
+16     3or4          bronx   Good  33.333333
+17     3or4          bronx   Poor  22.222222
+18     3or4       brooklyn   Good  36.363636
+19     3or4       brooklyn   Poor  36.363636
+20     3or4       brooklyn   Fair  27.272727
+21     3or4      manhattan   Good  40.000000
+22     3or4      manhattan   Fair  30.000000
+23     3or4      manhattan   Poor  30.000000
+24     3or4         queens   Good  44.444444
+25     3or4         queens   Fair  33.333333
+26     3or4         queens   Poor  22.222222
+27     3or4  staten island   Good  66.666667
+28     3or4  staten island   Fair  33.333333
+29  4orMore          bronx   Good  75.000000
+30  4orMore          bronx   Poor  25.000000
+31  4orMore       brooklyn   Good  60.000000
+32  4orMore       brooklyn   Fair  40.000000
+33  4orMore      manhattan   Fair  37.500000
+34  4orMore      manhattan   Good  37.500000
+35  4orMore      manhattan   Poor  25.000000
+36  4orMore         queens   Good  42.857143
+37  4orMore         queens   Fair  28.571429
+38  4orMore         queens   Poor  28.571429
+39  4orMore  staten island   Good  66.666667
+40  4orMore  staten island   Poor  33.333333
+41     None          bronx   Fair  33.333333
+42     None          bronx   Good  33.333333
+43     None          bronx   Poor  33.333333
+44     None       brooklyn   Fair  33.333333
+45     None       brooklyn   Good  33.333333
+46     None       brooklyn   Poor  33.333333
+47     None      manhattan   Fair  33.333333
+48     None      manhattan   Good  33.333333
+49     None      manhattan   Poor  33.333333
+50     None         queens   Fair  36.363636
+51     None         queens   Good  36.363636
+52     None         queens   Poor  27.272727
+53     None  staten island   Fair  33.333333
+54     None  staten island   Good  33.333333
+55     None  staten island   Poor  33.333333

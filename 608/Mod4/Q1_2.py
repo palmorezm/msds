@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 22 18:16:52 2021
+Created on Sat Oct 23 20:42:32 2021
 
 @author: Owner
 """
 
-# Question 2
-# For a given species (silver maple, honeylocust, or any single species), are stewards 
-# (steward activity measured by the ‘steward’ variable) having an impact on the health of trees?
+# Question 1
+# For a given species (silver maple, honeylocust, or any single species), what proportion 
+# of trees are in good, fair, and poor health within each boro?
 
 # Packages
 import pandas as pd
@@ -93,15 +93,6 @@ df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
 
-# Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
-                 color="health", barmode="stack",
-                 log_y=False, opacity=0.50,
-                 category_orders= cat_orders)
-fig.show()
-
-
-
 # Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
@@ -126,25 +117,20 @@ app.layout = html.Div([
     [Input("dropdown", "value")])
 def update_bar_chart(species5):
     mask = df5["spc_common"] == species5
-    fig = px.bar(df5[mask], 
-                 x="health", y="trees_scaled", 
-                 color="health", barmode="group",
-                 facet_row='steward', facet_col="boro",
-                 log_y=True, opacity=0.50,
+    species_selection = df5[mask]
+    df5_table = round((pd.crosstab(index=species_selection['health'], columns=species_selection['boro']) )/ 
+       (pd.crosstab(index=species_selection['health'], columns=species_selection['boro']).sum())*100, 2).stack().reset_index().rename(columns={0:"percent"})
+    fig = px.bar(df5_table, 
+                 x="boro", 
+                 y="percent", 
+                 color="health", 
+                 barmode="group",
+                 log_y=False, opacity=0.50,
                  category_orders= cat_orders)
     return fig
 
 if __name__ == '__main__':
     app.run_server(debug = False)
-
-
-# Other Options
-# 1
-# Sum the trees and their species and create a 
-# proportion of trees for that species in poor, fair, and good health. 
-# 2 
-# Stack the small multiples bar chart and make the xaxis the boro leaving health as a color
-
 
 
 

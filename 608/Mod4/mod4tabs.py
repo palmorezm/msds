@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 22 18:16:52 2021
+Created on Sat Oct 23 22:12:15 2021
 
 @author: Owner
 """
 
+# Working from
+# https://dash.plotly.com/dash-core-components/tabs
+
+# Question 1
+# For a given species (silver maple, honeylocust, or any single species), what proportion 
+# of trees are in good, fair, and poor health within each boro?
 # Question 2
 # For a given species (silver maple, honeylocust, or any single species), are stewards 
 # (steward activity measured by the ‘steward’ variable) having an impact on the health of trees?
+
 
 # Packages
 import pandas as pd
@@ -93,59 +100,62 @@ df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
 
-# Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
-                 color="health", barmode="stack",
-                 log_y=False, opacity=0.50,
-                 category_orders= cat_orders)
-fig.show()
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-
-
-# Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
 
-app = dash.Dash(__name__)
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+
 app.layout = html.Div([
-    # Sets up for a dropdown box with options 
-    # label x and values of x in df.spc_common.unique()
-    dcc.Dropdown(
-        id="dropdown",
-        options=[{"label": x, "value": x} for x in species5],
-        # What to show at start
-        value=species5[0],
-        clearable=False,
-    ),
-    # Sets up for graph object to be shown
-    dcc.Graph(id="q1graph"),
+    html.H1('Dash Tabs component demo'),
+    dcc.Tabs(id="tabs-example-graph", value='tab-1-example-graph', children=[
+        dcc.Tab(label='Tab One', value='tab-1-example-graph'),
+        dcc.Tab(label='Tab Two', value='tab-2-example-graph'),
+    ]),
+    html.Div(id='tabs-content-example-graph')
 ])
 
-@app.callback(
-    Output("q1graph", "figure"), 
-    [Input("dropdown", "value")])
-def update_bar_chart(species5):
-    mask = df5["spc_common"] == species5
-    fig = px.bar(df5[mask], 
-                 x="health", y="trees_scaled", 
-                 color="health", barmode="group",
-                 facet_row='steward', facet_col="boro",
-                 log_y=True, opacity=0.50,
-                 category_orders= cat_orders)
-    return fig
+@app.callback(Output('tabs-content-example-graph', 'children'),
+              Input('tabs-example-graph', 'value'))
+def render_content(tab):
+    if tab == 'tab-1-example-graph':
+        html.H3('Tab content 1'),
+        return html.Div([
+            html.H3('Tab content 1'),
+                def update_bar_chart(species5):
+                    mask = df5["spc_common"] == species5
+                    species_selection = df5[mask]
+                    df5_table = species_selection.groupby(['steward', 'boro']).health.value_counts(normalize=False).mul(100).rename('percent').reset_index()
+                    fig = px.bar(df5_table, 
+                                 x="boro", # boro
+                                 y="percent", # percent
+                                 color="health", # health
+                                 facet_col='steward', # steward
+                                 barmode="stack",
+                                 log_y=False, opacity=0.50,
+                                 category_orders= cat_orders)
+                    return fig
+                ])
+    elif tab == 'tab-2-example-graph':
+        return html.Div([
+            html.H3('Tab content 2'),
+            dcc.Graph(
+                id='graph-2-tabs',
+                figure={
+                    'data': [{
+                        'x': [1, 2, 3],
+                        'y': [5, 10, 6],
+                        'type': 'bar'
+                    }]
+                }
+            )
+        ])
 
 if __name__ == '__main__':
-    app.run_server(debug = False)
-
-
-# Other Options
-# 1
-# Sum the trees and their species and create a 
-# proportion of trees for that species in poor, fair, and good health. 
-# 2 
-# Stack the small multiples bar chart and make the xaxis the boro leaving health as a color
-
-
-
-
-
+    app.run_server(debug=False)
+    
+    
+    
+    

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Oct 22 18:16:52 2021
+Created on Sat Oct 23 20:42:32 2021
 
 @author: Owner
 """
@@ -93,14 +93,7 @@ df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
 
-# Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
-                 color="health", barmode="stack",
-                 log_y=False, opacity=0.50,
-                 category_orders= cat_orders)
-fig.show()
-
-
+df5.groupby(['steward', 'boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
 
 # Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
@@ -126,26 +119,28 @@ app.layout = html.Div([
     [Input("dropdown", "value")])
 def update_bar_chart(species5):
     mask = df5["spc_common"] == species5
-    fig = px.bar(df5[mask], 
-                 x="health", y="trees_scaled", 
-                 color="health", barmode="group",
-                 facet_row='steward', facet_col="boro",
-                 log_y=True, opacity=0.50,
+    species_selection = df5[mask]
+    df5_table = species_selection.groupby(['steward', 'boro']).health.value_counts(normalize=False).mul(100).rename('percent').reset_index()
+    fig = px.bar(df5_table, 
+                 x="boro", # boro
+                 y="percent", # percent
+                 color="health", # health
+                 facet_col='steward', # steward
+                 barmode="stack",
+                 log_y=False, opacity=0.50,
                  category_orders= cat_orders)
     return fig
 
 if __name__ == '__main__':
     app.run_server(debug = False)
 
-
-# Other Options
-# 1
-# Sum the trees and their species and create a 
-# proportion of trees for that species in poor, fair, and good health. 
-# 2 
-# Stack the small multiples bar chart and make the xaxis the boro leaving health as a color
-
-
+# Plotly Express
+fig = px.bar(df5, x="boro", y="count_tree_id", 
+                 color="health", barmode="stack",
+                 facet_col='steward',
+                 log_y=False, opacity=0.50,
+                 category_orders= cat_orders)
+fig.show()
 
 
 

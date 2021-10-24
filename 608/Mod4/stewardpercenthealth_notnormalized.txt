@@ -1,0 +1,58 @@
+Out[3]: 
+    steward           boro health  percent
+0      1or2          bronx   Fair      400
+1      1or2          bronx   Good      400
+2      1or2          bronx   Poor      400
+3      1or2       brooklyn   Fair      400
+4      1or2       brooklyn   Good      400
+5      1or2       brooklyn   Poor      400
+6      1or2      manhattan   Fair      400
+7      1or2      manhattan   Good      400
+8      1or2      manhattan   Poor      400
+9      1or2         queens   Fair      400
+10     1or2         queens   Good      400
+11     1or2         queens   Poor      300
+12     1or2  staten island   Fair      400
+13     1or2  staten island   Good      400
+14     1or2  staten island   Poor      400
+15     3or4          bronx   Fair      400
+16     3or4          bronx   Good      300
+17     3or4          bronx   Poor      200
+18     3or4       brooklyn   Good      400
+19     3or4       brooklyn   Poor      400
+20     3or4       brooklyn   Fair      300
+21     3or4      manhattan   Good      400
+22     3or4      manhattan   Fair      300
+23     3or4      manhattan   Poor      300
+24     3or4         queens   Good      400
+25     3or4         queens   Fair      300
+26     3or4         queens   Poor      200
+27     3or4  staten island   Good      400
+28     3or4  staten island   Fair      200
+29  4orMore          bronx   Good      300
+30  4orMore          bronx   Poor      100
+31  4orMore       brooklyn   Good      300
+32  4orMore       brooklyn   Fair      200
+33  4orMore      manhattan   Fair      300
+34  4orMore      manhattan   Good      300
+35  4orMore      manhattan   Poor      200
+36  4orMore         queens   Good      300
+37  4orMore         queens   Fair      200
+38  4orMore         queens   Poor      200
+39  4orMore  staten island   Good      200
+40  4orMore  staten island   Poor      100
+41     None          bronx   Fair      400
+42     None          bronx   Good      400
+43     None          bronx   Poor      400
+44     None       brooklyn   Fair      400
+45     None       brooklyn   Good      400
+46     None       brooklyn   Poor      400
+47     None      manhattan   Fair      400
+48     None      manhattan   Good      400
+49     None      manhattan   Poor      400
+50     None         queens   Fair      400
+51     None         queens   Good      400
+52     None         queens   Poor      300
+53     None  staten island   Fair      400
+54     None  staten island   Good      400
+55     None  staten island   Poor      400
