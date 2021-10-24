@@ -6,8 +6,8 @@ Created on Thu Oct 21 20:33:37 2021
 """
 
 # Question 1
-# For a given species (silver maple, honeylocust, or any single species), what proportion
-# trees are in good, fair, and poor health within each boro?
+# For a given species (silver maple, honeylocust, or any single species), what proportion 
+# of trees are in good, fair, and poor health within each boro?
 
 
 # Packages
@@ -85,12 +85,6 @@ cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
                                'steward': ['1or2','3or4','4orMore','None'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
 
-# Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
-                 color="health", barmode="group",
-                 color_discrete_map= colors, 
-                 category_orders= cat_orders)
-fig.show()
 
 # Test App (Functioning!) 
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
@@ -126,32 +120,13 @@ if __name__ == '__main__':
     app.run_server(debug = False)
 
 
+# Plotly Express
+fig = px.bar(df5, x="boro", y="count_tree_id", 
+                 color="health", barmode="group",
+                 color_discrete_map= colors, 
+                 category_orders= cat_orders)
+fig.show()
 
 
-# Dash Side-by-Side Figure Output
-app = dash.Dash()
-app.layout = html.Div([
-    html.Div([
-        html.Div([
-            html.H3('Column 1'),
-            dcc.Graph(id='g1', figure= px.bar(df5[mask], x="boro", y="count_tree_id", 
-                             color="health", barmode="group", 
-                             pattern_shape="health")
-                      ) 
-        ], className="six columns"),
-
-        html.Div([
-            html.H3('Column 2'),
-            dcc.Graph(id='g2', figure={'data': [{'y': [1, 2, 3]}]})
-        ], className="six columns"),
-    ], className="row")
-])
-
-app.css.append_css({
-    'external_url': 'https://codepen.io/chriddyp/pen/bWLwgP.css'
-})
-
-if __name__ == '__main__':
-    app.run_server(debug=False)
 
 

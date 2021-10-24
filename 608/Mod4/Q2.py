@@ -96,10 +96,10 @@ df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 # Plotly Express
 fig = px.bar(df5, x="boro", y="count_tree_id", 
                  color="health", barmode="stack",
+                 facet_col='steward',
                  log_y=False, opacity=0.50,
                  category_orders= cat_orders)
 fig.show()
-
 
 
 # Test App

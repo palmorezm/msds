@@ -93,7 +93,7 @@ df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
 
-df5.groupby(['steward', 'boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
+# df5.groupby(['steward', 'boro']).health.value_counts(normalize=False).mul(100).rename('percent').reset_index()
 
 # Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
