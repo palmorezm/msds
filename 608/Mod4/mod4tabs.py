@@ -241,8 +241,8 @@ app.layout = html.Div([
     html.Div(id='tabs-content-example')
  ])
 
-@app.callback(Output('tabs-content-example','children'),
-              [Input('tabs-example', 'value')])
+@app.callback(Output(component_id='tabs-content-example', component_property='children'),
+              [Input(component_id='tabs-example', component_property='value')])
 def render_content(tab):
     if tab == 'tab-1-example':
         return html.Div([
@@ -262,4 +262,6 @@ def render_content(tab):
                          clearable=False),
             dcc.Graph(id='q2graph')
         ])
+    
+
 

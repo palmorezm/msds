@@ -148,7 +148,7 @@ def update_bar_chart(species):
                  color_discrete_sequence=color_sequence, 
                  template='simple_white', 
                  title = "Health of Species Per Borough", 
-                 labels={"boro": "Borough",
+                 labels={"boro": " ",
                          "percent": "Percent of Trees(%)"}) 
     return fig
 

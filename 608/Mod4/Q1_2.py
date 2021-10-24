@@ -93,16 +93,6 @@ df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
 
-round((pd.crosstab(index=df1['health'], columns=df1['boro']) )/ 
-       (pd.crosstab(index=df1['health'], columns=df1['boro']).sum())*100, 2).stack().reset_index().rename(columns={0:"percent"})
-
-df1.groupby(['boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
-
-df.groupby(['boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
-
-ckm = df[df['spc_common'] =='crimson king maple']
-ckm.groupby(['boro']).health.value_counts(normalize=False)
-
 round((pd.crosstab(index=ckm['health'], columns=ckm['boro'])) /  
       (pd.crosstab(index=ckm['health'], columns=ckm['boro']).sum())*100, 2)
 pd.crosstab(index=ckm['boro'], columns=ckm['health']).stack().reset_index(name="frequency")
@@ -116,6 +106,14 @@ perc = ((df1_counts.frequency / df1_counts.boro_total)*100)
 df1_counts.insert(4, 'percent', perc)
 df1_counts
 
+df_dropped = df.drop(columns=['steward'])
+df_counts = df_dropped.groupby(['health', 'boro']).count_tree_id.sum().reset_index(name='frequency')
+borough_totals = df_counts.groupby(['boro']).frequency.sum()
+boro_totals = pd.DataFrame([borough_totals]*3).stack().reset_index(name='boro_totals')
+df_counts.insert(3, 'boro_total', boro_totals['boro_totals'])
+perc = ((df_counts.frequency / df_counts.boro_total)*100)
+df_counts.insert(4, 'percent', perc)
+df_counts
 
 # Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown

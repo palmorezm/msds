@@ -120,7 +120,7 @@ app.layout = html.Div([
 def update_bar_chart(species5):
     mask = df5["spc_common"] == species5
     species_selection = df5[mask]
-    df5_table = species_selection.groupby(['steward', 'boro']).health.value_counts(normalize=False).mul(100).rename('percent').reset_index()
+    df5_table = species_selection.groupby(['steward', 'boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
     fig = px.bar(df5_table, 
                  x="boro", # boro
                  y="percent", # percent
