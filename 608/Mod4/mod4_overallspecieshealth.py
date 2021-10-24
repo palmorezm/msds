@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Oct 23 20:42:32 2021
+Created on Sun Oct 24 16:27:19 2021
 
 @author: Owner
 """
-
-# Question 1
-# For a given species (silver maple, honeylocust, or any single species), what proportion 
-# of trees are in good, fair, and poor health within each boro?
 
 # Packages
 import pandas as pd
@@ -77,14 +73,13 @@ select1 = ['pin oak']
 df1 = df[df.spc_common.isin(select1)]
 
 # Choose Colors
-colors = ({'Poor':'red','Fair':'yellow','Good':'green'})
-
+colors = ({'Poor':'pink','Fair':'orange','Good':'green'})
+color_sequence =["pink","goldenrod", "green"]
 
 # Order (As umbridge would say, "I will have order!")
 df5.sort_values(['health', 'steward'])
-df1.sort_values(['count_tree_id','boro','health','steward'])
 cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
-                               'steward': ['1or2','3or4','4orMore','None'],
+                               'steward': ['None','1or2','3or4','4orMore'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
 
 # Preprocessing 
@@ -92,20 +87,6 @@ skdf5_counttreeids = sk.preprocessing.scale(df5['count_tree_id'])
 df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
-
-round((pd.crosstab(index=df1['health'], columns=df1['boro']) )/ 
-       (pd.crosstab(index=df1['health'], columns=df1['boro']).sum())*100, 2).stack().reset_index().rename(columns={0:"percent"})
-
-df1.groupby(['boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
-
-df.groupby(['boro']).health.value_counts(normalize=True).mul(100).rename('percent').reset_index()
-
-ckm = df[df['spc_common'] =='crimson king maple']
-ckm.groupby(['boro']).health.value_counts(normalize=False)
-
-round((pd.crosstab(index=ckm['health'], columns=ckm['boro'])) /  
-      (pd.crosstab(index=ckm['health'], columns=ckm['boro']).sum())*100, 2)
-pd.crosstab(index=ckm['boro'], columns=ckm['health']).stack().reset_index(name="frequency")
 
 df1_dropped = df1.drop(columns=['steward'])
 df1_counts = df1_dropped.groupby(['health', 'boro']).count_tree_id.sum().reset_index(name='frequency')
@@ -116,10 +97,18 @@ perc = ((df1_counts.frequency / df1_counts.boro_total)*100)
 df1_counts.insert(4, 'percent', perc)
 df1_counts
 
+df_dropped = df.drop(columns=['steward'])
+df_counts = df_dropped.groupby(['health', 'boro']).count_tree_id.sum().reset_index(name='frequency')
+borough_totals = df_counts.groupby(['boro']).frequency.sum()
+boro_totals = pd.DataFrame([borough_totals]*3).stack().reset_index(name='boro_totals')
+df_counts.insert(3, 'boro_total', boro_totals['boro_totals'])
+perc = ((df_counts.frequency / df_counts.boro_total)*100)
+df_counts.insert(4, 'percent', perc)
+df_counts
 
-# Test App
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
+species = df.spc_common.unique()
 
 app = dash.Dash(__name__)
 app.layout = html.Div([
@@ -127,9 +116,9 @@ app.layout = html.Div([
     # label x and values of x in df.spc_common.unique()
     dcc.Dropdown(
         id="dropdown",
-        options=[{"label": x, "value": x} for x in species5],
+        options=[{"label": x, "value": x} for x in species],
         # What to show at start
-        value=species5[0],
+        value=species[0],
         clearable=False,
     ),
     # Sets up for graph object to be shown
@@ -139,18 +128,28 @@ app.layout = html.Div([
 @app.callback(
     Output("q1graph", "figure"), 
     [Input("dropdown", "value")])
-def update_bar_chart(species5):
-    mask = df5["spc_common"] == species5
-    species_selection = df5[mask]
-    df5_table = round((pd.crosstab(index=species_selection['health'], columns=species_selection['boro']) )/ 
-       (pd.crosstab(index=species_selection['health'], columns=species_selection['boro']).sum())*100, 2).stack().reset_index().rename(columns={0:"percent"})
-    fig = px.bar(df5_table, 
+def update_bar_chart(species):
+    mask = df["spc_common"] == species
+    species_selection = df[mask]
+    df_dropped = species_selection.drop(columns=['steward'])
+    df_counts = df_dropped.groupby(['health', 'boro']).count_tree_id.sum().reset_index(name='frequency')
+    borough_totals = df_counts.groupby(['boro']).frequency.sum()
+    boro_totals = pd.DataFrame([borough_totals]*3).stack().reset_index(name='boro_totals')
+    df_counts.insert(3, 'boro_total', boro_totals['boro_totals'])
+    perc = ((df_counts.frequency / df_counts.boro_total)*100)
+    df_counts.insert(4, 'percent', perc)
+    fig = px.bar(df_counts, 
                  x="boro", 
                  y="percent", 
                  color="health", 
                  barmode="group",
                  log_y=False, opacity=0.50,
-                 category_orders= cat_orders)
+                 category_orders= cat_orders, 
+                 color_discrete_sequence=color_sequence, 
+                 template='simple_white', 
+                 title = "Health of Species Per Borough", 
+                 labels={"boro": "Borough",
+                         "percent": "Percent of Trees(%)"}) 
     return fig
 
 if __name__ == '__main__':

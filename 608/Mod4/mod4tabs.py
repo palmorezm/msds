@@ -99,63 +99,167 @@ skdf5_counttreeids = sk.preprocessing.scale(df5['count_tree_id'])
 df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
 df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
 
-
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
 
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 app.layout = html.Div([
-    html.H1('Dash Tabs component demo'),
-    dcc.Tabs(id="tabs-example-graph", value='tab-1-example-graph', children=[
-        dcc.Tab(label='Tab One', value='tab-1-example-graph'),
-        dcc.Tab(label='Tab Two', value='tab-2-example-graph'),
-    ]),
-    html.Div(id='tabs-content-example-graph')
-])
-
-@app.callback(Output('tabs-content-example-graph', 'children'),
-              Input('tabs-example-graph', 'value'))
-def render_content(tab):
-    if tab == 'tab-1-example-graph':
-        html.H3('Tab content 1'),
-        return html.Div([
-            html.H3('Tab content 1'),
-                def update_bar_chart(species5):
-                    mask = df5["spc_common"] == species5
-                    species_selection = df5[mask]
-                    df5_table = species_selection.groupby(['steward', 'boro']).health.value_counts(normalize=False).mul(100).rename('percent').reset_index()
-                    fig = px.bar(df5_table, 
-                                 x="boro", # boro
-                                 y="percent", # percent
-                                 color="health", # health
-                                 facet_col='steward', # steward
-                                 barmode="stack",
-                                 log_y=False, opacity=0.50,
-                                 category_orders= cat_orders)
-                    return fig
-                ])
-    elif tab == 'tab-2-example-graph':
-        return html.Div([
-            html.H3('Tab content 2'),
+    dcc.Tabs([
+        dcc.Tab(label='Tab one', children=[
             dcc.Graph(
-                id='graph-2-tabs',
                 figure={
-                    'data': [{
-                        'x': [1, 2, 3],
-                        'y': [5, 10, 6],
-                        'type': 'bar'
-                    }]
+                   px.bar(df5, x="boro", y="count_tree_id", color="health", 
+                          barmode="group", color_discrete_map= colors, category_orders= cat_orders)
                 }
             )
-        ])
+        ]),
+        dcc.Tab(label='Tab two', children=[
+            dcc.Graph(
+                figure={
+                    'data': [
+                        {'x': [1, 2, 3], 'y': [1, 4, 1],
+                            'type': 'bar', 'name': 'SF'},
+                        {'x': [1, 2, 3], 'y': [1, 2, 3],
+                         'type': 'bar', 'name': u'Montréal'},
+                    ]
+                }
+            )
+        ]),
+        dcc.Tab(label='Tab three', children=[
+            dcc.Graph(
+                figure={
+                    'data': [
+                        {'x': [1, 2, 3], 'y': [2, 4, 3],
+                            'type': 'bar', 'name': 'SF'},
+                        {'x': [1, 2, 3], 'y': [5, 4, 3],
+                         'type': 'bar', 'name': u'Montréal'},
+                    ]
+                }
+            )
+        ]),
+    ])
+])
+
+if __name__ == '__main__':
+    app.run_server(debug=False)
+
+# Fully written Static Two Tabs
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app.layout = html.Div([
+    dcc.Tabs([
+        dcc.Tab(label='Tab 1', children = [ 
+            dcc.Graph(
+                figure = px.bar(df5, x = 'boro', y="count_tree_id", color="health", 
+                                barmode="group", color_discrete_map= colors, category_orders= cat_orders)
+                )
+            ]),
+        dcc.Tab(label='Tab 2', children = [ 
+            dcc.Graph(
+                figure = px.bar(df5, x = 'boro', y="count_tree_id", color="health", 
+                                barmode="group", color_discrete_map= colors, category_orders= cat_orders)
+                )
+            ])        
+    ])
+])
 
 if __name__ == '__main__':
     app.run_server(debug=False)
     
     
+# Tab with dropdown callback
+species5 = df5.spc_common.unique() # Specify unique features for dropdown
+default_category = 'pin oak'
+default_index = 0
+
+# Method 1
+tab1 = html.Div([
+    html.H3('Tab content 1'),
+    dcc.Dropdown(id='first-dropdown',
+                 options=[{"label": x, "value": x} for x in species5],
+                 value=species5[0],
+                 clearable=False),
+    dcc.Graph(id='q1graph')
+    ])
+
+tab2 = html.Div([
+    html.H3('Tab content 2'),
+    dcc.Dropdown(id='first-dropdown',
+                 options=[{"label": x, "value": x} for x in species5],
+                 value=species5[0],
+                 clearable=False),
+    dcc.Graph(id='q2graph')
+    ])
+
+app.layout = html.Div([
+    html.H1('Dash Tabs Component Demo'),
+    dcc.Tabs(id='tabs-example', value = 'tab-1-example', children=[
+        dcc.Tab(id="tab-1", label='Tab One', value='tab-1-example'),
+        dcc.Tab(id="tab-1", label='Tab One', value='tab-1-example')
+        ])
+    html.Div(id='tabs-content-example', children = tab1)
+    ])
+
+@app.callback(dash.dependencies.Output('tabs-content-example', 'children'),
+              [dash.dependencies.Input('tabs-example', 'value')])
+def render_content(tab):
+    if tab == 'tab-1-example':
+        return tab1
+    if tab == 'tab-2-example':
+        return tab2
     
+@app.callback([desh.dependencies.Output('second-dropdown', 'options'),
+               dash.dependencies.Output('second-dropdown', 'value')],
+              [dash.dependencies.Input('first-dropdown', 'value')])
+def update_dropdown(value):
+    return [[ {'label': i, 'value': i} for i in df5[value] ], df5[value][default_index]]
     
+
+
+# Method 2
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dahs(__name__, external_stylesheets=external_stylesheets)
+app.layout = html.Div([
+    html.H1('Dash Tabs Component Demo'),
+    dcc.Tabs(id='tabs-example', value = 'tab-1-example', children=[
+        dcc.Tab(label='Tab 1', value = 'tab-1-example'), 
+            dcc.Dropdown(id = 'dropdown', 
+                         options=[{"label": x, "value": x} for x in species5],
+                         value = species5[0],
+                         clearable = False), 
+            dcc.Graph(id='q1graph'),
+        dcc.Tab(label='Tab 2', value='tab-2-example'),
+            dcc.Dropdown(id='dropdown',
+                         options=[{"label": x, "value": x} for x in species5],
+                         value = species5[0],
+                         clearable = False),
+            dcc.Graph(id='q2_2graph')
+        ]),
+    html.Div(id='tabs-content-example')
+ ])
+
+@app.callback(Output('tabs-content-example','children'),
+              [Input('tabs-example', 'value')])
+def render_content(tab):
+    if tab == 'tab-1-example':
+        return html.Div([
+            html.H3('Tab content 1'), 
+            dcc.Dropdown(id='dropdown',
+                         options=[{"label": x, "value": x} for x in species5],
+                         value =species5[0],
+                         clearable=False),
+            dcc.Graph(id='q1graph')
+        ])
+    elif tab == 'tab-2-example':
+        return html.Div([
+            html.H3('Tab content 2'),
+            dcc.Dropdown(id='dropdown',
+                         options=[{"label": x, "value": x} for x in species5],
+                         value =species5[0],
+                         clearable=False),
+            dcc.Graph(id='q2graph')
+        ])
+

@@ -76,19 +76,21 @@ select1 = ['pin oak']
 df1 = df[df.spc_common.isin(select1)]
 
 # Choose Colors
-colors = ({'Poor':'red','Fair':'yellow','Good':'green'})
-
+colors = ({'Poor':'pink','Fair':'orange','Good':'green'})
+color_sequence =["pink","goldenrod", "green"]
 
 # Order (As umbridge would say, "I will have order!")
 df5.sort_values(['health', 'steward'])
 cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
-                               'steward': ['1or2','3or4','4orMore','None'],
+                               'steward': ['None','1or2','3or4','4orMore'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
+
 
 
 # Test App (Functioning!) 
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
 species5 = df5.spc_common.unique() 
+species = df.spc_common.unique()
 
 app = dash.Dash(__name__)
 app.layout = html.Div([
@@ -96,9 +98,9 @@ app.layout = html.Div([
     # label x and values of x in df.spc_common.unique()
     dcc.Dropdown(
         id="dropdown",
-        options=[{"label": x, "value": x} for x in species5],
+        options=[{"label": x, "value": x} for x in species],
         # What to show at start
-        value=species5[0],
+        value=species[0],
         clearable=False,
     ),
     # Sets up for graph object to be shown
@@ -108,12 +110,14 @@ app.layout = html.Div([
 @app.callback(
     Output("q1graph", "figure"), 
     [Input("dropdown", "value")])
-def update_bar_chart(species5):
-    mask = df5["spc_common"] == species5
-    fig = px.bar(df5[mask], 
+def update_bar_chart(species):
+    mask = df["spc_common"] == species
+    fig = px.bar(df[mask], 
                  y="count_tree_id", x="boro", 
                  color="health", barmode="group", 
-                 category_orders= cat_orders)
+                 color_discrete_sequence=color_sequence,
+                 category_orders= cat_orders,
+                 template='simple_white', title = "title")
     return fig
 
 if __name__ == '__main__':
@@ -121,10 +125,11 @@ if __name__ == '__main__':
 
 
 # Plotly Express
-fig = px.bar(df5, x="boro", y="count_tree_id", 
+fig = px.bar(df, x="boro", y="count_tree_id", 
                  color="health", barmode="group",
-                 color_discrete_map= colors, 
-                 category_orders= cat_orders)
+                 color_discrete_sequence=color_sequence,
+                 category_orders= cat_orders, 
+                 template='simple_white')
 fig.show()
 
 
