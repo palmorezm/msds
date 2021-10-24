@@ -29,6 +29,7 @@ from dash.dependencies import Input, Output
 import plotly.express as px
 import plotly.io as pio
 pio.renderers.default='browser' # Let plotly display in local browser
+import gunicorn
 
 # Bronx
 soql_url1  = ('https://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
@@ -103,7 +104,8 @@ species5 = df5.spc_common.unique()
 species = df.spc_common.unique()
 
 # App Side-by-Side Figure Output
-app = dash.Dash()
+app = dash.Dash(__name__)
+server == app.server
 
 app.layout = html.Div([
     html.Div([
