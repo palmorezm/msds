@@ -17,19 +17,15 @@ Created on Sun Oct 24 17:55:49 2021
 # Packages
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt 
-import seaborn as sns
-import sklearn as sk
-from sklearn.preprocessing import scale
-from tabulate import tabulate
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output 
+from dash.dependencies import Input, Output
+import gunicorn
 import plotly.express as px
 import plotly.io as pio
 pio.renderers.default='browser' # Let plotly display in local browser
-import gunicorn
+
 
 # Bronx
 soql_url1  = ('https://data.cityofnewyork.us/resource/nwxe-4ae8.json?' +\
@@ -91,12 +87,6 @@ df5.sort_values(['health', 'steward'])
 cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
                                'steward': ['None','1or2','3or4','4orMore'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
-
-# Preprocessing 
-skdf5_counttreeids = sk.preprocessing.scale(df5['count_tree_id'])
-df5_countreeids_abovezero = (skdf5_counttreeids + abs(skdf5_counttreeids.min()))
-df5['trees_scaled'] = df5_countreeids_abovezero.tolist()
-
 
 # Species Selection Options
 species1 = df1.spc_common.unique() # Specify unique features for dropdown
