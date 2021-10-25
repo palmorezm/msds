@@ -13,18 +13,16 @@ Created on Sun Oct 24 17:55:49 2021
 # For a given species (silver maple, honeylocust, or any single species), are stewards 
 # (steward activity measured by the ‘steward’ variable) having an impact on the health of trees?
 
-
 # Packages
 import pandas as pd
-import numpy as np
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
-import gunicorn
 import plotly.express as px
 import plotly.io as pio
 pio.renderers.default='browser' # Let plotly display in local browser
+
 
 
 # Bronx
@@ -69,29 +67,17 @@ data = pd.concat(boros)
 # Remove NA
 df = data.dropna()
 
-
-# Select 5 trees for testing
-select5 = ['ginko', 'American linden', 'Chinese elm', 'Japanese hornbeam', 'pin oak']
-df5 = df[df.spc_common.isin(select5)]
-
-# Select 1 species for testing
-select1 = ['pin oak']
-df1 = df[df.spc_common.isin(select1)]
-
 # Choose Colors
 colors = ({'Poor':'pink','Fair':'orange','Good':'green'})
 color_sequence =["pink","goldenrod", "green"]
 
 # Order (As umbridge would say, "I will have order!")
-df5.sort_values(['health', 'steward'])
 cat_orders = category_orders=({'health': ["Poor","Fair","Good"],
                                'steward': ['None','1or2','3or4','4orMore'],
                                'boro': ['bronx','brooklyn','manhattan','staten island','queens'] })
 
 # Species Selection Options
-species1 = df1.spc_common.unique() # Specify unique features for dropdown
-species5 = df5.spc_common.unique() 
-species = df.spc_common.unique()
+species = df.spc_common.unique() # Specify unique features for dropdown
 
 # App Side-by-Side Figure Output
 app = dash.Dash(__name__)
