@@ -95,7 +95,10 @@ merged.df %>%
          HAI = (MEDINC / QINC) * 100, 
          HHAI = ( (MEDINC - 5000) / QINC) * 100, 
          DIF = HAI - HHAI, 
-         AVGHAI =  median((MEDINC / QINC) * 100 )
+         AVGHAI =  median((MEDINC / QINC) * 100), 
+         NEWHAI = mean((MEDINC / QINC)/.001 )
         ) %>% 
   arrange(desc(AVGHAI)) %>% View()
+
+
 
