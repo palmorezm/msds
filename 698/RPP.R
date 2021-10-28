@@ -31,7 +31,8 @@ which(is.na(mrpp))
 mrpp[which(is.na(mrpp)),] # Displays all NA's (if there are any)
 # There are no missing values in this data set 
 
-# Merging process with merged.df which already contains MEDINC and MEDVAL by metro 2010 - 2019 
+# Merging process with merged.df which already contains 
+# MEDINC, MEDVAL, PERINC and POP by metro 2010 - 2019 
 
 # 2019
 df1 <- rpp.allitems %>% 
@@ -505,7 +506,8 @@ merged.df <- rbind(merged.df.2010, merged.df.2011,
 merged.df <- merged.df %>% 
   dplyr::select(-GeoName.y, -year.y) %>% 
   rename(GeoName = GeoName.x, 
-         year = year.x)
+         year = year.x) 
+
 
 
 

@@ -33,8 +33,8 @@ mipd[which(is.na(mipd)),] # Displays all NA's
 na.omit(mipd)
 
 # Merging process with merged.df which already 
-# contains MEDINC, MEDVAL, RPPALL, RPPGOODS, RPPRENT, RPPSOTH 
-# by metro 2010 - 2019 
+# contains MEDINC, MEDVAL, PERINC, POP, RPPALL, 
+# RPPGOODS, RPPRENT, and RPPSOTH by metro 2010 - 2019 
 
 # 2019
 df1 <- mipd %>% 
