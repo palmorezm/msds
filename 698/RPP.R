@@ -393,7 +393,7 @@ merged.df <- merged.df %>%
 
 # Add RPP for other services 
 # 2019 
-rpp.services %>% 
+df1 <- rpp.services %>% 
   dplyr::select(GeoFips, GeoName, key, value) %>% 
   rename(year = key, 
          RPPSOTH = value) %>% 
@@ -506,8 +506,6 @@ merged.df <- merged.df %>%
   dplyr::select(-GeoName.y, -year.y) %>% 
   rename(GeoName = GeoName.x, 
          year = year.x)
-
-
 
 
 

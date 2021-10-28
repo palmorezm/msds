@@ -73,10 +73,9 @@ minc <- rbind(minc.personalincome, minc.population, minc.percapitaincome)
 
  ################## End Minc Rerun ############################
 
-# TODO:  
 # Pull Population and Per Capita Income for Minc Data 
 minc %>% 
-  filter(year == 2019 & LineCode ==c(2, 3))
+  filter(year == 2019 & LineCode ==c(1, 2, 3)) %>% View()
 
 # Extract MOE of Home Value Estimates from Median Home Values
 mhv %>% 
@@ -225,10 +224,20 @@ merged.df <- rbind(merged.df.2019, merged.df.2018,
 
 # Rename and drop columns 
 merged.df <- merged.df %>% 
-  dplyr::select(-GeoName.y, -year.y)
-colnames(merged.df) <- c("GeoFips", 
-                         "GeoName", "year", "MEDINC", "MEDVAL")
-View(merged.df)
+  dplyr::select(-GeoName.y, -year.y) %>% 
+  rename(GeoName = GeoName.x, 
+         year = year.x, 
+         MEDINC = value.x, 
+         MEDVAL = value.y)
 
+# 2019 
+df1 <- minc %>%  
+  filter(year == 2019 & LineCode == 2) %>%
+  dplyr::select("GeoFips", "GeoName", "year", "value") %>% 
+  slice(-1) 
+df2 <- merged.df %>% 
+  filter(year == 2019)
+merged.df.2019 <- merge(df2, df1, by = "GeoFips")
 
+# Repeat for remaining years and for LineCode == 1
 
