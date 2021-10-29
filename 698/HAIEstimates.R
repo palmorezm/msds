@@ -72,7 +72,7 @@ df %>%
   arrange(desc(AVGHAI)) %>% View()
 
 # All HAI Estimates
-df %>% 
+df.fin <- df %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
@@ -107,6 +107,6 @@ df %>%
          AQINC60 = PMT * (100/60)*12,
          # Lenient Lending Practices HAI 
          #(60% of monthly income on mortgage is acceptable with 3% DP)
-         HAILEN = (AINCALL / AQINC60)*100) %>% View()
+         HAILEN = (AINCALL / AQINC60)*100) 
 
 
