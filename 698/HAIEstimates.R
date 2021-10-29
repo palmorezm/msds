@@ -2,9 +2,8 @@
 # MS Analytics Capstone
 # Housing Affordability Index
 # Dataset: mixed
-# Sources: BEA and U.S.Census (ACS)
-# https://apps.bea.gov/iTable/
-# data.census.gov
+# Sources: BEA, BLS, U.S.Census (ACS)
+# See Github: https://github.com/palmorezm/msds/tree/main/698
 
 # Packages
 library(dplyr)
@@ -16,21 +15,24 @@ library(tidyr)
 # Or use link from remote Git: 
 # https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv
 
-merged.df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
-merged.df %>% View()
+df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
+
+# Change Data Types to Numeric
+df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
+
 
 # 384 Metros for 2019 Confirmed Reasonable HAI
-merged.df %>% 
+df %>% 
   filter(year == 2018) %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
          HAI = (MEDINC / QINC) * 100) %>%
-  arrange(desc(HAI)) %>% View()
+  arrange(desc(HAI))
 
 
 # All metros 2010 through 2019
-df_mapping <- merged.df %>% 
+df_mapping <- df %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
@@ -42,7 +44,7 @@ df_mapping <- merged.df %>%
 # 384 Metros for 2019 New Baseline HAI 
 # (minus average per person healthcare costs) - see link for details
 # https://www.cnbc.com/2019/10/09/americans-spend-twice-as-much-on-health-care-today-as-in-the-1980s.html
-merged.df %>% 
+df %>% 
   filter(year == 2018) %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
@@ -55,7 +57,7 @@ merged.df %>%
 
   
 # Average HAI using 10 year average HAI varaible
-merged.df %>% 
+df %>% 
   filter(GeoName == "Harrisburg-Carlisle, PA (Metropolitan Statistical Area)") %>%
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
@@ -68,5 +70,25 @@ merged.df %>%
         ) %>% 
   arrange(desc(AVGHAI)) %>% View()
 
-
+# RPP Adjusted Income (Real Wage) HAI
+df %>% 
+  filter(year == 2019) %>% 
+  mutate(IR = 0.035, 
+         PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINC = PMT * 4 * 12,
+         HAI = (MEDINC / QINC) * 100) %>% 
+  mutate(ADJALL = (MEDINC - ((RPPALL / 100)* MEDINC)),
+         AINCALL = MEDINC + ADJALL, 
+         # Real Wage HAI:
+         HAIRW = (AINCALL / QINC)*100) %>% 
+  mutate(ADJRNT = (MEDINC - ((RPPRENT / 100)* MEDINC)), 
+         AINCRNT = MEDINC + ADJRNT, 
+         # Rent Adjusted HAI:
+         HAIRNT = (AINCRNT / QINC)*100) %>% 
+  mutate(ADJIPD = (AINCRNT + AINCALL / 2)*(IPD/100),
+         # IPD Projected HAI:
+         HAIIPD = (ADJIPD / QINC)*100) %>% 
+  mutate(PMTRAW = MEDVAL * 0.99999 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+         QINCRAW = PMTRAW * 4 * 12,
+         HAIRAW = (MEDINC / QINCRAW) * 100)
 
