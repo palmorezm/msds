@@ -19,7 +19,8 @@ df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/c
 
 # Change Data Types to Numeric
 df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
-
+df <- df %>% 
+  dplyr::select(-X)
 
 # 384 Metros for 2019 Confirmed Reasonable HAI
 df %>% 
@@ -70,9 +71,8 @@ df %>%
         ) %>% 
   arrange(desc(AVGHAI)) %>% View()
 
-# RPP Adjusted Income (Real Wage) HAI
+# All HAI Estimates
 df %>% 
-  filter(year == 2019) %>% 
   mutate(IR = 0.035, 
          PMT = MEDVAL * 0.8 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINC = PMT * 4 * 12,
@@ -88,7 +88,25 @@ df %>%
   mutate(ADJIPD = (AINCRNT + AINCALL / 2)*(IPD/100),
          # IPD Projected HAI:
          HAIIPD = (ADJIPD / QINC)*100) %>% 
-  mutate(PMTRAW = MEDVAL * 0.99999 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
+  mutate(PMTRAW = MEDVAL * 0.99 * (IR / 12)/(1 - (1/(1 + IR/12)^360)), 
          QINCRAW = PMTRAW * 4 * 12,
-         HAIRAW = (MEDINC / QINCRAW) * 100)
+         # Raw HAI at 20% Down Payment:
+         HAIRAW = (MEDINC / QINCRAW) * 100) %>% 
+  mutate(HHSIZE = 2.53, 
+         DEBTMV = (20000/HHSIZE),
+         DEBTED = 9664*HHSIZE, 
+         DEBTIL = 9609*HHSIZE,
+         DEBTCC = 3500*HHSIZE, 
+         DEBTOC = 10000*HHSIZE, 
+         DEBTS = DEBTMV + DEBTED + DEBTIL + DEBTCC + DEBTOC, 
+         AQINC30 =  PMT * (100/30) * 12,
+         AINCDBT = ((AINCRNT + AINCALL / 2) - DEBTS), 
+         # HAI Adjusted for Average American Household Debts
+         HAIDBT = AINCDBT / AQINC30) %>% 
+  mutate(PMT3DP = MEDVAL * 0.97 * (IR / 12)/(1 - (1/(1 + IR/12)^360)),
+         AQINC60 = PMT * (100/60)*12,
+         # Lenient Lending Practices HAI 
+         #(60% of monthly income on mortgage is acceptable with 3% DP)
+         HAILEN = (AINCALL / AQINC60)*100) %>% View()
+
 
