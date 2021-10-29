@@ -10,12 +10,14 @@
 library(dplyr)
 library(tidyr)
 
-# Run Scripts In Order 
+# To get data
+# Run Scripts In Order:
 # GEOID_GEOFIPS.R --> RPP.R --> IPD.R
 # Or use link from remote Git: 
-# 
+# https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv
 
-##### After Running Scripts #####
+merged.df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
+merged.df %>% View()
 
 # 384 Metros for 2019 Confirmed Reasonable HAI
 merged.df %>% 
