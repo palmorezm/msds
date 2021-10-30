@@ -109,4 +109,3 @@ df.fin <- df %>%
          #(60% of monthly income on mortgage is acceptable with 3% DP)
          HAILEN = (AINCALL / AQINC60)*100) 
 
-

@@ -1,0 +1,48 @@
+---
+title: "Methodology"
+author: "Zachary M. Palmore"
+date: "10/29/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+We define affordable housing as the potential of the median household in a given area to finance or purchase a house at or above that area’s average house cost threshold wherein the median household has enough income leftover to afford other commonly purchased expenditures. As mentioned, there are many perspectives regarding what affordable housing means. To cover the topic at a reasonable depth, and to consider multiple affordability strategies, we develop 7 housing affordability indices (HAIs) based on the literature and available data. There is consensus that focus should be on creating metrics that are widely applicable, require relatively little computational power, and build on existing data. Ideally, these metrics would also be transparent for the public and policymakers alike. We adhere to these principles when developing our own adjusted HAI metrics.  
+Our original data comes from publicly accessible institutions including The United States Bureau of Economic Analysis (BEA) and their partnership projects with the Bureau of Labor Statistics (BLS) along with a mixed set of parameters created by the U.S. Census Bureau. These datasets each contain 1 or more of 15 essential variables that we use to calculate relevant HAI statistics. Our final dataset contains 43 variables with 28 created from separate computations used in the HAI adjustments. This final dataset and its original data sources, merging, and joining processes, are linked in the appendix for reference and open-source reproducibility. 
+We focus our efforts on localizing the HAI and utilizing relevant information at the level of metropolitan statistical areas (MSAs). As defined by the Census Bureau, an MSA is “one or more counties that contain a city of 50,000 or more inhabitants or contain a Census Bureau-defined urbanized area (UA) and have a total population of at least 100,000 (75,000 in New England).” In 2019, approximately 83% of the U.S. population lived in these urbanized metropolitan areas with an average population density of 283 people per square mile. The national average population density was about 94 for the same year. 
+These statistics show distinct gaps between where people are concentrated and where people are spread out and result in vastly different challenges to housing affordability outside of metropolitan areas. We note this but do not adjust for the differences in our 7 adjusted HAI estimates due to calculations that incorporate nationally smoothed values. Outside of metro areas (where at least 83% of the population resides), the HAI is less flexible. 
+Mathematically, we can write out these 7 HAI estimates as such: 
+NAR Method 
+
+$(\frac{M_{i}}{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$
+
+RPP Adjusted Income (Real Wage) HAI
+
+$(\frac{M_{i} - (   (\frac{R_{all}}{100})\times M_{i} )  }{(\frac{M_{p}\times8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$
+
+Rent Adjusted HAI
+
+$(\frac{M_{i} - (   (\frac{R_{rent}}{100})\times M_{i} )  }{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$
+
+IPD Projected HAI
+
+$$(\frac{   (\frac{I_{rw} + I_{rt} }{2})\times  \frac{IPD}{100} )  }{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
+
+Raw HAI 
+
+$(\frac{M_{i}}{(\frac{M_{p}\times0.99( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$
+
+Outstanding Debts HAI
+
+$$(\frac{(\frac{I_{rw} + I_{rt}} {2}) - \sum{(D_{mv}/h),(D_{ed}*h), (D_{il}*h), (D_{cc}*h), (D_{oc}*h) }}{(\frac{M_{p}\times0.99( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} \times \frac{100}{30}\times12   )} )\times100$$
+
+Lenient Lending HAI
+
+$(\frac{M_{i}}{(\frac{M_{p}\times0.97( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} \times (\frac{100}{60})\times12 )} )\times100$
+
+Within each of these HAIs we have a particular purpose and tactic to better calculate housing affordability. In all cases our interest rate is held constant to attribute changes to the formula rather than state and federal rates. The NAR method serves as our control, and it follows the same formula as the national standard setup by National Association of Realtors. Since the housing data collected contains estimated valuations by homeowners (which is not an exact estimate of home values), we need a base sample to build upon and measure deviations from. Unfortunately, the national association of realtors does not allow data sharing or open-source use without randomization of the MSA from their respective HAI’s. This is not as valuable to us since this would remove the opportunity for the public and policymakers to identify their locality and thereby eliminate the potential for improvements. 
+The remaining HAI methods rely on adjustments to median household income with the same qualifying income as the NAR HAI except when calculating the Outstanding Debts HAI and Lenient Lending HAI. The first adjustment simply creates a real wage estimate for the locality by adjusting for the cost of living. This integrates a median dollar adjustment derived from the national average for a market basket of goods and services including prices for transportation, food, rent, and other categories. We isolate rent in the Rent Adjusted HAI and adjust the median household income proportionally for each MSA. Next, we use the implicit regional price deflator for each MSA to create an IPD Projected HAI that incorporates wage growth with a stabilized housing market. Our Raw HAI weighs the influence of down payments on affordability by increasing the expected loan amount to 99% of the median home value. Lastly, we identify the average household debts from the literature to form an Outstanding Debts HAI and form a new Lenient Lending HAI by hypothetically easing lending restrictions.  
+Importantly, the data used to form these HAI estimates are collected and updated at regular frequencies and averaged (by median) across 5-year intervals. This limits volatility within the data, making it less biased and more robust. Our study spans from 2010 through 2019, or one decade. Traditionally, the ‘cap’ of household income that could be reasonably spent on housing was 30% of household income. We lower this in our calculations to reflect present lending practices. We also assume that every household is capable of making a 20% down payment. We note that, this is highly unlikely and is why government programs exist to assist individuals with lowering the up-front costs of purchasing a home. Nevertheless, because it is a standard of the industry and lending institutions, we focus on changes to income that could affect housing affordability. 
+
