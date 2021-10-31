@@ -118,8 +118,10 @@ library(ggplot2)
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
-  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>% 
-  ggplot(aes(value)) + geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
+  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", 
+                  "HAIRAW", "HAIDBT", "HAILEN")) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
 # Jitter plot of HAI values by year
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
@@ -174,6 +176,14 @@ df.fin %>%
   geom_smooth(aes(x = value), 
               method="loess", col = "black") + 
   facet_wrap(~key, scales = "free")  
+# Histogram without HAIDBT
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", 
+                  "HAIRAW", "HAILEN")) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
 
 # Notes:
 # 1 - Make the same scales on axes where possible
