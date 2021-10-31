@@ -175,4 +175,8 @@ df.fin %>%
               method="loess", col = "black") + 
   facet_wrap(~key, scales = "free")  
 
+# Notes:
+# 1 - Make the same scales on axes where possible
+# 2 - Denote the different HAI keys by color 
+
 
