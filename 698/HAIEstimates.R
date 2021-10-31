@@ -22,7 +22,7 @@ df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
 df <- df %>% 
   dplyr::select(-X)
 
-# 384 Metros for 2019 Confirmed Reasonable HAI
+# 384 Metros for selected year Confirmed Reasonable HAI
 df %>% 
   filter(year == 2018) %>% 
   mutate(IR = 0.035, 
@@ -53,7 +53,7 @@ df %>%
          HAI = (MEDINC / QINC) * 100, 
          HHAI = ( (MEDINC - 5000) / QINC) * 100, 
          DIF = HAI - HHAI ) %>%
-  arrange(desc(HAI)) %>% View()
+  arrange(desc(HAI)) 
 
 
   
@@ -69,7 +69,7 @@ df %>%
          AVGHAI =  median((MEDINC / QINC) * 100), 
          NEWHAI = mean((MEDINC / QINC)/.001 )
         ) %>% 
-  arrange(desc(AVGHAI)) %>% View()
+  arrange(desc(AVGHAI))
 
 # All HAI Estimates
 df.fin <- df %>% 
@@ -108,4 +108,71 @@ df.fin <- df %>%
          # Lenient Lending Practices HAI 
          #(60% of monthly income on mortgage is acceptable with 3% DP)
          HAILEN = (AINCALL / AQINC60)*100) 
+
+
+df.sample500 <- sample_n(df.fin, 500, replace = T)
+hist(df.sample500$HAILEN)
+
+library(ggplot2)
+# Histogram of HAI values
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>% 
+  ggplot(aes(value)) + geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
+# Jitter plot of HAI values by year
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>% 
+  ggplot(aes(year, value)) + 
+  geom_jitter(aes(col = key, alpha = .15)) 
+# Increase in all NAR HAI over 10 years
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI")) %>% 
+  ggplot(aes(year, value)) + 
+  geom_point(aes(col = key, alpha = .15)) + 
+  geom_smooth(col = "black")
+# Change in personal income and HAI value per year
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI")) %>% 
+  ggplot(aes(year, value)) + 
+  geom_point(aes(x = PERINC, col = PERINC, alpha = .15)) 
+# Change in personal income and HAI over the population 
+df.fin %>% 
+  filter(year == 2019) %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI")) %>% 
+  ggplot(aes(value, POP, col = PERINC)) + 
+  geom_point(aes(x = PERINC, alpha = .15)) + 
+  geom_smooth(aes(x = PERINC), 
+              method="loess", col = "black") 
+# Change in personal income, HAI, and population across all HAI's
+df.fin %>%  
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>%
+  ggplot(aes(value, PERINC, col = PERINC)) + 
+  geom_point(aes(x = PERINC, alpha = .15)) + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "black") + 
+  facet_wrap(~key, scales = "free")  
+# Needs Review
+df.fin %>%  
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>%
+  ggplot(aes(value, PERINC, col = PERINC)) + 
+  geom_point(aes(x = value, alpha = .15)) + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "black") + 
+  facet_wrap(~key, scales = "free")  
+
 
