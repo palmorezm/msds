@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<!--
+    Mod5: Part 1 & 2 
+-->
+
+<head><title>Module 5</head></title>
+
+<body>
+<h1>Part 1</h1>
+    <body>
+        <p>Prompt 1: Create a function to reverse any word that you type in. This can be typed into either an input 
+            box or an alert box, and then print the result in a box or on the webpage</p>
+    <script type="text/javascript">
+
+// functions to take the user input, split into letters, reverse it, and then paste it back together
+    function reverse_text(str){
+        var splitString = str.split("");
+        var reverseArray = splitString.reverse();
+        var joinArray = reverseArray.join("");
+        return joinArray;
+};
+    function reverser(){
+            var x = document.getElementById("target1");
+            x.innerHTML = reverse_text(document.getElementById('str').value);
+        }
+    </script>
+
+<form name="mystring">
+    <input id="str" type="str" size="55">
+    <input type="button" value="Reverse Text" onClick="reverser();">
+</form>
+<br>
+<div id="target1"></div>
+</body>
+
+<h1>Part 2</h1>
+<body>
+    <p1>Prompt 2: Create a function that takes an input number, and prints a table with the first 20 multiples of
+        the number, in order 5x4</p1>
+    <script type="text/javascript">
+
+
+    // create a multiples function and display function to do the calculations and store in a list
+    function multiples(num){
+        list = [];
+        var next_multiple = '<table border="4">';
+        for (i = 1; i <= 20; i++) {list.push(num * i)};
+        for (i = 0; i < 20; i++){
+            if (i % 4 == 0) { 
+                next_multiple = next_multiple +'<tr>'
+            };
+            next_multiple = next_multiple + '<td>' + list[i] + '</td>';
+            if (i % 4 == 3){
+                next_multiple = next_multiple + '</tr>'};};
+        next_multiple = next_multiple + '</table>';
+        return next_multiple
+    };
+
+    function return_table(){
+        var y = document.getElementById("target");
+        y.innerHTML = multiples(document.getElementById('num').value);
+    }
+    </script>
+
+    <!-- create a form for user to input their number,
+    then the button runs the return_table function -->
+    <form name="Multiples_Tables">
+        <input id="num" type="number" size="4">
+        <input type="button" value="Generate Multiples Table" onClick="return_table();">
+    </form>
+    <br>
+    <div id="target"></div>
+</body>
+</html>
