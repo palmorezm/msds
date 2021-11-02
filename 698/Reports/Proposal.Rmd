@@ -1,0 +1,84 @@
+---
+title: "A Contemporary Reevaluation of Relative Affordability in the American Housing Market"
+subtitle: "DATA698-004 Capstone Project Mid-Term Draft"
+author: "Zachary Palmore"
+date: "8/21/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Introduction 
+
+It is important that housing be affordable because people need a place to live. Failure to provide adequate affordable housing has been shown to weaken local economies, reduce quality of life, and increase financial and mental health stress in the population. We note the two major national indices that focus on estimating a qualifying income as a proportion of the median family income for a given area to measure affordability. While these incorporate interest rates and make reasonable assumptions about down payments, amortization, and other general requirements for consumers to be granted a mortgage loan, they leave out a plethora of obstacles faced by consumers, especially for first-time homebuyers. Instead, focus should be placed on direct consumer access to housing without loan considerations and incorporate a reasonable safety net in these index calculations. We propose a new method of calculating housing affordability for consumers in the 21st century, one that incorporates a set of minimum thresholds that better exemplify the economic challenges of the modern home buying process. 
+
+There are two main indices used to calculate housing affordability in the United States, the National Association of Realtors (NAR) Housing Affordability Index and the California Association of Realtors (CAR) Index. When these national methods are applied at the city or county level it is considered a Local Housing Affordability Index (LHAI). We intend to focus on U.S. metropolitan statistical areas (MSAs) to make well known the local affordability challenges. These major indices fail to consider the full scope of challenges that potential homebuyers, especially first-time homebuyers, face when making the decision to purchase a home. The formula for the home affordability index (HAI) is as follows: 
+
+ 
+
+$$HAI = ( \frac{Median\hspace{4pt} Family\hspace{4pt} Income }{\hspace{4pt}Qualifying\hspace{4pt}Income\hspace{4pt} }) \times 100$$ 
+
+ 
+
+Where the qualifying income value contains assumptions about the down payment, average federal mortgage interest rate, principal, interest on the loan, taxes (including property taxes), insurance, with the last four building the acronym PITI. The CAR Index incorporates a minimum income needed to qualify for the loan and income distribution of the area. In both cases, applying this equation to incomes at local levels improves our understanding of how affordable the area is but is narrowly focused on the average consumer’s income having little if any debts or financial obligations. However, debt and financial obligations are realities of modern life.  
+
+For example, consumers who are of home buying age (25+) are mostly millennials which according to the 2020 Experian State of Credit report means they have an average of about $27,251 in non-mortgage debts. It is important to understand that when the parents of these millennials (Colloquially Gen X’s and Baby Boomers) were purchasing houses, they had far fewer non-mortgage debts on average, were often given generous loans while needing fewer qualifications, and could have used the same amount of non-mortgage debts as millennials towards down-payments. Such an amount in their times would have more than covered the necessary upfront costs of becoming homeowners. Today, this is not the case. Lending practices have tightened, and costs have increased while the income of millennials has stabilized. These factors must be considered in the affordability index since they act as barriers to ensuring access to comparable housing. 
+
+In the United States the average cost to purchase a house has continuously increased since at least 1921 when the Bureau of Labor Statistics (BLS) began collecting data on the Consumer Price Index, or CPI, which included housing costs. As with all consumer goods, inflation has been a significant factor contributing to this increase in house prices. Market adjustments in personal and household income have also been made in response to inflation, generally increasing an individual’s gross income. Overall, this has raised the chances of homeownership in the U.S. through the collection of individuals who chose to save money, reduce their debts, and leverage credit to finance their homes with mortgages. This trend has lowered the upfront costs needed to purchase a house while simultaneously limiting the burden placed on some homeowners who lack the means to afford their house on their own. Unfortunately, today, there is far more to purchasing a house than simply having enough money. For most Americans, becoming homeowners is a process. 
+
+Consider that it is a standard recommendation by financial institutions that any mortgage bearer not consume more than 28% of that person’s monthly gross income on a monthly mortgage payment. In real dollars, this means if you make \$5,000 in a month, you should not pay more than \$1,400 on your mortgage payment. Additionally, the individual interested in purchasing a house using a mortgage, should expect to make a down payment on that house. Amounts vary by lender and the federal government has several programs available to assist prospective homebuyers should they fulfill the requirements of the program. For the average American these range from as low as 3% to 10% minimum down payments on government-backed specialty and conventional home loans. These are common among first-time home buyers. Private loans, however, require 20% as a minimum unless the individual has their mortgage insured. This makes understanding the home-buying process quite difficult and approval in any case is also dependent upon credit, existing real assets, financial assets, and other forms of wealth.  	 
+
+Evidence suggests that housing today is much less affordable than it was over the past century. In the 1920’s it was common for an individual to purchase a home without a mortgage. Instead, the individual would pay for the house outright, fully owning the home and its property upon transfer of the deed. According to James L. Butkiewicz, an economics professor at the University of Delaware, the first home loans were typically fixed short-term loans of 3 - 5 years in length and given for no more than 50% of the value of the property. This trend of loaning less than half the value of the home for short-terms lasted through much of the 1900’s until reforms were created in an attempt to stabilize the market. These methods are impractical or impossible for most Americans in the first two decades of the 21st century because we have failed to comprehend the magnitude of the problem; that is, owning homes has become less attainable for each subsequent generation since the 1980’s.  
+
+During the years 2020 and 2021, there was a surge in home buying fueled by the reactions of businesses and employees to work remotely and relocate, often to locations with a lower cost of living. Anecdotal accounts of reasons these people decided to move ranged from their location not being as valuable to them due to mandatory quarantines, to moving out a little sooner than planned. The economic outcomes of this shift resulted in a rapid increase of home prices. There simply was not enough supply of new homes to meet the demand of consumers in the market. To further worsen relative affordability for potential homeowners, there was also a lumber shortage and multitude of supply chain issues that intensified the process. It was completely unconventional of extant generational experiences and led to bidding wars and houses selling minutes after they hit the market prior to the buyer ever stepping foot on the property. This had the greatest effect on those just entering the market, namely millennials. It is unclear how this may affect future generations, but an improved housing affordability index may help to mitigate risks to consumers and local economies.  
+
+Our hypothesis is that improving upon the housing affordability index will increase understanding among financial institutions and municipalities to empower prospective homebuyers in their areas. With an improved relative affordability measure, efforts to mitigate homelessness, reduce financial stress, increase quality of life, and boost economies can occur at national, state, and local levels. By incorporating a safety net within the calculations of housing affordability, especially for metropolitan statistical areas, we can focus directly on the consumer’s access to housing and evaluate how comparable it is to that of previous generations. 
+
+ 
+
+Literature Review 
+
+Housing affordability is a significant contributing factor when determining the level of economic development and market stability in a country.9 For over a century, policy experts and analysts have targeted economic factors as the most important determinants of how to make housing more affordable.13 While this is supported by a larger share of historical publications than recent sustainability-focused socioeconomic examples, there has been a rapid increase since 1995 in the volume of literature concerning affordable housing.17 These papers have a wide range of definitions for what affordable housing is but nevertheless have exposed conventional economic hypotheses as having only scratched the surface of how to accurately calculate housing affordability.4  
+
+A cross-disciplinary review of existing literature on affordable housing in 2012 noted that it is widely accepted “among policy analysts that an inadequate supply of affordable rental and owner-occupied housing can lead to a number of negative social outcomes.”15 Current reviews of the literature from peer-reviewed articles to public releases of industry reports and data, found this remains the case.17 Failure to provide even adequate housing has been shown to create circumstances that force households into lower economic classes and in some cases, poverty. Whereas any marked improvements in how we measure housing affordability, could lead to positive outcomes for society and individuals alike through policy and market-based resolutions. Such documented outcomes include “enhanced housing and transportation infrastructure, income adequacy, household wellbeing, reduced inequalities and improved rental housing” as well as access to new opportunities.9  
+
+There is also a consensus that we must include additional costs consumers face to fully understand housing affordability.11 One example of this comes from studies that include household transportation expenses to create another index known as the location affordability index (LAI). The U.S. Department of Housing and Urban Development (HUD) filled a database with information on affordability by location and developed a method to estimate the LAI. While this has caused major improvements in public and private assessments of affordability, its reliability remains in question. Studies have shown that at census-tract level aggregation, LAI models tend to overestimate costs, especially for renters.11 Due to the unreliability in its aggregation, variable construction, and modeling methods, some studies have claimed “reliability metrics for the Journey to Work (JTW) data on transit use warrant jettisoning these data altogether” citing ethical reasons as well.10 Here again, there is also disagreement on how to calculate these satellite variables of the overall housing affordability index.6 Other studies have made it clear that an optimal measurement that precisely estimates the true value of affordability, especially at local levels, remains a major concern.3,7,9  
+
+As the direct costs of housing have increased on average across the United States, research efforts to address the growing concern of housing affordability have also tried to identify and deescalate the severities of the sources of the problem.5,8,16 While many have achieved success in identifying criteria thought to cause housing affordability, new challenges have raised alarm over the definition of affordable housing and how results differ depending on how it is measured.17 These are considered critical success factors.  
+
+According to a study published in the journal Building and Environment there are 13 critical success factors (CSFs) relevant to ensuring sustainable affordable housing.1These CSFs stem from a survey of affordable housing experts who responded to a questionnaire with 30 unique success factors identified from their review of existing literature in 2019. Responses were compiled and researchers were able to rank the experts’ agreement with each other on each unique success factor and found underlying patterns. Among those patterns they found the main obstacle was “political will and commitment to affordable housing” but the second highest consideration was the “formulation of sound housing policies.” As shown through records of housing affordability indices and reviews of the literature, forming sound housing policies is heavily influenced, and some might even say dependent on, the accuracy of the estimates themselves. These results have reaffirmed through various surveying and policy simulation modeling methods in subsequent studies.9,17  
+
+Experts in housing policy and urban studies tend to calculate housing affordability indices as the “average share of households paying more than 30 percent of their income for shelter.”6 According to the National Association of Realtors, the Joint Center for Housing Studies at Harvard, and other peer-reviewed sources, this is the most widely accepted metric for estimating housing affordability.3,14,18 The Joint Center for Housing Studies also states that when household spending exceeds this threshold, it is reasonable to expect that they do not have enough to afford other necessities. This is an important distinction from other sources of existing literature, which tend to have a broader definition such as “the relationship between housing and its users” 3 and those interested in examining the interdependencies of housing and health.2,19 
+
+Based on studies of global housing markets it is clear that in order to develop a better, more robust metric that is useful to both consumers and policymakers in understanding and addressing housing affordability, it is necessary to build on existing standards and data sources.1,12,13 There are well-understood relationships between housing affordability and housing cost, transportation, cost of living, and other variables and these should be used to determine an ideal measurement approach.1,15,19 Despite the exponential growth of research on the measurement and concept of housing affordability, there remains concerns over the reliance of conventional methods to inform and reform weaknesses in policy instruments.3,4,9 Current literature reiterates the need for better methods of conceptual analysis on and physical estimations of housing affordability to bring new insights to the field in a transparent, less data intensive manner.  
+
+```{r}
+# Read in Data 
+df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
+# Change Data Types to Numeric
+df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
+df <- df %>% 
+  dplyr::select(-X)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
