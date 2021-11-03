@@ -114,6 +114,7 @@ df.sample500 <- sample_n(df.fin, 500, replace = T)
 hist(df.sample500$HAILEN)
 
 library(ggplot2)
+library(tidyr)
 # Histogram of HAI values
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
@@ -183,10 +184,37 @@ df.fin %>%
   filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", 
                   "HAIRAW", "HAILEN")) %>% 
   ggplot(aes(value)) + 
-  geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
+  geom_histogram(aes(alpha = .50, col = key, fill=I("white")), binwidth = 5)
+# Histogram with only HAIDBT
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAIDBT")) %>% 
+  ggplot(aes(value)) + 
+  geom_histogram(aes(alpha = .50, col = key, fill=I("white")), binwidth = .1)
+
+# Real Income and HAI's
+df.fin %>%  
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>%
+  ggplot(aes(value, AINCALL)) + 
+  geom_point(aes(x = value, alpha = .15, col = key)) + 
+  geom_vline(xintercept = 100, lty = "dotted", col = "black") + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "black") + 
+  facet_wrap(~key, scales = "fixed", shrink = F) 
+
+
 
 # Notes:
 # 1 - Make the same scales on axes where possible
 # 2 - Denote the different HAI keys by color 
+
+
+# New Notes:
+# Tabulate total number of Metro Areas above and below threshold under different HAI measures
+# For example: Under HAILEN, how many metro's were given above 100 HAI? How many under 100? 
 
 
