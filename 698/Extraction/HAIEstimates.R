@@ -218,3 +218,69 @@ df.fin %>%
 # For example: Under HAILEN, how many metro's were given above 100 HAI? How many under 100? 
 
 
+df.fin %>%
+  filter(MEDINC >= 40000) %>% 
+  group_by(GeoFips, GeoName) %>% 
+  summarise(AVGHAIRNT = median(HAIRNT)) %>% 
+  filter(AVGHAIRNT >= 200) %>% View()
+
+# Number of Options 
+# 120 = 263
+# 130 = 248
+# 140 = 236
+# 150 = 221
+# 160 = 205
+# 170 = 188
+# 180 = 175
+# 190 = 160
+# 200 = 143
+
+# Histogram of Options
+df.fin %>%
+  filter(MEDINC >= 40000) %>% 
+  group_by(GeoFips, GeoName) %>% 
+  summarise(AVGHAIRNT = median(HAIRNT)) %>% 
+  filter(AVGHAIRNT >= 100) %>% 
+  ggplot(aes(AVGHAIRNT)) + 
+  geom_histogram(aes(fill = GeoName, col = AVGHAIRNT, alpha = 0.5), binwidth = 5) + 
+  theme(legend.position = "none")
+
+# Scatterplot of Options
+df.fin %>%
+  group_by(GeoFips, GeoName) %>% 
+  summarise(AVGHAIRNT = median(HAIRNT)) %>% 
+  filter(AVGHAIRNT >= 100) %>% 
+  ggplot(aes(GeoFips, AVGHAIRNT)) + geom_point(aes(fill = GeoName, alpha = .25)) + 
+  theme(legend.position = "none")
+
+library(plotly)
+df <- df.fin %>%
+  group_by(GeoFips, GeoName) %>% 
+  summarise(AVGHAIRNT = median(HAIRNT)) %>% 
+  filter(AVGHAIRNT >= 100)  %>% 
+  arrange(desc(AVGHAIRNT))
+
+class(df$GeoName)
+df$GeoName <- as.factor(df$GeoName)
+
+plot_ly(df, x = "GeoFips", y = "AVGHAIRNT", color = "GeoFips")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
