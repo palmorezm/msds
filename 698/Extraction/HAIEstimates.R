@@ -114,7 +114,9 @@ df.sample500 <- sample_n(df.fin, 500, replace = T)
 hist(df.sample500$HAILEN)
 
 library(ggplot2)
+library(ggpubr)
 library(tidyr)
+ggplot2::theme_set(theme_minimal())
 # Histogram of HAI values
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
@@ -145,16 +147,39 @@ df.fin %>%
   filter(key == c("HAI")) %>% 
   ggplot(aes(year, value)) + 
   geom_point(aes(x = PERINC, col = PERINC, alpha = .15)) 
-# Change in personal income and HAI over the population 
-df.fin %>% 
+# Change in personal income over the population 
+perinc.plt1 <- df.fin %>% 
   filter(year == 2019) %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
   filter(key == c("HAI")) %>% 
-  ggplot(aes(value, POP, col = PERINC)) + 
-  geom_point(aes(x = PERINC, alpha = .15)) + 
-  geom_smooth(aes(x = PERINC), 
-              method="loess", col = "black") 
+  filter(PERINC <= 500000000) %>%
+  ggplot(aes((PERINC/100000000), (POP/100000), col = (PERINC/100000000))) + 
+  geom_point(aes(x = (PERINC/100000000), size = MOE), alpha = .5) + 
+  geom_smooth(aes(x = (PERINC/100000000)), 
+              method="loess", col = "grey38", 
+              se = T, fill = "light blue", alpha = 0.25) + 
+  labs(x = "Personal Income (millions)", y = "Population (100,000)") + 
+  theme_classic() +
+  theme(legend.position = "none")
+# Subplot of above Change in personal income over the population
+perinc.plt2 <- df.fin %>% 
+  filter(year == 2019) %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
+  filter(key == c("HAI")) %>% 
+  filter(PERINC <= 100000000) %>%
+  ggplot(aes((PERINC/100000000), (POP/100000), col = (PERINC/100000000))) + 
+  geom_point(aes(x = (PERINC/100000000), size = MOE), alpha = .50) + 
+  geom_smooth(aes(x = (PERINC/100000000)), 
+              method="loess", col = "grey38", 
+              se = T, fill = "light blue", alpha = 0.25) + 
+  labs(x = "Personal Income (millions)", y = "Population (100,000)") + 
+  theme_classic()
+perinc.pltfull <- ggarrange(perinc.plt1, perinc.plt2)
+annotate_figure(perinc.pltfull, top = text_grob("Examining the Relationship between MSA Wealth and Size", 
+                                      color = "Black", size = 14))
+
 # Change in personal income, HAI, and population across all HAI's
 df.fin %>%  
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
@@ -194,17 +219,33 @@ df.fin %>%
   geom_histogram(aes(alpha = .50, col = key, fill=I("white")), binwidth = .1)
 
 # Real Income and HAI's
-df.fin %>%  
+# create a title list for HAI
+HAINAMES <- list("Normal" = "HAI", "Real Wage"="HAIRW", "Rent Adjustment"="HAIRNT", 
+                 "Inflation Adjusted"="HAIIPD", "Raw Values"="HAIRAW", "Lenient Lending"="HAILEN")
+hainames <- c("HAI" = "Normal", 
+              "HAIRW"="Real Wage", 
+              "HAIRNT"="Rent Adjustment", 
+              "HAIIPD"="Inflation Adjusted", 
+              "HAIRAW"="Raw Values", 
+              "HAILEN"="Lenient Lending")
+HAItitle <- function(variable,value){
+  return(HAINAMES[value])
+}
+df.fin %>%
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
   filter(key == c("HAI", "HAIRW", "HAIRNT", 
-                  "HAIIPD", "HAIRAW", "HAILEN")) %>%
-  ggplot(aes(value, AINCALL)) + 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
   geom_point(aes(x = value, alpha = .15, col = key)) + 
-  geom_vline(xintercept = 100, lty = "dotted", col = "black") + 
+  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
   geom_smooth(aes(x = value), 
-              method="loess", col = "black") + 
-  facet_wrap(~key, scales = "fixed", shrink = F) 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
+  facet_wrap(key ~ ., scales = "free", shrink = F, labeller = labeller(key = hainames)) + 
+  theme(legend.position = "none")
 
 
 
