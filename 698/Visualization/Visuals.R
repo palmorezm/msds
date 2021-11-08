@@ -1,9 +1,12 @@
 
-df.fin <- read.csv("")
 
-library(ggplot2)
+library(tidyverse)
 library(ggpubr)
-library(tidyr)
+
+df.fin <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/fin.csv")
+df.fin <- df.fin %>% 
+  dplyr::select(-X)
+
 ggplot2::theme_set(theme_minimal())
 # Histogram of HAI values
 df.fin %>% 
