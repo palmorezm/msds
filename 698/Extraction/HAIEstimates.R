@@ -260,12 +260,12 @@ df.fin %>%
 
 
 df.fin %>%
-  filter(MEDINC >= 40000) %>% 
+  filter(MEDINC >= 50000) %>% 
   group_by(GeoFips, GeoName) %>% 
   summarise(AVGHAIRNT = median(HAIRNT)) %>% 
-  filter(AVGHAIRNT >= 200) %>% View()
+  filter(AVGHAIRNT >= 140) %>% View()
 
-# Number of Options 
+# Number of Options (At 40k)
 # 120 = 263
 # 130 = 248
 # 140 = 236
@@ -307,10 +307,17 @@ df$GeoName <- as.factor(df$GeoName)
 plot_ly(df, x = "GeoFips", y = "AVGHAIRNT", color = "GeoFips")
 
 
+df.fin %>% 
+  filter(year == 2019) %>% 
+  summarize(NatAvg = mean(MEDINC))
 
+library(ggplot2)
 
-
-
+df.fin %>% 
+  filter(GeoFips == 31540 | GeoFips == 40060) %>% 
+  ggplot(aes(year, MEDINC)) + 
+  geom_point(aes(col = GeoName, size = HAIRNT), alpha = .99, shape = 21) + 
+  geom_smooth(aes(col = GeoName, fill = GeoName), alpha = .05)
 
 
 
