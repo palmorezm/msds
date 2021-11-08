@@ -181,9 +181,14 @@ df.fin <- df %>%
 ```
 
 
-## Data Exploration
+Include in the following sections a detailed analysis of finding, the importance of the work, our conclusion, whether our hypothesis was met, a discussion of the findings, and opportunities for future research. 
 
 
+## Results 
+
+## Conclusion
+
+## Discussion 
 
 
 
