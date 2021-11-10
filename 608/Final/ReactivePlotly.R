@@ -9,6 +9,9 @@ library(tidyr)
 
 data <- read.csv("https://raw.githubusercontent.com/charleyferrari/CUNY_DATA_608/master/module3/data/cleaned-cdc-mortality-1999-2010-2.csv", header = TRUE)
 
+
+
+
 ui <- fluidPage(
   titlePanel("Crude Mortality Rates"),
   h4("A Comparison of States' Causes of Death to National Averages"),
