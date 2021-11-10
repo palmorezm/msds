@@ -1,14 +1,22 @@
 
+# MS Analytics Capstone
+# Mapping Housing Affordability 
+# Dataset: mixed
+# Sources: BEA and U.S.Census (ACS)
+# https://apps.bea.gov/iTable/
+# data.census.gov
 
+# Packages
 library(tidyverse)
 library(ggpubr)
 
 df.fin <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/fin.csv")
 df.fin <- df.fin %>% 
   dplyr::select(-X)
-
 ggplot2::theme_set(theme_minimal())
-# Histogram of HAI values
+
+
+# Histogram of HAI values - checked, not yet useful
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
@@ -16,13 +24,16 @@ df.fin %>%
                   "HAIRAW", "HAIDBT", "HAILEN")) %>% 
   ggplot(aes(value)) + 
   geom_histogram(aes(alpha = .05, fill = key), binwidth = 5)
-# Jitter plot of HAI values by year
+
+# Jitter plot of HAI values by year - checked and useful 
+# Shows grouping of HAI values at levels based soley on their formulas'
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC) %>% 
   filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIIPD", "HAIRAW", "HAIDBT", "HAILEN")) %>% 
   ggplot(aes(year, value)) + 
   geom_jitter(aes(col = key, alpha = .15)) 
+
 # Increase in all NAR HAI over 10 years
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
