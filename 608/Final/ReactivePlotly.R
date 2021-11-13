@@ -9,6 +9,11 @@ library(tidyr)
 
 data <- read.csv("https://raw.githubusercontent.com/charleyferrari/CUNY_DATA_608/master/module3/data/cleaned-cdc-mortality-1999-2010-2.csv", header = TRUE)
 
+df.fin <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/fin.csv")
+df.fin <- df.fin %>% 
+  dplyr::select(-X)
+ggplot2::theme_set(theme_minimal())
+
 
 
 
@@ -42,7 +47,7 @@ ui <- fluidPage(
                             width = "800px"))
     ),
   hr(), 
-  helpText("Data Source: CDC WONDER system, at
+  helpText("Data Source: (NOT) CDC WONDER system, at
 https://wonder.cdc.gov/ucd-icd10.htm") 
   )
 )
@@ -102,7 +107,6 @@ server <- function(input, output, ...) {
 }
 
 shinyApp(ui, server)
-
 
 
 

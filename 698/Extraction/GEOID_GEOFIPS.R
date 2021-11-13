@@ -1,6 +1,7 @@
 
 # MS Analytics Capstone
-# Restring GEOID to GEOFIPS
+# Restring GEOID to GEOFIPS (Metro Areas) + 
+#   Recombine median home value with income
 # Dataset: Median Home Values
 # Sources: U.S.Census (ACS)
 # data.census.gov
