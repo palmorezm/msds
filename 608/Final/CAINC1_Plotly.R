@@ -48,6 +48,20 @@ url2<- "https://raw.githubusercontent.com/plotly/datasets/master/fips-unemp-16.c
 df <- read.csv(url2, colClasses=c(fips="character")) # Import Plotly's FIPS codes by county 
 df$fips == test2$GeoFIPS # Confirm our county FIPS codes match 
 
+# Remove outliers
+df <- test2 %>% 
+  dplyr::select(where(is.numeric))
+for (i in colnames(df)) {
+  iqr <- IQR(df[[i]])
+  q <- quantile(df[[i]], probs = c(0.25, 0.75), na.rm = FALSE)
+  qupper <- q[2]+1.5*iqr
+  qlower <- q[1]+1.5*iqr
+  outlier_free <- subset(df, df[[i]] > (q[1] - 1.5*iqr) & df[[i]] < (q[2]+1.5*iqr) )
+  df.outlier_free <- outlier_free
+}
+test2.med <- median(test2$value, na.rm=T) # Find median of all values as if NA's were removed
+test2[which(test2$GeoFIPS == "56039"),"value"] <- test2.med # To get it to not skew results
+
 # Visualize with Plotly Choropleth
 g <- list(
   scope = 'usa',
@@ -62,8 +76,8 @@ fig <- fig %>% add_trace(
   locations=test2$GeoFIPS,
   z=test2$value,
   colorscale="Viridis",
-  zmin=min(test2$value),
-  zmax=max(test$value),
+  zmin=0,
+  zmax=200000,
   marker=list(line=list(
     width=0)
   )
@@ -78,3 +92,5 @@ fig <- fig %>% layout(
 )
 
 fig
+
+
