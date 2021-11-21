@@ -150,7 +150,6 @@ df.fin %>%
   theme(legend.position = "none")
 
 
-
 # Notes:
 # 1 - Make the same scales on axes where possible
 # 2 - Denote the different HAI keys by color 
@@ -213,10 +212,15 @@ df.fin %>%
   filter(year == 2019) %>% 
   summarize(NatAvg = mean(MEDINC))
 
-library(ggplot2)
+df.fin %>% 
+  filter(GeoFips == 31540 | GeoFips == 40060) %>% View()  # Madison and Richmond Compared
+  ggplot(aes(year, MEDINC)) + # Use Median Income over time
+  geom_point(aes(col = GeoName, size = HAIRNT), alpha = .99, shape = 21) + # Make the size the rent-focused HAI 
+  geom_smooth(aes(col = GeoName, fill = GeoName), alpha = .05) # Add trends for each by color
 
 df.fin %>% 
-  filter(GeoFips == 31540 | GeoFips == 40060) %>% 
-  ggplot(aes(year, MEDINC)) + 
-  geom_point(aes(col = GeoName, size = HAIRNT), alpha = .99, shape = 21) + 
-  geom_smooth(aes(col = GeoName, fill = GeoName), alpha = .05)
+  filter(GeoFips == 35620 | GeoFips == 40060) %>%  # NYC and Richmond Compared
+  ggplot(aes(year, MEDINC)) + # Use Median Income over time
+  geom_point(aes(col = GeoName, size = HAIRNT), alpha = .99, shape = 21) + # Make the size the rent-focused HAI 
+  geom_smooth(aes(col = GeoName, fill = GeoName), alpha = .05) # Add trends for each by color
+

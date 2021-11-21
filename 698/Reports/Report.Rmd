@@ -183,8 +183,154 @@ df.fin <- df %>%
 
 Include in the following sections a detailed analysis of finding, the importance of the work, our conclusion, whether our hypothesis was met, a discussion of the findings, and opportunities for future research. 
 
+```{r}
+
+```
+
+## Analysis
 
 ## Results 
+
+```{r}
+# Real Income and HAI's
+# create a title list for HAI
+HAINAMES <- list("Normal" = "HAI", "Real Wage"="HAIRW", "Rent Adjustment"="HAIRNT", 
+                 "Inflation Adjusted"="HAIIPD", "Raw Values"="HAIRAW", "Lenient Lending"="HAILEN")
+hainames <- c("HAI" = "Normal", 
+              "HAIRW"="Real Wage", 
+              "HAIRNT"="Rent Adjustment", 
+              "HAIIPD"="Inflation Adjusted", 
+              "HAIRAW"="Raw Values", 
+              "HAILEN"="Lenient Lending")
+HAItitle <- function(variable,value){
+  return(HAINAMES[value])
+}
+df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .15, col = key)) + 
+  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
+  facet_wrap(key ~ ., scales = "free", shrink = F, labeller = labeller(key = hainames)) + 
+  theme(legend.position = "none")
+```
+
+
+
+```{r}
+# Get total number of observations for 1 year
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  group_by(key, year) %>% 
+  na.omit() %>% 
+  summarise(nrow(value)) %>% View()
+
+# Count unique valuesin HAI
+df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  count(key, value) %>% View()
+
+# Table of values above and below 100 (national average)
+df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  group_by(key, year) %>% 
+  summarize(Abv100 =, 
+            TotalMSA = 379, 
+            PercentAbv100 =
+              (Abv100/TotalMSA)*100) %>%
+  View()
+
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  group_by(key, year) %>% View()
+  # count(., key) or alternatively
+  summarize(Totals = n(), 
+            ) %>% View()
+
+# Consider subseting the df.fin by values 
+# > and < 100 with subset()
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  subset( value < 100) %>% View()
+# Count Missing Values
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  summarise(sum(is.na(value))) 
+
+```
+
+
+Create a table of the above values with a tally of how many are above or below average. Determine which of these statistics is most realistic for HAI purposes and when estimating home affordability across the U.S. 
+
+We believe that each has a unique perspective to offer. For purposes of former generations, lenient lending appears to have made it a lot easier to afford homes but at the cost of market stability (given the great depression, recession, and so on). The raw values also show that if practices were the same before the FHA was created the most amount of people would not be able to afford a home (excluding debts). When including the debts of the average homeowner today, there is no place in the U.S. deemed affordable by NAR HAI standards. Additionally, if incomes were adjusted for prospective inflation (and somehow the price of housing were to stagnate), a large majority of the metropolitan areas in the US would be affordable. Real wage estimates and Rent Adjusted estimates capture the minimum realities that most housholds face; the aggregated cost of a goods and services and the effect rent can have on encouraging (or in this case discouraging) homeownship in the U.S. Since rent is practically required of all potential homeowners (look for sources on this), it could be considered the most useful HAI metric from this analysis. 
+
 
 ## Conclusion
 
