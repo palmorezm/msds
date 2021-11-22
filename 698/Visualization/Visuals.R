@@ -224,3 +224,106 @@ df.fin %>%
   geom_point(aes(col = GeoName, size = HAIRNT), alpha = .99, shape = 21) + # Make the size the rent-focused HAI 
   geom_smooth(aes(col = GeoName, fill = GeoName), alpha = .05) # Add trends for each by color
 
+
+
+
+# Tables
+
+# Get total number of observations for 1 year
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  group_by(key, year) %>% 
+  na.omit() %>% 
+  summarise(nrow(value)) %>% View()
+
+# Count unique valuesin HAI
+df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  count(key, value) %>% View()
+
+# Table of values above and below 100 (national average)
+df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  group_by(key, year) %>% 
+  summarize(Abv100 =, 
+            TotalMSA = 379, 
+            PercentAbv100 =
+              (Abv100/TotalMSA)*100) %>%
+  View()
+
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  group_by(key, year) %>% View()
+# count(., key) or alternatively
+summarize(Totals = n(), 
+) %>% View()
+
+# Consider subseting the df.fin by values 
+# > and < 100 with subset()
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  subset( value < 100) %>% View()
+# Count Missing Values
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>%
+  summarise(sum(is.na(value))) 

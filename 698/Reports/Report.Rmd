@@ -263,90 +263,6 @@ The determining factors of which of these HAI plots performs best is dependent u
 
 
 ```{r}
-# Get total number of observations for 1 year
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, 
-         -year, -MEDINC, 
-         -MEDVAL, -MOE, 
-         -UMEDVAL, -LMEDVAL, 
-         -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", 
-                  "HAIRNT", 
-                  "HAIIPD", 
-                  "HAIRAW", 
-                  "HAILEN", 
-                  "HAIDBT")) %>% 
-  group_by(key, year) %>% 
-  na.omit() %>% 
-  summarise(nrow(value)) %>% View()
-
-# Count unique valuesin HAI
-df.fin %>%
-  gather(key, value, -GeoFips, -GeoName, 
-         -year, -MEDINC, 
-         -MEDVAL, -MOE, 
-         -UMEDVAL, -LMEDVAL, 
-         -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", 
-                  "HAIRNT", 
-                  "HAIIPD", 
-                  "HAIRAW", 
-                  "HAILEN", 
-                  "HAIDBT")) %>%
-  count(key, value) %>% View()
-
-# Table of values above and below 100 (national average)
-df.fin %>%
-  gather(key, value, -GeoFips, -GeoName, 
-         -year, -MEDINC, 
-         -MEDVAL, -MOE, 
-         -UMEDVAL, -LMEDVAL, 
-         -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", 
-                  "HAIRNT", 
-                  "HAIIPD", 
-                  "HAIRAW", 
-                  "HAILEN", 
-                  "HAIDBT")) %>%
-  group_by(key, year) %>% 
-  summarize(Abv100 =, 
-            TotalMSA = 379, 
-            PercentAbv100 =
-              (Abv100/TotalMSA)*100) %>%
-  View()
-
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, 
-         -year, -MEDINC, 
-         -MEDVAL, -MOE, 
-         -UMEDVAL, -LMEDVAL, 
-         -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", 
-                  "HAIRNT", 
-                  "HAIIPD", 
-                  "HAIRAW", 
-                  "HAILEN", 
-                  "HAIDBT")) %>%
-  group_by(key, year) %>% View()
-  # count(., key) or alternatively
-  summarize(Totals = n(), 
-            ) %>% View()
-
-# Consider subseting the df.fin by values 
-# > and < 100 with subset()
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, 
-         -year, -MEDINC, 
-         -MEDVAL, -MOE, 
-         -UMEDVAL, -LMEDVAL, 
-         -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", 
-                  "HAIRNT", 
-                  "HAIIPD", 
-                  "HAIRAW", 
-                  "HAILEN", 
-                  "HAIDBT")) %>% 
-  subset( value < 100) %>% View()
 # Count Missing Values
 df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, 
@@ -360,8 +276,8 @@ df.fin %>%
                   "HAIRAW", 
                   "HAILEN", 
                   "HAIDBT")) %>%
-  summarise(sum(is.na(value))) 
-# Extract HAIs >= 100
+  summarise(sum(is.na(value))) %>% View()
+# Extract HAIs < 100
 ltdf <- df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, 
          -year, -MEDINC, 
@@ -375,6 +291,7 @@ ltdf <- df.fin %>%
                   "HAILEN", 
                   "HAIDBT")) %>% 
   subset( value < 100) 
+# Extract HAIs >= 100
 gtdf <- df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, 
          -year, -MEDINC, 
@@ -388,7 +305,13 @@ gtdf <- df.fin %>%
                   "HAILEN", 
                   "HAIDBT")) %>% 
   subset( value >= 100) 
+ltdf %>%
+  filter(key == 'HAI') %>% View()
+keys <- unique(ltdf$key)
+
 ```
+
+
 
 
 Create a table of the above values with a tally of how many are above or below average. Determine which of these statistics is most realistic for HAI purposes and when estimating home affordability across the U.S. 
