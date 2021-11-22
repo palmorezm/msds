@@ -20,6 +20,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction 
 
+```{r}
+# Packages 
+library(tidyverse)
+library(ggpubr)
+library(kableExtra)
+```
+
 It is important that housing be affordable because people need a place to live. Failure to provide adequate affordable housing has been shown to weaken local economies, reduce quality of life, and increase financial and mental health stress in the population. We note the two major national indices that focus on estimating a qualifying income as a proportion of the median family income for a given area to measure affordability. While these incorporate interest rates and make reasonable assumptions about down payments, amortization, and other general requirements for consumers to be granted a mortgage loan, they leave out a plethora of obstacles faced by consumers, especially for first-time homebuyers. Instead, focus should be placed on direct consumer access to housing without loan considerations and incorporate a reasonable safety net in these index calculations. We propose a new method of calculating housing affordability for consumers in the 21st century, one that incorporates a set of minimum thresholds that better exemplify the economic challenges of the modern home buying process. 
 
 There are two main indices used to calculate housing affordability in the United States, the National Association of Realtors (NAR) Housing Affordability Index and the California Association of Realtors (CAR) Index. When these national methods are applied at the city or county level it is considered a Local Housing Affordability Index (LHAI). We intend to focus on U.S. metropolitan statistical areas (MSAs) to make well known the local affordability challenges. These major indices fail to consider the full scope of challenges that potential homebuyers, especially first-time homebuyers, face when making the decision to purchase a home. The formula for the home affordability index (HAI) is as follows: 
@@ -65,7 +72,6 @@ Based on studies of global housing markets it is clear that in order to develop 
 ## Methodology 
 
 ```{r}
-library(dplyr)
 # Read in Data 
 df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
 # Change Data Types to Numeric
@@ -86,50 +92,50 @@ Mathematically, we can write out these 7 HAI estimates as equations. All methods
 
 These methods can be reduced to the following equations:
 
-NAR Method
+$$National\hspace{4pt}Association\hspace{4pt}of\hspace{4pt}Realtors\hspace{4pt}(NAR)\hspace{4pt}Method$$
 
 $$(\frac{M_{i}}{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
 
 Where $Mi$ is the median household income for each MSA, 
 $M_{v}$ is the median home value for the same MSA, and $IR$ is a fixed interest rate. We make a slight adjustment to this to create a real wage using regional price parities for each MSA provided by BEA.  
 
-RPP Adjusted Income (Real Wage) HAI
+$$Regional\hspace{4pt}Price\hspace{4pt}Parity\hspace{4pt}(RPP)\hspace{4pt}Adjusted\hspace{4pt}Income\hspace{4pt}(Real\hspace{4pt}Wage)\hspace{4pt}HAI$$
 
 $$(\frac{M_{i} - (   (\frac{R_{all}}{100})\times M_{i} )  }{(\frac{M_{p}\times8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
 
 With $R_{all}$ representing the regional price parities for each MSA of the entire basket of goods and services surveyed by the BEA and the BLS. The rest of the equation went unchanged effectively allowing us to estimate the HAI with a ‘real wage,’ that is, the income leftover after adjusting for cost of living per MSA.  
 
-Rent Adjusted HAI
+$$Rent\hspace{4pt}Adjusted\hspace{4pt}HAI$$
 
 $$(\frac{M_{i} - (   (\frac{R_{rent}}{100})\times M_{i} )  }{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
 
 In this case, we isolate the most integral category of the regional price parities of MSAs, which is rent. These results could be interpreted as part of the route to homeownership since renting a place is often necessary before purchasing with a mortgage or other financial commitment outside of leasing.  
 
-IPD Projected HAI
+$$Implicity\hspace{4pt}Regional\hspace{4pt}Price\hspace{4pt}Deflator\hspace{4pt}(IPD)\hspace{4pt}Projected\hspace{4pt}HAI$$
 
 $$(\frac{   (\frac{I_{rw} + I_{rt} }{2})\times  \frac{IPD}{100} )  }{(\frac{M_{p}\times0.8( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
 
 The Implicit Regional Price Deflator (IPD) for MSAs is a “regional price index derived as the product of two terms: the regional price parity and the U.S. PCE price index” in which “growth rate or year-to-year change in the IRPDs is a measure of regional inflation.” We use this growth rate to project where the average between real personal income ($I_{rw}$) and rent adjusted incomes ($I_{rt}$) would be and create an HAI as if housing prices were stagnant.  
 
 
-Raw HAI 
+$$Raw\hspace{4pt}HAI$$
 
 $$(\frac{M_{i}}{(\frac{M_{p}\times0.99( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} *48 )} )\times100$$
 
 This Raw HAI considers how affordable housing would be if the individual were able to have 99% of the value of the home financed at a fixed interest rate for 30 years. 
 
-Outstanding Debts HAI
+$$Outstanding\hspace{4pt}Debts\hspace{4pt}HAI$$
 
 $$(\frac{(\frac{I_{rw} + I_{rt}} {2}) - \sum{(D_{mv}/h),(D_{ed}*h), (D_{il}*h), (D_{cc}*h), (D_{oc}*h) }}{(\frac{M_{p}\times0.99( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} \times \frac{100}{30}\times12   )} )\times100$$
 
 
 For the outstanding debts HAI only consumer debt is considered. No mortgages or home equity loans are included in consumer debt. These debts are averages for the American individual and as such are adjusted to fit household dollars. There are 5 kinds of debt in our formula, each of which are representative of the median for their category. They include motor vehicle debt at roughly \$20,000 per household, education debt (which includes student loans) at \$9,664 for each individual in a household under 40 years of age, debts from installment loans at \$9,609 per individual on average, credit card debt at \$3,500 per individual, and all other debts from medical expenses, leans against pensions, life insurance, payday loans, and more lumped into one category at about $10,000 per individual. The average household size (h) is 2.53 based on the 2020 Census Bureau’s decennial census. We expand the loan allowance here increasing the lending leniency to 30% of monthly personal income for the average household to compensate for the additional debts and give as much tolerance as possible with current lending practices.  
 
-Lenient Lending HAI
+$$Lenient\hspace{4pt}Lending\hspace{4pt}HAI$$
 
 $$(\frac{M_{i}}{(\frac{M_{p}\times0.97( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}   )^{360}} \times (\frac{100}{60})\times12 )} )\times100$$
 
-To stretch lending practices even further, a concept which has been argued would improve housing affordability while increasing market instability, we adjust the median value of the mortgage loan to account for 97% of the value of the home. This indicates that the individual would only need to pay 3% of the home value for a down payment. Then, we reevaluate the qualifying income of the HAI to allow greater flexibility in how much the average consumer could pay to 60% of their monthly income being spent on their monthly mortgage payment.  
+To stretch lending practices even further, a concept which has been argued would improve housing affordability while increasing market instability, we adjust the median value of the mortgage loan to account for 97% of the value of the home. This indicates that the individual would only need to pay 3% of the home value for a down payment. Then, we reevaluate the qualifying income of the HAI to allow greater flexibility in how much the average consumer could pay to 60% of their monthly income being spent on their monthly mortgage payment. 
 
 
 Within each of these HAIs we have a particular purpose and tactic to better calculate housing affordability. In all cases, our interest rate is held constant to attribute changes to the formula rather than state and federal loan rates. The NAR method serves as our control, and it follows the same formula as the national standard setup by National Association of Realtors. Since the housing data collected contains estimated valuations by homeowners (which is not an exact estimate of home values), we need a base sample to build upon and measure deviations from. Unfortunately, the national association of realtors does not allow data sharing or open-source use without randomization of the MSA from their respective HAI’s. This is not valuable to us since this would remove the opportunity for the public and policymakers to identify their locality and thereby eliminate the potential for improvements.  
@@ -183,12 +189,6 @@ df.fin <- df %>%
 
 Include in the following sections a detailed analysis of finding, the importance of the work, our conclusion, whether our hypothesis was met, a discussion of the findings, and opportunities for future research. 
 
-```{r}
-
-```
-
-## Analysis
-
 ## Results 
 
 ```{r}
@@ -205,7 +205,8 @@ hainames <- c("HAI" = "Normal",
 HAItitle <- function(variable,value){
   return(HAINAMES[value])
 }
-df.fin %>%
+# Main 6 HAIs labeled Scatterplot Trends
+main6 <- df.fin %>%
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
          -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
   filter(key == c("HAI", "HAIRW", "HAIRNT", 
@@ -220,8 +221,45 @@ df.fin %>%
   labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
   facet_wrap(key ~ ., scales = "free", shrink = F, labeller = labeller(key = hainames)) + 
   theme(legend.position = "none")
+# Outstanding Debts HAI ScatterPlot Trends
+dbts1 <- df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAIDBT")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .15, col = key)) + 
+  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
+       title = "Outstanding Debts HAI Distribution") +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = .5)) 
+dbts2 <- df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAIDBT")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .15, col = key)) +
+  geom_smooth(aes(x = value), 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
+       title = "Outstanding Debts HAI Distribution") +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = .5))
+# Arrange plots 
+ggarrange(main6,
+          ggarrange(dbts1, dbts2, 
+                    ncol=2, labels = c("B", "C")),
+          nrow = 2, labels = "A")
 ```
 
+
+The determining factors of which of these HAI plots performs best is dependent upon which factors are weighted most heavily. For example, if affordability is the key and there is little care about market stability, the lenient lending HAI is best suited to measure relative affordability. This is because it has by far the greatest proportion of MSAs located at a higher HAI value than the current national average located at an HAI of 100. By the same notion, if affordability is solely dependent upon how many of these MSA can be on the right side of the vertical line denoting the national average HAI, then the Outstanding Debts HAI would portray the least affordable HAI of all as no MSA is even close to the national average. Many are below zero making it impractical at best for those MSAs to afford anything, let alone housing, regardless of Median Income.     
 
 
 ```{r}
@@ -323,7 +361,33 @@ df.fin %>%
                   "HAILEN", 
                   "HAIDBT")) %>%
   summarise(sum(is.na(value))) 
-
+# Extract HAIs >= 100
+ltdf <- df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  subset( value < 100) 
+gtdf <- df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, 
+         -year, -MEDINC, 
+         -MEDVAL, -MOE, 
+         -UMEDVAL, -LMEDVAL, 
+         -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", 
+                  "HAIRNT", 
+                  "HAIIPD", 
+                  "HAIRAW", 
+                  "HAILEN", 
+                  "HAIDBT")) %>% 
+  subset( value >= 100) 
 ```
 
 
@@ -331,11 +395,11 @@ Create a table of the above values with a tally of how many are above or below a
 
 We believe that each has a unique perspective to offer. For purposes of former generations, lenient lending appears to have made it a lot easier to afford homes but at the cost of market stability (given the great depression, recession, and so on). The raw values also show that if practices were the same before the FHA was created the most amount of people would not be able to afford a home (excluding debts). When including the debts of the average homeowner today, there is no place in the U.S. deemed affordable by NAR HAI standards. Additionally, if incomes were adjusted for prospective inflation (and somehow the price of housing were to stagnate), a large majority of the metropolitan areas in the US would be affordable. Real wage estimates and Rent Adjusted estimates capture the minimum realities that most housholds face; the aggregated cost of a goods and services and the effect rent can have on encouraging (or in this case discouraging) homeownship in the U.S. Since rent is practically required of all potential homeowners (look for sources on this), it could be considered the most useful HAI metric from this analysis. 
 
-
-## Conclusion
-
+The goal should be to provide the most people with housing at an affordable cost without burdening the market or other individuals to achieve it. This should include sustainability goals which are not covered in this analysis.  
 ## Discussion 
 
+
+## Conclusion
 
 
 
