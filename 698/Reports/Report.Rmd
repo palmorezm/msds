@@ -25,6 +25,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggpubr)
 library(kableExtra)
+theme_set(theme_minimal())
 ```
 
 It is important that housing be affordable because people need a place to live. Failure to provide adequate affordable housing has been shown to weaken local economies, reduce quality of life, and increase financial and mental health stress in the population. We note the two major national indices that focus on estimating a qualifying income as a proportion of the median family income for a given area to measure affordability. While these incorporate interest rates and make reasonable assumptions about down payments, amortization, and other general requirements for consumers to be granted a mortgage loan, they leave out a plethora of obstacles faced by consumers, especially for first-time homebuyers. Instead, focus should be placed on direct consumer access to housing without loan considerations and incorporate a reasonable safety net in these index calculations. We propose a new method of calculating housing affordability for consumers in the 21st century, one that incorporates a set of minimum thresholds that better exemplify the economic challenges of the modern home buying process. 
@@ -138,13 +139,12 @@ $$(\frac{M_{i}}{(\frac{M_{p}\times0.97( \frac{IR}{12} )}{ 1- ( \frac{1 + IR}{12}
 To stretch lending practices even further, a concept which has been argued would improve housing affordability while increasing market instability, we adjust the median value of the mortgage loan to account for 97% of the value of the home. This indicates that the individual would only need to pay 3% of the home value for a down payment. Then, we reevaluate the qualifying income of the HAI to allow greater flexibility in how much the average consumer could pay to 60% of their monthly income being spent on their monthly mortgage payment. 
 
 
-Within each of these HAIs we have a particular purpose and tactic to better calculate housing affordability. In all cases, our interest rate is held constant to attribute changes to the formula rather than state and federal loan rates. The NAR method serves as our control, and it follows the same formula as the national standard setup by National Association of Realtors. Since the housing data collected contains estimated valuations by homeowners (which is not an exact estimate of home values), we need a base sample to build upon and measure deviations from. Unfortunately, the national association of realtors does not allow data sharing or open-source use without randomization of the MSA from their respective HAI’s. This is not valuable to us since this would remove the opportunity for the public and policymakers to identify their locality and thereby eliminate the potential for improvements.  
+Within each of these HAIs we have a particular purpose and tactic to better calculate housing affordability. In all cases, our interest rate is held constant to attribute changes to the formula rather than state and federal loan rates. The NAR method serves as our control, and it follows the same formula as the national standard setup by the National Association of Realtors. Since the housing data collected contains estimated valuations by homeowners (which is not an exact estimate of home values), we need a base sample to build upon and measure deviations from. Unfortunately, the national association of realtors does not allow data sharing or open-source use without randomization of the MSA from their respective HAI’s. This is not valuable to us since this would remove the opportunity for the public and policymakers to identify their locality and thereby eliminate the potential for improvements.  
 
 The remaining HAI methods rely on adjustments to median household income with the same qualifying income as the NAR HAI except when calculating the Outstanding Debts HAI and Lenient Lending HAI. The first adjustment simply creates a real wage estimate for the locality by adjusting for the cost of living. This integrates a median dollar adjustment derived from the national average for a market basket of goods and services including prices for transportation, food, rent, and other categories. We isolate rent in the Rent Adjusted HAI and adjust the median household income proportionally for each MSA. Next, we use the implicit regional price deflator for each MSA to create an IPD Projected HAI that incorporates wage growth with a theoretically stabilized housing market. Our Raw HAI weighs the influence of down payments on affordability by increasing the expected loan amount to 99% of the median home value. Lastly, we identify the average household debts from the literature to form an Outstanding Debts HAI and form a new Lenient Lending HAI by hypothetically easing lending restrictions.   
-
 Importantly, the data used to form these HAI estimates are collected and updated at regular frequencies and averaged (by median) across 5-year intervals. This limits volatility within the data, making it less biased and more robust. Our study spans from 2010 through 2019, or one decade. Traditionally, the ‘cap’ of household income that could be reasonably spent on housing was 30% of household income. We lower this in all but two of our calculations where it makes intuitive sense to reflect present lending practices. We also assume that every household is capable of making a 20% down payment. We note that this is highly unlikely and is why government programs exist to assist individuals with lowering the up-front costs of purchasing a home. Nevertheless, because it is a standard of the industry and lending institutions, we focus on changes to income that could affect housing affordability.  
 
-To elucidate upon the effects of each HAI method we model their distributions across income and population by MSA. The relationship between the population and our newly formed median HAI affordability model is such that we can state half of the population is below the HAI value and half is above. We take advantage of this relationship and available literature to estimate the proportion of the population that is unable to afford housing. We also compare rates of change in personal and real wage income to the change in housing affordability at various HAI levels. This allows us to use linear regression techniques to model changes by HAI method and predict where their metrics are heading as well as approximate how many people could afford at house in the future.
+To elucidate upon the effects of each HAI method we model their distributions across income and population by MSA. The relationship between the population and our newly formed median HAI affordability model is such that we can state half of the population is below the HAI value and half is above. We take advantage of this relationship and available literature to estimate the proportion of the population that is unable to afford housing. We also compare rates of change in personal and real wage income to the change in housing affordability at various HAI levels. This allows us to use linear regression techniques to model changes by HAI method and predict where their metrics are heading as well as approximate how many people could afford housing in the future.
 
 ```{r}
 # All HAI Estimates
@@ -187,9 +187,31 @@ df.fin <- df %>%
 ```
 
 
-Include in the following sections a detailed analysis of finding, the importance of the work, our conclusion, whether our hypothesis was met, a discussion of the findings, and opportunities for future research. 
+
 
 ## Results 
+
+Instead, focus should be placed on direct consumer access to housing without loan considerations and incorporate a reasonable safety net in these index calculations. We propose a new method of calculating housing affordability for consumers in the 21st century, one that incorporates a set of minimum thresholds that better exemplify the economic challenges of the modern home buying process. 
+
+
+Our hypothesis is that improving upon the housing affordability index will increase understanding among financial institutions and municipalities to empower prospective homebuyers in their areas. 
+
+To elucidate upon the effects of each HAI method we model their distributions across income and population by MSA. 
+
+estimate the proportion of the population that is unable to afford housing
+
+We also compare rates of change in personal and real wage income to the change in housing affordability at various HAI levels
+
+Use linear regression techniques to approximate how many people could afford housing in the future under each HAI measurement. 
+
+
+Estimates based on the NAR method found that in 2019 approximately [x] people would be unable to afford housing in the MSAs of the U.S. We developed 6 alternative methods to better exemplify the modern home-buying process, each with a focus on a particular interest factor or subset of variables that are currently understood to influence the housing market. Our results were tabulated and are shown alongside the national standard denoted with an asterisk for comparison: 
+
+
+The Outstanding Debts HAI method stands out the most with no person being able to afford housing. This indicates that if the debts of the average household were required to be paid immediately prior to the purchase of a house, no household in the U.S. would be able to afford the home with the current average amount of household debt. Given this HAI only considers consumer debts, which does not include mortgages, the value represents a shift in household finances towards greater debts for its goods and services even as lending practices have tightened since the 2008 financial crisis. 
+
+There are multiple ways to interpret the results of our HAI metrics and how well they perform. What is realistic to someone who has already purchased a house and is maintaining a long-term wealth assets, will not be as realistic to someone who has been renting their whole life. Rather than make this analysis is a host of situation specific scenarios, we draw on deviations from our current national average to make interpretations and pass judgement about its effects on the economy and people. This holistic approach is best represented by the following scatterplot of median income per HAI level where the dotted vertical line represents the current nationally accepted HAI value in which homes could be afforded. The colored points surrounding this line correspond to real MSA HAI values in the U.S. while a LOESS smoothing line is provided for reference. 
+
 
 ```{r}
 # Real Income and HAI's
@@ -219,7 +241,7 @@ main6 <- df.fin %>%
               method="loess", col = "grey30", fill = "light grey",
               se = T, na.rm = T) + 
   labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
-  facet_wrap(key ~ ., scales = "free", shrink = F, labeller = labeller(key = hainames)) + 
+  facet_wrap(key ~ ., scales = "free_x", shrink = F, labeller = labeller(key = hainames)) + 
   theme(legend.position = "none")
 # Outstanding Debts HAI ScatterPlot Trends
 dbts1 <- df.fin %>%
@@ -254,12 +276,35 @@ dbts2 <- df.fin %>%
 # Arrange plots 
 ggarrange(main6,
           ggarrange(dbts1, dbts2, 
-                    ncol=2, labels = c("B", "C")),
-          nrow = 2, labels = "A")
+                    ncol=2, labels = c(" ", " ")),
+          nrow = 2, labels = " ")
+```
+
+On again, the Outstanding Debts HAI is observed farthest from affordable and as such must be displayed on a separate scale. Recall that we also increased lending-leniency to allow for 30% of monthly personal income to be spent on housing to try and compensate for the additional debts. This is consistent with the maximum possible loan amounts (relative to household income) commonly granted by 2019 financial standards yet, it marginally improves results. 
+
+From this plot we use two visuals fully comprehend the change in median income as affordability increases of this Debt-laiden method. On the bottom left we see the change in median income per MSA at the same scale of the other HAI methods. In it, the rate of change is nearly vertical. On the bottom right, we see a smoother linear transition from lower, negative HAI values to positive ones. However, there is a slight uptick at the elbow of this plot located at an HAI of about 1. It is also clear that this is the only HAI method that resulted in value below zero.  
+
+Although the average household has not always been as debt-heavy, it is unrealistic to expect that consumers interested in purchasing a house would first pay off all their debts. Credit has existed in several forms since the 1900's but its prolific use is still a relatively new phenomena. We should not expect that its proliferation will cease anytime soon. Out interests are to inform the public and policymakers alike. For this reason, it will be discarded in favor of other methods.  
+
+With our the remaining methods located at the top of the plot, we can inspect the proportions of MSA that occur above and below the national average. At first glance, the Lenient Lending HAI pulls nearly all MSA values into the 'affordable' section above the national average. This is followed by the Inflation Adjusted HAI which assumed the median household value of each MSA maintained its present value. The remaining methods are too close to call so we revist them with another visual. 
+
+## Stoped Here - Continue Below -->
+
+The determining factors of which of these HAI plots performs best is dependent upon which factors are weighted most heavily. For example, if affordability is the key and there is little care about market stability, the lenient lending HAI is best suited to measure relative affordability. This is because it has by far the greatest proportion of MSAs located at a higher HAI value than the current national average located at an HAI of 100. By the same notion, if affordability is solely dependent upon how many of these MSA can be on the right side of the vertical line denoting the national average HAI, then the Outstanding Debts HAI would portray the least affordable HAI of all as no MSA is even close to the national average. Many are below zero making it impractical at best for those MSAs to afford anything, let alone housing, regardless of Median Income.     
+
+```{r}
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  mutate(value.med = median(value)) %>% 
+  ggplot(aes(value, col = key)) + 
+           geom_histogram(alpha = .05) + geom_vline(xintercept = 100) + 
+           facet_wrap(~key, scales = "free_x")
 ```
 
 
-The determining factors of which of these HAI plots performs best is dependent upon which factors are weighted most heavily. For example, if affordability is the key and there is little care about market stability, the lenient lending HAI is best suited to measure relative affordability. This is because it has by far the greatest proportion of MSAs located at a higher HAI value than the current national average located at an HAI of 100. By the same notion, if affordability is solely dependent upon how many of these MSA can be on the right side of the vertical line denoting the national average HAI, then the Outstanding Debts HAI would portray the least affordable HAI of all as no MSA is even close to the national average. Many are below zero making it impractical at best for those MSAs to afford anything, let alone housing, regardless of Median Income.     
 
 
 ```{r}
@@ -305,12 +350,168 @@ gtdf <- df.fin %>%
                   "HAILEN", 
                   "HAIDBT")) %>% 
   subset( value >= 100) 
-ltdf %>%
-  filter(key == 'HAI') %>% View()
-keys <- unique(ltdf$key)
-
+# Summarize by group the "less affordable" population and other statistics 
+lttbl <- ltdf %>%
+  group_by(key, year) %>% 
+  na.exclude() %>%
+  summarize(Set = 'LT100', 
+            N = n(), 
+            MMEDHAI = median(value), 
+            AAVGHAI = mean(value),
+            SMEDINC = sum(MEDINC),
+            SUMEDVAL = sum(UMEDVAL), 
+            SLMEDVAL = sum(LMEDVAL), 
+            SPERINC = sum(PERINC), 
+            SREALWAGE = sum(AINCALL, na.rm = T), 
+            TPOP = sum(POP), 
+            TPOPN = (TPOP/N), 
+            RMEDINC = (SMEDINC/N),
+            RMEDHAI = (MMEDHAI/N),
+            RAVGHAI = (AAVGHAI/N) 
+            )
+# Summarize by group the "more affordable" population and other statistics 
+gttbl <- gtdf %>%
+  group_by(key, year) %>% 
+  na.exclude() %>%
+  summarize(Set = 'GT100', 
+            N = n(), 
+            MMEDHAI = median(value), 
+            AAVGHAI = mean(value),
+            SMEDINC = sum(MEDINC),
+            SUMEDVAL = sum(UMEDVAL), 
+            SLMEDVAL = sum(LMEDVAL), 
+            SPERINC = sum(PERINC), 
+            SREALWAGE = sum(AINCALL, na.rm = T), 
+            TPOP = sum(POP), 
+            TPOPN = (TPOP/N), 
+            RMEDINC = (SMEDINC/N),
+            RMEDHAI = (MMEDHAI/N),
+            RAVGHAI = (AAVGHAI/N) )
+# Check Row Observations Match Data in Glb Env.
+# sum(gttbl$N) 
+# sum(lttbl$N)
+df <- rbind(lttbl, gttbl)
+head(df)
 ```
 
+
+```{r}
+df$year <- as.Date(paste(df$year, 12, 31, sep = "-"))
+df %>% 
+  group_by(key, Set) %>% 
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = MMEDHAI, col = key)) + 
+  geom_hline(yintercept = 100,  lty = "dotted") + 
+  geom_line(aes(y = MMEDHAI)) +
+  facet_wrap(~Set, ) +
+  geom_smooth(aes(y = MMEDHAI), 
+              method="lm",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid")
+df %>% 
+  group_by(key, Set) %>% 
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = MMEDHAI, col = key)) + 
+  geom_hline(yintercept = 100, lty = "dotted")  +
+  facet_wrap(~key, ) +
+  geom_smooth(aes(y = MMEDHAI), 
+              method="lm",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid")
+```
+
+
+```{r}
+RMEDINC.median <- median(df$RMEDINC)
+df %>% 
+  group_by(key, Set) %>% 
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
+  geom_hline(yintercept = RMEDINC.median, lty = "dotted") + 
+  geom_line(aes(y = RMEDINC)) +
+  facet_wrap(~Set, scales = "free") +
+  geom_smooth(aes(y = RMEDINC), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid")
+RMEDINC_reduced <- (df$RMEDINC / 1000)
+RMEDINC_reduced.median <- median(RMEDINC_reduced)
+df %>% 
+  group_by(key, Set) %>% 
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = RMEDINC_reduced, col = key)) + 
+  geom_hline(yintercept = RMEDINC_reduced.median, lty = "dotted")  +
+  facet_wrap(~key) +
+  geom_smooth(aes(y = RMEDINC_reduced), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid")
+```
+
+```{r}
+head(df)
+```
+
+
+
+```{r}
+df %>% 
+  filter(key != "HAIDBT") %>%
+  group_by(key, Set) %>% 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
+  geom_hline(yintercept = RMEDINC.median, lty = "dotted") + 
+  geom_point(aes(y = RMEDINC)) +
+  facet_wrap(~Set, scales = "free") +
+  geom_smooth(aes(y = RMEDINC), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid") + 
+  geom_smooth(aes(y = RMEDINC), 
+              method="lm", alpha = 0.25,
+              col = "grey70", 
+              fill = "light blue", 
+              se = F, na.rm = T, 
+              lty = "dashed") + 
+  labs(x = "Median HAI Value", y = "Median Income" )
+df %>% 
+  filter(key != "HAIDBT") %>%
+  group_by(key, Set) %>% 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
+  geom_hline(yintercept = RMEDINC.median, lty = "dotted")  +
+  facet_wrap(~key, scales = "free") +
+  geom_smooth(aes(y = RMEDINC), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = F, na.rm = T, 
+              lty = "solid") + 
+  geom_smooth(aes(y = RMEDINC), 
+              method="lm", alpha = 0.25,
+              col = "grey70", 
+              fill = "light blue", 
+              se = T, na.rm = T, 
+              lty = "dashed") + 
+  labs(x = "Median HAI Value", y = "Median Income" )
+```
+
+
+```{r}
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIDBT",
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, col = key)) + 
+           geom_histogram(alpha = .05) + 
+           facet_wrap(~key, scales = "free")
+```
 
 
 
