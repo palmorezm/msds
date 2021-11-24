@@ -14,7 +14,7 @@ link-citations: yes
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = F, warning = F, message = F)
 ```
 
 
@@ -191,125 +191,12 @@ df.fin <- df %>%
 
 ## Results 
 
-Instead, focus should be placed on direct consumer access to housing without loan considerations and incorporate a reasonable safety net in these index calculations. We propose a new method of calculating housing affordability for consumers in the 21st century, one that incorporates a set of minimum thresholds that better exemplify the economic challenges of the modern home buying process. 
-
-
-Our hypothesis is that improving upon the housing affordability index will increase understanding among financial institutions and municipalities to empower prospective homebuyers in their areas. 
-
-To elucidate upon the effects of each HAI method we model their distributions across income and population by MSA. 
-
-estimate the proportion of the population that is unable to afford housing
-
-We also compare rates of change in personal and real wage income to the change in housing affordability at various HAI levels
-
-Use linear regression techniques to approximate how many people could afford housing in the future under each HAI measurement. 
-
-
-Estimates based on the NAR method found that in 2019 approximately [x] people would be unable to afford housing in the MSAs of the U.S. We developed 6 alternative methods to better exemplify the modern home-buying process, each with a focus on a particular interest factor or subset of variables that are currently understood to influence the housing market. Our results were tabulated and are shown alongside the national standard denoted with an asterisk for comparison: 
-
-
-The Outstanding Debts HAI method stands out the most with no person being able to afford housing. This indicates that if the debts of the average household were required to be paid immediately prior to the purchase of a house, no household in the U.S. would be able to afford the home with the current average amount of household debt. Given this HAI only considers consumer debts, which does not include mortgages, the value represents a shift in household finances towards greater debts for its goods and services even as lending practices have tightened since the 2008 financial crisis. 
-
-There are multiple ways to interpret the results of our HAI metrics and how well they perform. What is realistic to someone who has already purchased a house and is maintaining a long-term wealth assets, will not be as realistic to someone who has been renting their whole life. Rather than make this analysis is a host of situation specific scenarios, we draw on deviations from our current national average to make interpretations and pass judgement about its effects on the economy and people. This holistic approach is best represented by the following scatterplot of median income per HAI level where the dotted vertical line represents the current nationally accepted HAI value in which homes could be afforded. The colored points surrounding this line correspond to real MSA HAI values in the U.S. while a LOESS smoothing line is provided for reference. 
-
-
-```{r}
-# Real Income and HAI's
-# create a title list for HAI
-HAINAMES <- list("Normal" = "HAI", "Real Wage"="HAIRW", "Rent Adjustment"="HAIRNT", 
-                 "Inflation Adjusted"="HAIIPD", "Raw Values"="HAIRAW", "Lenient Lending"="HAILEN")
-hainames <- c("HAI" = "Normal", 
-              "HAIRW"="Real Wage", 
-              "HAIRNT"="Rent Adjustment", 
-              "HAIIPD"="Inflation Adjusted", 
-              "HAIRAW"="Raw Values", 
-              "HAILEN"="Lenient Lending")
-HAItitle <- function(variable,value){
-  return(HAINAMES[value])
-}
-# Main 6 HAIs labeled Scatterplot Trends
-main6 <- df.fin %>%
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", "HAIRNT", 
-                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
-  filter(AINCALL <100000) %>% 
-  ggplot(aes(value, (AINCALL/1000))) + 
-  geom_point(aes(x = value, alpha = .15, col = key)) + 
-  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
-  geom_smooth(aes(x = value), 
-              method="loess", col = "grey30", fill = "light grey",
-              se = T, na.rm = T) + 
-  labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
-  facet_wrap(key ~ ., scales = "free_x", shrink = F, labeller = labeller(key = hainames)) + 
-  theme(legend.position = "none")
-# Outstanding Debts HAI ScatterPlot Trends
-dbts1 <- df.fin %>%
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAIDBT")) %>% 
-  filter(AINCALL <100000) %>% 
-  ggplot(aes(value, (AINCALL/1000))) + 
-  geom_point(aes(x = value, alpha = .15, col = key)) + 
-  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
-  geom_smooth(aes(x = value), 
-              method="loess", col = "grey30", fill = "light grey",
-              se = T, na.rm = T) + 
-  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
-       title = "Outstanding Debts HAI Distribution") +
-  theme(legend.position = "none", 
-        plot.title = element_text(hjust = .5)) 
-dbts2 <- df.fin %>%
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAIDBT")) %>% 
-  filter(AINCALL <100000) %>% 
-  ggplot(aes(value, (AINCALL/1000))) + 
-  geom_point(aes(x = value, alpha = .15, col = key)) +
-  geom_smooth(aes(x = value), 
-              method="loess", col = "grey30", fill = "light grey",
-              se = T, na.rm = T) + 
-  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
-       title = "Outstanding Debts HAI Distribution") +
-  theme(legend.position = "none", 
-        plot.title = element_text(hjust = .5))
-# Arrange plots 
-ggarrange(main6,
-          ggarrange(dbts1, dbts2, 
-                    ncol=2, labels = c(" ", " ")),
-          nrow = 2, labels = " ")
-```
-
-On again, the Outstanding Debts HAI is observed farthest from affordable and as such must be displayed on a separate scale. Recall that we also increased lending-leniency to allow for 30% of monthly personal income to be spent on housing to try and compensate for the additional debts. This is consistent with the maximum possible loan amounts (relative to household income) commonly granted by 2019 financial standards yet, it marginally improves results. 
-
-From this plot we use two visuals fully comprehend the change in median income as affordability increases of this Debt-laiden method. On the bottom left we see the change in median income per MSA at the same scale of the other HAI methods. In it, the rate of change is nearly vertical. On the bottom right, we see a smoother linear transition from lower, negative HAI values to positive ones. However, there is a slight uptick at the elbow of this plot located at an HAI of about 1. It is also clear that this is the only HAI method that resulted in value below zero.  
-
-Although the average household has not always been as debt-heavy, it is unrealistic to expect that consumers interested in purchasing a house would first pay off all their debts. Credit has existed in several forms since the 1900's but its prolific use is still a relatively new phenomena. We should not expect that its proliferation will cease anytime soon. Out interests are to inform the public and policymakers alike. For this reason, it will be discarded in favor of other methods.  
-
-With our the remaining methods located at the top of the plot, we can inspect the proportions of MSA that occur above and below the national average. At first glance, the Lenient Lending HAI pulls nearly all MSA values into the 'affordable' section above the national average. This is followed by the Inflation Adjusted HAI which assumed the median household value of each MSA maintained its present value. The remaining methods are too close to call so we revist them with another visual. 
-
-## Stoped Here - Continue Below -->
-
-The determining factors of which of these HAI plots performs best is dependent upon which factors are weighted most heavily. For example, if affordability is the key and there is little care about market stability, the lenient lending HAI is best suited to measure relative affordability. This is because it has by far the greatest proportion of MSAs located at a higher HAI value than the current national average located at an HAI of 100. By the same notion, if affordability is solely dependent upon how many of these MSA can be on the right side of the vertical line denoting the national average HAI, then the Outstanding Debts HAI would portray the least affordable HAI of all as no MSA is even close to the national average. Many are below zero making it impractical at best for those MSAs to afford anything, let alone housing, regardless of Median Income.     
-
-```{r}
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", "HAIRNT", 
-                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
-  mutate(value.med = median(value)) %>% 
-  ggplot(aes(value, col = key)) + 
-           geom_histogram(alpha = .05) + geom_vline(xintercept = 100) + 
-           facet_wrap(~key, scales = "free_x")
-```
-
 
 
 
 ```{r}
 # Count Missing Values
-df.fin %>% 
+df.missingvalues <- df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, 
          -year, -MEDINC, 
          -MEDVAL, -MOE, 
@@ -321,7 +208,7 @@ df.fin %>%
                   "HAIRAW", 
                   "HAILEN", 
                   "HAIDBT")) %>%
-  summarise(sum(is.na(value))) %>% View()
+  summarise(sum(is.na(value))) 
 # Extract HAIs < 100
 ltdf <- df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, 
@@ -359,16 +246,16 @@ lttbl <- ltdf %>%
             MMEDHAI = median(value), 
             AAVGHAI = mean(value),
             SMEDINC = sum(MEDINC),
+            SMEDVAL = sum(MEDVAL),
             SUMEDVAL = sum(UMEDVAL), 
             SLMEDVAL = sum(LMEDVAL), 
             SPERINC = sum(PERINC), 
-            SREALWAGE = sum(AINCALL, na.rm = T), 
+            SREALWAGE = sum(AINCALL), 
             TPOP = sum(POP), 
             TPOPN = (TPOP/N), 
-            RMEDINC = (SMEDINC/N),
-            RMEDHAI = (MMEDHAI/N),
-            RAVGHAI = (AAVGHAI/N) 
-            )
+            PMEDINC = (SMEDINC/N),
+            PMEDHAI = (MMEDHAI/N),
+            PAVGHAI = (AAVGHAI/N) )
 # Summarize by group the "more affordable" population and other statistics 
 gttbl <- gtdf %>%
   group_by(key, year) %>% 
@@ -378,26 +265,215 @@ gttbl <- gtdf %>%
             MMEDHAI = median(value), 
             AAVGHAI = mean(value),
             SMEDINC = sum(MEDINC),
+            SMEDVAL = sum(MEDVAL),
             SUMEDVAL = sum(UMEDVAL), 
             SLMEDVAL = sum(LMEDVAL), 
             SPERINC = sum(PERINC), 
-            SREALWAGE = sum(AINCALL, na.rm = T), 
+            SREALWAGE = sum(AINCALL), 
             TPOP = sum(POP), 
             TPOPN = (TPOP/N), 
-            RMEDINC = (SMEDINC/N),
-            RMEDHAI = (MMEDHAI/N),
-            RAVGHAI = (AAVGHAI/N) )
+            PMEDINC = (SMEDINC/N),
+            PMEDHAI = (MMEDHAI/N),
+            PAVGHAI = (AAVGHAI/N) )
 # Check Row Observations Match Data in Glb Env.
 # sum(gttbl$N) 
 # sum(lttbl$N)
-df <- rbind(lttbl, gttbl)
-head(df)
+d <- rbind(lttbl, gttbl) 
+d.columns <- d %>% 
+  ggplot(aes(year, (TPOP/1000000), fill=Set)) + 
+  geom_col(col = "grey38", alpha= 0.25) + 
+  scale_x_discrete(limit = c(2010, 2015, 2019)) + 
+  theme(axis.text.x = element_text(angle = -0), 
+        axis.ticks = element_line(size = .5) ) + 
+  facet_wrap(~key, scales = "fixed")
+# Create shifting function to move index values of column in d upwards by n 
+shift <- function(d, n){
+  c(d[-(seq(n))], rep(NA, n))
+}
+# Summarize with filtering
+data <- d %>% 
+  dplyr::select(key, year, Set, N, TPOP, TPOPN, SMEDVAL, SUMEDVAL, PMEDINC, PMEDHAI, PAVGHAI) %>% 
+  filter(Set == 'LT100' & year == 2010 | year == 2019) %>% 
+  filter(Set != 'GT100') %>% 
+  mutate(SKEW = PAVGHAI - PMEDHAI, 
+         MOE = ((SUMEDVAL - SMEDVAL)/N), 
+         C2019 = ifelse(year == 2019, TPOP, NA), 
+         C2010 = ifelse(year == 2010, TPOP, NA))%>% 
+  dplyr::select(-PAVGHAI, -Set, -TPOPN, -SMEDVAL, -SUMEDVAL)
+data$C2010 <- shift(data$C2010, 1)
+data <- data %>% 
+  mutate(CHANGE = C2019-C2010) %>% 
+  dplyr::select(-C2010, -C2019) %>%
+  mutate(CHANGE = replace_na(CHANGE, 0))
+data <- as.data.frame(data) 
+percent_pop_MSA <- 0.83
+censuspop2019 <- 328300000
 ```
 
 
+Estimates based on the NAR method found that in 2019 approximately `r sum(data$TPOP)` people, or `r round((sum(data$TPOP)/(censuspop2019*percent_pop_MSA))*100, 2)`% of the U.S. MSA population would be unable to afford housing when adhering to traditional financial conventions. Such commonly held conventions include no household paying more than 28% of their monthly income to their monthly mortgage payment and the assumption that everyone must make a 20% down payment at a constant, 30-year fixed interest rate of 3.5%. This was an decrease by `r abs(data$CHANGE[2])` people from 2010. Other methods show variations with as few as `r min(data$TPOP)` unable to afford housing using our lenient lending method and as many as `r max(data$TPOP)` when considering household debts. A table of relevant statistics and their change from 2010 to 2019 is shown for reference. 
+
+
 ```{r}
-df$year <- as.Date(paste(df$year, 12, 31, sep = "-"))
-df %>% 
+# display table
+data
+```
+
+The proportion of the population that is unable to afford housing varies by HAI. In accordance with the NAR methodology, we structured our HAI methods such that any value greater than or equal to 100 is considered affordable. By the same notion, anything less than 100, is less than affordable. In the following figure we notice that the majority of MSA are still able to afford housing. This is noted by the red coloration in the figure. Meanwhile, blue (less than affordable) is largely a minority in all but the HAIDBT method where household debts are factors in affordability. We also notice the levels of affordability change at different rates during the timespan. Our methods are both above and below the NAR method depending on which variables are focused on. 
+
+```{r}
+data.popchangecolumns <- data %>% 
+  ggplot(aes(year, (TPOP/1000000), col = key, alpha = .25)) + 
+  geom_col(fill = "white") + 
+  facet_wrap(~key, scales = "free_y") + 
+  scale_x_discrete(limit = c(2010, 2019))
+d.columns 
+```
+
+Excluding our NAR method, we developed 6 alternative methods to better exemplify the modern home-buying process, each with a focus on a particular variable of interest or subset of variables that are currently understood to influence the housing market and its relative affordability at local levels. To better understand the effects of each HAI method and its relationship to population and income, we examine where the distribution of MSA affordability values fall in relationship to a benchmark denoting where housing is considered affordable (100) alongside each MSA’s median household income from 2010 through 2019. This benchmark is shown as a vertical dot-dashed black line. Anything to the right of the line is affordable while MSA values to the left of the line are less affordable. We also add linear trendlines to the top 6 plots and a locally estimated scatterplot smoothing (LOESS) line to two supplemental plots of our abnormally unaffordable outstanding debts HAI. 
+
+```{r}
+# Real Income and HAI's
+# create a title list for HAI
+HAINAMES <- list("Normal" = "HAI", "Real Wage"="HAIRW", "Rent Adjustment"="HAIRNT", 
+                 "Inflation Adjusted"="HAIIPD", "Raw Values"="HAIRAW", "Lenient Lending"="HAILEN")
+hainames <- c("HAI" = "Normal", 
+              "HAIRW"="Real Wage", 
+              "HAIRNT"="Rent Adjusted", 
+              "HAIIPD"="Inflation Adjusted", 
+              "HAIRAW"="Raw Values", 
+              "HAILEN"="Lenient Lending")
+HAItitle <- function(variable,value){
+  return(HAINAMES[value])
+}
+# Main 6 HAIs labeled Scatterplot Trends
+main6 <- df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .01, col = key)) + 
+  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
+  geom_smooth(aes(x = value), 
+              method="lm", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)") +
+  facet_wrap(key ~ ., scales = "free_x", shrink = F, labeller = labeller(key = hainames)) + 
+  theme(legend.position = "none")
+# Outstanding Debts HAI ScatterPlot Trends
+dbts1 <- df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAIDBT")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .01, col = key)) + 
+  geom_vline(xintercept = 100, lty = "dotdash", col = "black") + 
+  geom_smooth(aes(x = value), 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
+       title = "Outstanding Debts HAI Distribution") +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = .5)) 
+dbts2 <- df.fin %>%
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAIDBT")) %>% 
+  filter(AINCALL <100000) %>% 
+  ggplot(aes(value, (AINCALL/1000))) + 
+  geom_point(aes(x = value, alpha = .01, col = key)) +
+  geom_smooth(aes(x = value), 
+              method="loess", col = "grey30", fill = "light grey",
+              se = T, na.rm = T) + 
+  labs(x = "Home Affordability Value", y = "Median Income ($1000)", 
+       title = "Outstanding Debts HAI Distribution") +
+  theme(legend.position = "none", 
+        plot.title = element_text(hjust = .5))
+# Arrange plots 
+ggarrange(main6,
+          ggarrange(dbts1, dbts2, 
+                    ncol=2, labels = c(" ", " ")),
+          nrow = 2, labels = " ")
+```
+
+The Outstanding Debts HAI method stands out the most with no person being able to afford housing. It is observed farthest from the affordable benchmark and as such must be displayed on a separate scale. Recall that we also increased lending-leniency to allow for 30% of monthly personal income to be spent on housing to try and compensate for the additional debts. This is consistent with the maximum possible loan amounts (relative to household income) commonly granted by 2019 financial standards yet, it marginally improves results. 
+
+This indicates that if the debts of the average household were required to be paid immediately prior to the purchase of a house, no household in the U.S. would be able to afford the home with the current average amount of household debt under traditional financial practices. Given this HAI only considers consumer debts, which does not include mortgages, the value represents a shift in household finances towards greater debts for its goods and services even as lending practices have tightened since the 2008 financial crisis. We remove the outstanding debts HAI since the scale is not comparable to existing measures and reassess the distribution. 
+
+
+```{r}
+df.fin %>% 
+  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
+         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
+  filter(key == c("HAI", "HAIRW", "HAIRNT", 
+                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
+  mutate(value.med = median(value)) %>% 
+  ggplot(aes(value, col = key)) + 
+           geom_histogram(alpha = .05) + geom_vline(xintercept = 100) + 
+           facet_wrap(~key, scales = "free_x")
+```
+
+It is clear that our NAR standard (HAI) contains a dominance of MSAs that are relatively affordable and a smaller number that are not. When adjusting for inflation (HAIIPD) the portion of MSAs that contain relatively affordable housing increases. The same applies to our lenient lending practices (HAILEN). Alternatively, if we consider the prospects of affording a home by purchasing the full amount of the home’s value, fewer MSAs are affordable. Our rent adjusted (HAIRNT) and real-wage (HAIRW) exemplify similar less-affordable results. We review these methods and their relationships with the median income per MSA. 
+
+```{r}
+# Megaplots 
+PMEDINC.median <- median(d$PMEDINC)
+megaplot1 <- d %>% 
+  filter(key != "HAIDBT") %>%
+  group_by(key, Set) %>% 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key)) + 
+  geom_hline(yintercept = PMEDINC.median, lty = "dotted") + 
+  geom_point(aes(y = PMEDINC)) +
+  facet_wrap(~Set, scales = "free") +
+  geom_smooth(aes(y = PMEDINC), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = T, na.rm = T, 
+              lty = "solid") + 
+  geom_smooth(aes(y = PMEDINC), 
+              method="lm", alpha = 0.25,
+              col = "grey70", 
+              fill = "light blue", 
+              se = F, na.rm = T, 
+              lty = "dashed") + 
+  labs(x = "Median HAI Value", y = "Median Income" )
+megaplot2 <- d %>% 
+  filter(key != "HAIDBT") %>%
+  group_by(key, Set) %>% 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key)) + 
+  geom_hline(yintercept = PMEDINC.median, lty = "dotted")  +
+  facet_wrap(~key, scales = "free") +
+  geom_smooth(aes(y = PMEDINC), 
+              method="loess",
+              col = "grey30", 
+              fill = "light grey", 
+              se = F, na.rm = T, 
+              lty = "solid") + 
+  geom_smooth(aes(y = PMEDINC), 
+              method="lm", alpha = 0.25,
+              col = "grey30", 
+              fill = "light blue", 
+              se = T, na.rm = T, 
+              lty = "dashed") + 
+  labs(x = "Median HAI Value", y = "Median Income" ) + theme(legend.position = "none")
+ggarrange(megaplot1, megaplot2, nrow=2)
+```
+
+In this figure the solid black line fits a LOESS trend to the median income values per MSA and the grey dashed line represents a linear regression line of best fit. The horizontal dotted line is the median income of all MSA in its respective categories. From this, we notice for affordable areas, median income per MSA tends to increase as HAI value increases. Whereas, in less affordable areas, median income per MSA tends to decrease as HAI value increases. We also notice groups by HAI where values cluster in a columnar fashion. This implies a differing relationship between income and affordability dependent on MSA location. 
+
+In the same figure the lighter grey area surrounding the LOESS trend and light blue area surrounding the dashed linear regression lines of best fit represents the standard error of the metrics. We use these areas as an indication of uncertainty regarding the data’s distribution and notice that there is greater certainty in linear regression than the smoothing trends, especially at localized levels as shown on the bottom half of the chart. Additionally, all HAI methods cross over their minimum affordability thresholds near 100 except for the rent-adjusted HAI which is closer to 150. The shape of the linear regressions imply that median income decreases slightly as HAI value increases (or as relative housing affordability becomes more affordable the median income for the MSA is lower). The shape of the LOESS trends tell a different story depending on the HAI. For the raw, rent adjusted, and lenient lending HAIs, the trend implies that median income increases to a certain threshold, then begins to decrease to another point, then increases minutely at the end of its distribution. Conversely, rather than displaying a wave motion of income per MSA HAI value, the NAR, inflation adjusted, and real-wage HAIs form a parabola, or widened U-shape, revealing that for their calculations, income decreases until a certain apex point, then, begins to increase at nearly the same rate.   
+
+
+
+```{r}
+# Caterpillar plots with GT100 and LT100 by Median HAI
+d$year <- as.Date(paste(d$year, 12, 31, sep = "-"))
+d %>% 
+  filter(key != "HAIDBT") %>%
   group_by(key, Set) %>% 
   ggplot(aes(x = year, col = key)) + geom_point(aes(y = MMEDHAI, col = key)) + 
   geom_hline(yintercept = 100,  lty = "dotted") + 
@@ -409,7 +485,8 @@ df %>%
               fill = "light grey", 
               se = T, na.rm = T, 
               lty = "solid")
-df %>% 
+d %>% 
+  filter(key != "HAIDBT") %>%
   group_by(key, Set) %>% 
   ggplot(aes(x = year, col = key)) + geom_point(aes(y = MMEDHAI, col = key)) + 
   geom_hline(yintercept = 100, lty = "dotted")  +
@@ -420,31 +497,28 @@ df %>%
               fill = "light grey", 
               se = T, na.rm = T, 
               lty = "solid")
-```
-
-
-```{r}
-RMEDINC.median <- median(df$RMEDINC)
-df %>% 
+# Seperate Code Chunk Below
+# Caterpillar plots with GT100 and LT100 by Median Income
+d %>% 
   group_by(key, Set) %>% 
-  ggplot(aes(x = year, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
-  geom_hline(yintercept = RMEDINC.median, lty = "dotted") + 
-  geom_line(aes(y = RMEDINC)) +
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = PMEDINC, col = key)) + 
+  geom_hline(yintercept = PMEDINC.median, lty = "dotted") + 
+  geom_line(aes(y = PMEDINC)) +
   facet_wrap(~Set, scales = "free") +
-  geom_smooth(aes(y = RMEDINC), 
+  geom_smooth(aes(y = PMEDINC), 
               method="loess",
               col = "grey30", 
               fill = "light grey", 
               se = T, na.rm = T, 
               lty = "solid")
-RMEDINC_reduced <- (df$RMEDINC / 1000)
-RMEDINC_reduced.median <- median(RMEDINC_reduced)
-df %>% 
+PMEDINC_reduced <- (d$PMEDINC / 1000)
+PMEDINC_reduced.median <- median(PMEDINC_reduced)
+d %>% 
   group_by(key, Set) %>% 
-  ggplot(aes(x = year, col = key)) + geom_point(aes(y = RMEDINC_reduced, col = key)) + 
-  geom_hline(yintercept = RMEDINC_reduced.median, lty = "dotted")  +
+  ggplot(aes(x = year, col = key)) + geom_point(aes(y = PMEDINC_reduced, col = key)) + 
+  geom_hline(yintercept = PMEDINC_reduced.median, lty = "dotted")  +
   facet_wrap(~key) +
-  geom_smooth(aes(y = RMEDINC_reduced), 
+  geom_smooth(aes(y = PMEDINC_reduced), 
               method="loess",
               col = "grey30", 
               fill = "light grey", 
@@ -452,74 +526,11 @@ df %>%
               lty = "solid")
 ```
 
-```{r}
-head(df)
-```
+In this figure the solid black line fits a LOESS trend to the median income values per MSA and the grey dashed line represents a linear regression line of best fit. The horizontal dotted line is the median income of all MSA in its respective categories. From this, we notice for affordable areas, median income per MSA tends to increase as HAI value increases. Whereas, in less affordable areas, median income per MSA tends to decrease as HAI value increases. We also notice groups by HAI where values cluster in a columnar fashion. This implies a differing relationship between income and affordability dependent on MSA location. 
+
+In the same figure the lighter grey area surrounding the LOESS trend and light blue area surrounding the dashed linear regression lines of best fit represents the standard error of the metrics. We use these areas as an indication of uncertainty regarding the data’s distribution and notice that there is greater certainty in linear regression than the smoothing trends, especially at localized levels as shown on the bottom half of the chart. Additionally, all HAI methods cross over their minimum affordability thresholds near 100 except for the rent-adjusted HAI which is closer to 150. The shape of the linear regressions imply that median income decreases slightly as HAI value increases (or as relative housing affordability becomes more affordable the median income for the MSA is lower). The shape of the LOESS trends tell a different story depending on the HAI. For the raw, rent adjusted, and lenient lending HAIs, the trend implies that median income increases to a certain threshold, then begins to decrease to another point, then increases minutely at the end of its distribution. Conversely, rather than displaying a wave motion of income per MSA HAI value, the NAR, inflation adjusted, and real-wage HAIs form a parabola, or widened U-shape, revealing that for their calculations, income decreases until a certain apex point, then, begins to increase at nearly the same rate.  
 
 
-
-```{r}
-df %>% 
-  filter(key != "HAIDBT") %>%
-  group_by(key, Set) %>% 
-  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
-  geom_hline(yintercept = RMEDINC.median, lty = "dotted") + 
-  geom_point(aes(y = RMEDINC)) +
-  facet_wrap(~Set, scales = "free") +
-  geom_smooth(aes(y = RMEDINC), 
-              method="loess",
-              col = "grey30", 
-              fill = "light grey", 
-              se = T, na.rm = T, 
-              lty = "solid") + 
-  geom_smooth(aes(y = RMEDINC), 
-              method="lm", alpha = 0.25,
-              col = "grey70", 
-              fill = "light blue", 
-              se = F, na.rm = T, 
-              lty = "dashed") + 
-  labs(x = "Median HAI Value", y = "Median Income" )
-df %>% 
-  filter(key != "HAIDBT") %>%
-  group_by(key, Set) %>% 
-  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = RMEDINC, col = key)) + 
-  geom_hline(yintercept = RMEDINC.median, lty = "dotted")  +
-  facet_wrap(~key, scales = "free") +
-  geom_smooth(aes(y = RMEDINC), 
-              method="loess",
-              col = "grey30", 
-              fill = "light grey", 
-              se = F, na.rm = T, 
-              lty = "solid") + 
-  geom_smooth(aes(y = RMEDINC), 
-              method="lm", alpha = 0.25,
-              col = "grey70", 
-              fill = "light blue", 
-              se = T, na.rm = T, 
-              lty = "dashed") + 
-  labs(x = "Median HAI Value", y = "Median Income" )
-```
-
-
-```{r}
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", "HAIRNT", "HAIDBT",
-                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
-  filter(AINCALL <100000) %>% 
-  ggplot(aes(value, col = key)) + 
-           geom_histogram(alpha = .05) + 
-           facet_wrap(~key, scales = "free")
-```
-
-
-
-Create a table of the above values with a tally of how many are above or below average. Determine which of these statistics is most realistic for HAI purposes and when estimating home affordability across the U.S. 
-
-We believe that each has a unique perspective to offer. For purposes of former generations, lenient lending appears to have made it a lot easier to afford homes but at the cost of market stability (given the great depression, recession, and so on). The raw values also show that if practices were the same before the FHA was created the most amount of people would not be able to afford a home (excluding debts). When including the debts of the average homeowner today, there is no place in the U.S. deemed affordable by NAR HAI standards. Additionally, if incomes were adjusted for prospective inflation (and somehow the price of housing were to stagnate), a large majority of the metropolitan areas in the US would be affordable. Real wage estimates and Rent Adjusted estimates capture the minimum realities that most housholds face; the aggregated cost of a goods and services and the effect rent can have on encouraging (or in this case discouraging) homeownship in the U.S. Since rent is practically required of all potential homeowners (look for sources on this), it could be considered the most useful HAI metric from this analysis. 
-
-The goal should be to provide the most people with housing at an affordable cost without burdening the market or other individuals to achieve it. This should include sustainability goals which are not covered in this analysis.  
 ## Discussion 
 
 
