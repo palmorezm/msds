@@ -15,6 +15,7 @@ link-citations: yes
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = F, warning = F, message = F)
+options(scipen=999)
 ```
 
 
@@ -74,7 +75,7 @@ Based on studies of global housing markets it is clear that in order to develop 
 
 ```{r}
 # Read in Data 
-df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/compiled.csv")
+df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Research%20Project/Data/compiled.csv")
 # Change Data Types to Numeric
 df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
 df <- df %>% 
@@ -311,12 +312,12 @@ censuspop2019 <- 328300000
 ```
 
 
-Estimates based on the NAR method found that in 2019 approximately `r sum(data$TPOP)` people, or `r round((sum(data$TPOP)/(censuspop2019*percent_pop_MSA))*100, 2)`% of the U.S. MSA population would be unable to afford housing when adhering to traditional financial conventions. Such commonly held conventions include no household paying more than 28% of their monthly income to their monthly mortgage payment and the assumption that everyone must make a 20% down payment at a constant, 30-year fixed interest rate of 3.5%. This was an decrease by `r abs(data$CHANGE[2])` people from 2010. Other methods show variations with as few as `r min(data$TPOP)` unable to afford housing using our lenient lending method and as many as `r max(data$TPOP)` when considering household debts. A table of relevant statistics and their change from 2010 to 2019 is shown for reference. 
+Estimates based on the NAR method found that in 2019 approximately `r format(round(sum(data$TPOP), 1), scientific = FALSE, big.mark = ",")` people, or `r round((sum(data$TPOP)/(censuspop2019*percent_pop_MSA))*100, 2)`% of the U.S. MSA population would be unable to afford housing when adhering to traditional financial conventions. Such commonly held conventions include no household paying more than 28% of their monthly income to their monthly mortgage payment and the assumption that everyone must make a 20% down payment at a constant, 30-year fixed interest rate of 3.5%. This was an decrease by `r format(abs(data$CHANGE[2]), scientific = FALSE, big.mark = ",")` people from 2010. Other methods show variations with as few as `r format(min(data$TPOP), scientific = FALSE, big.mark = ",")` unable to afford housing using our lenient lending method and as many as `r format(max(data$TPOP), scientific = FALSE, big.mark = ",")` when considering household debts. A table of relevant statistics and their change from 2010 to 2019 is shown for reference. 
 
 
 ```{r}
-# display table
-data
+# display table of LT100 (unaffordable MSA)
+data[]
 ```
 
 The proportion of the population that is unable to afford housing varies by HAI. In accordance with the NAR methodology, we structured our HAI methods such that any value greater than or equal to 100 is considered affordable. By the same notion, anything less than 100, is less than affordable. In the following figure we notice that the majority of MSA are still able to afford housing. This is noted by the red coloration in the figure. Meanwhile, blue (less than affordable) is largely a minority in all but the HAIDBT method where household debts are factors in affordability. We also notice the levels of affordability change at different rates during the timespan. Our methods are both above and below the NAR method depending on which variables are focused on. 
@@ -330,7 +331,7 @@ data.popchangecolumns <- data %>%
 d.columns 
 ```
 
-Excluding our NAR method, we developed 6 alternative methods to better exemplify the modern home-buying process, each with a focus on a particular variable of interest or subset of variables that are currently understood to influence the housing market and its relative affordability at local levels. To better understand the effects of each HAI method and its relationship to population and income, we examine where the distribution of MSA affordability values fall in relationship to a benchmark denoting where housing is considered affordable (100) alongside each MSA’s median household income from 2010 through 2019. This benchmark is shown as a vertical dot-dashed black line. Anything to the right of the line is affordable while MSA values to the left of the line are less affordable. We also add linear trendlines to the top 6 plots and a locally estimated scatterplot smoothing (LOESS) line to two supplemental plots of our abnormally unaffordable outstanding debts HAI. 
+Excluding our NAR method, we developed 6 alternative methods to better exemplify the modern home-buying process, each with a focus on a particular variable of interest or subset of variables that are currently understood to influence the housing market and its relative affordability at local levels. To better understand the effects of each HAI method and its relationship to population and income, we examine where the distribution of MSA affordability values fall in relationship to a benchmark denoting where housing is considered affordable (100) alongside each MSA’s median household income from 2010 through 2019. This benchmark is shown as a vertical dot-dashed black line. Anything to the right of the line is more affordable for that HAI type while MSA values to the left of the line are less affordable. We also add linear trendlines to the top 6 plots and a locally estimated scatterplot smoothing (LOESS) line to two supplemental plots of our abnormally unaffordable outstanding debts HAI. 
 
 ```{r}
 # Real Income and HAI's
@@ -413,7 +414,7 @@ df.fin %>%
   mutate(value.med = median(value)) %>% 
   ggplot(aes(value, col = key)) + 
            geom_histogram(alpha = .05) + geom_vline(xintercept = 100) + 
-           facet_wrap(~key, scales = "free_x")
+           facet_wrap(~key, scales = "free_x") + theme(legend.position = "none")
 ```
 
 It is clear that our NAR standard (HAI) contains a dominance of MSAs that are relatively affordable and a smaller number that are not. When adjusting for inflation (HAIIPD) the portion of MSAs that contain relatively affordable housing increases. The same applies to our lenient lending practices (HAILEN). Alternatively, if we consider the prospects of affording a home by purchasing the full amount of the home’s value, fewer MSAs are affordable. Our rent adjusted (HAIRNT) and real-wage (HAIRW) exemplify similar less-affordable results. We review these methods and their relationships with the median income per MSA. 
@@ -463,7 +464,7 @@ megaplot2 <- d %>%
 ggarrange(megaplot1, megaplot2, nrow=2)
 ```
 
-In this figure the solid black line fits a LOESS trend to the median income values per MSA and the grey dashed line represents a linear regression line of best fit. The horizontal dotted line is the median income of all MSA in its respective categories. From this, we notice for affordable areas, median income per MSA tends to increase as HAI value increases. Whereas, in less affordable areas, median income per MSA tends to decrease as HAI value increases. We also notice groups by HAI where values cluster in a columnar fashion. This implies a differing relationship between income and affordability dependent on MSA location. 
+In this figure the solid black line fits a LOESS trend to the median income values per MSA and the grey dashed line represents a linear regression line of best fit. The horizontal dotted lines are the median income of all MSA in its respective categories. From this, we notice for affordable areas, median income per MSA tends to increase as HAI value increases. Whereas, in less affordable areas, median income per MSA tends to decrease as HAI value increases. We also notice groups by HAI where values cluster in a columnar fashion. This implies a differing relationship between income and affordability dependent on MSA location. 
 
 In the same figure the lighter grey area surrounding the LOESS trend and light blue area surrounding the dashed linear regression lines of best fit represents the standard error of the metrics. We use these areas as an indication of uncertainty regarding the data’s distribution and notice that there is greater certainty in linear regression than the smoothing trends, especially at localized levels as shown on the bottom half of the chart. Additionally, all HAI methods cross over their minimum affordability thresholds near 100 except for the rent-adjusted HAI which is closer to 150. The shape of the linear regressions imply that median income decreases slightly as HAI value increases (or as relative housing affordability becomes more affordable the median income for the MSA is lower). The shape of the LOESS trends tell a different story depending on the HAI. For the raw, rent adjusted, and lenient lending HAIs, the trend implies that median income increases to a certain threshold, then begins to decrease to another point, then increases minutely at the end of its distribution. Conversely, rather than displaying a wave motion of income per MSA HAI value, the NAR, inflation adjusted, and real-wage HAIs form a parabola, or widened U-shape, revealing that for their calculations, income decreases until a certain apex point, then, begins to increase at nearly the same rate.   
 
@@ -526,15 +527,15 @@ d %>%
               lty = "solid")
 ```
 
-In this figure the solid black line fits a LOESS trend to the median income values per MSA and the grey dashed line represents a linear regression line of best fit. The horizontal dotted line is the median income of all MSA in its respective categories. From this, we notice for affordable areas, median income per MSA tends to increase as HAI value increases. Whereas, in less affordable areas, median income per MSA tends to decrease as HAI value increases. We also notice groups by HAI where values cluster in a columnar fashion. This implies a differing relationship between income and affordability dependent on MSA location. 
 
-In the same figure the lighter grey area surrounding the LOESS trend and light blue area surrounding the dashed linear regression lines of best fit represents the standard error of the metrics. We use these areas as an indication of uncertainty regarding the data’s distribution and notice that there is greater certainty in linear regression than the smoothing trends, especially at localized levels as shown on the bottom half of the chart. Additionally, all HAI methods cross over their minimum affordability thresholds near 100 except for the rent-adjusted HAI which is closer to 150. The shape of the linear regressions imply that median income decreases slightly as HAI value increases (or as relative housing affordability becomes more affordable the median income for the MSA is lower). The shape of the LOESS trends tell a different story depending on the HAI. For the raw, rent adjusted, and lenient lending HAIs, the trend implies that median income increases to a certain threshold, then begins to decrease to another point, then increases minutely at the end of its distribution. Conversely, rather than displaying a wave motion of income per MSA HAI value, the NAR, inflation adjusted, and real-wage HAIs form a parabola, or widened U-shape, revealing that for their calculations, income decreases until a certain apex point, then, begins to increase at nearly the same rate.  
+## Conclusion
+
 
 
 ## Discussion 
 
 
-## Conclusion
+## Future Work
 
 
 
