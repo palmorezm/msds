@@ -192,9 +192,6 @@ df.fin <- df %>%
 
 ## Results 
 
-
-
-
 ```{r}
 # Count Missing Values
 df.missingvalues <- df.fin %>% 
@@ -530,15 +527,40 @@ d %>%
 
 ## Conclusion
 
+Our analysis produced several informative HAI metrics that may be used to better assess the affordability of housing for a particular MSA location relative to other MSA locations within the United States. The process of determining which method should be used to inform the user is dependent on the goals and interests of the audience. 
+
+We were able to confirm existing hypotheses from the literature that adjustments to household median income for rent, inflation, and cost of living reduced the number of MSA that were considered unaffordable. Other methods showed easing lending restrictions could reduce the number of people unable to afford housing by as much as [x - min TPOP (display lenient lending) ]% or roughly [x - min TPOP] people. Meanwhile, the NAR standard calculated on the same data showed that in 2010 approximately [x - sum(TPOP) for 2010 under HAI filter] people could not afford housing. It is also clear that with adjustments using average household consumer debts, no MSA in the U.S. could afford housing. 
+
+Unfortunately, debt is a major contributing factor that can determine whether approval is given for mortgages. The average American household had around $90,000 of debt accrued on consumer credit in 2019. Debt has become a burden to as many as [x people] who are less likely to be able to afford housing because of their consumer debt obligations. This lowers the probability that extant generations, such as millennials and Generation-Z will experience a market similar to that of previous generations (colloquially Generation-X and Baby Boomers) because they must afford a higher cost of goods and services while median incomes remain predominantly stagnant in the U.S. However, it is important to note that the values used in this study were averages for all consumer debts in 2019 among people aged 25 - 65 which does present new challenges to calculating relative affordability with this metric. We are limited in that, there is little publicly available data on household consumer debts at the level of MSA and results have to be interpreted as is. 
+
+We also determined that with an easing of lending restrictions we could improve results but this does not occur without issues. Our HAI estimates indicate that in 2019 a mere [x - number of people] would be unable to afford housing or roughly [x percent] of MSA population. This was the lowest number of people unable to afford housing in this study. However, based on historical literature, when it is easier for financial markets to loan there is a higher risk of default. When enough people default or are otherwise unable to repay the loan, the economy experiences changes and most often results in economic downturn. The Great Recession from 2007 - 2009, is thought to have been caused by “The collapse of the housing market — fueled by low interest rates, easy credit, insufficient regulation, and toxic subprime mortgages — led to the economic crisis.” This is considered to be “one of the worst economic declines in U.S.” history. Although, it could have been worse without existing restrictions. 
+
+These and other regulatory management strategies surrounding the financial lending practices of the housing market have been reviewed for over a century and the evidence is what led to the existing regulations. They are designed to protect households from broader economic threats and as such, any changes to policy would need to be implemented carefully to avoid accidental damages to the housing market.
+
+For common use purposes by the public and policymakers alike, neither the lenient lending nor debt-laden HAI would not be the most realistic or practical due to limitations in their implementation and a lack of publicly accessible data. Our predicted inflation adjustment is also flawed because it is built on unstable consumer prices. Due to the aforementioned regulatory management strategies in the housing market, increasing median income by regressive techniques to make adjustments to median household income would also likely create a ripple effect of continuously inflating prices. This positive feedback loop would be difficult to control for across U.S. markets and it also assumes housing prices would remain stagnant. This is unrealistic, impractical, and could result in more harm than good when measuring for the public’s use who may decide to act on it in advance of the adjustment. For these reasons, we revert to other matters. 
+
+Presently, the use of the existing NAR standard methodology skews results in favor of those who meet traditional lending practices including 20% down-payments and no more than 28% of the household’s monthly income allowable to a monthly mortgage payment at a fixed 30-year average interest rate of 3.5%. This fails to capture the scope of those who cannot afford a 20% down-payment on a house as well as those who already pay more than 28% of their monthly income for housing. We made adjustments to their equation to examine the effects of new variables. 
+
+Cost of living adjustments to income are equivalent to real-wage estimations by the BLS and have better performance than the NAR at assessing relative affordability realistically. In 2019, [x - population HAIRW] people were unable to afford housing which was a slight decrease of [x] people from 9 years earlier. This exemplified the stagnation of median income cited in the literature while the NAR HAI failed to do so. Additionally, the same number of MSA were counted in both years, thus the slight decrease in population that is unable to afford housing might be attributed to simple random chance. This metric performed better than the NAR but we also considered other factors. 
+
+Rent adjustments to median income would push an additional [NAR HAI sum(TPOP)  - HAIRNT sum(TPOP) y] out of unaffordable housing in MSA when compared to the NAR. We selected this service adjustment due to its importance in determining regional price parities which could be interpreted as the primary booster to calculate overall cost of living for an area. It is important to consider rent when calculating affordability because this is a path to homeownership for over 44 million Americans of which over 45% paid more than 30% of their income towards in 2019. However, we note that the skew of the data is significantly larger than other HAI methods. This implies that renters are concentrated into more populated, less affordable MSA in 2019 than in 2010, indicating higher compactness but lower affordability. This measure is probably most effective in the most populated MSA of the U.S.
 
 
 ## Discussion 
 
+Through this study we developed 7 metrics to measure how affordable housing is relative to the location of the measurement. These HAI methods used reliable, regularly updated open-source data to build on the existing NAR standard methodology and improve our understanding of the variables’ relationships with relative affordability. Given the inherently unpredictable nature of economic challenges that people may face in their lifetimes, it is important we reassess the effectiveness of housing market standards to determine what best fits our needs. 
+
+Currently, the economy is undergoing a major shift in digitization hastened in part by the COVID-19 pandemic and subsequent lockdowns that required remote work. This has changed the viability of swaths of businesses and business sectors, the dynamics of heavily populated MSA, and pushed some people who could afford it toward cheaper locations to purchase housing. This reshuffling of how businesses function and where people live, work, and choose to spend money during lockdown has spurred new problems within the housing market. Demand for affordable housing spiked rapidly as people found themselves preferring amenities that did not come with housing in heavily populated MSA. A shortage of housing coupled with logistical hurdles and rising prices further increased the prices of housing. These factors have changed the market and with it, the needs of HAI measurements. We offer some solutions through this analysis. 
+
+It is important that we recognize none of these metrics will function perfectly in every scenario. Selecting the right one is key to ensuring you are properly measuring relative housing affordability for an MSA. For example, heavily populated areas and those locations with higher rents should probably rely on the rent-adjusted HAI for reference. Meanwhile, MSA locations with smaller population sizes might consider the real-wage HAI while the standard NAR, could be used in places where data is lacking, especially outside of MSA counties. Simply put, what works for someone who has already afforded housing assets will not work the same for first time-homebuyers. As mentioned, each method has its own strengths and weaknesses.  
+
+Lasly, we should consider who we want to house and if we want to house everyone. It is known that humans require shelter for survival but how we go about supplying that shelter and exactly who should receive the benefits of the shelter are debatable. Studies such as this one should bring up questions about whether or not we should recognize housing as anything other than an investment. The goal should be to provide the greatest number of people with housing at an affordable cost without burdening the market or other individuals to achieve it. This should include sustainability goals which are not covered in this analysis.  
+
+
 
 ## Future Work
 
-
-
+Future studies should consider how to estimate the occurrence of relative affordability at the county level. This could be achieved either via linear regression, moving averages, or other smoothie means. Furthermore, it would be interesting to see variables such as commuter distance and homeownership rates applied to a similar equation. We refrained from measures that included travel distance data because of unreliability and potential ethical issues surrounding its collection and interpretation. However, these are certainly factors that influence the relative affordability of housing for an area. Future studies should consider additional variables with existing data that is outside of the standard NAR equation and cross reference over a longer timespan. 
 
 
 
