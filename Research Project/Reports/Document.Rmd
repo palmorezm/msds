@@ -1,16 +1,9 @@
 ---
-title: "A Contemporary Reevaluation of Relative Affordability in the American Housing Market"
-subtitle: "DATA698-004 Capstone Project Final Draft"
+title: "698Report_Document"
 author: "Zachary Palmore"
-output:
-  bookdown::pdf_document2:
-    css: styles.css
-    fig_caption: yes
-    theme: flatly
-    toc: yes
-    toc_depth: 2
-bibliography: library.bib
-link-citations: no
+date: "11/30/2021"
+output: word_document
+always_allow_html: true
 ---
 
 ```{r setup, include=FALSE}
