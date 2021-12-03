@@ -4,7 +4,7 @@
 
 data <- read.csv("https://raw.githubusercontent.com/charleyferrari/CUNY_DATA_608/master/module3/data/cleaned-cdc-mortality-1999-2010-2.csv", header = TRUE)
 
-df.fin <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/698/Data/fin.csv")
+df.fin <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Research%20Project/Data/fin.csv")
 df.fin <- df.fin %>% 
   dplyr::select(-X)
 ggplot2::theme_set(theme_minimal())
@@ -23,7 +23,7 @@ url <- 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-countie
 counties <- rjson::fromJSON(file=url)
 # Import personal income CAINC1 
 # It contains Personal Income, Pop, Per Capita Personal Income
-inc_counties <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/608/Final/Data/CAINC1_AllCounties_1969_2019.csv")
+inc_counties3 <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Knowledge%20and%20Visual%20Analytics/Final/Data/CAINC1_AllCounties_1969_2019.csv")
 sample.df2019 <- inc_counties %>%
   gather(year, value, -GeoFIPS, -GeoName, -Region, 
          -TableName, -LineCode, -IndustryClassification,
