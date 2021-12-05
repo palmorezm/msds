@@ -1,0 +1,145 @@
+
+# DATA 608
+# Shiny Final
+
+# Packages
+library(tidyverse)
+library(rjson)
+library(tigris)
+library(plotly)
+library(shiny)
+library(geojsonsf)
+library(sf)
+ggplot2::theme_set(theme_minimal())
+
+# Cleaning
+counties <- rjson::fromJSON(file="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
+df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Knowledge%20and%20Visual%20Analytics/Final/Data/CAINC1_AllCounties_1969_2019.csv")
+df <- df %>%
+  gather(year, value, -GeoFIPS, -GeoName, -Region, 
+         -TableName, -LineCode, -IndustryClassification,
+         -Description, -Unit)  %>% # Keep descriptors for each County
+  slice(-c(1:3)) %>% # Remove US Totals/Averages
+  # filter(LineCode == 3) %>% # Subset to per capita personal income by county
+  mutate(Value = as.numeric(value)) %>% # Convert all values to numeric type
+  dplyr::select(-value) %>% # Remove non-numeric value column
+  mutate_all(~replace(., is.na(.), 0)) %>% # Replace missing with 0
+  filter(Value > 0) %>% # Remove missing
+  mutate(Year = as.numeric(str_remove(year, "^X"))) %>% 
+  dplyr::select(-year) %>% 
+  mutate(Est28 = Value*.28) %>% 
+  mutate(Statistic = case_when(
+    endsWith(Description, "(thousands of dollars)") ~ "Personal Income",
+    endsWith(Description, "2/") ~ "Income Per Capita", 
+    endsWith(Description, "1/") ~ "Population"
+  ), 
+  Years = as.Date(paste(Year, 1, 1, sep = "-"))) %>% 
+  # filter(Year %in% c(1969, 1979, 1989, 1999, 2009, 2019)) %>% 
+  dplyr::select(-Description, -TableName, -IndustryClassification) 
+
+
+df <- df %>% 
+  slice( -(str_which(df$GeoFIPS, pattern = "\\d{2}(000)")) ) %>% # extract counties by GeoFIPS string code
+  mutate(GeoFIPs = str_remove_all(GeoFIPS, '\\\"'), 
+       GeoFips = str_remove(GeoFIPs, "\\s"), # Remove quotations and whitespace from county GeoFIPS codes
+       ) %>% 
+  dplyr::select(-GeoFIPS, -GeoFIPs) 
+
+## Cleaned County Income ## 
+
+df_0919 <- df %>%
+  filter(Year > 2008) %>% 
+  filter(LineCode == 3) 
+
+df %>%
+  filter(Year > 2008) %>% 
+  filter(LineCode == 3) %>% 
+  dplyr::select(GeoFips, GeoName, Year, Statistic, Value) %>% 
+  spread(Year, Value) 
+
+
+
+
+
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white'))
+
+
+# Define UI for random distribution app ----
+library(shiny)
+library(plotly)
+
+shinyApp(
+  ui = fluidPage(
+    tabsetPanel(
+      # Show map of income by county in US 
+      # Consider option to make it static with most recent year since 
+      tabPanel("Map", fluid = TRUE,
+               sidebarLayout(
+                 sidebarPanel(
+                   selectInput("Country", "Select Country", choices = "", selected = "")),
+                 mainPanel(
+                   htmlOutput("Attacks")
+                 )
+               )
+      ),
+      tabPanel("Plots", fluid = TRUE,
+               sidebarLayout(
+                 sidebarPanel(
+                   sliderInput("year", "Year:", min = 1968, max = 2009, value = 2009, sep='')),
+                 mainPanel(fluidRow(
+                   column(7,  plotlyOutput("")),
+                   column(5, plotlyOutput(""))   
+                 )
+                 )
+               )
+      ),
+      tabPanel("Table(s)", fluid = TRUE,
+               sidebarLayout(
+                 sidebarPanel(
+                   selectizeInput(
+                     inputId = "Statistic", 
+                     label = "Select Filter:", 
+                     choices = unique(df_0919$Statistic), 
+                     selected = "Population", 
+                     multiple = F),
+                   selectizeInput(
+                     inputId = "Year", 
+                     label = "Select Year:", 
+                     choices = unique(df_0919$Year), 
+                     selected = "2009", 
+                     multiple = F)
+                              ),
+                 mainPanel(
+                   tabsetPanel(type = "tabs",
+                               tabPanel("Trend", plotlyOutput(outputId = "Summary")), 
+                               tabPanel("Table", tableOutput("Table")), 
+                               h4("some message in heading 4"),
+                               tabPanel("Map", plotlyOutput(outputId = "p", 
+                                                            height = "800px", 
+                                                            width = "1000px"))
+                              )
+                          )
+              
+              )
+          ) 
+      )
+  ), 
+  server = function(input, output) {
+    
+   # output$pltlytbl <- df.tbl %>% 
+  #    filter(Statistic == input$Statistic) 
+    
+  #  output$Plots <- plot_ly(pltlytbl, x = ~Years, y = ~min, name = "min", type = "scatter", mode = "lines+markers") %>% 
+   #   add_trace(y = ~med, name = 'med', mode = 'lines+markers') %>% 
+  #    add_trace(y = ~max, name = 'max', mode = 'lines+markers')
+  }
+)
+
+# Define server logic for random distribution app ----
+
+
+shinyApp(ui, server)

@@ -93,7 +93,8 @@ ui <- fluidPage(
   mainPanel(
     tabsetPanel(type = "tabs",
                 tabPanel("Trend", plotlyOutput(outputId = "Summary")), 
-                tabPanel("Table", tableOutput("Table")),
+                tabPanel("Table", tableOutput("Table")), 
+                h4("some message in heading 4")
                 tabPanel("Map", plotlyOutput(outputId = "p", 
                                              height = "800px", 
                                              width = "1000px"))
@@ -104,16 +105,6 @@ ui <- fluidPage(
 
 
 server <- function(input, output, ...) {
-  
-  pltlytbl2 <- df_0919 %>% 
-    filter(Statistic == input$Statistic) 
-  
-  tbl <- df_0919 %>% 
-    filter(Year == input$Year) %>%
-    summarize(min = min(Value), 
-              med = median(Value), 
-              max = max(Value)) 
-  
   output$p <- renderPlotly({
   
     df_0919 %>% 
@@ -148,8 +139,7 @@ server <- function(input, output, ...) {
       filter(Year == input$Year) %>%
       summarize(min = min(Value), 
                 med = median(Value), 
-                max = max(Value)) %>% 
-      kbl()
+                max = max(Value)) 
   })
 }
 
