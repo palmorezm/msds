@@ -94,7 +94,7 @@ ui <- fluidPage(
     tabsetPanel(type = "tabs",
                 tabPanel("Trend", plotlyOutput(outputId = "Summary")), 
                 tabPanel("Table", tableOutput("Table")), 
-                h4("some message in heading 4")
+                h4("some message in heading 4"),
                 tabPanel("Map", plotlyOutput(outputId = "p", 
                                              height = "800px", 
                                              width = "1000px"))
