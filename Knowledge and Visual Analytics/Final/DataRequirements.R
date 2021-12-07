@@ -182,17 +182,6 @@ HAItitle <- function(variable,value){
 # sum(gttbl$N) 
 # sum(lttbl$N)
 d <- rbind(lttbl, gttbl) 
-d.columns <- d %>% 
-  ggplot(aes(year, (TPOP/1000000), fill=Set)) + 
-  geom_col(col = "grey38", alpha= 0.25) + 
-  # scale_x_discrete(limit = c(2010, 2015, 2019)) + 
-  labs(x = "Year (2010 - 2019)", y = "Population (Millions)", subtitle = "Proportion of MSA Population by Method") + 
-  theme(axis.text.x = element_blank(), 
-        # axis.ticks = element_line(size = .5), 
-        plot.subtitle = element_text(hjust = 0.5)) +
-  facet_wrap(~key, scales = "fixed", labeller = labeller(key = hainames)) + 
-  scale_fill_discrete(limits = c("GT100", "LT100"), labels = c("Affordable", "Unaffordable") )
-d.columns
 # Create shifting function to move index values of column in d upwards by n 
 shift <- function(d, n){
   c(d[-(seq(n))], rep(NA, n))
@@ -207,6 +196,17 @@ data <- d %>%
          C2019 = ifelse(year == 2019, TPOP, NA), 
          C2010 = ifelse(year == 2010, TPOP, NA))%>% 
   dplyr::select(-PAVGHAI, -Set, -TPOPN, -SMEDVAL, -SUMEDVAL)
+
+df.fin %>% 
+  dplyr::select(key, year, Set, N, TPOP, TPOPN, SMEDVAL, SUMEDVAL, PMEDINC, PMEDHAI, PAVGHAI) %>%
+  filter(Set == 'LT100' & year == 2010 | year == 2019) %>% 
+  filter(Set != 'GT100') %>% 
+  mutate(SKEW = PAVGHAI - PMEDHAI, 
+         MOE = ((SUMEDVAL - SMEDVAL)/N), 
+         C2019 = ifelse(year == 2019, TPOP, NA), 
+         C2010 = ifelse(year == 2010, TPOP, NA))%>% 
+  dplyr::select(-PAVGHAI, -Set, -TPOPN, -SMEDVAL, -SUMEDVAL) 
+
 data$C2010 <- shift(data$C2010, 1)
 data <- data %>% 
   mutate(CHANGE = C2019-C2010) %>% 
@@ -316,13 +316,14 @@ megatitles <- function(variable,value){
 # Megaplots 
 PMEDINC.median <- median(d$PMEDINC)
 megaplot1 <- d %>% 
+  sample_n(715, replace = T) %>% 
   filter(key != "HAIDBT") %>%
   group_by(key, Set) %>%
   arrange(desc(Set)) %>% 
-  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key)) + 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key, size = 4)) + 
   geom_hline(yintercept = PMEDINC.median, lty = "dotted") + 
   geom_point(aes(y = PMEDINC)) +
-  facet_wrap(~Set, scales = "free", labeller = labeller(Set = meganames)) +
+  facet_wrap(~Set, scales = "free_x", labeller = labeller(Set = meganames)) +
   geom_smooth(aes(y = PMEDINC), 
               method="loess",
               col = "grey30", 
@@ -338,11 +339,12 @@ megaplot1 <- d %>%
   labs(x = "Median HAI Value", y = "Median Income") + 
   theme(legend.position = "none", plot.title = element_blank())
 megaplot2 <- d %>% 
+  sample_n(715, replace = T) %>% 
   filter(key != "HAIDBT") %>%
   group_by(key, Set) %>% 
-  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key)) + 
+  ggplot(aes(x = MMEDHAI, col = key)) + geom_point(aes(y = PMEDINC, col = key, size = 4)) + 
   geom_hline(yintercept = PMEDINC.median, lty = "dotted")  +
-  facet_wrap(~key, scales = "free", labeller = labeller(key = hainames)) +
+  facet_wrap(~key, scales = "free_x", labeller = labeller(key = hainames)) +
   geom_smooth(aes(y = PMEDINC), 
               method="loess",
               col = "grey30", 
@@ -364,4 +366,57 @@ df_finkey <- df.fin %>%
     gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
            -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) 
 
-unique(df_finkey$key)
+df_types <- df_finkey %>% 
+  spread(key, value) %>% 
+  gather(key, value, -GeoFips, -GeoName, -year) %>% 
+  mutate(Type = case_when(
+    endsWith(key, "MEDINC") ~ "Basics",
+    endsWith(key, "MEDVAL") ~ "Basics",
+    endsWith(key, "MOE") ~ "Basics",
+    endsWith(key, "UMEDVAL") ~ "Basics",
+    endsWith(key, "LMEDVAL") ~ "Basics",
+    endsWith(key, "PERINC") ~ "Basics",
+    endsWith(key, "POP") ~ "Basics",
+    endsWith(key, "ADJALL") ~ "Cost Adjustments",
+    endsWith(key, "ADJIPD") ~ "Cost Adjustments",
+    endsWith(key, "ADJRNT") ~ "Cost Adjustments",
+    endsWith(key, "AINCALL") ~ "Income Adjustments",
+    endsWith(key, "AINCDBT") ~ "Income Adjustments",
+    endsWith(key, "AINCRNT") ~ "Income Adjustments",
+    endsWith(key, "AQINC30") ~ "Income Adjustments",
+    endsWith(key, "AQINC60") ~ "Income Adjustments", 
+    endsWith(key, "DEBTCC") ~ "Debts and Obligations",
+    endsWith(key, "DEBTED") ~ "Debts and Obligations",
+    endsWith(key, "DEBTIL") ~ "Debts and Obligations",
+    endsWith(key, "DEBTMV") ~ "Debts and Obligations",
+    endsWith(key, "DEBTOC") ~ "Debts and Obligations",
+    endsWith(key, "DEBTS") ~ "Debts and Obligations",
+    endsWith(key, "HHSIZE") ~ "Debts and Obligations",
+    endsWith(key, "IR") ~ "Debts and Obligations",
+    endsWith(key, "HAI") ~ "Home Affordability Indices",
+    endsWith(key, "HAIIPD") ~ "Home Affordability Indices",
+    endsWith(key, "HAILEN") ~ "Home Affordability Indices",
+    endsWith(key, "HAIRAW") ~ "Home Affordability Indices",
+    endsWith(key, "HAIRNT") ~ "Home Affordability Indices",
+    endsWith(key, "HAIRW") ~ "Home Affordability Indices",
+    endsWith(key, "HAIDBT") ~ "Home Affordability Indices",
+    endsWith(key, "RPPALL") ~ "Regional Price Parities",
+    endsWith(key, "RPPGOODS") ~ "Regional Price Parities",
+    endsWith(key, "RPPRENT") ~ "Regional Price Parities",
+    endsWith(key, "RPPSOTH") ~ "Regional Price Parities",
+    endsWith(key, "IPD") ~ "Implicit Price Deflator",
+    endsWith(key, "PMT") ~ "Monthly Payments",
+    endsWith(key, "PMT3DP") ~ "Monthly Payments",
+    endsWith(key, "PMTRAW") ~ "Monthly Payments",
+    endsWith(key, "QINC") ~ "Qualifying Income",
+    endsWith(key, "QINCRAW") ~ "Qualifying Income",
+    )) 
+
+df_types %>% 
+  filter(Type != "Debts and Obligations") %>% 
+  ggplot(aes(value, col = key)) + 
+  geom_density(alpha = .05) + 
+  labs(subtitle = "Distribution", x = "Selected Statistic", y = "Count") + 
+  theme(plot.subtitle = element_text(hjust = 0.5)) + 
+  facet_wrap(~key, scales = "free") +
+  theme(legend.position = "none")

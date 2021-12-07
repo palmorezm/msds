@@ -508,7 +508,7 @@ In the same figure the lighter grey area surrounding the LOESS trend and light b
 
 
 
-```{r, include=FALSE}
+```{r, include=T}
 # Caterpillar plots with GT100 and LT100 by Median HAI
 d$year <- as.Date(paste(d$year, 12, 31, sep = "-"))
 d %>% 
