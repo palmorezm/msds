@@ -412,11 +412,13 @@ df_types <- df_finkey %>%
     endsWith(key, "QINCRAW") ~ "Qualifying Income",
     )) 
 
-df_types %>% 
-  filter(Type != "Debts and Obligations") %>% 
-  ggplot(aes(value, col = key)) + 
-  geom_density(alpha = .05) + 
-  labs(subtitle = "Distribution", x = "Selected Statistic", y = "Count") + 
-  theme(plot.subtitle = element_text(hjust = 0.5)) + 
-  facet_wrap(~key, scales = "free") +
-  theme(legend.position = "none")
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white'))
+
+
+
+  
+

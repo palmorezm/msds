@@ -23,11 +23,16 @@ ui <- fluidPage(
     tabPanel("Map", fluid = TRUE,
              sidebarLayout(
                sidebarPanel(
-                 selectInput("Country", "Select Country", choices = "", selected = "")
-               ),
-               mainPanel(
-                 htmlOutput("Attacks")
-               )
+                 selectizeInput(
+                   inputId = "year", 
+                   label = "Select Year:", 
+                   choices = unique(df_types$year), 
+                   selected = "2019", 
+                   multiple = F) 
+                 ), 
+             mainPanel(tabsetPanel(type = "tabs", 
+                                   tabPanel("Map", plotlyOutput(outputId = "map")))
+                       )
              )
     ), # End tab 1 
     # Start tab 2 
@@ -47,7 +52,12 @@ ui <- fluidPage(
                    label = "Select Statistic Type", 
                    choices = unique(df_types$Type), 
                    selected = "Basics", 
-                   multiple = T)
+                   multiple = T),  
+                 radioButtons("method_geom_function", "Visual Type:",
+                              c("Boxplot" = "boxplot",
+                                "Density Plot" = "density",
+                                "Histogram" = "hist",
+                                "Bar Chart" = "bar"))
                ), # Close sidebar panel for tab 2
                mainPanel(
                  tabsetPanel(type = "tabs",
@@ -110,7 +120,7 @@ ui <- fluidPage(
                    multiple = F)
                ), # close Sidebar Panel for Tab 5
                mainPanel(fluidRow( # Create main panel Tab 5
-                 column(4, plotlyOutput("plotincome")),
+                 column(4, plotlyOutput("boxplotincome")),
                  column(8, plotlyOutput("plotincome2")),
                  h5("somthing written here"),
                  h6("This is an example of a longer paragraph with sentences 
@@ -149,24 +159,52 @@ ui <- fluidPage(
                  )
                )
              )
+      )
     )
   )
-)
 
 # Define server functions
 server <- function(input, output){
+
+  # Choropleth Map
+  output$map <- renderPlotly({
+    map_df <- df_types %>% 
+      filter(year == input$year)
+    z_min <- map_df$Value
+    z_max <- map_df$Value
+      plot_ly(map_df, type="choropleth",
+              geojson=counties,
+              locations=map_df$GeoFips,
+              z=map_df$Value,
+              colorscale="Viridis",
+              zmin=z_min,
+              zmax=z_max,
+              marker=list(line=list(
+                width=0))) %>% 
+      colorbar(title = "Value") %>% 
+      layout(title = "Selected Statistical Changes in U.S. Counties") %>% 
+      layout(geo = g)
+  })
   
   # Method Tab
   output$method1 <- renderPlot({
+    
+    method_function <- switch(input$method_geom_function,
+                              boxplot = geom_boxplot,
+                              density = geom_density,
+                              hist = geom_histogram, 
+                              bar = geom_bar)
+    
     df_finkey %>% 
       filter(key == input$df_finkey_key) %>% 
       ggplot(aes(value, col = key)) + 
-      geom_histogram(alpha = .05) + 
+      method_function(alpha = .05) + 
       geom_vline(xintercept = 100) + 
       labs(subtitle = "Method Distributions", x = "Selected Statistic", y = "Count") + 
       theme(plot.subtitle = element_text(hjust = 0.5)) + 
       facet_wrap(~key, scales = "free_x", labeller = labeller(key = hainames)) +
-      theme(legend.position = "none")
+      theme(legend.position = "none", 
+            panel.grid = element_blank()) 
   })
   
   output$method2 <- renderPlot({
@@ -362,24 +400,38 @@ server <- function(input, output){
   })
   
   output$method6 <- renderPlot({
+    
+    method_function <- switch(input$method_geom_function,
+           boxplot = geom_boxplot,
+           density = geom_density,
+           hist = geom_histogram, 
+           bar = geom_bar)
+    
     df_types %>% 
       filter(Type == input$method6type) %>% 
-      ggplot(aes(value, col = key)) + 
-      geom_density(alpha = .05) + 
+      ggplot(aes(value, col = key, alpha = 0.05)) + 
+      method_function() + 
       labs(subtitle = "Distribution", x = "Selected Statistic", y = "Count") + 
       theme(plot.subtitle = element_text(hjust = 0.5)) + 
       facet_wrap(~key, scales = "free") +
-      theme(legend.position = "none")
+      theme(legend.position = "none", 
+            panel.grid = element_blank())
   })
   
   
   # Income Tab
-  output$plotincome <- renderPlotly({
+  output$boxplotincome <- renderPlotly({
     df.tbl %>% 
       filter(Statistic == input$Statisticdftbl) %>% 
-      plot_ly(., x = ~Years, y = ~min, name = "min", type = "scatter", mode = "lines+markers") %>% 
-      add_trace(y = ~med, name = 'med', mode = 'lines+markers') %>% 
-      add_trace(y = ~max, name = 'max', mode = 'lines+markers')
+      plot_ly(., y = ~min, name = 'min', type = "box", boxpoints = "all", jitter = 0.75,
+              pointpos = 0, 
+              marker = list(opacity = 0.5, color = 'rgb(17, 157, 255)', line = list(width = 2))) %>% 
+      add_trace(y = ~med, name = 'med', boxpoints = "all", jitter = 0.3,
+                pointpos = 0, 
+                marker = list(opacity = 0.5, color = 'rgb(17, 157, 255)', line = list(width = 2))) %>% 
+      add_trace(y = ~max, name = 'max', boxpoints = "all", jitter = 0.3,
+                pointpos = 0, 
+                marker = list(opacity = 0.5, color = 'rgb(17, 157, 255)', line = list(width = 2)))
   })
   
   output$plotincome2 <- renderPlotly({
