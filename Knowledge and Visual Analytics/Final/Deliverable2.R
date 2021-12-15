@@ -14,7 +14,6 @@ library(ggpubr)
 library(DT)
 theme_set(theme_minimal())
 
-
 ui <- fluidPage(
   tabsetPanel(
     # Start Tab 1 
@@ -172,7 +171,8 @@ server <- function(input, output){
       filter(year == input$year)
     z_min <- map_df$Value
     z_max <- map_df$Value
-      plot_ly(map_df, type="choropleth",
+      
+    plot_ly(map_df, type="choropleth",
               geojson=counties,
               locations=map_df$GeoFips,
               z=map_df$Value,
