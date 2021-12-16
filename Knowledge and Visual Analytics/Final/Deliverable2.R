@@ -30,7 +30,7 @@ ui <- fluidPage(
                    multiple = F) 
                  ), 
              mainPanel(tabsetPanel(type = "tabs", 
-                                   tabPanel("Map", plotlyOutput(outputId = "map")))
+                                   tabPanel("map", plotlyOutput(outputId = "map")))
                        )
              )
     ), # End tab 1 
@@ -166,25 +166,30 @@ ui <- fluidPage(
 server <- function(input, output){
 
   # Choropleth Map
+  # output$map <- renderPlotly({
+  #  map_df <- df_types %>% 
+   #   filter(year == input$year)
+    #z_min <- map_df$Value
+    #z_max <- map_df$Value
   output$map <- renderPlotly({
-    map_df <- df_types %>% 
-      filter(year == input$year)
-    z_min <- map_df$Value
-    z_max <- map_df$Value
-      
-    plot_ly(map_df, type="choropleth",
-              geojson=counties,
-              locations=map_df$GeoFips,
-              z=map_df$Value,
-              colorscale="Viridis",
-              zmin=z_min,
-              zmax=z_max,
-              marker=list(line=list(
-                width=0))) %>% 
-      colorbar(title = "Value") %>% 
-      layout(title = "Selected Statistical Changes in U.S. Counties") %>% 
-      layout(geo = g)
-  })
+      df %>% 
+        filter(Statistic == input$Statistic) %>% 
+        filter(Years == input$Years) %>% 
+        plot_ly(.) %>% 
+        add_trace(
+          type="choropleth",
+          geojson=counties,
+          locations=df$GeoFips,
+          z=df$Value,
+          colorscale="Viridis",
+          zmin=min(df$Value),
+          zmax=max(df$Value),
+          marker=list(line=list(
+            width=0))) %>% 
+        colorbar(title = "Value") %>% 
+        layout(title = "Selected Statistical Changes in U.S. Counties") %>% 
+        layout(geo = g)
+    })
   
   # Method Tab
   output$method1 <- renderPlot({
