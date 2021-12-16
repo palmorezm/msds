@@ -1,4 +1,6 @@
 
+# Data was run in order: DataRequirements ->  CAINCMAP_Slider -> here
+
 t <- df %>% 
   filter(Statistic == "Income Per Capita") %>% 
   filter(Years == "2019-01-01") %>%
