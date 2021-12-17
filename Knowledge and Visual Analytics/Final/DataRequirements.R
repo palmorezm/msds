@@ -81,8 +81,8 @@ df <- df %>%
     endsWith(Description, "2/") ~ "Income Per Capita", 
     endsWith(Description, "1/") ~ "Population"
   ), 
-  Years = as.Date(paste(Year, 1, 1, sep = "-"))) %>% 
-  # filter(Year %in% c(1969, 1979, 1989, 1999, 2009, 2019)) %>% 
+  Years = as.Date(paste(Year, 12, 31, sep = "-"))) %>% 
+  filter(Year %in% c(1969, 1979, 1989, 1999, 2009, 2019)) %>% 
   dplyr::select(-Description, -TableName, -IndustryClassification) 
 
 df <- df %>% 
@@ -425,6 +425,30 @@ g <- list(
   lakecolor = toRGB('white'))
 
 
+dmap <- df %>% 
+  filter(Statistic == "Income Per Capita") %>% 
+  mutate(mpay = (Value*.28)/12, 
+         lmpay = (Value*.16)/12,
+         dif = mpay - lmpay) %>% 
+  mutate(RegionName = case_when(
+    Region == 1 ~ "New England", 
+    Region == 2 ~ "Mid-Atlantic",
+    Region == 3 ~ "Midwest",
+    Region == 4 ~ "Great Plains",
+    Region == 5 ~ "South",
+    Region == 6 ~ "Southwest",
+    Region == 7 ~ "Rocky Mountain",
+    Region == 8 ~ "Pacific West",
+  )) 
+
+# Alter to fit map
+dmap$hover <- with(dmap, 
+                   paste(GeoName, "<br>",
+                         "Region:", RegionName, "<br>",
+                         '<br>', "Income Per Capita:", paste0("$", format(Value, nsmall = 0)), "<br>",
+                         "Max. Monthly Payment:", paste0("$", format(mpay, nsmall = 2, digits = 2)), "<br>",
+                         "Min. Monthly Payment:", paste0("$", format(lmpay, nsmall = 2, digits = 2)), "<br>",
+                         "Affordability Range", paste0("$", format(dif, nsmall = 2, digits = 2)))) 
 
   
 

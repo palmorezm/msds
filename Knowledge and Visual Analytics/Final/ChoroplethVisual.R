@@ -6,27 +6,54 @@ t <- df %>%
   filter(Years == "2019-01-01") %>%
   mutate(mpay = (Value*.28)/12, 
          lmpay = (Value*.16)/12,
-         dif = mpay - lmpay) 
+         dif = mpay - lmpay) %>% 
+  mutate(RegionName = case_when(
+    Region == 1 ~ "New England", 
+    Region == 2 ~ "Mid-Atlantic",
+    Region == 3 ~ "Midwest",
+    Region == 4 ~ "Great Plains",
+    Region == 5 ~ "South",
+    Region == 6 ~ "Southwest",
+    Region == 7 ~ "Rocky Mountain",
+    Region == 8 ~ "Pacific West",
+    ))
 
-t$hover <- with(t, paste(GeoName, '<br>', "Beef", beef, "Dairy", dairy, "<br>",
-                           "Fruits", total.fruits, "Veggies", total.veggies,
-                           "<br>", "Wheat", wheat, "Corn", corn)) # Alter to fit map
+dmap <- df %>% 
+  filter(Statistic == "Income Per Capita") %>% 
+  mutate(mpay = (Value*.28)/12, 
+         lmpay = (Value*.16)/12,
+         dif = mpay - lmpay) %>% 
+  mutate(RegionName = case_when(
+    Region == 1 ~ "New England", 
+    Region == 2 ~ "Mid-Atlantic",
+    Region == 3 ~ "Midwest",
+    Region == 4 ~ "Great Plains",
+    Region == 5 ~ "South",
+    Region == 6 ~ "Southwest",
+    Region == 7 ~ "Rocky Mountain",
+    Region == 8 ~ "Pacific West",
+  )) 
 
-  t %>% 
+
+dmap$hover <- with(dmap, paste(GeoName, "<br>",
+                         "Region:", RegionName, "<br>",
+                         '<br>', "Income Per Capita:", paste0("$", format(Value, nsmall = 0)), "<br>",
+                         "Max. Monthly Payment:", paste0("$", format(mpay, nsmall = 2, digits = 2)), "<br>", 
+                         "Min. Monthly Payment:", paste0("$", format(lmpay, nsmall = 2, digits = 2)), "<br>",
+                         "Affordability Range", paste0("$", format(dif, nsmall = 2, digits = 2)))) # Alter to fit map
+
+  dmap %>% 
+  filter(Years == "2019-12-31") %>%
   plot_ly(.) %>% 
   add_trace(
     type="choropleth",
     geojson=counties,
     locations=~GeoFips,
     z=~Value,
-    colorscale="Viridis",
+    colorscale="Cividis",
     zmin=0,
     zmax=100000,
-    text =~mpay,
-    featureidkey=~GeoName,
-    hovertemplate = paste("Max Per Month:%{text:$.2f}</b>", 
-                          "<br>Income: %{z:$.2f}", 
-                          "<br>Max Per Month:{featureidkey:$.2f}"),
+    text =~hover,
     marker=list(line=list(
       width=0))) %>% 
   colorbar(title = "Value") %>% 
