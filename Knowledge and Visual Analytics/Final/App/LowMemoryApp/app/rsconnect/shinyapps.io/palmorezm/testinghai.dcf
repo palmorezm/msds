@@ -1,0 +1,13 @@
+name: testinghai
+title: testinghai
+username:
+account: palmorezm
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5346811
+bundleId: 5388821
+url: https://palmorezm.shinyapps.io/testinghai/
+when: 1639864215.02139
+lastSyncTime: 1639864215.02139
+asMultiple: FALSE
+asStatic: FALSE

@@ -5,9 +5,9 @@ account: palmorezm
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5346604
-bundleId: 5388594
+bundleId: 5388640
 url: https://palmorezm.shinyapps.io/IncomeMap/
-when: 1639857830.07366
-lastSyncTime: 1639857830.07366
+when: 1639858852.78572
+lastSyncTime: 1639858852.78572
 asMultiple: FALSE
 asStatic: FALSE

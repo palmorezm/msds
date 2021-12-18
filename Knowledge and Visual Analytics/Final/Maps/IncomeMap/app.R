@@ -9,61 +9,7 @@ library(shiny)
 
 ### County Income & Population Data ###
 counties <- rjson::fromJSON(file="https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json")
-df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Knowledge%20and%20Visual%20Analytics/Final/Data/CAINC1_AllCounties_1969_2019.csv")
-
-df_decades <- df %>%
-    gather(year, value, -GeoFIPS, -GeoName, -Region, 
-           -TableName, -LineCode, -IndustryClassification,
-           -Description, -Unit)  %>% # Keep descriptors for each County
-    slice(-c(1:3)) %>% # Remove US Totals/Averages
-    # filter(LineCode == 3) %>% # Subset to per capita personal income by county
-    mutate(Value = as.numeric(value)) %>% # Convert all values to numeric type
-    dplyr::select(-value) %>% # Remove non-numeric value column
-    mutate_all(~replace(., is.na(.), 0)) %>% # Replace missing with 0
-    filter(Value > 0) %>% # Remove missing
-    mutate(Year = as.numeric(str_remove(year, "^X"))) %>% 
-    dplyr::select(-year) %>% 
-    mutate(Statistic = case_when(
-        endsWith(Description, "(thousands of dollars)") ~ "Personal Income",
-        endsWith(Description, "2/") ~ "Income Per Capita", 
-        endsWith(Description, "1/") ~ "Population"
-    ), 
-    Years = as.Date(paste(Year, 12, 31, sep = "-"))) %>% 
-    filter(Year %in% c(1969, 1979, 1989, 1999, 2009, 2019)) %>% 
-    dplyr::select(-Description, -TableName, -IndustryClassification)
-
-df_decades <- df_decades %>% 
-    slice( -(str_which(df$GeoFIPS, pattern = "\\d{2}(000)")) ) %>% # extract counties by GeoFIPS string code
-    mutate(GeoFIPs = str_remove_all(GeoFIPS, '\\\"'), 
-           GeoFips = str_remove(GeoFIPs, "\\s")) %>% 
-    dplyr::select(-GeoFIPS, -GeoFIPs)
-
-dmap <- df_decades %>% 
-    filter(Statistic == "Income Per Capita") %>% 
-    mutate(mpay = (Value*.28)/12, 
-           lmpay = (Value*.16)/12,
-           dif = mpay - lmpay) %>% 
-    mutate(RegionName = case_when(
-        Region == 1 ~ "New England", 
-        Region == 2 ~ "Mid-Atlantic",
-        Region == 3 ~ "Midwest",
-        Region == 4 ~ "Great Plains",
-        Region == 5 ~ "South",
-        Region == 6 ~ "Southwest",
-        Region == 7 ~ "Rocky Mountain",
-        Region == 8 ~ "West",
-    )) 
-
-# Alter to fit map
-dmap$hover <- with(dmap, 
-                   paste(GeoName, "<br>",
-                         "Region:", RegionName, "<br>",
-                         '<br>', "Income Per Capita:", paste0("$", format(Value, nsmall = 0)), "<br>",
-                         "Max. Monthly Payment:", paste0("$", format(mpay, nsmall = 2, digits = 2)), "<br>",
-                         "Min. Monthly Payment:", paste0("$", format(lmpay, nsmall = 2, digits = 2)), "<br>",
-                         "Affordability Range", paste0("$", format(dif, nsmall = 2, digits = 2)))) 
-
-
+dmap <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Knowledge%20and%20Visual%20Analytics/Final/Data/dmap.csv")
 colors <- data.frame(list(c("Bluered", "Cividis", "Earth", "Electric", "Greens", "Greys", "Hot", "Picnic", "RdBu", "Viridis")))
 colnames(colors) <- "col"
 
@@ -72,7 +18,6 @@ g <- list(
     projection = list(type = 'albers usa'),
     showlakes = TRUE,
     lakecolor = toRGB('white'))
-
 
 ui <- fluidPage(
     tabsetPanel(
