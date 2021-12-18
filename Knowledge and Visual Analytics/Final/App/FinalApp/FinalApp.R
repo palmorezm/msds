@@ -234,16 +234,6 @@ data <- d %>%
          C2010 = ifelse(year == 2010, TPOP, NA))%>% 
   dplyr::select(-PAVGHAI, -Set, -TPOPN, -SMEDVAL, -SUMEDVAL)
 
-df.fin %>% 
-  dplyr::select(key, year, Set, N, TPOP, TPOPN, SMEDVAL, SUMEDVAL, PMEDINC, PMEDHAI, PAVGHAI) %>%
-  filter(Set == 'LT100' & year == 2010 | year == 2019) %>% 
-  filter(Set != 'GT100') %>% 
-  mutate(SKEW = PAVGHAI - PMEDHAI, 
-         MOE = ((SUMEDVAL - SMEDVAL)/N), 
-         C2019 = ifelse(year == 2019, TPOP, NA), 
-         C2010 = ifelse(year == 2010, TPOP, NA))%>% 
-  dplyr::select(-PAVGHAI, -Set, -TPOPN, -SMEDVAL, -SUMEDVAL) 
-
 data$C2010 <- shift(data$C2010, 1)
 data <- data %>% 
   mutate(CHANGE = C2019-C2010) %>% 
@@ -252,13 +242,6 @@ data <- data %>%
 data <- as.data.frame(data) 
 percent_pop_MSA <- 0.83
 censuspop2019 <- 328300000
-
-# display table of LT100 (unaffordable MSA)
-data %>% 
-  kbl(booktabs = T, caption = "Less Than Affordable Data Summary") %>%
-  kable_styling(latex_options = c("striped", "HOLD_position", "scale_down"), full_width = F) %>%
-  column_spec(1, width = "8em") %>%
-  footnote(c("Includes calculations with all HAI values less than 100"))
 
 # HAI Scatterplot Comparisson Plots
 HAINAMES <- list("Normal" = "HAI", "Real Wage"="HAIRW", "Rent Adjustment"="HAIRNT", 
@@ -322,26 +305,6 @@ dbts2 <- df.fin %>%
   theme(legend.position = "none", 
         plot.title = element_text(hjust = .5), 
         panel.grid.minor.y = element_blank())
-# Arrange plots 
-ggarrange(main6,
-          ggarrange(dbts1, dbts2, 
-                    ncol=2, labels = c(" ", " ")),
-          nrow = 2, labels = " ")
-
-# Histograms of HAI distributions
-df.fin %>% 
-  gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
-         -MEDVAL, -MOE, -UMEDVAL, -LMEDVAL, -POP, -PERINC, -AINCALL) %>%
-  filter(key == c("HAI", "HAIRW", "HAIRNT", 
-                  "HAIIPD", "HAIRAW", "HAILEN")) %>% 
-  mutate(value.med = median(value)) %>% 
-  ggplot(aes(value, col = key)) + 
-  geom_histogram(alpha = .05) + 
-  geom_vline(xintercept = 100) + 
-  labs(subtitle = "Method Distributions", x = "HAI", y = "Count") + 
-  theme(plot.subtitle = element_text(hjust = 0.5)) + 
-  facet_wrap(~key, scales = "free_x", labeller = labeller(key = hainames)) + 
-  theme(legend.position = "none")
 
 # Megaplot
 MEGANAMES <- list("Affordable" = "GT100", "Unaffordable"="LT100")
@@ -397,7 +360,6 @@ megaplot2 <- d %>%
   labs(x = element_blank(), y = "Median Income", subtitle = "Patterns in MSA by HAI Method") + 
   theme(legend.position = "none", 
         plot.subtitle = element_text(hjust=0.5))
-ggarrange(megaplot2, megaplot1, nrow=2)
 
 df_finkey <- df.fin %>% 
   gather(key, value, -GeoFips, -GeoName, -year, -MEDINC, 
@@ -469,7 +431,7 @@ dmap <- df_decades %>%
     Region == 5 ~ "South",
     Region == 6 ~ "Southwest",
     Region == 7 ~ "Rocky Mountain",
-    Region == 8 ~ "Pacific West",
+    Region == 8 ~ "West",
   )) 
 
 # Alter to fit map
@@ -886,12 +848,6 @@ ui <- fluidPage(
 # Define server functions
 server <- function(input, output){
 
-  # Choropleth Map
-  # output$map <- renderPlotly({
-  #  map_df <- df_types %>% 
-   #   filter(year == input$year)
-    #z_min <- map_df$Value
-    #z_max <- map_df$Value
   output$map <- renderPlotly({
     dmap %>% 
       filter(Year == input$mapyear) %>%
@@ -899,12 +855,12 @@ server <- function(input, output){
       add_trace(
         type="choropleth",
         geojson=counties,
-        locations=~GeoFips,
-        z=~Value,
-        colorscale=input$mapcolor,
+        locations= ~GeoFips,
+        z= ~Value,
+        colorscale= input$mapcolor,
         zmin=0,
         zmax=100000,
-        text =~hover,
+        text = ~hover,
         marker=list(line=list(
           width=0))) %>% 
       colorbar(title = "Salary") %>% 

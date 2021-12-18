@@ -1,0 +1,13 @@
+name: FinalApp
+title: FinalApp
+username:
+account: palmorezm
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5346438
+bundleId: 5388556
+url: https://palmorezm.shinyapps.io/FinalApp/
+when: 1639856230.04087
+lastSyncTime: 1639856230.04087
+asMultiple: FALSE
+asStatic: FALSE
