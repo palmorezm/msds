@@ -12,6 +12,8 @@ xA <- function(x,y){
   x %*% y
 }
 
+plot(x, y)
+
 
 # Shear
 for (i in seq(0,3, length.out = 12)) { 
