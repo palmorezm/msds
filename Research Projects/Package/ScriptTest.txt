@@ -1,0 +1,28 @@
+library(MASS) # stepAIC
+
+data(mtcars)
+head(mtcars)
+data(iris)
+
+formu <- mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb
+
+lm.out1 <- lm(formu, data = mtcars)
+summary(lm.out1)
+
+aic1 <- stepAIC(lm.out1)
+aic1$anova
+aic1$coefficients
+
+lm.out2 <- lm(mpg ~ .^2, data = mtcars)
+summary(lm.out2)
+
+step2 <- stepAIC(lm.out2)
+
+lm.out3 <- lm(Sepal.Length ~ ., data = iris)
+summary(lm.out3)
+
+lm.out4 <- lm(Sepal.Length ~ .^2, data = iris)
+summary(lm.out4)
+
+step4 <- stepAIC(lm.out4)
+step4$coefficients
