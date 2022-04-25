@@ -22,7 +22,9 @@ theme_set(theme_minimal())
 ### MSA HAI Estimates ###
 
 # Read in Data 
-df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Research%20Project/Data/compiled.csv")
+# Revision! Compiled Data Location Changed
+# df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Research%20Project/Data/compiled.csv")
+df <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Research%20Projects/Data/compiled.csv")
 # Change Data Types to Numeric
 df[4:length(df)] <- sapply(df[4:length(df)], as.numeric)
 df <- df %>% 
