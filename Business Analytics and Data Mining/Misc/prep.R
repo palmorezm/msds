@@ -84,3 +84,25 @@ Meals %>%
 CGM %>% 
   dplyr::filter(datetime > Meals$MealStart[[1]] & datetime < Meals$MealEnd[[1]]) %>% View()
 
+function_name <- function(g, m) {
+  # Function body
+  g %>% 
+    dplyr::filter(datetime > Meals$MealStart[[1]] & datetime < Meals$MealEnd[[1]])
+}
+
+df <- as.data.frame("")
+
+sort(Meals, )
+
+for (i in 1:length(Meals$MealEnd)) {
+  tmp <- CGM %>% 
+    dplyr::filter(datetime > Meals$MealStart[[i]] & datetime < Meals$MealEnd[[i]]) %>% 
+    mutate
+  df <- rbind(tmp)
+}
+
+
+list(c(Meals$MealStart, Meals$MealEnd))
+matrix(Meals$MealStart, Meals$MealEnd)
+
+
