@@ -1,0 +1,119 @@
+---
+title: "Reproducible Research HW1"
+author: "Zachary Palmore"
+date: "September 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Rice Rivers Data
+
+In this *Markdown document*, which will be used from now until the end of time, I will be creating a summary of data taken from the Rice Center. The **intent** of this homework is to figure out how to **manipulate data** and begin experimenting with the basics of **generating summaries, tables, plots, common writing and font styles.**
+
+### Rice River Summary
+
+```{r, include=TRUE}
+require(RCurl)
+long_link <- c( "https://docs.google.com/spreadsheets/d",
+"/1Mk1YGH9LqjF7drJE-td1G_JkdADOU0eMlrP01WFBT8s",
+"/pub?gid=0&single=true&output=csv"
+)
+
+link <- paste(long_link, collapse="")
+url <- getURL( link )
+con <- textConnection( url)
+RiceData <- read.csv(con)
+summary(RiceData)
+```
+
+
+## Rice Plots
+
+Each of the following two plots contain the code displayed to demonstrate that the `echo = True` parameters was used correctly. Code is read by R programming language to display these plots. Whether these plots were coded correctly however, remains to be seen. 
+
+```{r, include=TRUE}
+plot(RiceData$H2O_TempC,RiceData$PH, 
+     xlab = "Water Temperature (C)", 
+     ylab = "PH", 
+     main = "PH at Various Water Temperatures", 
+     sub = "Displays Higher Water Temperatures Increasing PH")
+
+```
+
+Here is the second plot where fluffery is continued and this fake manuscript dives deeper into new realms of craziness. Call it figure 2 categorized as *The Savant Child*
+
+```{r, include=TRUE}
+plot(RiceData$AirTempF,RiceData$RelHumidity, 
+     xlab = "Air Temperature (F)", 
+     ylab = "Relative Humidity", 
+     main = "Change in Humidity with Increasing Air Temperature", 
+     sub = "Savant Child's Rendering of Air Temperature's Effect on Humidty", 
+     type = "l", 
+     col = "dark green"
+     )
+```
+
+
+Important to remember so that the professor may help me with my screwups is the `echo = True` parameter. This was added to ensure the code chunk to printed itself into the document and demonstrates the code to create my summary, plots, and table.
+
+##Table
+
+Ah Yes, the hardest part of any fake manuscript, creating tables in R. This should be fun. What could possibly go wrong?
+
+```{r, include=TRUE}
+head(RiceData, n=10)
+
+```
+
+Turns out, not much. The table generated above contains the first 10 variables of 'RiceData' dataset gathered from the Rice Rivers Center. 
+
+#### Data, Methods, and Other Pertinent Information
+
+Processing of Rice data into a table was the most difficult and went something like this:
+
+    With the help of Hadley Whickam, author of dplyr and ggplot2 at https://www.cyclismo.org/tutorial/R/tables.html, the following table was generated. Then, practicing input of basic idea of inputing variables and given the columns and rows names data, this was created using the following code.
+
+```{r}
+FakeTable <- matrix(c(11,343,3342,18,190,330,18,2,99,10,20,30,40,50,001001,01101201,1001,01,02,03), ncol=4, byrow=TRUE)
+colnames(FakeTable) <- c("High","Low","Former","Greatest")
+rownames(FakeTable) <- c("Super Current","Current","Former","Partially Quit","Never")
+FakeTable <- as.table(FakeTable)
+FakeTable
+```
+
+Eventually, the proper coding formula was derived from the combination of information from the website https://www.statmethods.net/input/contents.html, re-reading class documents (over and over), then referring to Rstudio's help feature multiple times a session on repeat (for replicability) playing with the programs until something close to what was generated popped up. This gave the results needed to complete this homework assignement. What's next?
+
+## Discussion
+
+In the future, the best possible method of figuring out how to do something already created (not reinventing the wheel/program), might be to reference completed works (such as my own). 
+
+
+## References
+
+Links are easy and in no way would this fly on a manuscript, but do they really work when knitted to an html format? Of course they do! R markdown is meant to be easy (sort of).
+
+https://cran.r-project.org/web/packages/qwraps2/vignettes/summary-statistics.html
+
+https://www.statmethods.net/input/contents.html
+
+https://www.cyclismo.org/tutorial/R/tables.html
+
+someotherwebsites.html
+
+## Considerations
+
+Rodney J. Dyer |
+Jane L. Remefert |
+Mattew G. DeSaix |
+Bonnie Roderique |
+Megan Keuchle |
+Jack |
+
+Dyer Lab Rules!
+
+
+
+

@@ -1,0 +1,48 @@
+---
+title: "Iris Flower Classwork"
+author: "Zachary Palmore"
+date: "September 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+getwd()
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+```{r, include=TRUE}
+require(RCurl)
+long_link <- c( "https://docs.google.com/spreadsheets/d",
+"/1Mk1YGH9LqjF7drJE-td1G_JkdADOU0eMlrP01WFBT8s",
+"/pub?gid=0&single=true&output=csv"
+)
+
+link <- paste(long_link, collapse="")
+url <- getURL( link )
+con <- textConnection( url)
+RiceData <- read.csv(con)
+summary(RiceData)
+```
+
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+data("iris")
+View(iris)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
