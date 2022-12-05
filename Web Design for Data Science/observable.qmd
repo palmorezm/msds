@@ -1,0 +1,17 @@
+---
+title: "OSJ Old Faithful"
+format: html
+editor: visual
+---
+
+## Observable Java Script (OJS)
+
+In this quarto document we are going to demonstrate how to create interactive plots using observable javascript (OJS).
+
+```{ojs}
+require('arquero')
+data = FileAttachment("https://raw.githubusercontent.com/palmorezm/misc/master/Loans/loans.csv").csv({ typed: true })
+```
+
+
+

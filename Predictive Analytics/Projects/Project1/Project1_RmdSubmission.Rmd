@@ -18,10 +18,12 @@ Given an unknown data source with several groups, we attempt to predict the next
 ```{r}
 # Packages
 library(tidyverse)
+library(kableExtra)
+library(fpp2)
 # Data source
-data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/project1data.csv")
-data <- data %>% 
-  rename(SeriesInd = ï..SeriesInd) 
+data <- read.csv("https://raw.githubusercontent.com/palmorezm/msds/main/Predictive%20Analytics/Projects/Project1/project1data.csv")
+# data <- data %>% 
+#   rename(SeriesInd = ï..SeriesInd) 
 head(data, 5)
 ```
 
@@ -103,7 +105,7 @@ Before we begin, the data is filtered to extract each time series by group. This
 We began by addressing missing values. Given 10,572 observations, about 8% of each variable was missing. Several methods were tried to address this but the best were Kalman smoothing and simple imputation by the median of each ‘Var0X’ variable to fill in where appropriate. The ‘SeriesInd’ numeric date was also converted from its serial number form to a common date-time series. We then examined each group’s variables separately.
 
 ```{r}
-library(fpp2)
+# library(fpp2)
 
 #S01
 S01<-subset(data, group == "S01", select = c(SeriesInd, Var01, Var02))%>%

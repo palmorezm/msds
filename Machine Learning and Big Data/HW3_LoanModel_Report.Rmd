@@ -35,7 +35,6 @@ We will use ‘r’ for data modeling. All packages used for data exploration, v
 
 ```{r libraries, include=FALSE, warning=FALSE, message=FALSE}
 # Libraries
-
 library(summarytools)
 library(tidyverse)
 library(DataExplorer)
@@ -48,7 +47,6 @@ library(caret)
 library(tree)
 library(randomForest)
 library(corrplot)
-
 set.seed(622)
 ```
 

@@ -64,7 +64,7 @@ registerDoParallel(cores=2)
 theme_set(theme_minimal())
 set.seed(004)
 ph <- read.csv(
-  "https://raw.githubusercontent.com/palmorezm/msds/main/624/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
+  "https://raw.githubusercontent.com/palmorezm/msds/main/Predictive%20Analytics/Projects/Project2/StudentData%20-%20TO%20MODEL.csv")
 obs.sample <- as.data.frame(t(head(sample_n(ph[1:33], 5), 5)))
 obs.sample <- as.data.frame(lapply(obs.sample[2:33,], 
 function(x) round(as.numeric(as.character(x)),1)))
