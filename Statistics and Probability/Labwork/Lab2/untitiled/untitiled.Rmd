@@ -1,0 +1,203 @@
+---
+title: "Lab 2"
+author: "Zachary Palmore"
+date: "`r Sys.Date()`"
+output: openintro::lab_report
+---
+
+```{r load-packages, message=FALSE}
+library(tidyverse)
+library(openintro)
+library(psych)
+data("nycflights")
+```
+
+### Pre-exercise
+
+To see the names of the variables (column names) I write this:
+
+```{r}
+names(nycflights)
+```
+
+To see the codebook of the data frame (the variables and their descriptions) add a ? to the data frame like this:
+
+```{r code-chunk-label}
+?nycflights
+```
+
+To get a quick look (or glimpse) at the data use the glimpse function
+
+```{r}
+glimpse(nycflights)
+```
+
+It also tells us that there are 32,735 rows of data and 16 columns.
+
+#### Analysis questions
+
+A few questions that we may want to answer. 
+
+- How delayed were flights that were headed to Los Angeles?
+- How do departure delays vary by month?
+- Which of the three major NYC airports has the best on time percentage for 
+departing flights?
+
+
+Visualizing the distribution of departure delays with a histogram:
+
+```{r}
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram()
+```
+
+It recommended to pick a better value with 'binwidth' because using stat_bin() is using 'bins = 30'. 
+
+Per the recommendation, the bin size will be adjusted to 15. 
+
+```{r}
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 15)
+# For reference, below adjusts bin size to 150 for comparison 
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 150)
+```
+
+Two graphs were created. Now the bin width of the first graph is 15 or binwidth = 15 and the second has a binwidth  = 150. 
+
+### Exercise 1
+
+1.  Look carefully at these three histograms. How do they compare? Are features
+revealed in one that are obscured in another?
+
+Where the binwidth = 150 the distribution includes nearly all values in the first bin. The distribution is not informative of the entire data set and is not very useful due to several factors. It has a high density at 150 minutes or less, no clusters lower than 150 are shown (even though that is where most of the data are), and having the bins this large makes outliers appear normalized in this distribution. In it you could only infer that departure delays are almost always less than 150 minutes. For practical purposes, that two and a half hours and it dramatically obscures this data.
+
+Having binwidth = 30 improves clarity by showing a more prominent right skew but with it we could still only infer that nearly all departure delays are less than 30 minutes. Most of the data are still densely clustered at 30 minutes or less. To see more precisely how the data is distributed, where the mode is, and better approximate the skewness of the data, the graph where binwidth = 15 is best. 
+
+Of these graphs, having binwidth = 15 is best to avoid obscurity because it shows data not present in the other graphs, shows that values greater than 150 are not as common, and the steadier decline in departure delays indicates the most clear unimodal distribution of the data. It shows 15 minutes or less, which was not present in either the biwidth = 30 or binwidth = 150 graphs. It also reveals the most frequent delay to be between 15 and 30 minutes while the others graphs could not give this clear of a right skewed distribution around the mean.
+
+
+
+```{r}
+# Each graph is:
+# Right skewed (long tail extending towards positive values)
+# Unimodal
+
+# Differences:
+
+# Bin 30
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram()
+# High density at 30 minutes or less
+# No clusters left of 30 shown
+
+# Bin 15
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 15)
+# Shows 15 minutes or less (not present before binwidth = 15)
+# Shows a more steady decline in distribution
+# Not a lot of deviation from range 15 - 30 minutes
+# Values greater than 150 are very uncommon
+ 
+# Bin 150
+ggplot(data = nycflights, aes(x = dep_delay)) +
+  geom_histogram(binwidth = 150)
+# High density at 150 minutes or less
+# No clusters left of 150 shown
+# So heavily clustered in the 0-150 bar there is almost no distribution
+# Values in 150+ ranges are displayed prominantly but contain many outliers
+```
+
+
+
+### Exercise 2
+
+1.  Create a new data frame that includes flights headed to SFO in February, 
+    and save this data frame as `sfo_feb_flights`. How many flights 
+    meet these criteria? 
+
+68 flights meet the criteria in this data set. 
+    
+```{r}
+sfo_feb_flights <- nycflights %>%
+  filter(dest == "SFO", month == 2)
+glimpse(sfo_feb_flights)
+```
+
+
+  
+1.  Describe the distribution of the **arrival** delays of these flights using a 
+    histogram and appropriate summary statistics. **Hint:** The summary 
+    statistics you use should depend on the shape of the distribution.
+
+The distribution of the arrival delays of flights in SFO are unimodal with the most frequent 'delay' concentrated around -10 minutes. This indicates that most flights arrive earlier than expected. There are 68 total flights and the data has at least one outlier with a delay of around 200 minutes. Almost all data falls between -50 and 50 minutes. The distribution is fairly symmetric and displays a prominent peak at -10. 
+
+```{r}
+ggplot(data = sfo_feb_flights, aes(x = arr_delay)) +
+  geom_histogram(binwidth = 10)
+```
+
+1.  Calculate the median and interquartile range for `arr_delay`s of flights in
+    in the `sfo_feb_flights` data frame, grouped by carrier. Which carrier
+    has the most variable arrival delays?
+
+
+```{r}
+sfo_feb_flights %>%
+  group_by(carrier) %>%
+  summarise(median_ad = median(arr_delay), iqr_ad = IQR(arr_delay), n_flights = n())
+```
+
+
+
+```{r}
+# Displaying each carrier's flight data as a boxplot
+ggplot(data = sfo_feb_flights, aes(x =carrier, y=arr_delay)) +
+         geom_boxplot() + coord_flip()
+```
+
+
+```{r}
+sfo_feb_flights %>%
+  group_by(carrier) %>%
+  summarise(max_ad = max(arr_delay), 
+            min_ad = min(arr_delay), 
+          range_ad = (max_ad-min_ad),
+          mean_ad = mean(arr_delay),
+          median_ad = median(arr_delay), 
+          iqr_ad = IQR(arr_delay),
+            n_flights = n(),
+          MPF_IQR_ad = signif((IQR(arr_delay)/n_flights), digits = 3),
+          MPF_Range_ad = signif((range_ad/n_flights), digits = 3),
+          )
+```
+
+
+
+```{r}
+sfo_feb_flights %>%
+  group_by(carrier) %>%
+  summarise(mean_ad = mean(arr_delay), n_flights = n(), var_ad = (mean((square((arr_delay)-mean_ad)))/n_flights)
+```
+
+var_ad = (mean((square((arr_delay)-mean_ad)))/n_flights)
+
+```{r}
+# Creating flights by each carrier
+AA_flights <- subset(sfo_feb_flights, carrier =="AA", select = c(arr_delay, carrier))
+B6_flights <- subset(sfo_feb_flights, carrier =="B6", select = c(arr_delay, carrier))
+DL_flights <- subset(sfo_feb_flights, carrier =="DL", select = c(arr_delay, carrier))
+UA_flights <- subset(sfo_feb_flights, carrier =="UA", select = c(arr_delay, carrier))
+VX_flights <- subset(sfo_feb_flights, carrier =="VX", select = c(arr_delay, carrier))
+```
+
+
+
+
+
+
+
+
+    
+...
+
