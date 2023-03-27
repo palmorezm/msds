@@ -2,8 +2,7 @@
 source("C:/Users/Zachary Palmore/GitHub/msds/Knowledge and Visual Analytics/Final/App/FinalApp/df_source.R") # Might take a minute 
 
 df.fin %>%
-  filter(HAI >= 110)
-
+  filter(HAI >= 110) %>% View()
 
 df.fin %>% 
   filter(GeoName == "Janesville-Beloit, WI (Metropolitan Statistical Area)") %>% View()

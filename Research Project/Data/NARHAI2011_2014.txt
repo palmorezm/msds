@@ -1,0 +1,181 @@
+##### Page One #####
+10180 Abilene, TX 216.6 248.0 210.7 223.9 -15.0% 6.2%
+10420 Akron, OH 336.3 326.0 273.0 304.0 -16.2% 11.3%
+10580 Albany-Schenectady-Troy, NY 198.7 221.0 201.2 213.4 -9.0% 6.1%
+10740 Albuquerque, NM 169.4 186.7 172.7 182.3 -7.5% 5.6%
+10900 Allentown-Bethlehem-Easton, PA-NJ 182.4 201.1 199.5 208.2 -0.8% 4.4%
+11100 Amarillo, TX 243.2 237.6 238.4 230.2 0.3% -3.5%
+31100 Anaheim-Santa Ana-Irvine, CA 81.5 84.8 67.9 65.0 -20.0% -4.2%
+11540 Appleton, WI 267.9 320.7 261.0 269.8 -18.6% 3.4%
+12060 Atlanta-Sandy Springs-Marietta, GA 321.1 360.6 240.2 221.7 -33.4% -7.7%
+12100 Atlantic City, NJ 150.0 163.6 162.3 157.6 -0.8% -2.9%
+12420 Austin-Round Rock, TX 192.0 199.7 176.0 169.9 -11.8% -3.5%
+12580 Baltimore-Towson, MD 178.7 233.0 172.7 185.1 -25.9% 7.2%
+12700 Barnstable Town, MA 118.3 134.2 116.3 116.4 -13.3% 0.0%
+12940 Baton Rouge, LA 199.9 213.7 203.4 194.7 -4.8% -4.3%
+13140 Beaumont-Port Arthur, TX 213.5 245.9 207.1 222.0 -15.8% 7.2%
+13780 Binghamton, NY 271.9 324.5 293.5 298.9 -9.6% 1.9%
+13820 Birmingham-Hoover, AL 214.6 221.5 192.3 194.8 -13.2% 1.3%
+13900 Bismarck, ND 226.1 222.8 183.4 198.3 -17.7% 8.1%
+14060 Bloomington-Normal, IL 258.9 286.3 276.0 301.2 -3.6% 9.1%
+14260 Boise City-Nampa, ID 237.1 236.5 176.9 189.7 -25.2% 7.2%
+14460 Boston-Cambridge-Quincy, MA-NH 128.4 145.6 125.2 125.3 -14.0% 0.1%
+14500 Boulder, CO 134.8 138.8 135.5 127.6 -2.4% -5.8%
+14540 Bowling Green, KY 225.2 240.0 222.2 217.1 -7.4% -2.3%
+14860 Bridgeport-Stamford-Norwalk, CT 134.0 147.4 137.4 135.1 -6.7% -1.7%
+15380 Buffalo-Niagara Falls, NY 263.6 291.3 253.9 273.4 -12.8% 7.7%
+15540 Burlington-South Burlington, VT 145.1 162.1 149.0 156.0 -8.1% 4.7%
+15940 Canton-Massillon, OH 306.0 318.5 280.3 284.7 -12.0% 1.6%
+15980 Cape Coral-Fort Myers, FL 277.4 241.0 181.9 155.3 -24.5% -14.6%
+16020 Cape Girardeau, MO-IL N/A N/A N/A 211.2 N/A N/A
+16300 Cedar Rapids, IA 263.9 287.9 248.9 263.1 -13.6% 5.7%
+16580 Champaign-Urbana, IL 228.2 260.3 242.9 270.0 -6.7% 11.2%
+16700 Charleston-North Charleston, SC 154.6 162.3 145.4 157.3 -10.4% 8.2%
+16620 Charleston, WV 211.6 249.5 217.0 226.6 -13.0% 4.4%
+16740 Charlotte-Gastonia-Concord, NC-SC 212.0 229.8 191.8 174.1 -16.6% -9.2%
+16860 Chattanooga, TN-GA 219.6 244.7 213.3 230.8 -12.8% 8.2%
+16980 Chicago-Naperville-Joliet, IL 201.8 232.0 197.0 190.3 -15.1% -3.4%
+17140 Cincinnati-Middletown, OH-KY-IN 275.4 297.0 263.1 257.4 -11.4% -2.2%
+17460 Cleveland-Elyria-Mentor, OH 292.9 322.0 276.9 285.5 -14.0% 3.1%
+17820 Colorado Springs, CO 183.9 193.9 168.1 167.6 -13.3% -0.3%
+17860 Columbia, MO 224.1 253.0 229.7 226.4 -9.2% -1.5%
+17900 Columbia, SC 202.9 244.1 205.6 218.0 -15.7% 6.0%
+18140 Columbus, OH 277.7 278.5 255.0 231.6 -8.4% -9.2%
+18580 Corpus Christi, TX 192.9 220.5 179.6 179.7 -18.6% 0.0%
+18880 Crestview-Fort Walton Beach-Destin, FL N/A 201.5 174.6 176.1 -13.3% 0.8%
+19060 Cumberland, MD-WV 299.4 287.5 275.4 314.7 -4.2% 14.3%
+19100 Dallas-Fort Worth-Arlington, TX 224.2 236.6 201.2 197.7 -15.0% -1.8%
+19340 Davenport-Moline-Rock Island, IA-IL 281.2 322.5 285.5 311.9 -11.5% 9.3%
+19380 Dayton, OH 317.5 319.3 294.4 272.4 -7.8% -7.5%
+19460 Decatur, AL 247.6 257.8 242.0 248.9 -6.1% 2.8%
+19500 Decatur, IL 358.0 358.2 391.0 343.5 9.2% -12.2%
+19660 Deltona-Daytona Beach-Ormond Beach, FL 241.6 253.2 228.8 200.3 -9.6% -12.5%
+19740 Denver-Aurora, CO 163.0 169.6 142.2 135.9 -16.1% -4.5%
+19780 Des Moines, IA 243.7 253.2 228.7 235.8 -9.7% 3.1%
+19820 Detroit-Warren-Livonia, MI 590.6 571.9 N/A N/A N/A N/A
+20100 Dover, DE 179.8 202.1 182.2 177.8 -9.8% -2.4%
+20500 Durham, NC 176.4 194.4 177.6 190.4 -8.6% 7.2%
+21300 Elmira, NY 301.5 322.3 297.0 320.0 -7.8% 7.7%
+21340 El Paso, TX 163.9 184.0 165.0 168.9 -10.3% 2.4%
+21500 Erie, PA 248.8 289.1 254.9 258.1 -11.8% 1.2%
+21660 Eugene-Springfield, OR N/A N/A 143.1 154.2 N/A 7.8%
+22020 Fargo, ND-MN 238.7 268.0 228.1 222.6 -14.9% -2.4%
+22140 Farmington, NM 185.4 168.6 196.9 168.6 16.8% -14.3%
+22180 Fayetteville, NC 170.4 191.2 187.5 221.1 -1.9% 17.9%
+22500 Florence, SC 217.8 211.0 213.4 212.0 1.2% -0.7%
+22540 Fond du Lac, WI 288.3 306.1 294.0 288.3 -4.0% -1.9%
+23060 Ft. Wayne, IN 305.0 311.7 288.9 283.2 -7.3% -2.0%
+23540 Gainesville, FL 216.6 234.6 203.6 182.4 -13.2% -10.4%
+23844 Gary-Hammond, IN 259.8 282.0 254.9 248.6 -9.6% -2.5%
+##### Page Two #####
+24020 Glens Falls, NY 197.9 213.0 203.7 205.6 -4.3% 0.9%
+24340 Grand Rapids, MI 310.2 305.4 254.4 250.3 -16.7% -1.6%
+24580 Green Bay, WI 249.0 272.4 263.7 240.0 -3.2% -9.0%
+24660 Greensboro-High Point, NC 219.0 231.8 219.1 216.5 -5.5% -1.2%
+24860 Greenville, SC 198.2 204.2 190.4 186.3 -6.8% -2.1%
+25060 Gulfport-Biloxi, MS 239.8 277.5 246.7 236.3 -11.1% -4.2%
+25180 Hagerstown-Martinsburg, MD-WV 237.3 255.5 223.1 231.6 -12.7% 3.8%
+25540 Hartford-West Hartford-East Hartford, CT 185.2 210.4 196.6 204.8 -6.6% 4.2%
+26180 Honolulu, HI 68.1 74.0 65.0 67.7 -12.1% 4.1%
+26420 Houston-Baytown-Sugar Land, TX 210.5 225.2 191.3 180.4 -15.1% -5.7%
+26620 Huntsville, AL 198.3 231.5 211.4 220.8 -8.7% 4.4%
+26900 Indianapolis, IN 255.1 288.2 244.7 238.5 -15.1% -2.5%
+27140 Jackson, MS 212.1 209.7 205.9 187.0 -1.8% -9.2%
+27260 Jacksonville, FL 251.4 264.4 204.6 188.4 -22.6% -7.9%
+28100 Kankakee-Bradley, IL 223.5 305.9 251.2 277.1 -17.9% 10.3%
+28140 Kansas City, MO-KS 258.2 275.2 235.1 240.3 -14.6% 2.2%
+28420 Kennewick-Richland-Pasco, WA 186.4 205.5 186.6 184.3 -9.2% -1.3%
+28740 Kingston, NY 174.2 211.8 178.5 199.6 -15.7% 11.8%
+28940 Knoxville, TN 211.0 233.3 214.7 206.9 -8.0% -3.6%
+29460 Lakeland-Winter Haven, FL N/A 265.3 223.8 204.9 -15.7% -8.4%
+29620 Lansing-E.Lansing, MI 407.3 404.3 326.9 287.1 -19.2% -12.2%
+29820 Las Vegas-Paradise, NV 228.8 236.3 173.7 158.8 -26.5% -8.6%
+30460 Lexington-Fayette, KY 240.4 255.2 245.3 241.4 -3.9% -1.6%
+30700 Lincoln, NE 250.9 272.3 246.4 254.3 -9.5% 3.2%
+30780 Little Rock-N. Little Rock, AR 227.7 245.5 228.3 249.0 -7.0% 9.1%
+31100 Los Angeles-Long Beach-Santa Ana, CA 96.8 103.0 77.8 73.0 -24.5% -6.1%
+31140 Louisville, KY-IN 242.4 250.2 239.8 246.1 -4.2% 2.6%
+31540 Madison, WI 186.3 210.1 189.8 185.1 -9.7% -2.5%
+31700 Manchester-Nashua, NH 196.2 225.8 193.4 186.2 -14.3% -3.7%
+32820 Memphis, TN-MS-AR 248.4 265.0 228.2 224.3 -13.9% -1.7%
+33100 Miami-Fort Lauderdale-Miami Beach, FL 153.1 151.6 119.3 111.8 -21.3% -6.2%
+33340 Milwaukee-Waukesha-West Allis, WI 186.8 209.6 182.5 177.7 -12.9% -2.6%
+33460 Minneapolis-St. Paul-Bloomington, MN-WI 263.4 269.9 219.8 213.4 -18.5% -3.0%
+33660 Mobile, AL 256.8 272.1 258.7 240.7 -4.9% -7.0%
+33860 Montgomery, AL 228.5 248.1 232.4 231.4 -6.3% -0.4%
+34820 Myrtle Beach-Conway-North Myrtle Beach, SC-NC 141.7 162.6 144.9 156.7 -10.8% 8.1%
+34940 Naples-Marco Island, FL N/A 140.4 104.7 92.1 -25.4% -12.1%
+34980 Nashville-Davidson--Murfreesboro, TN 207.2 222.9 188.9 191.4 -15.3% 1.4%
+35300 New Haven-Milford, CT 165.1 196.0 172.1 182.5 -12.2% 6.0%
+35380 New Orleans-Metairie-Kenner, LA 189.1 205.9 185.9 191.3 -9.7% 2.9%
+35620 New York-Northern New Jersey-Long Island, NY-NJ-PA 101.4 114.0 103.7 108.2 -9.0% 4.3%
+35620 New York-Wayne-White Plains, NY-NJ 72.0 80.4 72.4 81.6 -10.0% 12.7%
+35620 NY: Edison, NJ 145.1 172.4 159.6 171.7 -7.4% 7.6%
+35620 NY: Nassau-Suffolk, NY 137.5 152.6 137.9 137.6 -9.6% -0.2%
+35620 NY: Newark-Union, NJ-PA 117.9 134.8 121.3 131.1 -10.0% 8.0%
+35980 Norwich-New London, CT 226.1 249.4 236.1 228.0 -5.4% -3.4%
+36100 Ocala, FL 278.1 279.1 236.0 241.9 -15.4% 2.5%
+36420 Oklahoma City, OK 213.1 238.2 208.6 223.0 -12.4% 6.9%
+36540 Omaha, NE-IA 264.6 279.9 260.8 255.1 -6.8% -2.2%
+36740 Orlando, FL 215.8 233.2 177.9 168.8 -23.7% -5.1%
+36780 Oshkosh-Neenah, WI 294.9 318.9 285.3 281.4 -10.5% -1.4%
+37340 Palm Bay-Melbourne-Titusville, FL 275.3 284.7 250.5 223.0 -12.0% -11.0%
+37380 Palm Coast, FL N/A 214.8 203.8 179.2 -5.1% -12.1%
+37460 Panama City-Lynn Haven-Panama City Beach, FL N/A 221.6 201.9 171.3 -8.9% -15.2%
+37860 Pensacola-Ferry Pass-Brent, FL 213.5 249.5 199.6 207.8 -20.0% 4.1%
+37900 Peoria, IL 261.7 299.0 290.1 307.3 -3.0% 5.9%
+37980 Philadelphia-Camden-Wilmington, PA-NJ-DE-MD 184.4 203.6 186.2 191.3 -8.6% 2.8%
+38060 Phoenix-Mesa-Scottsdale, AZ 263.6 232.4 175.5 166.7 -24.5% -5.0%
+38340 Pittsfield, MA 167.8 197.9 182.3 193.3 -7.9% 6.0%
+38940 Port St. Lucie, FL N/A 238.2 215.7 192.8 -9.4% -10.6%
+38860 Portland-South Portland-Biddeford, ME 171.8 178.6 169.8 170.1 -4.9% 0.2%
+38900 Portland-Vancouver-Beaverton, OR-WA 155.5 169.9 136.1 134.7 -19.9% -1.0%
+39300 Providence-New Bedford-Fall River, RI-MA 163.4 185.6 162.8 161.0 -12.3% -1.1%
+39460 Punta Gorda, FL N/A 272.6 209.0 189.0 -23.3% -9.5%
+39580 Raleigh-Cary, NC 201.4 224.0 200.5 193.1 -10.5% -3.7%
+39740 Reading, PA 230.0 248.1 235.1 251.1 -5.2% 6.8%
+39900 Reno-Sparks, NV 196.2 200.4 150.3 142.3 -25.0% -5.3%
+40060 Richmond, VA 191.6 205.3 182.8 172.8 -10.9% -5.5%
+40140 Riverside-San Bernardino-Ontario, CA 173.3 171.1 130.9 117.9 -23.5% -9.9%
+40380 Rochester, NY 275.5 291.8 276.3 286.0 -5.3% 3.5%
+40420 Rockford, IL 299.0 378.9 336.2 353.5 -11.3% 5.1%
+40900 Sacramento--Arden-Arcade--Roseville, CA 201.3 216.6 147.8 136.9 -31.8% -7.4%
+40980 Saginaw-Saginaw Township North, MI N/A N/A N/A N/A N/A N/A
+##### Page Three #####
+41180 Saint Louis, MO-IL 270.9 304.2 260.1 259.9 -14.5% -0.1%
+41420 Salem, OR 187.6 207.6 172.3 158.4 -17.0% -8.1%
+41620 Salt Lake City, UT 185.3 188.8 155.0 160.2 -17.9% 3.4%
+41700 San Antonio, TX 189.6 212.8 179.0 180.4 -15.9% 0.8%
+41740 San Diego-Carlsbad-San Marcos, CA 96.6 101.4 81.5 77.6 -19.6% -4.8%
+41860 San Francisco-Oakland-Fremont, CA 93.5 94.4 71.4 70.5 -24.3% -1.3%
+41940 San Jose-Sunnyvale-Santa Clara, CA 87.9 88.3 68.0 64.3 -23.0% -5.4%
+42260 Sarasota-Bradenton-Venice, FL 180.6 194.1 146.4 147.8 -24.6% 1.0%
+42660 Seattle-Tacoma-Bellevue, WA 142.1 151.7 127.5 125.3 -16.0% -1.7%
+42680 Sebastian-Vero Beach, FL N/A 228.1 181.4 172.0 -20.4% -5.2%
+43300 Sherman-Denison, TX 325.3 342.9 279.4 252.6 -18.5% -9.6%
+43340 Shreveport-Bossier City, LA 188.0 196.9 191.4 193.4 -2.8% 1.0%
+43620 Sioux Falls, SD 251.1 255.0 241.7 233.2 -5.2% -3.5%
+43780 South Bend-Mishawaka, IN 325.9 357.8 302.9 260.7 -15.3% -13.9%
+43900 Spartanburg, SC 220.7 222.9 213.2 210.7 -4.4% -1.1%
+44060 Spokane, WA 192.2 203.7 189.5 182.3 -6.9% -3.8%
+44100 Springfield, IL 292.0 329.7 309.9 315.2 -6.0% 1.7%
+44140 Springfield, MA 178.1 202.8 180.2 185.0 -11.1% 2.7%
+44180 Springfield, MO 252.4 276.3 238.9 230.8 -13.5% -3.4%
+45060 Syracuse, NY 270.9 293.8 280.8 289.5 -4.4% 3.1%
+45220 Tallahassee, FL 222.9 240.5 196.2 201.6 -18.4% 2.7%
+45300 Tampa-St. Petersburg-Clearwater, FL 220.7 236.0 209.1 205.6 -11.4% -1.7%
+45780 Toledo, OH 370.9 418.3 363.8 368.1 -13.0% 1.2%
+45820 Topeka, KS 316.8 331.0 312.3 294.4 -5.6% -5.7%
+45940 Trenton-Ewing, NJ 196.5 209.8 193.9 183.2 -7.6% -5.5%
+46060 Tucson, AZ 205.9 210.7 172.8 169.6 -18.0% -1.9%
+46140 Tulsa, OK 224.3 241.4 215.2 222.1 -10.9% 3.2%
+47260 Virginia Beach-Norfolk-Newport News, VA-NC 189.9 202.6 190.5 186.2 -6.0% -2.3%
+47900 Washington-Arlington-Alexandria, DC-VA-MD-WV 161.7 166.1 145.8 147.1 -12.2% 0.8%
+47940 Waterloo/Cedar Falls, IA 269.8 298.9 256.6 280.5 -14.1% 9.3%
+48620 Wichita, KS 280.4 285.4 280.8 272.1 -1.6% -3.1%
+48900 Wilmington, NC 149.5 174.2 147.6 150.6 -15.3% 2.0%
+49180 Winston-Salem, NC 218.9 243.0 226.6 221.9 -6.7% -2.1%
+49340 Worcester, MA 186.9 217.0 179.2 174.8 -17.4% -2.5%
+49420 Yakima, WA 159.8 175.9 159.0 160.7 -9.6% 1.1%
+49620 York-Hanover, PA 222.9 256.5 237.6 238.4 -7.4% 0.3%
+49660 Youngstown-Warren-Boardman, OH-PA N/A 396.1 364.2 369.0 -8.1% 1.3%
